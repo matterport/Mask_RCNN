@@ -159,13 +159,21 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 * Keras 2.0.8+
 * Jupyter Notebook
 * Numpy, skimage, scipy
+* pycocotools, cython
 
 If you use Docker, the model has been verified to work on
 [this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
 
+The package `pycocotools` requires `cython` and a C compiler to install correctly. See below for further instructions.
+
 ## Installation
 1. Clone this repository
 2. Download pre-trained COCO weights from the releases section of this repository.
+3. Install `pycocotools` as follows:
+    - On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
+    - On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+
+Note that on Windows, for the avove to work, you must have the Visual C++ 2015 build tools on your path (see [this coco clone](https://github.com/philferriere/cocoapi) for additional details). 
 
 ## More Examples
 ![Sheep](assets/sheep.png)
