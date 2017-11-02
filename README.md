@@ -1,4 +1,7 @@
-# Mask R-CNN for Object Detection and Segmentation
+Mask R-CNN for Object Detection and Segmentation
+================================================
+
+> This repo is a clone of [matterport/Mask_RCNNN](https://github.com/matterport/Mask_RCNN). The README.md of this clone contains additional installation instructions for Windows 10.
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
 
@@ -12,7 +15,6 @@ The repository includes:
 * ParallelModel class for multi-GPU training
 * Evaluation on MS COCO metrics (AP)
 * Example of training on your own dataset
-
 
 The code is documented and designed to be easy to extend. If you use it in your research, please consider referencing this repository. If you work on 3D vision, you might find our recently released [Matterport3D](https://matterport.com/blog/2017/09/20/announcing-matterport3d-research-dataset/) dataset useful as well.
 This dataset was created from 3D-reconstructed spaces captured by our customers who agreed to make them publicly available for academic use. You can see more examples [here](https://matterport.com/gallery/).
@@ -152,20 +154,27 @@ Contributions to this repository are welcome. Examples of things you can contrib
 
 You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
 
-
 ## Requirements
 * Python 3.4+
 * TensorFlow 1.3+
 * Keras 2.0.8+
 * Jupyter Notebook
 * Numpy, skimage, scipy
+* pycocotools, cython
 
 If you use Docker, the model has been verified to work on
 [this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
 
+The package `pycocotools` requires `cython` and a C compiler to install correctly. See below for further instructions.
+
 ## Installation
 1. Clone this repository
 2. Download pre-trained COCO weights from the releases section of this repository.
+3. Install `pycocotools` as follows:
+    - On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
+    - On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+
+Note that on Windows, for the avove to work, you must have the Visual C++ 2015 build tools on your path (see [this coco clone](https://github.com/philferriere/cocoapi) for additional details). 
 
 ## More Examples
 ![Sheep](assets/sheep.png)
