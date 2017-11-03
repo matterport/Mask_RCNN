@@ -336,7 +336,7 @@ if __name__ == '__main__':
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
         config = InferenceConfig()
-    config.print()
+    config.display()
 
     # Create model
     if args.command == "train":

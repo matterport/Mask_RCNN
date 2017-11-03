@@ -149,7 +149,7 @@ class Config(object):
               int(math.ceil(self.IMAGE_SHAPE[1] / stride))]
              for stride in self.BACKBONE_STRIDES])
 
-    def print(self):
+    def display(self):
         """Display Configuration values."""
         print("\nConfigurations:")
         for a in dir(self):
