@@ -159,9 +159,13 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 * Jupyter Notebook
 * Numpy, skimage, scipy
 
+### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
-* pycocotools
+* pycocotools (installation instructions below)
 * [MS COCO Dataset](http://cocodataset.org/#home)
+* Download the 5K [minival](https://dl.dropboxusercontent.com/s/o43o90bna78omob/instances_minival2014.json.zip?dl=0)
+  and the 35K [validation-minus-minival](https://dl.dropboxusercontent.com/s/s3tw5zcg7395368/instances_valminusminival2014.json.zip?dl=0)
+  subsets. More details in the original [Faster R-CNN implementation](https://github.com/rbgirshick/py-faster-rcnn/blob/master/data/README.md).
 
 If you use Docker, the code has been verified to work on
 [this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
