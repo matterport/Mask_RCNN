@@ -152,28 +152,29 @@ Contributions to this repository are welcome. Examples of things you can contrib
 
 You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
 
-
 ## Requirements
 * Python 3.4+
 * TensorFlow 1.3+
 * Keras 2.0.8+
 * Jupyter Notebook
 * Numpy, skimage, scipy
-* pycocotools, cython
 
-If you use Docker, the model has been verified to work on
+To train or test on MS COCO, you'll also need:
+* pycocotools
+* [MS COCO Dataset](http://cocodataset.org/#home)
+
+If you use Docker, the code has been verified to work on
 [this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
 
-The package `pycocotools` requires `cython` and a C compiler to install correctly. See below for further instructions.
 
 ## Installation
 1. Clone this repository
-2. Download pre-trained COCO weights from the releases section of this repository.
-3. Install `pycocotools` as follows:
-    - On Linux, run `pip install git+https://github.com/waleedka/coco.git#egg=pycocotools&subdirectory=PythonAPI`
-    - On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
+2. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
+3. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
-Note that on Windows, for the avove to work, you must have the Visual C++ 2015 build tools on your path (see [this coco clone](https://github.com/philferriere/cocoapi) for additional details). 
+    * Linux: https://github.com/waleedka/coco
+    * Windows: https://github.com/philferriere/cocoapi.
+    You must have the Visual C++ 2015 build tools on your path (see the repo for additional details)
 
 ## More Examples
 ![Sheep](assets/sheep.png)
