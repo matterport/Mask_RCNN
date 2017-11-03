@@ -170,7 +170,7 @@ The package `pycocotools` requires `cython` and a C compiler to install correctl
 1. Clone this repository
 2. Download pre-trained COCO weights from the releases section of this repository.
 3. Install `pycocotools` as follows:
-    - On Linux, run `pip install git+https://github.com/waleedka/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI`
+    - On Linux, run `pip install git+https://github.com/waleedka/coco.git#egg=pycocotools&subdirectory=PythonAPI`
     - On Windows, run `pip install git+https://github.com/philferriere/cocoapi.git#egg=pycocotools^&subdirectory=PythonAPI`
 
 Note that on Windows, for the avove to work, you must have the Visual C++ 2015 build tools on your path (see [this coco clone](https://github.com/philferriere/cocoapi) for additional details). 
