@@ -243,7 +243,7 @@ def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
             result = {
                 "image_id": image_id,
                 "category_id": dataset.get_source_class_id(class_id, "coco"),
-                "bbox": [bbox[1], bbox[0], bbox[3]-bbox[1], bbox[2]-bbox[0]],
+                "bbox": [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]],
                 "score": score,
                 "segmentation": maskUtils.encode(np.asfortranarray(mask))
             }
@@ -281,7 +281,7 @@ def evaluate_coco(dataset, coco, eval_type="bbox", limit=0):
         t_prediction += (time.time() - t)
 
         # Convert results to COCO format
-        image_results = build_coco_results(dataset, coco_image_ids[i:i+1],
+        image_results = build_coco_results(dataset, coco_image_ids[i:i + 1],
                                            r["rois"], r["class_ids"],
                                            r["scores"], r["masks"])
         results.extend(image_results)
@@ -297,14 +297,14 @@ def evaluate_coco(dataset, coco, eval_type="bbox", limit=0):
     cocoEval.summarize()
 
     print("Prediction time: {}. Average {}/image".format(
-        t_prediction, t_prediction/len(image_ids)))
+        t_prediction, t_prediction / len(image_ids)))
     print("Total time: ", time.time() - t_start)
-
 
 
 ############################################################
 #  Training
 ############################################################
+
 
 if __name__ == '__main__':
     import argparse
@@ -336,7 +336,7 @@ if __name__ == '__main__':
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
         config = InferenceConfig()
-    config.print()
+    config.display()
 
     # Create model
     if args.command == "train":
