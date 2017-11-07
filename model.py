@@ -712,25 +712,24 @@ class DetectionLayer(KE.Layer):
     def call(self, inputs):
         def wrapper(rois, mrcnn_class, mrcnn_bbox, image_meta):
             # currently supports one image per batch
-            b = 0
-            _, _, window, _ = parse_image_meta(image_meta)
-            detections = refine_detections(
-                rois[b], mrcnn_class[b], mrcnn_bbox[b], window[b], self.config)
-            # Pad with zeros if detections < DETECTION_MAX_INSTANCES
-            gap = self.config.DETECTION_MAX_INSTANCES - detections.shape[0]
-            assert gap >= 0
-            if gap > 0:
-                detections = np.pad(detections, [(0, gap), (0, 0)],
-                                    'constant', constant_values=0)
+            detections_batch = []
+            for b in range(self.config.BATCH_SIZE):
+                _, _, window, _ = parse_image_meta(image_meta)
+                detections = refine_detections(
+                    rois[b], mrcnn_class[b], mrcnn_bbox[b], window[b], self.config)
+                # Pad with zeros if detections < DETECTION_MAX_INSTANCES
+                gap = self.config.DETECTION_MAX_INSTANCES - detections.shape[0]
+                assert gap >= 0
+                if gap > 0:
+                    detections = np.pad(detections, [(0, gap), (0, 0)], 'constant', constant_values=0)
+                detections_batch.append(detections)
 
             # Cast to float32
             # TODO: track where float64 is introduced
-            detections = detections.astype(np.float32)
-
+            detections_batch = np.array(detections_batch).astype(np.float32)
             # Reshape output
             # [batch, num_detections, (y1, x1, y2, x2, class_score)] in pixels
-            return np.reshape(detections,
-                              [1, self.config.DETECTION_MAX_INSTANCES, 6])
+            return np.reshape(detections_batch, [self.config.BATCH_SIZE, self.config.DETECTION_MAX_INSTANCES, 6])
 
         # Return wrapped function
         return tf.py_func(wrapper, inputs, tf.float32)
