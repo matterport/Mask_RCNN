@@ -700,8 +700,6 @@ class DetectionLayer(KE.Layer):
     """Takes classified proposal boxes and their bounding box deltas and
     returns the final detection boxes.
 
-    # TODO: Add support for batch_size > 1
-
     Returns:
     [batch, num_detections, (y1, x1, y2, x2, class_score)] in pixels
     """
@@ -711,7 +709,6 @@ class DetectionLayer(KE.Layer):
 
     def call(self, inputs):
         def wrapper(rois, mrcnn_class, mrcnn_bbox, image_meta):
-            # currently supports one image per batch
             detections_batch = []
             for b in range(self.config.BATCH_SIZE):
                 _, _, window, _ = parse_image_meta(image_meta)
@@ -724,7 +721,7 @@ class DetectionLayer(KE.Layer):
                     detections = np.pad(detections, [(0, gap), (0, 0)], 'constant', constant_values=0)
                 detections_batch.append(detections)
 
-            # Cast to float32
+            # Stack detections and cast to float32
             # TODO: track where float64 is introduced
             detections_batch = np.array(detections_batch).astype(np.float32)
             # Reshape output
