@@ -50,7 +50,7 @@ class ShapesConfig(Config):
     STEPS_PER_EPOCH = 100
 
     # use small validation steps since the epoch is small
-    VALIDATION_STPES = 5
+    VALIDATION_STEPS = 5
 
 
 class ShapesDataset(utils.Dataset):
