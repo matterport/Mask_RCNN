@@ -1930,10 +1930,10 @@ class MaskRCNN():
             self.keras_model.add_loss(tf.reduce_mean(layer.output, keep_dims=True))
 
         # Add L2 Regularization
-        reg_losses = [keras.regularizers.l2(self.config.WEIGHT_DECAY)(w)
-                    for w in self.keras_model.trainable_weights]
+        reg_losses = [keras.regularizers.l2(self.config.WEIGHT_DECAY)(w) / tf.cast(tf.size(w), tf.float32)
+                      for w in self.keras_model.trainable_weights]
         self.keras_model.add_loss(tf.add_n(reg_losses))
-            
+
         # Compile
         self.keras_model.compile(optimizer=optimizer, loss=[None]*len(self.keras_model.outputs))
 
