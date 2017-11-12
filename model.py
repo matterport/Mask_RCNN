@@ -449,11 +449,12 @@ def detection_targets_graph(proposals, gt_boxes, gt_masks, config):
     with tf.control_dependencies(asserts):
         proposals = tf.identity(proposals)
 
-    # Remove proposals zero padding
-    non_zeros = tf.cast(tf.reduce_sum(tf.abs(proposals), axis=1), tf.bool)
-    proposals = tf.boolean_mask(proposals, non_zeros)
+    # Remove zero padding
+    proposals, _ = trim_zeros_graph(proposals, name="trim_proposals")
+    gt_boxes, non_zeros = trim_zeros_graph(gt_boxes, name="trim_gt_boxes")
+    gt_masks = tf.gather(gt_masks, tf.where(non_zeros)[:, 0], axis=2,
+                         name="trim_gt_masks")
 
-    # TODO: Remove zero padding from gt_boxes and gt_masks
 
     # Compute overlaps matrix [rpn_rois, gt_boxes]
     # 1. Tile GT boxes and repeate ROIs tensor. This
@@ -2392,16 +2393,16 @@ def unmold_image(normalized_images, config):
 #  Miscellenous Graph Functions
 ############################################################
 
-def trim_zeros_graph(boxes):
+def trim_zeros_graph(boxes, name=None):
     """Often boxes are represented with matricies of shape [N, 4] and
     are padded with zeros. This removes zero boxes.
 
     boxes: [N, 4] matrix of boxes.
-
-    TODO: use this function to reduce code duplication
+    non_zeros: [N] a 1D boolean mask identifying the rows to keep
     """
-    area = tf.boolean_mask(boxes, tf.cast(tf.reduce_sum(tf.abs(boxes), axis=1),
-                           tf.bool))
+    non_zeros = tf.cast(tf.reduce_sum(tf.abs(boxes), axis=1), tf.bool)
+    boxes = tf.boolean_mask(boxes, non_zeros, name=name)
+    return boxes, non_zeros
 
 
 def batch_pack_graph(x, counts, num_rows):
