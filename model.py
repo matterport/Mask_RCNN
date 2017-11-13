@@ -1321,7 +1321,7 @@ def build_rpn_targets(image_shape, anchors, gt_boxes, config):
     overlaps = np.zeros((anchors.shape[0], gt_boxes.shape[0]))
     for i in range(overlaps.shape[1]):
         gt = gt_boxes[i][:4]
-        overlaps[:,i] = utils.compute_iou(gt, anchors, gt_box_area[i], anchor_area)
+        overlaps[:, i] = utils.compute_iou(gt, anchors, gt_box_area[i], anchor_area)
 
     # Match anchors to GT Boxes
     # If an anchor overlaps a GT box with IoU >= 0.7 then it's positive.
@@ -1362,7 +1362,7 @@ def build_rpn_targets(image_shape, anchors, gt_boxes, config):
     # to match the corresponding GT boxes.
     ids = np.where(rpn_match == 1)[0]
     ix = 0  # index into rpn_bbox
-    # TODO: use box_refinment() rather that duplicating the code here
+    # TODO: use box_refinment() rather than duplicating the code here
     for i, a in zip(ids, anchors[ids]):
         # Closest gt box (it might have IoU < 0.7)
         gt = gt_boxes[anchor_iou_argmax[i], :4]
@@ -1526,7 +1526,7 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
             # Skip images that have no instances. This can happen in cases 
             # where we train on a subset of classes and the image doesn't
             # have any of the classes we care about.
-            if np.sum(gt_boxes) <= 0:
+            if not np.any(gt_boxes):
                 continue
 
             # RPN Targets
@@ -1938,7 +1938,7 @@ class MaskRCNN():
         # Compile
         self.keras_model.compile(optimizer=optimizer, loss=[None]*len(self.keras_model.outputs))
 
-        # Add metrics
+        # Add metrics for losses
         for name in loss_names:
             if name in self.keras_model.metrics_names:
                 continue
