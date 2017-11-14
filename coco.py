@@ -252,14 +252,14 @@ def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
     return results
 
 
-def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0):
+def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=None):
     """Runs official COCO evaluation.
     dataset: A Dataset object with valiadtion data
     eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
     limit: if not 0, it's the number of images to use for evaluation
     """
     # Pick COCO images from the dataset
-    image_ids = dataset.image_ids
+    image_ids = image_ids or dataset.image_ids
 
     # Limit to a subset
     if limit:
