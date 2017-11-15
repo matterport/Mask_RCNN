@@ -194,7 +194,7 @@ def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10)
 
             # Mask
             m = utils.unmold_mask(mask[id], rois[id]
-                                   [:4].astype(np.int32), image.shape)
+                                  [:4].astype(np.int32), image.shape)
             masked_image = apply_mask(masked_image, m, color)
 
     ax.imshow(masked_image)
@@ -236,10 +236,10 @@ def display_top_masks(image, mask, class_ids, class_names, limit=4):
         class_id = top_ids[i] if i < len(top_ids) else -1
         # Pull masks of instances belonging to the same class.
         m = mask[:, :, np.where(class_ids == class_id)[0]]
-        m = np.sum(m * np.arange(1, m.shape[-1]+1), -1)
+        m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
         to_display.append(m)
         titles.append(class_names[class_id] if class_id != -1 else "-")
-    display_images(to_display, titles=titles, cols=limit+1, cmap="Blues_r")
+    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r")
 
 
 def plot_precision_recall(AP, precisions, recalls):
@@ -362,7 +362,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
         # Refined boxes
         if refined_boxes is not None and visibility > 0:
             ry1, rx1, ry2, rx2 = refined_boxes[i].astype(np.int32)
-            p = patches.Rectangle((rx1, ry1), rx2-rx1, ry2-ry1, linewidth=2,
+            p = patches.Rectangle((rx1, ry1), rx2 - rx1, ry2 - ry1, linewidth=2,
                                   edgecolor=color, facecolor='none')
             ax.add_patch(p)
             # Connect the top-left corners of the anchor and proposal
@@ -378,7 +378,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
             x = random.randint(x1, (x1 + x2) // 2)
             ax.text(x1, y1, caption, size=11, verticalalignment='top',
                     color='w', backgroundcolor="none",
-                    bbox={'facecolor': color, 'alpha': 0.5, 
+                    bbox={'facecolor': color, 'alpha': 0.5,
                           'pad': 2, 'edgecolor': 'none'})
 
         # Masks

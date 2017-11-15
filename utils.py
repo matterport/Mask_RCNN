@@ -220,6 +220,7 @@ class Dataset(object):
 
     See COCODataset and ShapesDataset as examples.
     """
+
     def __init__(self, class_map=None):
         self._image_ids = []
         self.image_info = []
@@ -294,7 +295,7 @@ class Dataset(object):
     def map_source_class_id(self, source_class_id):
         """Takes a source class ID and returns the int class ID assigned to it.
 
-        For example: 
+        For example:
         dataset.map_source_class_id("coco.12") -> 23
         """
         return self.class_from_source_map[source_class_id]
@@ -606,7 +607,7 @@ def compute_ap(gt_boxes, gt_class_ids,
                 break
 
     # Compute precision and recall at each prediction box step
-    precisions = np.cumsum(pred_match) / (np.arange(len(pred_match))+1)
+    precisions = np.cumsum(pred_match) / (np.arange(len(pred_match)) + 1)
     recalls = np.cumsum(pred_match).astype(np.float32) / len(gt_match)
 
     # Pad with start and end values to simplify the math
@@ -616,12 +617,13 @@ def compute_ap(gt_boxes, gt_class_ids,
     # Ensure precision values decrease but don't increase. This way, the
     # precision value at each recall threshold is the maximum it can be
     # for all following recall thresholds, as specified by the VOC paper.
-    for i in range(len(precisions)-2, -1, -1):
-        precisions[i] = np.maximum(precisions[i], precisions[i+1])
+    for i in range(len(precisions) - 2, -1, -1):
+        precisions[i] = np.maximum(precisions[i], precisions[i + 1])
 
     # Compute mean AP over recall range
     indices = np.where(recalls[:-1] != recalls[1:])[0] + 1
-    mAP = np.sum((recalls[indices] - recalls[indices - 1]) * precisions[indices])
+    mAP = np.sum((recalls[indices] - recalls[indices - 1]) *
+                 precisions[indices])
 
     return mAP, precisions, recalls, overlaps
 

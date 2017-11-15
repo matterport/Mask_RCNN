@@ -75,7 +75,7 @@ class ParallelModel(KM.Model):
                                         self.inner_model.inputs)
                     inputs = [
                         KL.Lambda(lambda s: input_slices[name][i],
-                                  output_shape=lambda s: (None,)+s[1:])(tensor)
+                                  output_shape=lambda s: (None,) + s[1:])(tensor)
                         for name, tensor in zipped_inputs]
                     # Create the model replica and get the outputs
                     outputs = self.inner_model(inputs)
