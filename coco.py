@@ -325,7 +325,11 @@ if __name__ == '__main__':
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
-                        help='Directory to save logs and checkpoints. Defaults to logs/')
+                        help='Logs and checkpoints directory (default=logs/)')
+    parser.add_argument('--limit', required=False,
+                        default=500,
+                        metavar="<image count>",
+                        help='Images to use for evaluation (defaults=500)')
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -413,9 +417,8 @@ if __name__ == '__main__':
         dataset_val = CocoDataset()
         coco = dataset_val.load_coco(args.dataset, "minival", return_coco=True)
         dataset_val.prepare()
-
-        # TODO: evaluating on 500 images. Set to 0 to evaluate on all images.
-        evaluate_coco(model, dataset_val, coco, "bbox", limit=500)
+        print("Running COCO evaluation on {} images.".format(args.limit))
+        evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))
