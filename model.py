@@ -1357,19 +1357,9 @@ def build_rpn_targets(image_shape, anchors, gt_class_ids, gt_boxes, config):
     # RPN bounding boxes: [max anchors per image, (dy, dx, log(dh), log(dw))]
     rpn_bbox = np.zeros((config.RPN_TRAIN_ANCHORS_PER_IMAGE, 4))
 
-    # Areas of anchors and GT boxes
-    gt_box_area = (gt_boxes[:, 2] - gt_boxes[:, 0]) * \
-        (gt_boxes[:, 3] - gt_boxes[:, 1])
-    anchor_area = (anchors[:, 2] - anchors[:, 0]) * \
-        (anchors[:, 3] - anchors[:, 1])
 
     # Compute overlaps [num_anchors, num_gt_boxes]
-    # Each cell contains the IoU of an anchor and GT box.
-    overlaps = np.zeros((anchors.shape[0], gt_boxes.shape[0]))
-    for i in range(overlaps.shape[1]):
-        gt = gt_boxes[i]
-        overlaps[:, i] = utils.compute_iou(
-            gt, anchors, gt_box_area[i], anchor_area)
+    overlaps = utils.compute_overlaps(anchors, gt_boxes)
 
     # Match anchors to GT Boxes
     # If an anchor overlaps a GT box with IoU >= 0.7 then it's positive.
@@ -1576,13 +1566,13 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
             # Get GT bounding boxes and masks for image.
             image_id = image_ids[image_index]
             image, image_meta, gt_class_ids, gt_boxes, gt_masks = \
-                load_image_gt(dataset, config, image_id,
-                              augment=augment, use_mini_mask=config.USE_MINI_MASK)
+                load_image_gt(dataset, config, image_id, augment=augment,
+                              use_mini_mask=config.USE_MINI_MASK)
 
             # Skip images that have no instances. This can happen in cases
             # where we train on a subset of classes and the image doesn't
             # have any of the classes we care about.
-            if not np.any(gt_class_ids):
+            if not np.any(gt_class_ids > 0):
                 continue
 
             # RPN Targets
@@ -1816,7 +1806,8 @@ class MaskRCNN():
         rpn_class_logits, rpn_class, rpn_bbox = outputs
 
         # Generate proposals
-        # Proposals are [N, (y1, x1, y2, x2)] in normalized coordinates.
+        # Proposals are [batch, N, (y1, x1, y2, x2)] in normalized coordinates
+        # and zero padded.
         proposal_count = config.POST_NMS_ROIS_TRAINING if mode == "training"\
             else config.POST_NMS_ROIS_INFERENCE
         rpn_rois = ProposalLayer(proposal_count=proposal_count,
@@ -2036,8 +2027,8 @@ class MaskRCNN():
                 continue
             layer = self.keras_model.get_layer(name)
             self.keras_model.metrics_names.append(name)
-            self.keras_model.metrics_tensors.append(tf.reduce_mean(layer.output,
-                                                                   keep_dims=True))
+            self.keras_model.metrics_tensors.append(tf.reduce_mean(
+                layer.output, keep_dims=True))
 
     def set_trainable(self, layer_regex, keras_model=None, indent=0, verbose=1):
         """Sets model layers as trainable if their names match
@@ -2133,7 +2124,7 @@ class MaskRCNN():
         layer_regex = {
             # all layers but the backbone
             "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            # From Resnet stage 4 layers and up
+            # From a specific Resnet stage and up
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
@@ -2147,7 +2138,8 @@ class MaskRCNN():
         train_generator = data_generator(train_dataset, self.config, shuffle=True,
                                          batch_size=self.config.BATCH_SIZE)
         val_generator = data_generator(val_dataset, self.config, shuffle=True,
-                                       batch_size=self.config.BATCH_SIZE)
+                                       batch_size=self.config.BATCH_SIZE,
+                                       augment=False)
 
         # Callbacks
         callbacks = [
@@ -2156,17 +2148,6 @@ class MaskRCNN():
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
         ]
-
-        # Common parameters to pass to fit_generator()
-        fit_kwargs = {
-            "steps_per_epoch": self.config.STEPS_PER_EPOCH,
-            "callbacks": callbacks,
-            "validation_data": next(val_generator),
-            "validation_steps": self.config.VALIDATION_STEPS,
-            "max_queue_size": 100,
-            "workers": max(self.config.BATCH_SIZE // 2, 2),
-            "use_multiprocessing": True,
-        }
 
         # Train
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
@@ -2178,7 +2159,13 @@ class MaskRCNN():
             train_generator,
             initial_epoch=self.epoch,
             epochs=epochs,
-            **fit_kwargs
+            steps_per_epoch=self.config.STEPS_PER_EPOCH,
+            callbacks=callbacks,
+            validation_data=next(val_generator),
+            validation_steps=self.config.VALIDATION_STEPS,
+            max_queue_size=100,
+            workers=max(self.config.BATCH_SIZE // 2, 2),
+            use_multiprocessing=True,
         )
         self.epoch = max(self.epoch, epochs)
 
