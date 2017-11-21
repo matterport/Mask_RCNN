@@ -2097,8 +2097,9 @@ class MaskRCNN():
             "validation_data": next(val_generator),
             "validation_steps": self.config.VALIDATION_STEPS,
             "max_queue_size": 100,
-            "workers": max(self.config.BATCH_SIZE // 2, 2),
-            "use_multiprocessing": True,
+            # "workers": max(self.config.BATCH_SIZE // 2, 2),
+            "workers": 1,
+            "use_multiprocessing": False,
         }
         
         # Train

@@ -12,10 +12,12 @@ import itertools
 import colorsys
 import numpy as np
 from skimage.measure import find_contours
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.lines as lines
-from matplotlib.patches import Polygon
+import skimage
+from skimage import io as sio
+# import matplotlib.pyplot as plt
+# import matplotlib.patches as patches
+# import matplotlib.lines as lines
+# from matplotlib.patches import Polygon
 import IPython.display
 
 import utils
@@ -37,16 +39,17 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
     """
     titles = titles if titles is not None else [""] * len(images)
     rows = len(images) // cols + 1
-    plt.figure(figsize=(14, 14 * rows // cols))
+    # plt.figure(figsize=(14, 14 * rows // cols))
     i = 1
     for image, title in zip(images, titles):
-        plt.subplot(rows, cols, i)
-        plt.title(title, fontsize=9)
-        plt.axis('off')
-        plt.imshow(image.astype(np.uint8), cmap=cmap,
-                   norm=norm, interpolation=interpolation)
+        # plt.subplot(rows, cols, i)
+        sio.imread(title + '.jpg', image.astype(np.uint8))
+        # plt.title(title, fontsize=9)
+        # plt.axis('off')
+        # plt.imshow(image.astype(np.uint8), cmap=cmap,
+        #            norm=norm, interpolation=interpolation)
         i += 1
-    plt.show()
+    # plt.show()
 
 
 def random_colors(N, bright=True):
@@ -143,7 +146,6 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.show()
 
 
 def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10):
