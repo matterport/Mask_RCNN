@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="server43" showNewOnSourceInSync="false">
+  <component name="PublishConfigData" autoUpload="Always" showNewOnSourceInSync="false">
     <serverData>
-      <paths name="Copy of project-level server 'server41'">
+      <paths name="Copy of project-level server 'server29'">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/liuml/maskrcnn" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="server43">
+      <paths name="Copy of project-level server 'server43'">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/liuml/maskrcnn" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="serverx41">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="serverx43">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/maskrcnn" local="$PROJECT_DIR$" web="/" />
           </mappings>
           <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/images" />
-            <excludedPath path="/home/liuml/maskrcnn/assets" />
+            <excludedPath local="true" path="$PROJECT_DIR$/data" />
             <excludedPath local="true" path="$PROJECT_DIR$/assets" />
-            <excludedPath path="/home/liuml/maskrcnn/logs" />
+            <excludedPath local="true" path="$PROJECT_DIR$/images" />
           </excludedPaths>
         </serverdata>
       </paths>
