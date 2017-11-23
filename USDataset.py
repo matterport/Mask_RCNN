@@ -7,8 +7,8 @@ import skimage.io
 
 import utils
 
-images_path = 'I:\\Mask_RCNN\\data\\images\\'
-masks_path = 'I:\\Mask_RCNN\\data\\masks\\'
+images_path = '/home/liuml/maskrcnn/data/images/'
+masks_path = '/home/liuml/maskrcnn/data/masks/'
 
 
 class USDataset(utils.Dataset):
@@ -42,7 +42,7 @@ class USDataset(utils.Dataset):
         """Generate instance masks for shapes of the given image ID.
         """
         path = self.image_info[image_id]['path']
-        path = path.split('\\')
+        path = path.split('/')
         mask_path = masks_path + path[-1]
         mask = skimage.io.imread(mask_path)
         # mask = mask[:, :, 1]
