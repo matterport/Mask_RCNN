@@ -2269,17 +2269,6 @@ class MaskRCNN():
         scores = detections[:N, 5]
         masks = mrcnn_mask[np.arange(N), :, :, class_ids]
 
-        # Filter out detections with zero area. Often only happens in early
-        # stages of training when the network weights are still a bit random.
-        exclude_ix = np.where(
-            (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 2] - boxes[:, 0]) <= 0)[0]
-        if exclude_ix.shape[0] > 0:
-            boxes = np.delete(boxes, exclude_ix, axis=0)
-            class_ids = np.delete(class_ids, exclude_ix, axis=0)
-            scores = np.delete(scores, exclude_ix, axis=0)
-            masks = np.delete(masks, exclude_ix, axis=0)
-            N = class_ids.shape[0]
-
         # Compute scale and shift to translate coordinates to image domain.
         h_scale = image_shape[0] / (window[2] - window[0])
         w_scale = image_shape[1] / (window[3] - window[1])
@@ -2290,6 +2279,17 @@ class MaskRCNN():
 
         # Translate bounding boxes to image domain
         boxes = np.multiply(boxes - shifts, scales).astype(np.int32)
+
+        # Filter out detections with zero area. Often only happens in early
+        # stages of training when the network weights are still a bit random.
+        exclude_ix = np.where(
+            (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1]) <= 0)[0]
+        if exclude_ix.shape[0] > 0:
+            boxes = np.delete(boxes, exclude_ix, axis=0)
+            class_ids = np.delete(class_ids, exclude_ix, axis=0)
+            scores = np.delete(scores, exclude_ix, axis=0)
+            masks = np.delete(masks, exclude_ix, axis=0)
+            N = class_ids.shape[0]
 
         # Resize masks to original image size and set boundary threshold.
         full_masks = []
