@@ -387,10 +387,9 @@ if __name__ == '__main__':
         dataset_val.load_coco(args.dataset, "minival")
         dataset_val.prepare()
 
-        # This training schedule is an example. Update to fit your needs.
+        # *** This training schedule is an example. Update to your needs ***
 
         # Training - Stage 1
-        # Adjust epochs and layers as needed
         print("Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
@@ -399,18 +398,18 @@ if __name__ == '__main__':
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
-        print("Training Resnet layer 4+")
+        print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=100,
+                    learning_rate=config.LEARNING_RATE,
+                    epochs=120,
                     layers='4+')
 
         # Training - Stage 3
-        # Finetune layers from ResNet stage 3 and up
-        print("Training Resnet layer 3+")
+        # Fine tune all layers
+        print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 100,
-                    epochs=200,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=160,
                     layers='all')
 
     elif args.command == "evaluate":
