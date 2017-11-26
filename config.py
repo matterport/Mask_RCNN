@@ -121,8 +121,10 @@ class Config(object):
     DETECTION_NMS_THRESHOLD = 0.3
 
     # Learning rate and momentum
-    # The paper uses lr=0.02, but we found that to cause weights to explode often
-    LEARNING_RATE = 0.002
+    # The Mask RCNN paper uses lr=0.02, but on TensorFlow it causes
+    # weights to explode. Likely due to differences in optimzer
+    # implementation.
+    LEARNING_RATE = 0.001
     LEARNING_MOMENTUM = 0.9
 
     # Weight decay regularization
