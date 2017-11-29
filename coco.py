@@ -154,7 +154,7 @@ class CocoDataset(utils.Dataset):
         # If not a COCO image, delegate to parent class.
         image_info = self.image_info[image_id]
         if image_info["source"] != "coco":
-            return super(self.__class__).load_mask(image_id)
+            return super(CocoDataset, self).load_mask(image_id)
 
         instance_masks = []
         class_ids = []
@@ -189,7 +189,7 @@ class CocoDataset(utils.Dataset):
             return mask, class_ids
         else:
             # Call super class to return an empty mask
-            return super(self.__class__).load_mask(image_id)
+            return super(CocoDataset, self).load_mask(image_id)
 
     def image_reference(self, image_id):
         """Return a link to the image in the COCO Website."""
@@ -197,7 +197,7 @@ class CocoDataset(utils.Dataset):
         if info["source"] == "coco":
             return "http://cocodataset.org/#explore?id={}".format(info["id"])
         else:
-            super(self.__class__).image_reference(self, image_id)
+            super(CocoDataset, self).image_reference(self, image_id)
 
     # The following two functions are from pycocotools with a few changes.
 
