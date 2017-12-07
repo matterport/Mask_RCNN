@@ -3,5 +3,7 @@ __pycache__/
 mask_rcnn_coco.h5
 /logs
 /data
+/.ideal
 /images
-/result
+/assets
+/__pycache__

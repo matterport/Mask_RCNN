@@ -2,13 +2,13 @@ import os.path
 import os
 import random
 
-train = 0.5
-val = 0.5
+train = 0.75
+val = 0.25
 
 train_output = 'train.txt'
 val_output = 'val.txt'
-rootdir = 'D:\RCNN\matlab_for_preprocess\image&mask_delete_the_border\\images\\'  # 指明被遍历的文件夹
-maskdir = 'D:\RCNN\matlab_for_preprocess\image&mask_delete_the_border\\masks\\'  # 指明被遍历的文件夹
+rootdir = 'I:\Mask_RCNN\data\images\\'  # 指明被遍历的文件夹
+maskdir = 'I:\Mask_RCNN\data\masks\\'  # 指明被遍历的文件夹
 
 
 # # rename the chinese file to index number for general

@@ -13,8 +13,8 @@
 import os
 import pickle
 import tensorflow as tf
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
 # config.gpu_options.per_process_gpu_memory_fraction = 0.3
@@ -196,19 +196,18 @@ model.load_weights(model_path, by_name=True)
 # Running on 10 images. Increase for better accuracy.
 image_ids = np.random.choice(dataset_val.image_ids, 90)
 APs = []
-f_results = []
 for image_id in image_ids:
     # Load image and ground truth data
     image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config,
                                image_id, use_mini_mask=False)
-    # print(image.shape)
+    print(image.shape)
     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
     # Run object detection
     results = model.detect([image], verbose=0)
     r = results[0]
     IMAGE_DIR = ''
     file_names = dataset_val.image_info[image_id]['path']
-    # print(file_names)
+    print(file_names)
     # image = skimage.io.imread(file_names)
 
     # # Run detection
@@ -222,29 +221,11 @@ for image_id in image_ids:
     AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
                          r["rois"], r["class_ids"], r["scores"])
     print("************************************")
-    # print(AP)
-    # print(precisions)
-    # print(recalls)
-    for score, overlap in zip(r['scores'], overlaps):
-        s = score
-        o = overlap.tolist()[0]
-        print('score %f, overlap %f'%(s, o))
-        f_results.append([s, o])
+    print(AP)
+    print(precisions)
+    print(recalls)
+    print(overlaps)
     APs.append(AP)
 
-f_results = np.array(f_results, dtype=np.float32)
-f_results = f_results[f_results[:, 0].argsort()[::-1]]
-
-tp = 0
-fp = 0
-ap = []
-for item in f_results:
-    if item[1] >= 0.5:
-        tp = tp + 1
-        ap.append(tp/(tp + fp))
-    else:
-        fp = fp + 1
-
-print('mAP: ', np.sum(ap) / 90)
 print("mAP: ", np.mean(APs))
 
