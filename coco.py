@@ -41,6 +41,10 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
+import zipfile
+import urllib.request
+import shutil
+
 from config import Config
 import utils
 import model as modellib
@@ -54,7 +58,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
+DEFAULT_DATASET_YEAR = "2014"
 
 ############################################################
 #  Configurations
@@ -84,28 +88,25 @@ class CocoConfig(Config):
 ############################################################
 
 class CocoDataset(utils.Dataset):
-    def load_coco(self, dataset_dir, subset, class_ids=None,
-                  class_map=None, return_coco=False):
+    def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_ids=None,
+                  class_map=None, return_coco=False, auto_download=False):
         """Load a subset of the COCO dataset.
         dataset_dir: The root directory of the COCO dataset.
-        subset: What to load (train, val, minival, val35k)
+        subset: What to load (train, val, minival, valminusminival)
+        year: What dataset year to load (2014, 2017) as a string, not an integer
         class_ids: If provided, only loads images that have the given classes.
         class_map: TODO: Not implemented yet. Supports maping classes from
             different datasets to the same class ID.
         return_coco: If True, returns the COCO object.
+        auto_download: Automatically download and unzip MS-COCO images and annotations
         """
-        # Path
-        image_dir = os.path.join(dataset_dir, "train2014" if subset == "train"
-                                 else "val2014")
+        if auto_download == True:
+            self.auto_download(dataset_dir, subset, year)
 
-        # Create COCO object
-        json_path_dict = {
-            "train": "annotations/instances_train2014.json",
-            "val": "annotations/instances_val2014.json",
-            "minival": "annotations/instances_minival2014.json",
-            "val35k": "annotations/instances_valminusminival2014.json",
-        }
-        coco = COCO(os.path.join(dataset_dir, json_path_dict[subset]))
+        coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        if subset == "minival" or subset == "valminusminival":
+            subset = "val"
+        image_dir = "{}/{}{}".format(dataset_dir, subset, year)
 
         # Load all classes or a subset?
         if not class_ids:
@@ -138,6 +139,78 @@ class CocoDataset(utils.Dataset):
                     imgIds=[i], catIds=class_ids, iscrowd=None)))
         if return_coco:
             return coco
+
+    def auto_download(self, dataDir, dataType, dataYear):
+        """Download the COCO dataset/annotations if requested.
+        dataDir: The root directory of the COCO dataset.
+        dataType: What to load (train, val, minival, valminusminival)
+        dataYear: What dataset year to load (2014, 2017) as a string, not an integer
+        Note:
+            For 2014, use "train", "val", "minival", or "valminusminival"
+            For 2017, only "train" and "val" annotations are available
+        """
+
+        # Setup paths and file names
+        if dataType == "minival" or dataType == "valminusminival":
+            imgDir = "{}/{}{}".format(dataDir, "val", dataYear)
+            imgZipFile = "{}/{}{}.zip".format(dataDir, "val", dataYear)
+            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format("val", dataYear)
+        else:
+            imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
+            imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
+            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
+        print ("Image paths:"); print (imgDir); print (imgZipFile); print (imgURL)
+
+        # Create main folder if it doesn't exist yet
+        if not os.path.exists(dataDir):
+            os.makedirs(dataDir)
+
+        # Download images if not available locally
+        if not os.path.exists(imgDir):
+            os.makedirs(imgDir)
+            print ("Downloading images to " + imgZipFile + " ...")
+            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
+                shutil.copyfileobj(resp, out)
+            print ("... done downloading.")
+            print ("Unzipping " + imgZipFile)
+            with zipfile.ZipFile(imgZipFile,"r") as zip_ref:
+                zip_ref.extractall(dataDir)
+            print ("... done unzipping")
+        # print ("Will use images in " + imgDir)
+
+        # Setup annotations data paths
+        annDir = "{}/annotations".format(dataDir)
+        if dataType == "minival":
+            annZipFile = "{}/instances_minival2014.json.zip".format(dataDir)
+            annFile = "{}/instances_minival2014.json".format(annDir)
+            annURL = "https://dl.dropboxusercontent.com/s/o43o90bna78omob/instances_minival2014.json.zip?dl=0"
+            unZipDir = annDir
+        elif dataType == "valminusminival":
+            annZipFile = "{}/instances_valminusminival2014.json.zip".format(dataDir)
+            annFile = "{}/instances_valminusminival2014.json".format(annDir)
+            annURL = "https://dl.dropboxusercontent.com/s/s3tw5zcg7395368/instances_valminusminival2014.json.zip?dl=0"
+            unZipDir = annDir
+        else:
+            annZipFile = "{}/annotations_trainval{}.zip".format(dataDir, dataYear)
+            annFile = "{}/instances_{}{}.json".format(annDir, dataType, dataYear)
+            annURL = "http://images.cocodataset.org/annotations/annotations_trainval{}.zip".format(dataYear)
+            unZipDir = dataDir
+        # print ("Annotations paths:"); print (annDir); print (annFile); print (annZipFile); print (annURL)
+
+        # Download annotations if not available locally
+        if not os.path.exists(annDir):
+            os.makedirs(annDir)
+        if not os.path.exists(annFile):
+            if not os.path.exists(annZipFile):
+                print ("Downloading zipped annotations to " + annZipFile + " ...")
+                with urllib.request.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
+                    shutil.copyfileobj(resp, out)
+                print ("... done downloading.")
+            print ("Unzipping " + annZipFile)
+            with zipfile.ZipFile(annZipFile,"r") as zip_ref:
+                zip_ref.extractall(unZipDir)
+            print ("... done unzipping")
+        print ("Will use annotations in " + annFile)
 
     def load_mask(self, image_id):
         """Load instance masks for the given image.
@@ -328,6 +401,10 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', required=True,
                         metavar="/path/to/coco/",
                         help='Directory of the MS-COCO dataset')
+    parser.add_argument('--year', required=False,
+                        default=DEFAULT_DATASET_YEAR,
+                        metavar="<year>",
+                        help='Year of the MS-COCO dataset (2014 or 2017) (default=2014)')
     parser.add_argument('--model', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
@@ -338,12 +415,18 @@ if __name__ == '__main__':
     parser.add_argument('--limit', required=False,
                         default=500,
                         metavar="<image count>",
-                        help='Images to use for evaluation (defaults=500)')
+                        help='Images to use for evaluation (default=500)')
+    parser.add_argument('--download', required=False,
+                        default=False,
+                        metavar="<auto download>",
+                        help='Automatically download and unzip MS-COCO files (default=False)')
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
     print("Dataset: ", args.dataset)
+    print("Year: ", args.year)
     print("Logs: ", args.logs)
+    print("Auto Download: ", args.download)
 
     # Configurations
     if args.command == "train":
@@ -388,7 +471,7 @@ if __name__ == '__main__':
         # validation set, as as in the Mask RCNN paper.
         dataset_train = CocoDataset()
         dataset_train.load_coco(args.dataset, "train")
-        dataset_train.load_coco(args.dataset, "val35k")
+        dataset_train.load_coco(args.dataset, "valminusminival")
         dataset_train.prepare()
 
         # Validation dataset
