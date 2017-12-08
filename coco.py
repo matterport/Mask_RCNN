@@ -64,6 +64,7 @@ DEFAULT_DATASET_YEAR = "2014"
 #  Configurations
 ############################################################
 
+
 class CocoConfig(Config):
     """Configuration for training on MS COCO.
     Derives from the base Config class and overrides values specific
@@ -101,7 +102,7 @@ class CocoDataset(utils.Dataset):
         auto_download: Automatically download and unzip MS-COCO images and annotations
         """
 
-        if auto_download == True:
+        if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
         coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
@@ -160,7 +161,7 @@ class CocoDataset(utils.Dataset):
             imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
-        # print ("Image paths:"); print (imgDir); print (imgZipFile); print (imgURL)
+        # print("Image paths:"); print(imgDir); print(imgZipFile); print(imgURL)
 
         # Create main folder if it doesn't exist yet
         if not os.path.exists(dataDir):
@@ -169,15 +170,15 @@ class CocoDataset(utils.Dataset):
         # Download images if not available locally
         if not os.path.exists(imgDir):
             os.makedirs(imgDir)
-            print ("Downloading images to " + imgZipFile + " ...")
+            print("Downloading images to " + imgZipFile + " ...")
             with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
                 shutil.copyfileobj(resp, out)
-            print ("... done downloading.")
-            print ("Unzipping " + imgZipFile)
-            with zipfile.ZipFile(imgZipFile,"r") as zip_ref:
+            print("... done downloading.")
+            print("Unzipping " + imgZipFile)
+            with zipfile.ZipFile(imgZipFile, "r") as zip_ref:
                 zip_ref.extractall(dataDir)
-            print ("... done unzipping")
-        print ("Will use images in " + imgDir)
+            print("... done unzipping")
+        print("Will use images in " + imgDir)
 
         # Setup annotations data paths
         annDir = "{}/annotations".format(dataDir)
@@ -196,22 +197,22 @@ class CocoDataset(utils.Dataset):
             annFile = "{}/instances_{}{}.json".format(annDir, dataType, dataYear)
             annURL = "http://images.cocodataset.org/annotations/annotations_trainval{}.zip".format(dataYear)
             unZipDir = dataDir
-        # print ("Annotations paths:"); print (annDir); print (annFile); print (annZipFile); print (annURL)
+        # print("Annotations paths:"); print(annDir); print(annFile); print(annZipFile); print(annURL)
 
         # Download annotations if not available locally
         if not os.path.exists(annDir):
             os.makedirs(annDir)
         if not os.path.exists(annFile):
             if not os.path.exists(annZipFile):
-                print ("Downloading zipped annotations to " + annZipFile + " ...")
+                print("Downloading zipped annotations to " + annZipFile + " ...")
                 with urllib.request.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
                     shutil.copyfileobj(resp, out)
-                print ("... done downloading.")
-            print ("Unzipping " + annZipFile)
-            with zipfile.ZipFile(annZipFile,"r") as zip_ref:
+                print("... done downloading.")
+            print("Unzipping " + annZipFile)
+            with zipfile.ZipFile(annZipFile, "r") as zip_ref:
                 zip_ref.extractall(unZipDir)
-            print ("... done unzipping")
-        print ("Will use annotations in " + annFile)
+            print("... done unzipping")
+        print("Will use annotations in " + annFile)
 
     def load_mask(self, image_id):
         """Load instance masks for the given image.
