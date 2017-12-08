@@ -100,6 +100,7 @@ class CocoDataset(utils.Dataset):
         return_coco: If True, returns the COCO object.
         auto_download: Automatically download and unzip MS-COCO images and annotations
         """
+
         if auto_download == True:
             self.auto_download(dataset_dir, subset, year)
 
@@ -159,7 +160,7 @@ class CocoDataset(utils.Dataset):
             imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
-        print ("Image paths:"); print (imgDir); print (imgZipFile); print (imgURL)
+        # print ("Image paths:"); print (imgDir); print (imgZipFile); print (imgURL)
 
         # Create main folder if it doesn't exist yet
         if not os.path.exists(dataDir):
@@ -176,7 +177,7 @@ class CocoDataset(utils.Dataset):
             with zipfile.ZipFile(imgZipFile,"r") as zip_ref:
                 zip_ref.extractall(dataDir)
             print ("... done unzipping")
-        # print ("Will use images in " + imgDir)
+        print ("Will use images in " + imgDir)
 
         # Setup annotations data paths
         annDir = "{}/annotations".format(dataDir)
@@ -418,8 +419,9 @@ if __name__ == '__main__':
                         help='Images to use for evaluation (default=500)')
     parser.add_argument('--download', required=False,
                         default=False,
-                        metavar="<auto download>",
-                        help='Automatically download and unzip MS-COCO files (default=False)')
+                        metavar="<True|False>",
+                        help='Automatically download and unzip MS-COCO files (default=False)',
+                        type=bool)
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -470,13 +472,13 @@ if __name__ == '__main__':
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = CocoDataset()
-        dataset_train.load_coco(args.dataset, "train")
-        dataset_train.load_coco(args.dataset, "valminusminival")
+        dataset_train.load_coco(args.dataset, "train", year=args.year, auto_download=args.download)
+        dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = CocoDataset()
-        dataset_val.load_coco(args.dataset, "minival")
+        dataset_val.load_coco(args.dataset, "minival", year=args.year, auto_download=args.download)
         dataset_val.prepare()
 
         # *** This training schedule is an example. Update to your needs ***
@@ -507,7 +509,7 @@ if __name__ == '__main__':
     elif args.command == "evaluate":
         # Validation dataset
         dataset_val = CocoDataset()
-        coco = dataset_val.load_coco(args.dataset, "minival", return_coco=True)
+        coco = dataset_val.load_coco(args.dataset, "minival", year=args.year, return_coco=True, auto_download=args.download)
         dataset_val.prepare()
         print("Running COCO evaluation on {} images.".format(args.limit))
         evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
