@@ -4,12 +4,16 @@ import cv2
 import numpy as np
 import skimage
 import skimage.io
+import os
 
 import utils
 
-images_path = '/home/liuml/maskrcnn/data/images/'
-masks_path = '/home/liuml/maskrcnn/data/masks/'
+# images_path = '/home/liuml/maskrcnn/data/images/'
+# masks_path = '/home/liuml/maskrcnn/data/masks/'
 
+ROOT_DIR = os.getcwd()
+images_path =  os.path.join(ROOT_DIR, 'data/images/')
+masks_path =  os.path.join(ROOT_DIR, 'data/masks/')
 
 class USDataset(utils.Dataset):
     """Generates the shapes synthetic dataset. The dataset consists of simple

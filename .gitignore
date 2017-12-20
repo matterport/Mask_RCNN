@@ -1,9 +1,12 @@
 .ipynb_checkpoints/
 __pycache__/
 mask_rcnn_coco.h5
+*.h5
+*.dat
 /logs
 /data
 /.ideal
 /images
 /assets
+/result
 /__pycache__
