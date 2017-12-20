@@ -29,7 +29,6 @@ import keras.engine as KE
 import keras.models as KM
 
 import utils
-import focal_loss
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -1024,27 +1023,27 @@ def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
     #       images in a batch have the same active_class_ids
     pred_active = tf.gather(active_class_ids[0], pred_class_ids)
 
-    target_class_ids = tf.Print(target_class_ids, [tf.shape(target_class_ids)])
-    pred_class_logits = tf.Print(pred_class_logits, [tf.shape(pred_class_logits)])
+    # target_class_ids = tf.Print(target_class_ids, [tf.shape(target_class_ids)])
+    # pred_class_logits = tf.Print(pred_class_logits, [tf.shape(pred_class_logits)])
 
     # Loss
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
         labels=target_class_ids, logits=pred_class_logits)
 
     # target_class_ids = tf.one_hot(target_class_ids, depth=2)
-    target_class_ids = tf.Print(target_class_ids, [tf.shape(target_class_ids)], "true shape:")
+    # target_class_ids = tf.Print(target_class_ids, [tf.shape(target_class_ids)], "true shape:")
     pred_class_prob = tf.nn.softmax(pred_class_logits)[:, :, 1]
-    pred_class_prob = tf.Print(pred_class_prob, [tf.shape(pred_class_prob)])
+    # pred_class_prob = tf.Print(pred_class_prob, [tf.shape(pred_class_prob)])
 
-    alpha = 0.25
-    gamma = 2.0
+    alpha = 0.5
+    gamma = 0.0
     alpha_factor = tf.ones_like(loss) * alpha
     alpha_factor = tf.where(tf.greater(tf.cast(target_class_ids, tf.float32), 0.5), alpha_factor, 1 - alpha_factor)
-    alpha_factor = tf.Print(alpha_factor, [alpha_factor])
+    # alpha_factor = tf.Print(alpha_factor, [alpha_factor])
     pred_class_prob = tf.reshape(pred_class_prob, shape=tf.shape(alpha_factor))
     focal_weight = tf.where(tf.greater(tf.cast(target_class_ids, tf.float32), 0.5), 1 - pred_class_prob, pred_class_prob)
-    focal_weight = alpha_factor * focal_weight ** gamma
-    focal_weight = tf.Print(focal_weight, [tf.shape(focal_weight)], "focal weight shape")
+    focal_weight = alpha_factor * tf.pow(focal_weight , gamma)
+    # focal_weight = tf.Print(focal_weight, [tf.shape(focal_weight)], "focal weight shape")
     loss = loss * focal_weight
 
     # add focal loss

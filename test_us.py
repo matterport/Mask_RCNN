@@ -114,7 +114,7 @@ dataset_train = USDataset('train.txt')
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = USDataset('test.txt')
+dataset_val = USDataset('val.txt')
 dataset_val.prepare()
 
 # In[6]:
@@ -151,7 +151,7 @@ model = modellib.MaskRCNN(mode="inference",
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "mask_rcnn_shapes.h5")
+model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_0004.h5")
 # model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)
@@ -194,20 +194,20 @@ model.load_weights(model_path, by_name=True)
 
 # Compute VOC-Style mAP @ IoU=0.5
 # Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 90)
+image_ids = np.random.choice(dataset_val.image_ids, 123)
 APs = []
 for image_id in image_ids:
     # Load image and ground truth data
     image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config,
                                image_id, use_mini_mask=False)
-    print(image.shape)
+    # print(image.shape)
     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
     # Run object detection
     results = model.detect([image], verbose=0)
     r = results[0]
     IMAGE_DIR = ''
     file_names = dataset_val.image_info[image_id]['path']
-    print(file_names)
+    # print(file_names)
     # image = skimage.io.imread(file_names)
 
     # # Run detection
@@ -220,11 +220,11 @@ for image_id in image_ids:
     # Compute AP
     AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
                          r["rois"], r["class_ids"], r["scores"])
-    print("************************************")
-    print(AP)
-    print(precisions)
-    print(recalls)
-    print(overlaps)
+    # print("************************************")
+    # print(AP)
+    # print(precisions)
+    # print(recalls)
+    # print(overlaps)
     APs.append(AP)
 
 print("mAP: ", np.mean(APs))
