@@ -195,8 +195,8 @@ model.train(dataset_train, dataset_val,
 # Typically not needed because callbacks save after every epoch
 # Uncomment to save manually
 
-model_path = os.path.join(MODEL_DIR, "mask_rcnn_us.h5")
-print("model save in: %s"%model_path)
-model.keras_model.save_weights(model_path)
+# model_path = os.path.join(MODEL_DIR, "mask_rcnn_us.h5")
+# print("model save in: %s"%model_path)
+# model.keras_model.save_weights(model_path)
 
 

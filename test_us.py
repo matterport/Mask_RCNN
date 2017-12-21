@@ -16,6 +16,7 @@ import tensorflow as tf
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 from keras.backend.tensorflow_backend import set_session
+
 config = tf.ConfigProto()
 # config.gpu_options.per_process_gpu_memory_fraction = 0.3
 set_session(tf.Session(config=config))
@@ -44,6 +45,11 @@ ROOT_DIR = os.getcwd()
 
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
+
+dirs = os.listdir(MODEL_DIR)
+dirs = [os.path.join(MODEL_DIR, filename) for filename in dirs]
+ctimes = [os.path.getctime(filename) for filename in dirs]
+MODEL_DIR = dirs[ctimes.index(max(ctimes))]
 
 # Path to COCO trained weights
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
@@ -86,7 +92,7 @@ class ShapesConfig(Config):
 
 
 config = ShapesConfig()
-config.display()
+# config.display()
 
 
 # ## Notebook Preferences
@@ -98,7 +104,7 @@ def get_ax(rows=1, cols=1, size=8):
     """Return a Matplotlib Axes array to be used in
     all visualizations in the notebook. Provide a
     central point to control graph sizes.
-    
+
     Change the default size attribute to control the size
     of rendered images
     """
@@ -116,6 +122,7 @@ dataset_train.prepare()
 # Validation dataset
 dataset_val = USDataset('val.txt')
 dataset_val.prepare()
+
 
 # In[6]:
 
@@ -141,6 +148,7 @@ class InferenceConfig(ShapesConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
+
 inference_config = InferenceConfig()
 print(MODEL_DIR)
 
@@ -151,7 +159,7 @@ model = modellib.MaskRCNN(mode="inference",
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_0004.h5")
+model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_000%s.h5" % sys.argv[-1])
 # model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)
@@ -194,12 +202,12 @@ model.load_weights(model_path, by_name=True)
 
 # Compute VOC-Style mAP @ IoU=0.5
 # Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 123)
+image_ids = np.random.choice(dataset_val.image_ids, 82)
 APs = []
 for image_id in image_ids:
     # Load image and ground truth data
     image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config,
-                               image_id, use_mini_mask=False)
+                                                                              image_id, use_mini_mask=False)
     # print(image.shape)
     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
     # Run object detection
@@ -216,10 +224,10 @@ for image_id in image_ids:
     # Visualize results
     result_name = file_names.split('.')
     fr = open(result_name[0] + '.dat', 'wb')
-    pickle.dump([image, r, ['mass']], fr)
+    # pickle.dump([image, r, ['mass']], fr)
     # Compute AP
     AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
-                         r["rois"], r["class_ids"], r["scores"])
+                                                         r["rois"], r["class_ids"], r["scores"])
     # print("************************************")
     # print(AP)
     # print(precisions)
@@ -228,4 +236,3 @@ for image_id in image_ids:
     APs.append(AP)
 
 print("mAP: ", np.mean(APs))
-
