@@ -5,7 +5,7 @@ mask_rcnn_coco.h5
 *.dat
 /logs
 /data
-/.ideal
+.idea/
 /images
 /assets
 /result
