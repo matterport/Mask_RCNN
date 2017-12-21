@@ -3,10 +3,12 @@ import os
 import random
 
 train = 0.75
-val = 0.25
+val = 0.125
+test = 0.125
 
 train_output = 'train.txt'
 val_output = 'val.txt'
+test_output = 'test.txt'
 rootdir = '/home/liuml/maskrcnn/data/images/'  # 指明被遍历的文件夹
 maskdir = '/home/liuml/maskrcnn/data/masks/'  # 指明被遍历的文件夹
 
@@ -30,5 +32,9 @@ for _, _, filenames in os.walk(rootdir):  # 三个参数：分别返回1.父目�
             train_file.write(filename + '\n')
     print("gen val file for %f of the total file count %d" %(val, len(filenames)))
     with open(val_output, 'w') as val_file:
-        for filename in filenames[round(len(filenames) * train):-1]:
+        for filename in filenames[round(len(filenames) * train):round(len(filenames) * (train + val))]:
             val_file.write(filename + '\n')
+    print("gen test file for %f of the total file count %d" %(val, len(filenames)))
+    with open(test_output, 'w') as test_file:
+        for filename in filenames[round(len(filenames) * (train + val)): -1]:
+            test_file.write(filename + '\n')

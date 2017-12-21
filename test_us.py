@@ -120,7 +120,7 @@ dataset_train = USDataset('train.txt')
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = USDataset('val.txt')
+dataset_val = USDataset('test.txt')
 dataset_val.prepare()
 
 
@@ -202,7 +202,7 @@ model.load_weights(model_path, by_name=True)
 
 # Compute VOC-Style mAP @ IoU=0.5
 # Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 82)
+image_ids = np.random.choice(dataset_val.image_ids, 41)
 APs = []
 for image_id in image_ids:
     # Load image and ground truth data
@@ -223,7 +223,7 @@ for image_id in image_ids:
 
     # Visualize results
     result_name = file_names.split('.')
-    fr = open(result_name[0] + '.dat', 'wb')
+    # fr = open(result_name[0] + '.dat', 'wb')
     # pickle.dump([image, r, ['mass']], fr)
     # Compute AP
     AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
