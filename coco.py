@@ -272,7 +272,7 @@ class CocoDataset(utils.Dataset):
         if info["source"] == "coco":
             return "http://cocodataset.org/#explore?id={}".format(info["id"])
         else:
-            super(CocoDataset, self).image_reference(self, image_id)
+            super(CocoDataset, self).image_reference(image_id)
 
     # The following two functions are from pycocotools with a few changes.
 
