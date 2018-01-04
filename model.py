@@ -762,7 +762,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     deltas_range_size = deltas.shape[0]
     deltas_range = tf.range(deltas_range_size)
     deltas_indices = tf.stack([deltas_range, class_ids], axis=1)
-    deltas_specific = tf.gather_nd(deltas, deltas_indices) 
+    deltas_specific = tf.gather_nd(deltas, deltas_indices)
     # Apply bounding box deltas
     # Shape: [boxes, (y1, x1, y2, x2)] in normalized coordinates
     refined_rois = apply_box_deltas_graph(
@@ -770,7 +770,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Convert coordiates to image domain
     # TODO: better to keep them normalized until later
     height, width = config.IMAGE_SHAPE[:2]
-    refined_rois *= tf.constant([height, width, height, width], dtype=tf.float32) 
+    refined_rois *= tf.constant([height, width, height, width], dtype=tf.float32)
     #np.array([height, width, height, width])
     # Clip boxes to image window
     refined_rois = clip_boxes_graph(refined_rois, window)
@@ -790,9 +790,9 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     pre_nms_class_ids = tf.gather(class_ids, keep) #class_ids[keep]
     pre_nms_scores = tf.gather(class_scores, keep) #class_scores[keep]
     pre_nms_rois = tf.gather(refined_rois,   keep) #refined_rois[keep]
-    
+
     uniq_pre_nms_class_ids = tf.unique(pre_nms_class_ids)[0]
-    
+
     """
     i = tf.constant(0)
     uniq_pre_nms_class_ids_size = uniq_pre_nms_class_ids.shape[0]
@@ -803,51 +803,51 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     def class_keep_nms(i, nms_keep, pre_nms_class_ids, uniq_pre_nms_class_ids):
         class_id = uniq_pre_nms_class_ids[i]
         ixs = tf.where(pre_nms_class_ids == class_id)[0]
-        
+
         # Apply NMS
         class_keep = tf.image.non_max_suppression(
-                tf.to_float(tf.gather(pre_nms_rois,ixs)), 
+                tf.to_float(tf.gather(pre_nms_rois,ixs)),
                 tf.gather(pre_nms_scores, ixs),
                 ixs.shape[0],
                 iou_threshold=config.DETECTION_NMS_THRESHOLD)
 
         # Map indicies
-        class_keep = tf.gather(keep, tf.gather(ixs, class_keep)) 
-        
+        class_keep = tf.gather(keep, tf.gather(ixs, class_keep))
+
         if nms_keep == []:
             nms_keep = class_keep
         else:
             nms_keep = tf.unique(tf.concat([nms_keep, class_keep], 0))[0]
             #tf.sets.set_union(nms_keep, class_keep)
-    
+
         return [i+1, nms_keep, pre_nms_class_ids, uniq_pre_nms_class_ids]
 
     print(pre_nms_class_ids.shape, uniq_pre_nms_class_ids.shape, uniq_pre_nms_class_ids_size)
-    nms_keep = tf.while_loop(while_condition, class_keep_nms, 
+    nms_keep = tf.while_loop(while_condition, class_keep_nms,
             [i, nms_keep, pre_nms_class_ids, uniq_pre_nms_class_ids])
-    """    
-    
+    """
+
     nms_keep = []
     def nms_keep_map(class_id):
         ixs = tf.where(pre_nms_class_ids == class_id)[0]
-        
+
         # Apply NMS
         class_keep = tf.image.non_max_suppression(
-                tf.to_float(tf.gather(pre_nms_rois,ixs)), 
+                tf.to_float(tf.gather(pre_nms_rois,ixs)),
                 tf.gather(pre_nms_scores, ixs),
                 ixs.shape[0],
                 iou_threshold=config.DETECTION_NMS_THRESHOLD)
 
         # Map indicies
-        return tf.gather(keep, tf.gather(ixs, class_keep)) 
-        
+        return tf.gather(keep, tf.gather(ixs, class_keep))
+
     nms_keep = tf.to_int64(tf.unique(tf.concat(
         tf.map_fn(nms_keep_map, uniq_pre_nms_class_ids), axis=0))[0])
 
     print(keep.shape, nms_keep.shape)
     print(keep.dtype, nms_keep.dtype)
     #keep = tf.sets.set_intersection(keep, nms_keep)
-    #tf.to_int32( 
+    #tf.to_int32(
     #np.intersect1d(keep, nms_keep).astype(np.int32)
     result_keep = tf.concat([keep,nms_keep], axis = 0)
     output_keep, idx_keep, count_keep = tf.unique_with_counts(result_keep)
@@ -872,7 +872,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Arrange output as [N, (y1, x1, y2, x2, class_id, score)]
     # Coordinates are in image domain.
     detections = tf.stack(
-            (tf.gather(tf.to_float(refined_rois), keep), 
+            (tf.gather(tf.to_float(refined_rois), keep),
                 tf.gather(tf.to_float(class_ids), keep)[..., tf.newaxis],
                 tf.gather(class_scores, keep)[..., tf.newaxis])
             )
@@ -881,7 +881,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     #                    class_scores[keep][..., np.newaxis]))
 
     # Pad with zeros if detections < DETECTION_MAX_INSTANCES
-    num_detections = tf.shape(detections)[0] 
+    num_detections = tf.shape(detections)[0]
     gap = roi_count - num_detections
     print(gap, roi_count, num_detections)
     pred = tf.less(tf.constant(0), gap)
@@ -890,12 +890,11 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     #    paddings = tf.constant([[0, gap], [0, 0]])
     #    detections = tf.pad(detections, paddings, "CONSTANT")
     def pad_detections():
-        paddings = tf.constant([[0, gap], [0, 0]])
-        return tf.pad(detections, paddings, "CONSTANT")
-    
+        return tf.pad(detections, [(0, gap), (0, 0)])
+
     detections = tf.cond(pred, pad_detections, lambda: detections)
-    
-    return tf.to_float(detections)  
+
+    return tf.to_float(detections)
 
 class DetectionLayer(KE.Layer):
     """Takes classified proposal boxes and their bounding box deltas and
@@ -916,11 +915,12 @@ class DetectionLayer(KE.Layer):
         mrcnn_bbox  = inputs[2]
         image_meta  = inputs[3]
         print(rois.shape, mrcnn_class.shape, mrcnn_bbox.shape, image_meta.shape)
-        
-        _, _, window, _ = parse_image_meta_graph(image_meta)
+
+        #parse_image_meta can be reused as slicing works same way in TF & numpy
+        _, _, window, _ = [parse_image_meta(image_meta)]
         print('window after: ', window.shape)
         detections_batch = utils.batch_slice(
-                [rois, mrcnn_class, mrcnn_bbox, window], 
+                [rois, mrcnn_class, mrcnn_bbox, window],
                 lambda x, y, w, z: refine_detections_graph(x, y, w, z, self.config),
                 self.config.IMAGES_PER_GPU)
 
@@ -932,10 +932,10 @@ class DetectionLayer(KE.Layer):
         # [batch, num_detections, (y1, x1, y2, x2, class_score)] in pixels
 
         return tf.reshape(
-                detections_batch, 
+                detections_batch,
                 [self.config.BATCH_SIZE, self.config.DETECTION_MAX_INSTANCES, 6])
-    
- 
+
+
     def compute_output_shape(self, input_shape):
         return (None, self.config.DETECTION_MAX_INSTANCES, 6)
 
@@ -2637,7 +2637,6 @@ def compose_image_meta(image_id, image_shape, window, active_class_ids):
     return meta
 
 
-# Two functions (for Numpy and TF) to parse image_meta tensors.
 def parse_image_meta(meta):
     """Parses an image info Numpy array to its components.
     See compose_image_meta() for more details.
@@ -2647,19 +2646,6 @@ def parse_image_meta(meta):
     window = meta[:, 4:8]   # (y1, x1, y2, x2) window of image in in pixels
     active_class_ids = meta[:, 8:]
     return image_id, image_shape, window, active_class_ids
-
-
-def parse_image_meta_graph(meta):
-    """Parses a tensor that contains image attributes to its components.
-    See compose_image_meta() for more details.
-
-    meta: [batch, meta length] where meta length depends on NUM_CLASSES
-    """
-    image_id = meta[:, 0]
-    image_shape = meta[:, 1:4]
-    window = meta[:, 4:8]
-    active_class_ids = meta[:, 8:]
-    return [image_id, image_shape, window, active_class_ids]
 
 
 def mold_image(images, config):
