@@ -29,6 +29,8 @@ import keras.engine as KE
 import keras.models as KM
 
 import utils
+from deform_conv.layers import ConvOffset2D
+
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -133,6 +135,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     x = BatchNorm(axis=3, name=bn_name_base + '2b')(x)
     x = KL.Activation('relu')(x)
 
+    # x = ConvOffset2D(round(nb_filter3 / 2), name=conv_name_base + '2c_deform')(x)
     x = KL.Conv2D(nb_filter3, (1, 1), name=conv_name_base + '2c', use_bias=use_bias)(x)
     x = BatchNorm(axis=3, name=bn_name_base + '2c')(x)
 
@@ -144,6 +147,38 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
     return x
 
+def identity_block_deform(input_tensor, kernel_size, filters, stage, block,
+                   use_bias=True):
+    """The identity_block is the block that has no conv layer at shortcut
+    # Arguments
+        input_tensor: input tensor
+        kernel_size: defualt 3, the kernel size of middle conv layer at main path
+        filters: list of integers, the nb_filters of 3 conv layer at main path
+        stage: integer, current stage label, used for generating layer names
+        block: 'a','b'..., current block label, used for generating layer names
+    """
+    nb_filter1, nb_filter2, nb_filter3 = filters
+    conv_name_base = 'res' + str(stage) + block + '_branch'
+    bn_name_base = 'bn' + str(stage) + block + '_branch'
+
+    x = KL.Conv2D(nb_filter1, (1, 1), name=conv_name_base + '2a',
+                  use_bias=use_bias)(input_tensor)
+    x = BatchNorm(axis=3, name=bn_name_base + '2a')(x)
+    x = KL.Activation('relu')(x)
+
+    x = KL.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same',
+                  name=conv_name_base + '2b', use_bias=use_bias)(x)
+    x = BatchNorm(axis=3, name=bn_name_base + '2b')(x)
+    x = KL.Activation('relu')(x)
+    x = ConvOffset2D(nb_filter2, name=conv_name_base + '2b_defor')(x)
+
+    x = KL.Conv2D(nb_filter3, (1, 1), name=conv_name_base + '2c',
+                  use_bias=use_bias)(x)
+    x = BatchNorm(axis=3, name=bn_name_base + '2c')(x)
+
+    x = KL.Add()([x, input_tensor])
+    x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
+    return x
 
 def resnet_graph(input_image, architecture, stage5=False):
     assert architecture in ["resnet50", "resnet101"]
@@ -156,23 +191,25 @@ def resnet_graph(input_image, architecture, stage5=False):
     # Stage 2
     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
-    C2 = x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
+    C2 = x = identity_block_deform(x, 3, [64, 64, 256], stage=2, block='c')
     # Stage 3
     x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
-    C3 = x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
+    C3 = x = identity_block_deform(x, 3, [128, 128, 512], stage=3, block='d')
     # Stage 4
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
     block_count = {"resnet50": 5, "resnet101": 22}[architecture]
-    for i in range(block_count):
+    for i in range(block_count - 1):
         x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i))
+    x = identity_block_deform(x, 3, [256, 256, 1024], stage=4, block=chr(98 + block_count - 1))
     C4 = x
     # Stage 5
     if stage5:
         x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a')
         x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b')
-        C5 = x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
+        # C5 = x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c')
+        C5 = x = identity_block_deform(x, 3, [512, 512, 2048], stage=5, block='c')
     else:
         C5 = None
     return [C1, C2, C3, C4, C5]
