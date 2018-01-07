@@ -785,12 +785,12 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Filter out low confidence boxes
     if config.DETECTION_MIN_CONFIDENCE:
         keep = tf.sets.set_intersection(
-                keep, tf.where(class_scores >= config.DETECTION_MIN_CONFIDENCE)[:,0])
+                keep, tf.where(class_scores >= config.DETECTION_MIN_CONFIDENCE))[:,0]
 
     # Apply per-class NMS
-    pre_nms_class_ids = tf.gather(class_ids, keep) #class_ids[keep]
-    pre_nms_scores = tf.gather(class_scores, keep) #class_scores[keep]
-    pre_nms_rois = tf.gather(refined_rois,   keep) #refined_rois[keep]
+    pre_nms_class_ids = tf.gather(class_ids, keep)
+    pre_nms_scores = tf.gather(class_scores, keep)
+    pre_nms_rois = tf.gather(refined_rois,   keep)
     print('pre_nms_class_ids = {}'.format(pre_nms_class_ids.shape))
     print('pre_nms_scores = {}'.format(pre_nms_scores.shape))
     print('pre_nms_rois = {}'.format(pre_nms_rois.shape))
@@ -799,41 +799,33 @@ def refine_detections_graph(rois, probs, deltas, window, config):
 
     nms_keep = []
     def nms_keep_map(class_id):
+        #class_id = tf.expand_dims(class_id, -1)
         print('pre_nms_class_ids.shape', pre_nms_class_ids.shape)
         print('class_id', class_id.shape)
-        ixs = tf.where(pre_nms_class_ids == tf.expand_dims(class_id, -1))[0]
+        ixs = tf.where(pre_nms_class_ids == class_id)
 
+        print('ixs {}'.format(ixs.shape))
         # Apply NMS
         class_keep = tf.image.non_max_suppression(
                 tf.to_float(tf.gather(pre_nms_rois,ixs)),
                 tf.gather(pre_nms_scores, ixs),
-                ixs.shape[0],
+                max_output_size=ixs.shape[1],
                 iou_threshold=config.DETECTION_NMS_THRESHOLD)
 
         # Map indicies
         return tf.gather(keep, tf.gather(ixs, class_keep))
     
     print('uniq_pre_nms_class_ids: {}'.format(uniq_pre_nms_class_ids.shape))
-    nms_keep = tf.to_int64(tf.unique(tf.concat(
-        tf.map_fn(nms_keep_map, uniq_pre_nms_class_ids), axis=0))[0])
-
-    print(keep.shape, nms_keep.shape)
-    print(keep.dtype, nms_keep.dtype)
-    """keep = tf.sets.set_intersection(
-            tf.expand_dims(keep, 0), 
-            tf.expand_dims(tf.sparse_to_dense(nms_keep), 0))[1]
+    nms_keep = tf.map_fn(nms_keep_map, uniq_pre_nms_class_ids)
+    nms_keep = tf.concat(nms_keep, axis=0) 
+    nms_keep = tf.unique(nms_keep)[0] 
+    nms_keep = tf.to_int64(nms_keep)
+    keep = tf.expand_dims(keep, 0)
+    nms_keep = tf.expand_dims(nms_keep, 0)
+    keep = tf.sparse_tensor_to_dense(tf.sets.set_intersection(keep, nms_keep))[:,0]
     """#tf.to_int32(
     #np.intersect1d(keep, nms_keep).astype(np.int32)
-    
-    result_keep = tf.concat([keep,nms_keep], axis = 0)
-    print('result_keep: {}'.format(result_keep.shape))
-    output_keep, idx_keep, count_keep = tf.unique_with_counts(result_keep)
-    print('output_keep: {}, idx_keep: {}, count_keep: {}, 2const: {}'.format(output_keep.shape,
-        idx_keep.shape, count_keep.shape, tf.constant(2).shape))
-    new_idx_keep = tf.where(count_keep >= tf.constant(2))[1] # keep coordinates of true elems
-    print('keep bbefore: {}, new_idx_keep: {}'.format(keep.shape, new_idx_keep.shape))
-    keep = tf.gather(output_keep, new_idx_keep)
-
+    """
     # Keep top detections
     roi_count = tf.convert_to_tensor(config.DETECTION_MAX_INSTANCES)
     print('class scores: {}'.format(class_scores.shape))
@@ -858,9 +850,6 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     detections = tf.concat((refined_rois_keep, class_ids_keep, 
                 class_scores_keep), axis=1)
     print('detections.shape = ', detections.shape)
-    #np.hstack((refined_rois[keep],
-    #                    class_ids[keep][..., np.newaxis],
-    #                    class_scores[keep][..., np.newaxis]))
 
     # Pad with zeros if detections < DETECTION_MAX_INSTANCES
     num_detections = tf.shape(detections)[0]
