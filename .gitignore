@@ -9,4 +9,5 @@ mask_rcnn_coco.h5
 /images
 /assets
 /result
+experments/
 /__pycache__
