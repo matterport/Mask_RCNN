@@ -2278,8 +2278,8 @@ class MaskRCNN():
         masks = mrcnn_mask[np.arange(N), :, :, class_ids]
 
         # Compute scale and shift to translate coordinates to image domain.
-        h_scale = image_shape[0] / (window[2] - window[0])
-        w_scale = image_shape[1] / (window[3] - window[1])
+        h_scale = float(image_shape[0]) / (window[2] - window[0])
+        w_scale = float(image_shape[1]) / (window[3] - window[1])
         scale = min(h_scale, w_scale)
         shift = window[:2]  # y, x
         scales = np.array([scale, scale, scale, scale])
