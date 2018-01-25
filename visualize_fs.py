@@ -14,10 +14,10 @@ import numpy as np
 from skimage.measure import find_contours
 import skimage
 from skimage import io as sio
-# import matplotlib.pyplot as plt
-# import matplotlib.patches as patches
-# import matplotlib.lines as lines
-# from matplotlib.patches import Polygon
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.lines as lines
+from matplotlib.patches import Polygon
 import IPython.display
 
 import utils

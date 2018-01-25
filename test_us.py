@@ -13,8 +13,9 @@
 import os
 import pickle
 import tensorflow as tf
+
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto()
@@ -92,6 +93,8 @@ class ShapesConfig(Config):
 
 
 config = ShapesConfig()
+
+
 # config.display()
 
 
@@ -161,6 +164,7 @@ model = modellib.MaskRCNN(mode="inference",
 # Either set a specific path or find last trained weights
 # model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_000%s.h5" % sys.argv[-1])
 model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_000%s.h5" % 8)
+model_path = os.path.join("mask_rcnn_shapes.h5")
 # model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)
@@ -213,7 +217,22 @@ for image_id in image_ids:
     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
     # Run object detection
     results = model.detect([image], verbose=0)
+
     r = results[0]
+    rois = r['rois']
+    area = (rois[:,2] - rois[:, 0]) * (rois[:,3] - rois[:, 1])
+    ids = np.transpose(np.asarray(np.where(area > 1000)), (0, 1))[0]
+    rois = np.asarray(r['rois'])[ids, :]
+    class_ids = np.asarray(r['class_ids'])[ids]
+    scores = np.asarray(r['scores'])[ids]
+    masks = np.asarray(r['masks'])[:, :, ids]
+
+    ids = np.argsort(scores)[::-1][0: 5]
+    rois = rois[ids, :]
+    class_ids = class_ids[ids]
+    scores = scores[ids]
+    masks = masks[:, :, ids]
+    r = {'rois':rois, 'scores': scores, 'masks':masks, 'class_ids':class_ids}
 
     IMAGE_DIR = ''
     file_names = dataset_val.image_info[image_id]['path']
@@ -225,8 +244,10 @@ for image_id in image_ids:
 
     # Visualize results
     result_name = file_names.split('.')
-    # fr = open(result_name[0] + '.dat', 'wb')
-    # pickle.dump([image, r, ['mass']], fr)
+    fr = open(result_name[0] + '.dat', 'wb')
+    pickle.dump([image, r, ['mass']], fr)
+    fr.flush()
+    fr.close()
     # Compute AP
     AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
                                                          r["rois"], r["class_ids"], r["scores"])
@@ -235,6 +256,6 @@ for image_id in image_ids:
     # print(precisions)
     # print(recalls)
     # print(overlaps)
-    APs.append(AP)
+    # APs.append(AP)
 
 print("mAP: ", np.mean(APs))
