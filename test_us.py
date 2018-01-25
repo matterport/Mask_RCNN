@@ -214,6 +214,7 @@ for image_id in image_ids:
     # Run object detection
     results = model.detect([image], verbose=0)
     r = results[0]
+
     IMAGE_DIR = ''
     file_names = dataset_val.image_info[image_id]['path']
     # print(file_names)

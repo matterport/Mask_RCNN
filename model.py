@@ -695,9 +695,14 @@ def refine_detections(rois, probs, deltas, window, config):
     Returns detections shaped: [N, (y1, x1, y2, x2, class_id, score)]
     """
     # Class IDs per ROI
-    class_ids = np.argmax(probs, axis=1)
+    # class_ids = np.argmax(probs, axis=1)
+    # class_ids
+    class_ids = np.ones(shape=np.shape(probs)[0], dtype=np.int32)
+    print(class_ids.shape)
     # Class probability of the top class of each ROI
     class_scores = probs[np.arange(class_ids.shape[0]), class_ids]
+    print(class_scores[0:20])
+    print(class_ids[0:20])
     # Class-specific bounding box deltas
     deltas_specific = deltas[np.arange(deltas.shape[0]), class_ids]
     # Apply bounding box deltas
@@ -717,7 +722,9 @@ def refine_detections(rois, probs, deltas, window, config):
 
     # Filter out background boxes
     keep = np.where(class_ids > 0)[0]
+    print(keep)
     # Filter out low confidence boxes
+    print("confidence %s"%config.DETECTION_MIN_CONFIDENCE)
     if config.DETECTION_MIN_CONFIDENCE:
         keep = np.intersect1d(
             keep, np.where(class_scores >= config.DETECTION_MIN_CONFIDENCE)[0])
@@ -738,6 +745,7 @@ def refine_detections(rois, probs, deltas, window, config):
         class_keep = keep[ixs[class_keep]]
         nms_keep = np.union1d(nms_keep, class_keep)
     keep = np.intersect1d(keep, nms_keep).astype(np.int32)
+    print(keep)
 
     # Keep top detections
     roi_count = config.DETECTION_MAX_INSTANCES
