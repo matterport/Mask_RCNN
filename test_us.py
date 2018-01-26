@@ -15,7 +15,7 @@ import pickle
 import tensorflow as tf
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto()
@@ -164,7 +164,7 @@ model = modellib.MaskRCNN(mode="inference",
 # Either set a specific path or find last trained weights
 # model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_000%s.h5" % sys.argv[-1])
 model_path = os.path.join(MODEL_DIR, "mask_rcnn_ultar_sound_000%s.h5" % 8)
-model_path = os.path.join("mask_rcnn_shapes.h5")
+# model_path = os.path.join("mask_rcnn_shapes.h5")
 # model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)
