@@ -666,78 +666,6 @@ def clip_to_window(window, boxes):
     boxes[:, 3] = np.maximum(np.minimum(boxes[:, 3], window[3]), window[1])
     return boxes
 
-
-def refine_detections(rois, probs, deltas, window, config):
-    """Refine classified proposals and filter overlaps and return final
-    detections.
-
-    Inputs:
-        rois: [N, (y1, x1, y2, x2)] in normalized coordinates
-        probs: [N, num_classes]. Class probabilities.
-        deltas: [N, num_classes, (dy, dx, log(dh), log(dw))]. Class-specific
-                bounding box deltas.
-        window: (y1, x1, y2, x2) in image coordinates. The part of the image
-            that contains the image excluding the padding.
-
-    Returns detections shaped: [N, (y1, x1, y2, x2, class_id, score)]
-    """
-    # Class IDs per ROI
-    class_ids = np.argmax(probs, axis=1)
-    # Class probability of the top class of each ROI
-    class_scores = probs[np.arange(class_ids.shape[0]), class_ids]
-    # Class-specific bounding box deltas
-    deltas_specific = deltas[np.arange(deltas.shape[0]), class_ids]
-    # Apply bounding box deltas
-    # Shape: [boxes, (y1, x1, y2, x2)] in normalized coordinates
-    refined_rois = utils.apply_box_deltas(
-        rois, deltas_specific * config.BBOX_STD_DEV)
-    # Convert coordiates to image domain
-    # TODO: better to keep them normalized until later
-    height, width = config.IMAGE_SHAPE[:2]
-    refined_rois *= np.array([height, width, height, width])
-    # Clip boxes to image window
-    refined_rois = clip_to_window(window, refined_rois)
-    # Round and cast to int since we're deadling with pixels now
-    refined_rois = np.rint(refined_rois).astype(np.int32)
-
-    # TODO: Filter out boxes with zero area
-
-    # Filter out background boxes
-    keep = np.where(class_ids > 0)[0]
-    # Filter out low confidence boxes
-    if config.DETECTION_MIN_CONFIDENCE:
-        keep = np.intersect1d(
-            keep, np.where(class_scores >= config.DETECTION_MIN_CONFIDENCE)[0])
-
-    # Apply per-class NMS
-    pre_nms_class_ids = class_ids[keep]
-    pre_nms_scores = class_scores[keep]
-    pre_nms_rois = refined_rois[keep]
-    nms_keep = []
-    for class_id in np.unique(pre_nms_class_ids):
-        # Pick detections of this class
-        ixs = np.where(pre_nms_class_ids == class_id)[0]
-        # Apply NMS
-        class_keep = utils.non_max_suppression(
-            pre_nms_rois[ixs], pre_nms_scores[ixs],
-            config.DETECTION_NMS_THRESHOLD)
-        # Map indicies
-        class_keep = keep[ixs[class_keep]]
-        nms_keep = np.union1d(nms_keep, class_keep)
-    keep = np.intersect1d(keep, nms_keep).astype(np.int32)
-
-    # Keep top detections
-    roi_count = config.DETECTION_MAX_INSTANCES
-    top_ids = np.argsort(class_scores[keep])[::-1][:roi_count]
-    keep = keep[top_ids]
-
-    # Arrange output as [N, (y1, x1, y2, x2, class_id, score)]
-    # Coordinates are in image domain.
-    result = np.hstack((refined_rois[keep],
-                        class_ids[keep][..., np.newaxis],
-                        class_scores[keep][..., np.newaxis]))
-    return result
-
 def refine_detections_graph(rois, probs, deltas, window, config):
     """Refine classified proposals and filter overlaps and return final
     detections.
@@ -842,22 +770,16 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     top_ids = tf.nn.top_k(class_scores_keep, k=num_keep, sorted=True)[1]
 
     #np.argsort(class_scores[keep])[::-1][:roi_count]
-    print('keep before: {}'.format(keep.shape))
     keep = tf.gather(keep, top_ids)
-    print('keep after: {}'.format(keep.shape))
 
     refined_rois_keep = tf.gather(tf.to_float(refined_rois), keep)
     class_ids_keep = tf.gather(tf.to_float(class_ids), keep)[..., tf.newaxis]
     class_scores_keep = tf.gather(class_scores, keep)[..., tf.newaxis]
-    print('refined_rois_keep = ', refined_rois_keep.shape)
-    print('class_ids_keep = ', class_ids_keep.shape)
-    print('class_scores_keep = ', class_scores_keep.shape)
 
     # Arrange output as [N, (y1, x1, y2, x2, class_id, score)]
     # Coordinates are in image domain.
     detections = tf.concat((refined_rois_keep, class_ids_keep,
                 class_scores_keep), axis=1)
-    print('detections.shape = ', detections.shape)
 
     # Pad with zeros if detections < DETECTION_MAX_INSTANCES
     num_detections = tf.shape(detections)[0]
@@ -897,7 +819,7 @@ class DetectionLayer(KE.Layer):
         print(rois.shape, mrcnn_class.shape, mrcnn_bbox.shape, image_meta.shape)
 
         #parse_image_meta can be reused as slicing works same way in TF & numpy
-        window = get_image_meta_window(image_meta)
+        _, _, window, _ = parse_image_meta(image_meta)
         print('window after: ', window.shape)
         detections_batch = utils.batch_slice(
                 [rois, mrcnn_class, mrcnn_bbox, window],
@@ -2616,22 +2538,17 @@ def compose_image_meta(image_id, image_shape, window, active_class_ids):
     )
     return meta
 
-
-def parse_image_meta(meta):
-    """Parses an image info Numpy array to its components.
+def parse_image_meta_graph(meta):
+    """Parses a tensor that contains image attributes to its components.
     See compose_image_meta() for more details.
+
+    meta: [batch, meta length] where meta length depends on NUM_CLASSES
     """
     image_id = meta[:, 0]
     image_shape = meta[:, 1:4]
     window = meta[:, 4:8]   # (y1, x1, y2, x2) window of image in in pixels
     active_class_ids = meta[:, 8:]
-    return image_id, image_shape, window, active_class_ids
-
-def get_image_meta_window(meta):
-    """Parses an image info Numpy array to its components.
-    See compose_image_meta() for more details.
-    """
-    return meta[:, 4:8]   # (y1, x1, y2, x2) window of image in in pixels
+    return [image_id, image_shape, window, active_class_ids]
 
 def mold_image(images, config):
     """Takes RGB images with 0-255 values and subtraces
