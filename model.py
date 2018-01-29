@@ -701,7 +701,6 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # TODO: better to keep them normalized until later
     height, width = config.IMAGE_SHAPE[:2]
     refined_rois *= tf.constant([height, width, height, width], dtype=tf.float32)
-    #np.array([height, width, height, width])
     # Clip boxes to image window
     refined_rois = clip_boxes_graph(refined_rois, window)
     # Round and cast to int since we're deadling with pixels now
@@ -769,7 +768,6 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     num_keep = tf.minimum(tf.shape(class_scores_keep)[0], roi_count)
     top_ids = tf.nn.top_k(class_scores_keep, k=num_keep, sorted=True)[1]
 
-    #np.argsort(class_scores[keep])[::-1][:roi_count]
     keep = tf.gather(keep, top_ids)
 
     refined_rois_keep = tf.gather(tf.to_float(refined_rois), keep)
@@ -784,10 +782,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     num_detections = tf.shape(detections)[0]
     gap = roi_count - num_detections
     pred = tf.less(tf.constant(0), gap)
-    #assert gap >= 0
-    #if gap > 0:
-    #    paddings = tf.constant([[0, gap], [0, 0]])
-    #    detections = tf.pad(detections, paddings, "CONSTANT")
+    
     def pad_detections():
         return tf.pad(detections, [(0, gap), (0, 0)], "CONSTANT")
 
@@ -821,10 +816,6 @@ class DetectionLayer(KE.Layer):
                 lambda x, y, w, z: refine_detections_graph(x, y, w, z, self.config),
                 self.config.IMAGES_PER_GPU)
 
-        # Stack detections and cast to float32
-        # TODO: track where float64 is introduced
-        #detections_batch = tf.stack(detections_batch)
-        #detections_batch = np.array(detections_batch).astype(np.float32)
         # Reshape output
         # [batch, num_detections, (y1, x1, y2, x2, class_score)] in pixels
         return tf.reshape(
