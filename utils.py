@@ -92,6 +92,7 @@ def compute_overlaps(boxes1, boxes2):
         overlaps[:, i] = compute_iou(box2, boxes1, area2[i], area1)
     return overlaps
 
+
 def compute_overlaps_masks(masks1, masks2):
     '''Computes IoU overlaps between two sets of masks.
     masks1, masks2: [Height, Width, instances]
@@ -288,6 +289,7 @@ class Dataset(object):
         TODO: class map is not supported yet. When done, it should handle mapping
               classes from different datasets to the same class ID.
         """
+
         def clean_name(name):
             """Returns a shorter version of object names for cleaner display."""
             return ",".join(name.split(",")[:1])
@@ -582,8 +584,8 @@ def trim_zeros(x):
     return x[~np.all(x == 0, axis=1)]
 
 
-def compute_ap(gt_boxes, gt_class_ids,
-               pred_boxes, pred_class_ids, pred_scores,
+def compute_ap(gt_boxes, gt_class_ids, gt_masks,
+               pred_boxes, pred_class_ids, pred_scores, pred_masks,
                iou_threshold=0.5):
     """Compute Average Precision at a set IoU threshold (default 0.5).
 
@@ -596,15 +598,17 @@ def compute_ap(gt_boxes, gt_class_ids,
     # Trim zero padding and sort predictions by score from high to low
     # TODO: cleaner to do zero unpadding upstream
     gt_boxes = trim_zeros(gt_boxes)
+    gt_masks = gt_masks[..., :gt_boxes.shape[0]]
     pred_boxes = trim_zeros(pred_boxes)
     pred_scores = pred_scores[:pred_boxes.shape[0]]
     indices = np.argsort(pred_scores)[::-1]
     pred_boxes = pred_boxes[indices]
     pred_class_ids = pred_class_ids[indices]
     pred_scores = pred_scores[indices]
+    pred_masks = pred_masks[..., indices]
 
-    # Compute IoU overlaps [pred_boxes, gt_boxes]
-    overlaps = compute_overlaps(pred_boxes, gt_boxes)
+    # Compute IoU overlaps [pred_masks, gt_masks]
+    overlaps = compute_overlaps_masks(pred_masks, gt_masks)
 
     # Loop through ground truth boxes and find matching predictions
     match_count = 0
