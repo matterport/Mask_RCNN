@@ -2,7 +2,7 @@
 
 See on YouTube: [4K Mask RCNN COCO Object detection and segmentation #2](http://www.youtube.com/watch?v=OOT3UIXZztE)
 
-[![4K Mask RCNN COCO Object detection and segmentation #2](http://img.youtube.com/vi/OOT3UIXZztE/0.jpg)](http://www.youtube.com/watch?v=OOT3UIXZztE)
+[![4K Mask RCNN COCO Object detection and segmentation #2](https://github.com/karolmajek/Mask_RCNN/raw/master/mask-rcnn.gif)](http://www.youtube.com/watch?v=OOT3UIXZztE)
 
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
