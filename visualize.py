@@ -78,7 +78,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       figsize=(16, 16), ax=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
-    masks: [num_instances, height, width]
+    masks: [height, width, num_instances]
     class_ids: [num_instances]
     class_names: list of class names of the dataset
     scores: (optional) confidence scores for each box
@@ -143,7 +143,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-
+    plt.show()
+    
 
 def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10):
     """

@@ -528,7 +528,8 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     positive_indices = tf.random_shuffle(positive_indices)[:positive_count]
     positive_count = tf.shape(positive_indices)[0]
     # Negative ROIs. Add enough to maintain positive:negative ratio.
-    negative_count = int((positive_count / config.ROI_POSITIVE_RATIO) - positive_count)
+    r = 1.0 / config.ROI_POSITIVE_RATIO
+    negative_count = tf.cast(r * tf.cast(positive_count, tf.float32), tf.int32) - positive_count
     negative_indices = tf.random_shuffle(negative_indices)[:negative_count]
     # Gather selected ROIs
     positive_rois = tf.gather(proposals, positive_indices)
@@ -752,8 +753,8 @@ class DetectionLayer(KE.Layer):
     def call(self, inputs):
         def wrapper(rois, mrcnn_class, mrcnn_bbox, image_meta):
             detections_batch = []
+            _, _, window, _ = parse_image_meta(image_meta)
             for b in range(self.config.BATCH_SIZE):
-                _, _, window, _ = parse_image_meta(image_meta)
                 detections = refine_detections(
                     rois[b], mrcnn_class[b], mrcnn_bbox[b], window[b], self.config)
                 # Pad with zeros if detections < DETECTION_MAX_INSTANCES
@@ -790,7 +791,7 @@ def rpn_graph(feature_map, anchors_per_location, anchor_stride):
 
     Returns:
         rpn_logits: [batch, H, W, 2] Anchor classifier logits (before softmax)
-        rpn_probs: [batch, W, W, 2] Anchor classifier probabilities.
+        rpn_probs: [batch, H, W, 2] Anchor classifier probabilities.
         rpn_bbox: [batch, H, W, (dy, dx, log(dh), log(dw))] Deltas to be
                   applied to anchors.
     """
@@ -878,7 +879,6 @@ def fpn_classifier_graph(rois, feature_maps,
                            name="mrcnn_class_conv1")(x)
     x = KL.TimeDistributed(BatchNorm(axis=3), name='mrcnn_class_bn1')(x)
     x = KL.Activation('relu')(x)
-    # x = KL.Dropout(0.5)(x)
     x = KL.TimeDistributed(KL.Conv2D(1024, (1, 1)),
                            name="mrcnn_class_conv2")(x)
     x = KL.TimeDistributed(BatchNorm(axis=3),
@@ -2189,6 +2189,14 @@ class MaskRCNN():
         self.set_trainable(layers)
         self.compile(learning_rate, self.config.LEARNING_MOMENTUM)
 
+        # Work-around for Windows: Keras fails on Windows when using
+        # multiprocessing workers. See discussion here:
+        # https://github.com/matterport/Mask_RCNN/issues/13#issuecomment-353124009
+        if os.name is 'nt':
+            workers = 0
+        else:
+            workers = max(self.config.BATCH_SIZE // 2, 2)
+
         self.keras_model.fit_generator(
             train_generator,
             initial_epoch=self.epoch,
@@ -2198,7 +2206,7 @@ class MaskRCNN():
             validation_data=next(val_generator),
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=max(self.config.BATCH_SIZE // 2, 2),
+            workers=workers,
             use_multiprocessing=True,
         )
         self.epoch = max(self.epoch, epochs)

@@ -17,6 +17,12 @@ The repository includes:
 The code is documented and designed to be easy to extend. If you use it in your research, please consider referencing this repository. If you work on 3D vision, you might find our recently released [Matterport3D](https://matterport.com/blog/2017/09/20/announcing-matterport3d-research-dataset/) dataset useful as well.
 This dataset was created from 3D-reconstructed spaces captured by our customers who agreed to make them publicly available for academic use. You can see more examples [here](https://matterport.com/gallery/).
 
+# Projects Using this Model
+If you extend this model to other datasets or build projects that use it, we'd love to hear from you.
+
+* [Images to OSM](https://github.com/jremillard/images-to-osm): Use TensorFlow, Bing, and OSM to find features in satellite images.
+The goal is to improve OpenStreetMap by adding high quality baseball, soccer, tennis, football, and basketball fields.
+
 
 # Getting Started
 * [demo.ipynb](/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
@@ -157,7 +163,7 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 * TensorFlow 1.3+
 * Keras 2.0.8+
 * Jupyter Notebook
-* Numpy, skimage, scipy, Pillow
+* Numpy, skimage, scipy, Pillow, cython, h5py
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
