@@ -22,7 +22,8 @@ If you extend this model to other datasets or build projects that use it, we'd l
 
 * [Images to OSM](https://github.com/jremillard/images-to-osm): Use TensorFlow, Bing, and OSM to find features in satellite images.
 The goal is to improve OpenStreetMap by adding high quality baseball, soccer, tennis, football, and basketball fields.
-
+* [4K Video Demo](https://www.youtube.com/watch?v=OOT3UIXZztE): A beautiful demo on 4K video, by Karol Majek.
+    ![https://www.youtube.com/watch?v=OOT3UIXZztE](assets/4k_video.gif)
 
 # Getting Started
 * [demo.ipynb](/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
