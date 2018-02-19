@@ -45,9 +45,9 @@ import zipfile
 import urllib.request
 import shutil
 
-from config import Config
-import utils
-import model as modellib
+from .config import Config
+from . import utils
+from . import model as modellib
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
