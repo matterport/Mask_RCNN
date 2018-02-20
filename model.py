@@ -1631,8 +1631,6 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
                 load_image_gt(dataset, config, image_id, augment=augment,
                               use_mini_mask=config.USE_MINI_MASK)
 
-            print(gt_boxes)
-
             # Skip images that have no instances. This can happen in cases
             # where we train on a subset of classes and the image doesn't
             # have any of the classes we care about.
@@ -1895,9 +1893,6 @@ class MaskRCNN():
                     x, tf.float32) / image_scale[:4])(input_rois)
             else:
                 target_rois = rpn_rois
-
-
-            print(":::",target_rois, input_gt_class_ids, gt_boxes, input_gt_masks)
 
             # Generate detection targets
             # Subsamples proposals and generates target outputs for training

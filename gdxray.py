@@ -88,15 +88,36 @@ class TrainConfig(Config):
     # Give the configuration a recognizable name
     NAME = "gdxray"
 
-    # We use a GPU with 12GB memory, which can fit two images.
+    # We use a GPU with 11 GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 2
+
+    # Number of training steps per epoch
+    # This doesn't need to match the size of the training set. Tensorboard
+    # updates are saved at the end of each epoch, so setting this to a
+    # smaller number means getting more frequent TensorBoard updates.
+    # Validation stats are also calculated at each epoch end and they
+    # might take a while, so don't set this too small to avoid spending
+    # a lot of time on validation stats.
+    STEPS_PER_EPOCH = 100
+
+    # Number of validation steps to run at the end of every training epoch.
+    # A bigger number improves accuracy of validation stats, but slows
+    # down the training.
+    VALIDATION_STEPS = 10
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
 
     IMAGE_MIN_DIM = 256
-    IMAGE_MAX_DIM = 1024
+    IMAGE_MAX_DIM = 768
+
+    # Number of ROIs per image to feed to classifier/mask heads
+    # The Mask RCNN paper uses 512 but often the RPN doesn't generate
+    # enough positive proposals to fill this and keep a positive:negative
+    # ratio of 1:3. You can increase the number of proposals by adjusting
+    # the RPN NMS threshold.
+    TRAIN_ROIS_PER_IMAGE = 40
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can reduce this during training to generate more propsals.
