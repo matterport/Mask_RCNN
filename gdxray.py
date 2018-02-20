@@ -102,6 +102,15 @@ class TrainConfig(Config):
     IMAGE_MAX_DIM = 1024
     TRAIN_ROIS_PER_IMAGE = 40
 
+    # Non-max suppression threshold to filter RPN proposals.
+    # You can reduce this during training to generate more propsals.
+    RPN_NMS_THRESHOLD = 0.2
+
+    # How many anchors per image to use for RPN training
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 512
+
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
+
 
 class InferenceConfig(TrainConfig):
     # Set batch size to 1 since we'll be running inference on
