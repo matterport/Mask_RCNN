@@ -86,7 +86,7 @@ class TrainConfig(Config):
     to the COCO dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "coco"
+    NAME = "gdxray"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
@@ -160,7 +160,7 @@ class XrayDataset(utils.Dataset):
                 dataset_dir=dataset_dir,
                 annotations=boxes.get(image_id,[])
             )
-            self.create_mask(dataset_dir,image_id)
+            # self.create_mask(dataset_dir,image_id)
 
 
 
@@ -205,12 +205,11 @@ class XrayDataset(utils.Dataset):
             # Box dimensions: (y1, x1, y2, x2)
             center_x = (box[1]+box[3])/2
             center_y = (box[0]+box[2])/2
-            width = abs(box[3]-box[1])
-            height = abs(box[2]-box[0])
-            radius = math.ceil(min(width, height)/2)
+            r_x = math.ceil(abs(box[3]-box[1])/2)
+            r_y = math.ceil(abs(box[2]-box[0])/2)
             # Make a bitmap mask
             mask = np.zeros((info["height"], info["width"]), dtype=np.uint8)
-            rr, cc = draw.circle(center_x, center_y, radius=radius, shape=mask.shape)
+            rr, cc = draw.ellipse(center_y, center_x, r_y, r_x, shape=mask.shape)
             mask[rr, cc] = 1
             # Save image
             path = self.get_mask_path(dataset_dir, image_id, i)
@@ -239,11 +238,12 @@ class XrayDataset(utils.Dataset):
             path = self.get_mask_path(dataset_dir, image_id, i)
             if os.path.exists(path):
                 mask = scipy.ndimage.imread(path)
+                mask = mask.astype(np.bool)
                 masks.append(mask)
             else:
                 break
         mask = np.stack(masks,axis=-1)
-        class_ids = np.array([CASTING_DEFECT for _ in range(len(masks))])
+        class_ids = np.array([CASTING_DEFECT for _ in range(len(masks))], dtype=np.int32)
         return mask, class_ids
 
 
@@ -265,7 +265,7 @@ class XrayDataset(utils.Dataset):
         if info["source"] == "coco":
             return "http://cocodataset.org/#explore?id={}".format(info["id"])
         else:
-            super(CocoDataset, self).image_reference(image_id)
+            super().image_reference(image_id)
 
 
     def auto_download(self, dataset_dir, series):
