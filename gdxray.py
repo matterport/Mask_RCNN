@@ -163,7 +163,6 @@ class XrayDataset(utils.Dataset):
                 dataset_dir=dataset_dir,
                 annotations=boxes.get(image_id,[])
             )
-            print(boxes.get(image_id,[]))
             # self.create_mask(dataset_dir,image_id)
 
 
