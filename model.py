@@ -1908,10 +1908,18 @@ class MaskRCNN():
                 fpn_classifier_graph(rois, mrcnn_feature_maps, config.IMAGE_SHAPE,
                                      config.POOL_SIZE, config.NUM_CLASSES)
 
-            mrcnn_mask = build_fpn_mask_graph(rois, mrcnn_feature_maps,
-                                              config.IMAGE_SHAPE,
-                                              config.MASK_POOL_SIZE,
-                                              config.NUM_CLASSES)
+            mrcnn_mask_original = build_fpn_mask_graph(rois, mrcnn_feature_maps,
+                                                       config.IMAGE_SHAPE,
+                                                       config.MASK_POOL_SIZE,
+                                                       config.NUM_CLASSES)
+
+            def ff_true():
+                return mrcnn_mask_original
+
+            def ff_false():
+                return tf.zeros_like(target_mask)
+
+            mrcnn_mask = KL.Lambda(lambda x: tf.cond(tf.equal(tf.reduce_mean(x), 0), ff_true, ff_true))(rois)
 
             # TODO: clean up (use tf.identify if necessary)
             output_rois = KL.Lambda(lambda x: x * 1, name="output_rois")(rois)
