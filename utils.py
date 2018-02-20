@@ -247,6 +247,7 @@ class Dataset(object):
     def __init__(self, class_map=None):
         self._image_ids = []
         self.image_info = []
+        self.image_indices = {}
         # Background is always the first class
         self.class_info = [{"source": "", "id": 0, "name": "BG"}]
         self.source_class_ids = {}
@@ -273,6 +274,7 @@ class Dataset(object):
         }
         image_info.update(kwargs)
         self.image_info.append(image_info)
+        self.image_indices[image_id] = len(self.image_info)-1
 
     def image_reference(self, image_id):
         """Return a link to the image in its source Website or details about
@@ -351,6 +353,14 @@ class Dataset(object):
         debugging.
         """
         return self.image_info[image_id]["path"]
+
+    def get_image_info(self, image_id):
+        """Load the specified image metadata by image_id
+        """
+        index = self.image_indices[image_id]
+        info = self.image_info[index]
+        assert info["id"]==image_id
+        return info
 
     def load_image(self, image_id):
         """Load the specified image and return a [H,W,3] Numpy array.
