@@ -98,8 +98,8 @@ class TrainConfig(Config):
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
 
-    IMAGE_MIN_DIM = 400
-    IMAGE_MAX_DIM = 800
+    IMAGE_MIN_DIM = 256
+    IMAGE_MAX_DIM = 1024
     TRAIN_ROIS_PER_IMAGE = 40
 
 
