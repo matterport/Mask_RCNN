@@ -66,6 +66,14 @@ DATASETS = {
 }
 
 
+# These layers change weights depending on the number of classes
+EXCLUDE_LAYER_WEIGHTS = [
+    'mrcnn_bbox_fc',      # [1024,324]  --> [1024,8]
+    'mrcnn_class_logits', # [1024,2]    --> [1024,81]
+    'mrcnn_mask',         # [1,1,256,2] --> [1,1,256,81]
+]
+
+
 
 ############################################################
 #  Configurations
@@ -88,7 +96,7 @@ class TrainConfig(Config):
     # GPU_COUNT = 8
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 80  # We classify weld defect and casting defect
+    NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
 
 
 class InferenceConfig(TrainConfig):
@@ -459,7 +467,7 @@ if __name__ == '__main__':
 
     # Load weights
     print("Loading weights ", model_path)
-    model.load_weights(model_path, by_name=True)
+    model.load_weights(model_path, by_name=True, exclude=EXCLUDE_LAYER_WEIGHTS)
 
     # Train or evaluate
     if args.command == "train":
