@@ -98,6 +98,10 @@ class TrainConfig(Config):
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
 
+    IMAGE_MIN_DIM = 400
+    IMAGE_MAX_DIM = 800
+    TRAIN_ROIS_PER_IMAGE = 40
+
 
 class InferenceConfig(TrainConfig):
     # Set batch size to 1 since we'll be running inference on
@@ -105,7 +109,6 @@ class InferenceConfig(TrainConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
     DETECTION_MIN_CONFIDENCE = 0
-
 
 ############################################################
 #  Dataset
@@ -160,6 +163,7 @@ class XrayDataset(utils.Dataset):
                 dataset_dir=dataset_dir,
                 annotations=boxes.get(image_id,[])
             )
+            print(boxes.get(image_id,[]))
             # self.create_mask(dataset_dir,image_id)
 
 
