@@ -48,7 +48,7 @@ def extract_bboxes(mask):
         else:
             # No mask for this instance. Might happen due to
             # resizing or cropping. Set bbox to zeros
-            x1, x2, y1, y2 = 0, 0, 0, 0
+            x1, x2, y1, y2 = 0, 1, 0, 1
         boxes[i] = np.array([y1, x1, y2, x2])
     return boxes.astype(np.int32)
 
