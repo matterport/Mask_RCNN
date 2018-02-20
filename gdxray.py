@@ -92,22 +92,15 @@ class TrainConfig(Config):
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 2
 
-    # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
-
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
 
     IMAGE_MIN_DIM = 256
     IMAGE_MAX_DIM = 1024
-    TRAIN_ROIS_PER_IMAGE = 40
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can reduce this during training to generate more propsals.
-    RPN_NMS_THRESHOLD = 0.2
-
-    # How many anchors per image to use for RPN training
-    RPN_TRAIN_ANCHORS_PER_IMAGE = 512
+    RPN_NMS_THRESHOLD = 0.5
 
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
 
@@ -118,6 +111,7 @@ class InferenceConfig(TrainConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
     DETECTION_MIN_CONFIDENCE = 0
+
 
 ############################################################
 #  Dataset
