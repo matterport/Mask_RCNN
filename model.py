@@ -1631,6 +1631,8 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
                 load_image_gt(dataset, config, image_id, augment=augment,
                               use_mini_mask=config.USE_MINI_MASK)
 
+            print(gt_boxes)
+
             # Skip images that have no instances. This can happen in cases
             # where we train on a subset of classes and the image doesn't
             # have any of the classes we care about.
