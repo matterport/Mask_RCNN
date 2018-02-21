@@ -99,12 +99,12 @@ class TrainConfig(Config):
     # Validation stats are also calculated at each epoch end and they
     # might take a while, so don't set this too small to avoid spending
     # a lot of time on validation stats.
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
 
     # Number of validation steps to run at the end of every training epoch.
     # A bigger number improves accuracy of validation stats, but slows
     # down the training.
-    VALIDATION_STEPS = 10
+    VALIDATION_STEPS = 50
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
