@@ -1203,6 +1203,11 @@ def load_image_gt(dataset, config, image_id, augment=False,
             image = np.fliplr(image)
             mask = np.fliplr(mask)
 
+    # Note that some boxes might be all zeros if the corresponding mask got cropped out.
+    # and here is to filter them out
+    _idx = np.sum(np.where(mask > 0, 1, 0), axis=(0, 1)) >= 0
+    mask = mask[:, :, _idx]
+
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
     # bbox: [num_instances, (y1, x1, y2, x2)]
