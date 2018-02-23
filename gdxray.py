@@ -117,7 +117,7 @@ class TrainConfig(Config):
     # enough positive proposals to fill this and keep a positive:negative
     # ratio of 1:3. You can increase the number of proposals by adjusting
     # the RPN NMS threshold.
-    TRAIN_ROIS_PER_IMAGE = 40
+    TRAIN_ROIS_PER_IMAGE = 50
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can reduce this during training to generate more propsals.
