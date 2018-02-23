@@ -49,6 +49,7 @@ def extract_bboxes(mask):
             # No mask for this instance. Might happen due to
             # resizing or cropping. Set bbox to zeros
             x1, x2, y1, y2 = 0, 1, 0, 1
+        print("Box:",[y1, x1, y2, x2])
         boxes[i] = np.array([y1, x1, y2, x2])
     return boxes.astype(np.int32)
 
@@ -452,8 +453,17 @@ def resize_mask(mask, scale, padding):
             [(top, bottom), (left, right), (0, 0)]
     """
     h, w = mask.shape[:2]
-    mask = scipy.ndimage.zoom(mask, zoom=[scale, scale, 1], order=0)
-    mask = np.pad(mask, padding, mode='constant', constant_values=0)
+    new_mask = scipy.ndimage.zoom(mask, zoom=[scale, scale, 1], order=1)
+    new_mask = np.pad(new_mask, padding, mode='constant', constant_values=0)
+
+    # Debugging
+    #import matplotlib.pyplot as plt
+    #for i in range(mask.shape[2]):
+    #    plt.imshow(mask[:,:,i])
+    #    plt.figure()
+    #    plt.imshow(new_mask[:,:,i])
+    #    plt.show()
+
     return mask
 
 

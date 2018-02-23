@@ -226,6 +226,7 @@ class XrayDataset(utils.Dataset):
         in the form of a bitmap [height, width, instances].
         """
         info = self.get_image_info(image_id)
+        print("Creating mask for ",image_id,info)
 
         for i,box in enumerate(info["annotations"]):
             # Convert to center and radius
@@ -238,6 +239,13 @@ class XrayDataset(utils.Dataset):
             mask = np.zeros((info["height"], info["width"]), dtype=np.uint8)
             rr, cc = draw.ellipse(center_y, center_x, r_y, r_x, shape=mask.shape)
             mask[rr, cc] = 1
+            # Debugging
+            #import matplotlib.pyplot as plt
+            #image = scipy.ndimage.imread(info["path"])
+            #image[rr, cc] = mask[rr, cc]*0.4
+            #plt.imshow(image)
+            #plt.imshow(mask)
+            #plt.show()
             # Save image
             path = self.get_mask_path(dataset_dir, image_id, i)
             im = Image.fromarray(mask)
@@ -267,6 +275,14 @@ class XrayDataset(utils.Dataset):
                 mask = scipy.ndimage.imread(path)
                 mask = mask.astype(np.bool)
                 masks.append(mask)
+                # Debugging
+                #import matplotlib.pyplot as plt
+                #image = scipy.ndimage.imread(info["path"])
+                #plt.figure()
+                #plt.imshow(image)
+                #plt.figure()
+                #plt.imshow(mask)
+                #plt.show()
             else:
                 break
         mask = np.stack(masks,axis=-1)
