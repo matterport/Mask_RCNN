@@ -18,8 +18,6 @@ import matplotlib.patches as patches
 import matplotlib.lines as lines
 
 import utils
-import visualize
-from visualize import display_images
 import model as modellib
 from model import log
 
