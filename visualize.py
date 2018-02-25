@@ -62,7 +62,7 @@ def random_colors(N, bright=True):
     return colors
 
 
-def apply_mask(image, mask, color, alpha=0.5):
+def apply_mask(image, mask, color, alpha=0.1):
     """Apply the given mask to the image.
     """
     for c in range(3):
@@ -124,7 +124,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         label = class_names[class_id]
         x = random.randint(x1, (x1 + x2) // 2)
         caption = "{} {:.3f}".format(label, score) if score else label
-        ax.text(x1, y1 + 8, caption,
+        ax.text(x2+4, y1 + 8, caption,
                 color='w', size=11, backgroundcolor="none")
 
         # Mask
@@ -144,7 +144,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     plt.show()
-    
+    return ax
 
 def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10):
     """
@@ -377,7 +377,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
             if refined_boxes is not None:
                 y1, x1, y2, x2 = ry1, rx1, ry2, rx2
             x = random.randint(x1, (x1 + x2) // 2)
-            ax.text(x1, y1, caption, size=11, verticalalignment='top',
+            ax.text(x2, y1, caption, size=11, verticalalignment='top',
                     color='w', backgroundcolor="none",
                     bbox={'facecolor': color, 'alpha': 0.5,
                           'pad': 2, 'edgecolor': 'none'})

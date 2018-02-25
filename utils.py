@@ -464,7 +464,7 @@ def resize_mask(mask, scale, padding):
     #    plt.imshow(new_mask[:,:,i])
     #    plt.show()
 
-    return mask
+    return new_mask
 
 
 def minimize_mask(bbox, mask, mini_shape):

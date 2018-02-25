@@ -40,6 +40,7 @@ import shutil
 from PIL import Image
 from skimage import draw
 from config import Config
+from preprocessing import prepare_welding
 import utils
 import model as modellib
 import numpy as np
@@ -62,7 +63,7 @@ DEFAULT_DATASET_YEAR = "2014"
 
 DATASETS = {
     "Castings": "http://dmery.sitios.ing.uc.cl/images/GDXray/Castings.zip",
-    "Welds": "http://dmery.sitios.ing.uc.cl/images/GDXray/Welds.zip"
+    "Welding": "http://dmery.sitios.ing.uc.cl/images/GDXray/Welds.zip"
 }
 
 
@@ -156,15 +157,24 @@ class XrayDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, series)
 
+        castings_metadata = "metadata/gdxray/castings_{0}.txt".format(subset)
+        welds_metadata = "metadata/gdxray/welds_{0}.txt".format(subset)
+
         if series=="Castings":
-            metadata = "metadata/gdxray/castings_{0}.txt".format(subset)
+            metadata = [castings_metadata]
 
         if series=="Welds":
-            metadata = "metadata/gdxray/welds_{0}.txt".format(subset)
+            metadata = [welds_metadata]
 
-        with open(metadata,"r") as metadata_file:
-            image_ids = metadata_file.readlines()
-            image_ids = [p.rstrip() for p in image_ids]
+        if series=="All":
+            metadata = [castings_metadata, welds_metadata]
+
+        image_ids = []
+        for metadata_path in metadata:
+            with open(metadata_path,"r") as metadata_file:
+                image_ids += metadata_file.readlines()
+        # Strip all the newlines
+        image_ids = [p.rstrip() for p in image_ids]
 
         boxes = self.load_boxes(dataset_dir, series)
 
@@ -178,6 +188,10 @@ class XrayDataset(utils.Dataset):
             im = Image.open(path)
             width, height = im.size
 
+            if not os.path.exists(self.get_mask_path(dataset_dir, image_id, 0)):
+                print("Skipping ",image_id," Reason: No mask")
+                continue
+
             self.add_image(
                 "gdxray",
                 image_id=image_id,
@@ -188,7 +202,6 @@ class XrayDataset(utils.Dataset):
                 annotations=boxes.get(image_id,[])
             )
             # self.create_mask(dataset_dir,image_id)
-
 
 
     def load_boxes(self, dataset_dir, series):
@@ -286,7 +299,13 @@ class XrayDataset(utils.Dataset):
             else:
                 break
         mask = np.stack(masks,axis=-1)
-        class_ids = np.array([CASTING_DEFECT for _ in range(len(masks))], dtype=np.int32)
+
+        # Get defect type
+        CLASS = CASTING_DEFECT
+        if "weld" in image_id.lower():
+            CLASS = WELDING_DEFECT
+        class_ids = np.array([CLASS for _ in range(len(masks))], dtype=np.int32)
+
         return mask, class_ids
 
 
@@ -317,8 +336,8 @@ class XrayDataset(utils.Dataset):
         dataset_dir: The directory to place the dataset
         series: The series to download "Castings, Welds, Both"
         """
-        if series=="Both":
-            all_series = ["Castings","Welds"]
+        if series=="All":
+            all_series = ["Castings","Welding"]
         else:
             all_series = [series]
 
@@ -351,6 +370,14 @@ class XrayDataset(utils.Dataset):
                 if os.path.exists(mac_dir):
                     print("Removing ",mac_dir)
                     shutil.rmtree(mac_dir)
+
+        # Prepare the welding set
+        weld_original = os.path.join(dataset_dir, "Welding")
+        weld_processed = os.path.join(dataset_dir, "Welds")
+        if os.path.exists(weld_original) and not os.path.exists(weld_processed):
+            print("Preparing the welding data")
+            prepare_welding()
+
         print("Finished downloading datasets")
 
 
