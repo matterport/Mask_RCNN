@@ -22,7 +22,7 @@ import model as modellib
 from model import log
 
 ROOT_DIR = os.getcwd()
-DATA_DIR = os.path.expanduser("~/data/gdxray")
+DATA_DIR = os.path.expanduser("~/data/GDXray")
 
 
 from PIL import Image
