@@ -108,7 +108,7 @@ class TrainConfig(Config):
     VALIDATION_STEPS = 50
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # We classify weld defect and casting defect
+    NUM_CLASSES = 1 + 2  # We classify weld defect and casting defect
 
     IMAGE_MIN_DIM = 256
     IMAGE_MAX_DIM = 768
@@ -191,6 +191,8 @@ class XrayDataset(utils.Dataset):
             if not os.path.exists(self.get_mask_path(dataset_dir, image_id, 0)):
                 print("Skipping ",image_id," Reason: No mask")
                 continue
+
+            print("Adding image:", image_id)
 
             self.add_image(
                 "gdxray",
