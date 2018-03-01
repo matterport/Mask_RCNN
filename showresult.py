@@ -35,7 +35,7 @@ for file in files:
         shutil.copy(src, dst)
 
         boxes = r['rois']
-        for i in boxes.shape[0]:
+        for i in boxes.shape[:
             y1, x1, y2, x2 = boxes[i]
             sub_image = image[y1:y2, x1:x2, :]
             io.imsave(os.path.join(dir_path, "%s.jpg" % i), sub_image)
