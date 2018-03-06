@@ -127,12 +127,16 @@ class Config(object):
     # Non-maximum suppression threshold for detection
     DETECTION_NMS_THRESHOLD = 0.3
 
-    # Learning rate and momentum
-    # The Mask RCNN paper uses lr=0.02, but on TensorFlow it causes
-    # weights to explode. Likely due to differences in optimzer
-    # implementation.
-    LEARNING_RATE = 0.001
-    LEARNING_MOMENTUM = 0.9
+    # The optimiser class to use in Keras.optimizers
+    OPTIMIZER = "Nadam"
+    # The parameters for the chosen optimizer
+    OPTIMIZER_PARAMS = {
+        "lr": 0.0005,
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": None,
+        "schedule_decay": 0.004
+    }
 
     # Weight decay regularization
     WEIGHT_DECAY = 0.0001

@@ -2068,13 +2068,18 @@ class MaskRCNN():
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
 
-    def compile(self, learning_rate, momentum):
+    def compile(self, learning_rate_multiplier=1.0):
         """Gets the model ready for training. Adds losses, regularization, and
         metrics. Then calls the Keras compile() function.
         """
         # Optimizer object
-        optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum,
-                                         clipnorm=5.0)
+
+        optimizer_class = getattr(keras.optimizers, self.config.OPTIMIZER)
+        optimizer_params = {}
+        optimizer_params.update(self.config.OPTIMIZER_PARAMS)
+        optimizer_params['lr'] *= learning_rate_multiplier
+        optimizer = optimizer_class(**optimizer_params)
+
         # Add Losses
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
@@ -2096,8 +2101,10 @@ class MaskRCNN():
         self.keras_model.add_loss(tf.add_n(reg_losses))
 
         # Compile
-        self.keras_model.compile(optimizer=optimizer, loss=[
-                                 None] * len(self.keras_model.outputs))
+        self.keras_model.compile(
+            optimizer=optimizer,
+            loss=[None] * len(self.keras_model.outputs)
+        )
 
         # Add metrics for losses
         for name in loss_names:
@@ -2179,10 +2186,11 @@ class MaskRCNN():
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
 
-    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers):
+    def train(self, train_dataset, val_dataset, learning_rate_multiplier, epochs, layers):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
-        learning_rate: The learning rate to train with
+        learning_rate_multiplier: Multiply the learning rate in the config by
+                this fraction before training.
         epochs: Number of training epochs. Note that previous training epochs
                 are considered to be done alreay, so this actually determines
                 the epochs to train in total rather than in this particaular
@@ -2228,10 +2236,10 @@ class MaskRCNN():
         ]
 
         # Train
-        log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
+        log("\nStarting at epoch {}. LR multiplier={}\n".format(self.epoch, learning_rate_multiplier))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)
-        self.compile(learning_rate, self.config.LEARNING_MOMENTUM)
+        self.compile(learning_rate_multiplier)
 
         # Work-around for Windows: Keras fails on Windows when using
         # multiprocessing workers. See discussion here:
