@@ -144,6 +144,24 @@ class Config(object):
     # train the RPN.
     USE_RPN_ROIS = True
 
+    # Data augmentation parameters (see http://imgaug.readthedocs.io/en/latest/index.html)
+    # Vertically flip the data 50% of the time (None to disable)
+    AUGMENTATION_FLIP_UD = 0.50
+    # Horizontally flip the data 50% of the time  (None to disable)
+    AUGMENTATION_FLIP_LR = 0.50
+    # Zoom, translate, shear and rotate the data  (None to disable)
+    # The example below scales both axes from 80-120%, translates in both axes -20% to 20%,
+    # rotates from -5 to 5 degrees and shears -5 to 5 degrees
+    # Order must be 0 in order to disable mask interpolation
+    AUGMENTATION_AFFINE = {
+        "scale": {"x": (0.8, 1.2), "y": (0.8, 1.2)}, 
+        "translate_percent": {"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+        "rotate": (-5, 5),
+        "shear": (-5, 5),
+        "order": 0,
+        "clipnorm": 5.0
+    }
+
     def __init__(self):
         """Set values of computed attributes."""
         # Effective batch size

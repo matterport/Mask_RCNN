@@ -17,7 +17,9 @@ import itertools
 import json
 import re
 import logging
+
 from collections import OrderedDict
+from imgaug import augmenters as iaa
 import numpy as np
 import scipy.misc
 import tensorflow as tf
@@ -1198,10 +1200,17 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
+    augmentations = []
     if augment:
-        if random.randint(0, 1):
-            image = np.fliplr(image)
-            mask = np.fliplr(mask)
+        if config.AUGMENTATION_FLIP_LR:
+            augmentations.append(iaa.Fliplr(config.AUGMENTATION_FLIP_LR))
+        if config.AUGMENTATION_FLIP_UD:
+            augmentations.append(iaa.Flipud(config.AUGMENTATION_FLIP_UD))
+        if config.AUGMENTATION_AFFINE:
+            augmentations.append(iaa.Affine(**config.AUGMENTATION_AFFINE))
+    seq = iaa.Sequential(augmentations)
+    seq_det = seq.to_deterministic()
+    image, mask = seq_det.augment_image(image), seq_det.augment_image(mask)
 
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
@@ -1730,10 +1739,17 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
                 b = 0
         except (GeneratorExit, KeyboardInterrupt):
             raise
+        except utils.TrainingError:
+            # Log it and skip the image
+            # If it is a training error like zero area, don't count the error
+            logging.exception(
+                "Skipping due to training error on image {}".format(dataset.image_info[image_id])
+            )
         except:
             # Log it and skip the image
-            logging.exception("Error processing image {}".format(
-                dataset.image_info[image_id]))
+            logging.exception(
+                "Error processing image {}".format(dataset.image_info[image_id])
+            )
             error_count += 1
             if error_count > 5:
                 raise

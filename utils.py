@@ -24,6 +24,13 @@ COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0
 
 
 ############################################################
+#  Exceptions
+############################################################
+
+class TrainingError(RuntimeError):
+    pass
+
+############################################################
 #  Bounding Boxes
 ############################################################
 
@@ -446,7 +453,6 @@ def resize_mask(mask, scale, padding):
     mask = np.pad(mask, padding, mode='constant', constant_values=0)
     return mask
 
-
 def minimize_mask(bbox, mask, mini_shape):
     """Resize masks to a smaller version to cut memory load.
     Mini-masks can then resized back to image scale using expand_masks()
@@ -459,7 +465,7 @@ def minimize_mask(bbox, mask, mini_shape):
         y1, x1, y2, x2 = bbox[i][:4]
         m = m[y1:y2, x1:x2]
         if m.size == 0:
-            raise Exception("Invalid bounding box with area of zero")
+            raise TrainingError("Invalid bounding box with area of zero")
         m = scipy.misc.imresize(m.astype(float), mini_shape, interp='bilinear')
         mini_mask[:, :, i] = np.where(m >= 128, 1, 0)
     return mini_mask
