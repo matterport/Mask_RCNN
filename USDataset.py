@@ -12,8 +12,9 @@ import utils
 # masks_path = '/home/liuml/maskrcnn/data/masks/'
 
 ROOT_DIR = os.getcwd()
-images_path =  os.path.join(ROOT_DIR, 'data/images/')
-masks_path =  os.path.join(ROOT_DIR, 'data/masks/')
+images_path = os.path.join(ROOT_DIR, 'data/images/')
+masks_path = os.path.join(ROOT_DIR, 'data/masks/')
+
 
 class USDataset(utils.Dataset):
     """Generates the shapes synthetic dataset. The dataset consists of simple
@@ -28,12 +29,13 @@ class USDataset(utils.Dataset):
         self.path = path
         self.add_class("", 1, 'mass')
 
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding="gb18030", errors='ignore') as f:
             lines = f.readlines()
             count = 0
             for line in lines:
                 line = line.strip()
-                self.add_image(source='', path=images_path + line, image_id=count)
+                line = line.split(" ")[0]
+                self.add_image(source='', path=os.path.join(images_path, line), image_id=count)
                 count = count + 1
         print('load image: %d' % len(self.image_info))
 

@@ -12,6 +12,7 @@
 
 import os
 import pickle
+import traceback
 import tensorflow as tf
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -123,7 +124,7 @@ dataset_train = USDataset('train.txt')
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = USDataset('test.txt')
+dataset_val = USDataset('data/label.txt')
 dataset_val.prepare()
 
 
@@ -207,55 +208,63 @@ model.load_weights(model_path, by_name=True)
 
 # Compute VOC-Style mAP @ IoU=0.5
 # Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 41)
+# image_ids = np.random.choice(dataset_val.image_ids, 330)
+image_ids = dataset_val.image_ids
 APs = []
 for image_id in image_ids:
-    # Load image and ground truth data
-    image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config,
-                                                                              image_id, use_mini_mask=False)
-    # print(image.shape)
-    molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
-    # Run object detection
-    results = model.detect([image], verbose=0)
+    try:
+        # Load image and ground truth data
+        image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config,
+                                                                                  image_id, use_mini_mask=False)
+        # print(image.shape)
+        molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
+        # Run object detection
+        results = model.detect([image], verbose=0)
 
-    r = results[0]
-    rois = r['rois']
-    area = (rois[:,2] - rois[:, 0]) * (rois[:,3] - rois[:, 1])
-    ids = np.transpose(np.asarray(np.where(area > 1000)), (0, 1))[0]
-    rois = np.asarray(r['rois'])[ids, :]
-    class_ids = np.asarray(r['class_ids'])[ids]
-    scores = np.asarray(r['scores'])[ids]
-    masks = np.asarray(r['masks'])[:, :, ids]
+        r = results[0]
+        rois = r['rois']
+        area = (rois[:, 2] - rois[:, 0]) * (rois[:, 3] - rois[:, 1])
+        ids = np.transpose(np.asarray(np.where(area > 1000)), (0, 1))[0]
+        rois = np.asarray(r['rois'])[ids, :]
+        class_ids = np.asarray(r['class_ids'])[ids]
+        scores = np.asarray(r['scores'])[ids]
+        masks = np.asarray(r['masks'])[:, :, ids]
+        print(ids.shape[0])
+        if ids.shape[0] < 5:
+            ids = np.argsort(scores)[::-1][0: ids.shape[0]]
+        else:
+            ids = np.argsort(scores)[::-1][0: 5]
+        rois = rois[ids, :]
+        class_ids = class_ids[ids]
+        scores = scores[ids]
+        masks = masks[:, :, ids]
+        r = {'rois': rois, 'scores': scores, 'masks': masks, 'class_ids': class_ids}
 
-    ids = np.argsort(scores)[::-1][0: 5]
-    rois = rois[ids, :]
-    class_ids = class_ids[ids]
-    scores = scores[ids]
-    masks = masks[:, :, ids]
-    r = {'rois':rois, 'scores': scores, 'masks':masks, 'class_ids':class_ids}
+        IMAGE_DIR = ''
+        file_names = dataset_val.image_info[image_id]['path']
+        # print(file_names)
+        # image = skimage.io.imread(file_names)
 
-    IMAGE_DIR = ''
-    file_names = dataset_val.image_info[image_id]['path']
-    # print(file_names)
-    # image = skimage.io.imread(file_names)
+        # # Run detection
+        # results = model.detect([image], verbose=1)
 
-    # # Run detection
-    # results = model.detect([image], verbose=1)
-
-    # Visualize results
-    result_name = file_names.split('.')
-    fr = open(result_name[0] + '.dat', 'wb')
-    pickle.dump([image, r, ['mass']], fr)
-    fr.flush()
-    fr.close()
-    # Compute AP
-    AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
-                                                         r["rois"], r["class_ids"], r["scores"])
-    # print("************************************")
-    # print(AP)
-    # print(precisions)
-    # print(recalls)
-    # print(overlaps)
-    # APs.append(AP)
+        # Visualize results
+        result_name = file_names.split('.')
+        fr = open(result_name[0] + '.dat', 'wb')
+        pickle.dump([image, r, ['mass']], fr)
+        fr.flush()
+        fr.close()
+        print(result_name[0] + '.dat')
+        # Compute AP
+        # AP, precisions, recalls, overlaps = utils.compute_ap(gt_bbox, gt_class_id,
+        #                                                      r["rois"], r["class_ids"], r["scores"])
+        # print("************************************")
+    except Exception as e:
+        traceback.print_exc()
+        # print(AP)
+        # print(precisions)
+        # print(recalls)
+        # print(overlaps)
+        # APs.append(AP)
 
 print("mAP: ", np.mean(APs))

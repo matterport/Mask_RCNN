@@ -34,8 +34,8 @@ for file in files:
         dst = os.path.join(dir_path, "ori.bmp")
         shutil.copy(src, dst)
 
-        boxes = r['rois']
-        for i in boxes.shape[:
+        boxes = np.asarray(r['rois'])
+        for i in range(boxes.shape[0]):
             y1, x1, y2, x2 = boxes[i]
             sub_image = image[y1:y2, x1:x2, :]
             io.imsave(os.path.join(dir_path, "%s.jpg" % i), sub_image)

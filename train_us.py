@@ -112,7 +112,7 @@ dataset_train = USDataset('train.txt')
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = USDataset('val.txt')
+dataset_val = USDataset('test.txt')
 dataset_val.prepare()
 
 # In[6]:
