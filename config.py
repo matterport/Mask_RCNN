@@ -25,6 +25,9 @@ class Config(object):
     # experiment is running.
     NAME = None  # Override in sub-classes
 
+    # Number of classification classes (including background)
+    NUM_CLASSES = None  # Override in sub-classes
+
     # NUMBER OF GPUs to use. For CPU training, use 1
     GPU_COUNT = 1
 
@@ -33,6 +36,9 @@ class Config(object):
     # Adjust based on your GPU memory and image sizes. Use the highest
     # number that your GPU can handle for best performance.
     IMAGES_PER_GPU = 2
+
+    # Image mean (RGB)
+    MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
 
     # Number of training steps per epoch
     # This doesn't need to match the size of the training set. Tensorboard
@@ -51,9 +57,6 @@ class Config(object):
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
-
-    # Number of classification classes (including background)
-    NUM_CLASSES = 1  # Override in sub-classes
 
     # Length of square anchor side in pixels
     RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
@@ -92,9 +95,6 @@ class Config(object):
     # If True, pad images with zeros such that they're (max_dim by max_dim)
     IMAGE_PADDING = True  # currently, the False option is not supported
 
-    # Image mean (RGB)
-    MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
-
     # Number of ROIs per image to feed to classifier/mask heads
     # The Mask RCNN paper uses 512 but often the RPN doesn't generate
     # enough positive proposals to fill this and keep a positive:negative
@@ -131,11 +131,12 @@ class Config(object):
     OPTIMIZER = "Nadam"
     # The parameters for the chosen optimizer
     OPTIMIZER_PARAMS = {
-        "lr": 0.0005,
+        "lr": 0.0001,
         "beta_1": 0.9,
         "beta_2": 0.999,
         "epsilon": None,
-        "schedule_decay": 0.004
+        "schedule_decay": 0.004,
+        "clipnorm": 5.0
     }
 
     # Weight decay regularization
@@ -158,12 +159,11 @@ class Config(object):
     # rotates from -5 to 5 degrees and shears -5 to 5 degrees
     # Order must be 0 in order to disable mask interpolation
     AUGMENTATION_AFFINE = {
-        "scale": {"x": (0.8, 1.2), "y": (0.8, 1.2)}, 
-        "translate_percent": {"x": (-0.2, 0.2), "y": (-0.2, 0.2)},
+        # "scale": {"x": (1.0, 1.4), "y": (1.0, 1.4)}, 
+        # "translate_percent": {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
         "rotate": (-5, 5),
         "shear": (-5, 5),
         "order": 0,
-        "clipnorm": 5.0
     }
 
     def __init__(self):
