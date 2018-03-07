@@ -166,6 +166,19 @@ class Config(object):
         "order": 0,
     }
 
+    # Decrease the LR if it has not decreased in a given number of epochs
+    # See keras.callbacks.ReduceLROnPlateau
+    LR_PLATEAU = {
+        "monitor": 'val_loss',
+        "factor": 0.5,
+        "patience": 10,
+        "verbose": 1,
+        "mode": 'auto',
+        "epsilon": 0.0001,
+        "cooldown": 0,
+        "min_lr": 1e-7
+    }
+
     def __init__(self):
         """Set values of computed attributes."""
         # Effective batch size

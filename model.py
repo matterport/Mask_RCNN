@@ -2234,6 +2234,8 @@ class MaskRCNN():
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
         ]
+        if self.config.LR_PLATEAU:
+            callbacks.append(keras.callbacks.ReduceLROnPlateau(**self.config.LR_PLATEAU))
 
         # Train
         log("\nStarting at epoch {}. LR multiplier={}\n".format(self.epoch, learning_rate_multiplier))
