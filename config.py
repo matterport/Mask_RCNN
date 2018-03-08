@@ -131,7 +131,7 @@ class Config(object):
     OPTIMIZER = "Nadam"
     # The parameters for the chosen optimizer
     OPTIMIZER_PARAMS = {
-        "lr": 0.0001,
+        "lr": 5e-7,
         "beta_1": 0.9,
         "beta_2": 0.999,
         "epsilon": None,
@@ -159,11 +159,11 @@ class Config(object):
     # rotates from -5 to 5 degrees and shears -5 to 5 degrees
     # Order must be 0 in order to disable mask interpolation
     AUGMENTATION_AFFINE = {
-        # "scale": {"x": (1.0, 1.4), "y": (1.0, 1.4)}, 
-        # "translate_percent": {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
-        "rotate": (-5, 5),
-        "shear": (-5, 5),
         "order": 0,
+        "rotate": (-5, 5),
+        "scale": {"x": (0.8, 1.2), "y": (0.8, 1.2)}, 
+        "shear": (-5, 5),
+        # "translate_percent": {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
     }
 
     # Decrease the LR if it has not decreased in a given number of epochs
@@ -175,8 +175,8 @@ class Config(object):
         "verbose": 1,
         "mode": 'auto',
         "epsilon": 0.0001,
-        "cooldown": 0,
-        "min_lr": 1e-7
+        "cooldown": 5,
+        "min_lr": 1e-10
     }
 
     def __init__(self):
