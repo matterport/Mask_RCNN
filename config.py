@@ -48,6 +48,10 @@ class Config(object):
     # down the training.
     VALIDATION_STEPS = 50
 
+    # Backbone network architecture
+    # Supported values are: resnet50, resnet101
+    BACKBONE = "resnet101"
+
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
