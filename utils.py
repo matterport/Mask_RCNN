@@ -364,9 +364,21 @@ class Dataset(object):
         """
         # Load image
         image = skimage.io.imread(self.image_info[image_id]['path'])
+        if isinstance(image, object):
+            # Temporary bugfix for PIL error
+            image = skimage.io.imread(self.image_info[image_id]['path'], plugin='matplotlib')
+
+        if not isinstance(image, np.ndarray):
+            print(image)
+            raise Exception("skimage.io.read failed: image is of type {:s}".format(str(type(image))))
         # If grayscale. Convert to RGB for consistency.
-        if image.ndim != 3:
-            image = skimage.color.gray2rgb(image)
+        if image.ndim == 1 or (image.ndim == 3 and image.shape[2] == 1):
+            image = skimage.color.gray2rgb(np.squeeze(image))
+        elif image.ndim == 3:
+            if image.shape[2] > 3:
+                image = image[..., 0:3] # Remove any alpha channel
+            elif image.shape[2] != 3:
+                raise Exception("load_image tried to load an image with dims of {:s}".format(str(image.shape)))
         return image
 
     def load_mask(self, image_id):
