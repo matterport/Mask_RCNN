@@ -17,7 +17,9 @@ import itertools
 import json
 import re
 import logging
+
 from collections import OrderedDict
+from imgaug import augmenters as iaa
 import numpy as np
 import scipy.misc
 import tensorflow as tf
@@ -1198,10 +1200,17 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
+    augmentations = []
     if augment:
-        if random.randint(0, 1):
-            image = np.fliplr(image)
-            mask = np.fliplr(mask)
+        if config.AUGMENTATION_FLIP_LR:
+            augmentations.append(iaa.Fliplr(config.AUGMENTATION_FLIP_LR))
+        if config.AUGMENTATION_FLIP_UD:
+            augmentations.append(iaa.Flipud(config.AUGMENTATION_FLIP_UD))
+        if config.AUGMENTATION_AFFINE:
+            augmentations.append(iaa.Affine(**config.AUGMENTATION_AFFINE))
+    seq = iaa.Sequential(augmentations)
+    seq_det = seq.to_deterministic()
+    image, mask = seq_det.augment_image(image), seq_det.augment_image(mask)
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
@@ -1735,10 +1744,17 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
                 b = 0
         except (GeneratorExit, KeyboardInterrupt):
             raise
+        except utils.TrainingError:
+            # Log it and skip the image
+            # If it is a training error like zero area, don't count the error
+            logging.exception(
+                "Skipping due to training error on image {}".format(dataset.image_info[image_id])
+            )
         except:
             # Log it and skip the image
-            logging.exception("Error processing image {}".format(
-                dataset.image_info[image_id]))
+            logging.exception(
+                "Error processing image {}".format(dataset.image_info[image_id])
+            )
             error_count += 1
             if error_count > 5:
                 raise
@@ -2057,13 +2073,18 @@ class MaskRCNN():
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
 
-    def compile(self, learning_rate, momentum):
+    def compile(self, learning_rate_multiplier=1.0):
         """Gets the model ready for training. Adds losses, regularization, and
         metrics. Then calls the Keras compile() function.
         """
         # Optimizer object
-        optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum,
-                                         clipnorm=5.0)
+
+        optimizer_class = getattr(keras.optimizers, self.config.OPTIMIZER)
+        optimizer_params = {}
+        optimizer_params.update(self.config.OPTIMIZER_PARAMS)
+        optimizer_params['lr'] *= learning_rate_multiplier
+        optimizer = optimizer_class(**optimizer_params)
+
         # Add Losses
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
@@ -2085,8 +2106,10 @@ class MaskRCNN():
         self.keras_model.add_loss(tf.add_n(reg_losses))
 
         # Compile
-        self.keras_model.compile(optimizer=optimizer, loss=[
-                                 None] * len(self.keras_model.outputs))
+        self.keras_model.compile(
+            optimizer=optimizer,
+            loss=[None] * len(self.keras_model.outputs)
+        )
 
         # Add metrics for losses
         for name in loss_names:
@@ -2168,10 +2191,11 @@ class MaskRCNN():
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
 
-    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers):
+    def train(self, train_dataset, val_dataset, learning_rate_multiplier, epochs, layers):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
-        learning_rate: The learning rate to train with
+        learning_rate_multiplier: Multiply the learning rate in the config by
+                this fraction before training.
         epochs: Number of training epochs. Note that previous training epochs
                 are considered to be done alreay, so this actually determines
                 the epochs to train in total rather than in this particaular
@@ -2215,12 +2239,14 @@ class MaskRCNN():
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
         ]
+        if self.config.LR_PLATEAU:
+            callbacks.append(keras.callbacks.ReduceLROnPlateau(**self.config.LR_PLATEAU))
 
         # Train
-        log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
+        log("\nStarting at epoch {}. LR multiplier={}\n".format(self.epoch, learning_rate_multiplier))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)
-        self.compile(learning_rate, self.config.LEARNING_MOMENTUM)
+        self.compile(learning_rate_multiplier)
 
         # Work-around for Windows: Keras fails on Windows when using
         # multiprocessing workers. See discussion here:

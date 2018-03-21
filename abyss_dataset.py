@@ -89,26 +89,21 @@ class CocoConfig(Config):
 ############################################################
 
 class CocoDataset(utils.Dataset):
-    def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_ids=None,
-                  class_map=None, return_coco=False, auto_download=False):
+    def load_coco(self, dataset_path, image_dir=None, class_ids=None,
+                  class_map=None, return_coco=False):
         """Load a subset of the COCO dataset.
-        dataset_dir: The root directory of the COCO dataset.
-        subset: What to load (train, val, minival, valminusminival)
-        year: What dataset year to load (2014, 2017) as a string, not an integer
+        dataset_path: Thepath to the COCO dataset JSON.
+        image_dir: The base path of the RGB images, if None then look for 'path' key in JSON
         class_ids: If provided, only loads images that have the given classes.
         class_map: TODO: Not implemented yet. Supports maping classes from
             different datasets to the same class ID.
         return_coco: If True, returns the COCO object.
-        auto_download: Automatically download and unzip MS-COCO images and annotations
+        auto_download: REMOVED
         """
 
-        if auto_download is True:
-            self.auto_download(dataset_dir, subset, year)
-
-        coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
-        if subset == "minival" or subset == "valminusminival":
-            subset = "val"
-        image_dir = "{}/{}{}".format(dataset_dir, subset, year)
+        # if auto_download is True:
+        #     self.auto_download(os.path.dirname(dataset_path), subset, year)
+        coco = COCO(dataset_path)
 
         # Load all classes or a subset?
         if not class_ids:
@@ -132,9 +127,10 @@ class CocoDataset(utils.Dataset):
 
         # Add images
         for i in image_ids:
+            path = os.path.join(image_dir, coco.imgs[i]['file_name']) if image_dir != None else coco.imgs[i]['path']
             self.add_image(
                 "coco", image_id=i,
-                path=os.path.join(image_dir, coco.imgs[i]['file_name']),
+                path=path,
                 width=coco.imgs[i]["width"],
                 height=coco.imgs[i]["height"],
                 annotations=coco.loadAnns(coco.getAnnIds(

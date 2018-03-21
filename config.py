@@ -25,6 +25,9 @@ class Config(object):
     # experiment is running.
     NAME = None  # Override in sub-classes
 
+    # Number of classification classes (including background)
+    NUM_CLASSES = None  # Override in sub-classes
+
     # NUMBER OF GPUs to use. For CPU training, use 1
     GPU_COUNT = 1
 
@@ -33,6 +36,9 @@ class Config(object):
     # Adjust based on your GPU memory and image sizes. Use the highest
     # number that your GPU can handle for best performance.
     IMAGES_PER_GPU = 2
+
+    # Image mean (RGB)
+    MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
 
     # Number of training steps per epoch
     # This doesn't need to match the size of the training set. Tensorboard
@@ -55,9 +61,6 @@ class Config(object):
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
-
-    # Number of classification classes (including background)
-    NUM_CLASSES = 1  # Override in sub-classes
 
     # Length of square anchor side in pixels
     RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
@@ -96,9 +99,6 @@ class Config(object):
     # If True, pad images with zeros such that they're (max_dim by max_dim)
     IMAGE_PADDING = True  # currently, the False option is not supported
 
-    # Image mean (RGB)
-    MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
-
     # Number of ROIs per image to feed to classifier/mask heads
     # The Mask RCNN paper uses 512 but often the RPN doesn't generate
     # enough positive proposals to fill this and keep a positive:negative
@@ -131,12 +131,17 @@ class Config(object):
     # Non-maximum suppression threshold for detection
     DETECTION_NMS_THRESHOLD = 0.3
 
-    # Learning rate and momentum
-    # The Mask RCNN paper uses lr=0.02, but on TensorFlow it causes
-    # weights to explode. Likely due to differences in optimzer
-    # implementation.
-    LEARNING_RATE = 0.001
-    LEARNING_MOMENTUM = 0.9
+    # The optimiser class to use in Keras.optimizers
+    OPTIMIZER = "Nadam"
+    # The parameters for the chosen optimizer
+    OPTIMIZER_PARAMS = {
+        "lr": 2e-3, 
+        "beta_1": 0.9,
+        "beta_2": 0.999,
+        "epsilon": None,
+        "schedule_decay": 0.004,
+        "clipnorm": 5.0
+    }
 
     # Weight decay regularization
     WEIGHT_DECAY = 0.0001
@@ -147,6 +152,39 @@ class Config(object):
     # the RPN. For example, to debug the classifier head without having to
     # train the RPN.
     USE_RPN_ROIS = True
+    BACKBONE = ["resnet50", "resnet101"][0]
+
+    # Specifies the backbone to use, choose one of existing
+
+    # Data augmentation parameters (see http://imgaug.readthedocs.io/en/latest/index.html)
+    # Vertically flip the data 50% of the time (None to disable)
+    AUGMENTATION_FLIP_UD = 0.50
+    # Horizontally flip the data 50% of the time  (None to disable)
+    AUGMENTATION_FLIP_LR = 0.50
+    # Zoom, translate, shear and rotate the data  (None to disable)
+    # The example below scales both axes from 80-120%, translates in both axes -20% to 20%,
+    # rotates from -5 to 5 degrees and shears -5 to 5 degrees
+    # Order must be 0 in order to disable mask interpolation
+    AUGMENTATION_AFFINE = {
+        "order": 0,
+        "rotate": (-5, 5),
+        "scale": {"x": (0.8, 1.2), "y": (0.8, 1.2)}, 
+        "shear": (-5, 5),
+        # "translate_percent": {"x": (-0.1, 0.1), "y": (-0.1, 0.1)},
+    }
+
+    # Decrease the LR if it has not decreased in a given number of epochs
+    # See keras.callbacks.ReduceLROnPlateau
+    LR_PLATEAU = {
+        "monitor": 'val_loss',
+        "factor": 0.5,
+        "patience": 20,
+        "verbose": 1,
+        "mode": 'auto',
+        "epsilon": 0.0001,
+        "cooldown": 5,
+        "min_lr": 1e-7
+    }
 
     def __init__(self):
         """Set values of computed attributes."""

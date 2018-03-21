@@ -46,7 +46,7 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         plt.imshow(image.astype(np.uint8), cmap=cmap,
                    norm=norm, interpolation=interpolation)
         i += 1
-    plt.show()
+    # plt.show()
 
 
 def random_colors(N, bright=True):
@@ -92,7 +92,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
     if not ax:
-        _, ax = plt.subplots(1, figsize=figsize)
+        # _, ax = plt.subplots(1, figsize=figsize)
+        ax = plt.gca()
 
     # Generate random colors
     colors = random_colors(N)
@@ -143,7 +144,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.show()
+    # plt.show()
     
 
 def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10):
@@ -271,7 +272,7 @@ def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
     gt_class_ids = gt_class_ids[gt_class_ids != 0]
     pred_class_ids = pred_class_ids[pred_class_ids != 0]
 
-    plt.figure(figsize=(12, 10))
+    # plt.figure(figsize=(12, 10))
     plt.imshow(overlaps, interpolation='nearest', cmap=plt.cm.Blues)
     plt.yticks(np.arange(len(pred_class_ids)),
                ["{} ({:.2f})".format(class_names[int(id)], pred_scores[i])

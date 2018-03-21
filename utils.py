@@ -24,6 +24,13 @@ COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0
 
 
 ############################################################
+#  Exceptions
+############################################################
+
+class TrainingError(RuntimeError):
+    pass
+
+############################################################
 #  Bounding Boxes
 ############################################################
 
@@ -357,9 +364,21 @@ class Dataset(object):
         """
         # Load image
         image = skimage.io.imread(self.image_info[image_id]['path'])
+        if isinstance(image, object):
+            # Temporary bugfix for PIL error
+            image = skimage.io.imread(self.image_info[image_id]['path'], plugin='matplotlib')
+
+        if not isinstance(image, np.ndarray):
+            print(image)
+            raise Exception("skimage.io.read failed: image is of type {:s}".format(str(type(image))))
         # If grayscale. Convert to RGB for consistency.
-        if image.ndim != 3:
-            image = skimage.color.gray2rgb(image)
+        if image.ndim == 1 or (image.ndim == 3 and image.shape[2] == 1):
+            image = skimage.color.gray2rgb(np.squeeze(image))
+        elif image.ndim == 3:
+            if image.shape[2] > 3:
+                image = image[..., 0:3] # Remove any alpha channel
+            elif image.shape[2] != 3:
+                raise Exception("load_image tried to load an image with dims of {:s}".format(str(image.shape)))
         return image
 
     def load_mask(self, image_id):
@@ -446,7 +465,6 @@ def resize_mask(mask, scale, padding):
     mask = np.pad(mask, padding, mode='constant', constant_values=0)
     return mask
 
-
 def minimize_mask(bbox, mask, mini_shape):
     """Resize masks to a smaller version to cut memory load.
     Mini-masks can then resized back to image scale using expand_masks()
@@ -459,7 +477,7 @@ def minimize_mask(bbox, mask, mini_shape):
         y1, x1, y2, x2 = bbox[i][:4]
         m = m[y1:y2, x1:x2]
         if m.size == 0:
-            raise Exception("Invalid bounding box with area of zero")
+            raise TrainingError("Invalid bounding box with area of zero")
         m = scipy.misc.imresize(m.astype(float), mini_shape, interp='bilinear')
         mini_mask[:, :, i] = np.where(m >= 128, 1, 0)
     return mini_mask
