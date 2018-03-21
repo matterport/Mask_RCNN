@@ -131,7 +131,7 @@ class Config(object):
     OPTIMIZER = "Nadam"
     # The parameters for the chosen optimizer
     OPTIMIZER_PARAMS = {
-        "lr": 5e-7,
+        "lr": 2e-3, 
         "beta_1": 0.9,
         "beta_2": 0.999,
         "epsilon": None,
@@ -148,6 +148,9 @@ class Config(object):
     # the RPN. For example, to debug the classifier head without having to
     # train the RPN.
     USE_RPN_ROIS = True
+    BACKBONE = ["resnet50", "resnet101"][0]
+
+    # Specifies the backbone to use, choose one of existing
 
     # Data augmentation parameters (see http://imgaug.readthedocs.io/en/latest/index.html)
     # Vertically flip the data 50% of the time (None to disable)
@@ -171,12 +174,12 @@ class Config(object):
     LR_PLATEAU = {
         "monitor": 'val_loss',
         "factor": 0.5,
-        "patience": 10,
+        "patience": 20,
         "verbose": 1,
         "mode": 'auto',
         "epsilon": 0.0001,
         "cooldown": 5,
-        "min_lr": 1e-10
+        "min_lr": 1e-7
     }
 
     def __init__(self):
