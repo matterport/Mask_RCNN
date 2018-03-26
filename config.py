@@ -87,7 +87,7 @@ class Config(object):
     USE_MINI_MASK = True
     MINI_MASK_SHAPE = (56, 56)  # (height, width) of the mini-mask
 
-    # Input image resing
+    # Input image resizing
     # Images are resized such that the smallest side is >= IMAGE_MIN_DIM and
     # the longest side is <= IMAGE_MAX_DIM. In case both conditions can't
     # be satisfied together the IMAGE_MAX_DIM is enforced.
@@ -147,6 +147,9 @@ class Config(object):
     # the RPN. For example, to debug the classifier head without having to
     # train the RPN.
     USE_RPN_ROIS = True
+
+    # Gradient norm clipping
+    GRADIENT_CLIP_NORM = 5.0
 
     def __init__(self):
         """Set values of computed attributes."""
