@@ -1117,7 +1117,6 @@ def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
                     smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox),
                     tf.constant(0.0))
     loss = K.mean(loss)
-    loss = K.reshape(loss, [1, 1])
     return loss
 
 
@@ -1157,7 +1156,6 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
                     K.binary_crossentropy(target=y_true, output=y_pred),
                     tf.constant(0.0))
     loss = K.mean(loss)
-    loss = K.reshape(loss, [1, 1])
     return loss
 
 
@@ -2236,7 +2234,7 @@ class MaskRCNN():
             epochs=epochs,
             steps_per_epoch=self.config.STEPS_PER_EPOCH,
             callbacks=callbacks,
-            validation_data=next(val_generator),
+            validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
             workers=workers,
