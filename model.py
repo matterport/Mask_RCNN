@@ -1164,12 +1164,15 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
 #  Data Generator
 ############################################################
 
-def load_image_gt(dataset, config, image_id, augment=False,
+def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
                   use_mini_mask=False):
     """Load and return ground truth data for an image (image, mask, bounding boxes).
 
-    augment: If true, apply random image augmentation. Currently, only
-        horizontal flipping is offered.
+    augment: (Depricated. Use augmentation instead). If true, apply random
+        image augmentation. Currently, only horizontal flipping is offered.
+    augmentation: Optional. An imgaug (https://github.com/aleju/imgaug) augmentation.
+        For example, passing imgaug.augmenters.Fliplr(0.5) flips images
+        right/left 50% of the time.
     use_mini_mask: If False, returns full-size masks that are the same height
         and width as the original image. These can be big, for example
         1024x1024x100 (for 100 instances). Mini masks are smaller, typically,
@@ -1197,10 +1200,43 @@ def load_image_gt(dataset, config, image_id, augment=False,
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
+    # TODO: will be removed in a future update in favor of augmentation
     if augment:
+        logging.warning("'augment' is depricated. Use 'augmentation' instead.")
         if random.randint(0, 1):
             image = np.fliplr(image)
             mask = np.fliplr(mask)
+
+    # Augmentation
+    # This requires the imgaug lib (https://github.com/aleju/imgaug)
+    if augmentation:
+        import imgaug
+
+        # Augmentors that are safe to apply to masks
+        # Some, such as Affine, have settings that make them unsafe, so always
+        # test your augmentation on masks
+        MASK_AUGMENTERS = ["Sequential", "SomeOf", "OneOf", "Sometimes",
+                           "Fliplr", "Flipud", "CropAndPad",
+                           "Affine", "PiecewiseAffine"]
+
+        def hook(images, augmenter, parents, default):
+            """Determines which augmenters to apply to masks."""
+            return (augmenter.__class__.__name__ in MASK_AUGMENTERS)
+
+        # Store original shapes to compare
+        image_shape = image.shape
+        mask_shape = mask.shape
+        # Make augmenters deterministic to apply similarly to images and masks
+        det = augmentation.to_deterministic()
+        image = det.augment_image(image)
+        # Change mask to np.uint8 because imgaug doesn't support np.bool
+        mask = det.augment_image(mask.astype(np.uint8),
+                                 hooks=imgaug.HooksImages(activator=hook))
+        # Verify that shapes didn't change
+        assert image.shape == image_shape, "Augmentation shouldn't change image size"
+        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
+        # Change mask back to bool
+        mask = mask.astype(np.bool)
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
@@ -1572,16 +1608,19 @@ def generate_random_rois(image_shape, count, gt_class_ids, gt_boxes):
     return rois
 
 
-def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
-                   batch_size=1, detection_targets=False):
+def data_generator(dataset, config, shuffle=True, augment=False, augmentation=None,
+                   random_rois=0, batch_size=1, detection_targets=False):
     """A generator that returns images and corresponding target class ids,
     bounding box deltas, and masks.
 
     dataset: The Dataset object to pick data from
     config: The model config object
     shuffle: If True, shuffles the samples before every epoch
-    augment: If True, applies image augmentation to images (currently only
-             horizontal flips are supported)
+    augment: (Depricated. Use augmentation instead). If true, apply random
+        image augmentation. Currently, only horizontal flipping is offered.
+    augmentation: Optional. An imgaug (https://github.com/aleju/imgaug) augmentation.
+        For example, passing imgaug.augmenters.Fliplr(0.5) flips images
+        right/left 50% of the time.
     random_rois: If > 0 then generate proposals to be used to train the
                  network classifier and mask heads. Useful if training
                  the Mask RCNN part without the RPN.
@@ -1633,6 +1672,7 @@ def data_generator(dataset, config, shuffle=True, augment=True, random_rois=0,
             image_id = image_ids[image_index]
             image, image_meta, gt_class_ids, gt_boxes, gt_masks = \
                 load_image_gt(dataset, config, image_id, augment=augment,
+                              augmentation=augmentation,
                               use_mini_mask=config.USE_MINI_MASK)
 
             # Skip images that have no instances. This can happen in cases
@@ -2167,7 +2207,8 @@ class MaskRCNN():
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
 
-    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers):
+    def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
+              augmentation=None):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2183,6 +2224,9 @@ class MaskRCNN():
               3+: Train Resnet stage 3 and up
               4+: Train Resnet stage 4 and up
               5+: Train Resnet stage 5 and up
+        augmentation: Optional. An imgaug (https://github.com/aleju/imgaug) augmentation.
+            For example, passing imgaug.augmenters.Fliplr(0.5) flips images
+            right/left 50% of the time.
         """
         assert self.mode == "training", "Create model in training mode."
 
@@ -2202,10 +2246,10 @@ class MaskRCNN():
 
         # Data generators
         train_generator = data_generator(train_dataset, self.config, shuffle=True,
+                                         augmentation=augmentation,
                                          batch_size=self.config.BATCH_SIZE)
         val_generator = data_generator(val_dataset, self.config, shuffle=True,
-                                       batch_size=self.config.BATCH_SIZE,
-                                       augment=False)
+                                       batch_size=self.config.BATCH_SIZE)
 
         # Callbacks
         callbacks = [

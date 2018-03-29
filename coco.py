@@ -30,6 +30,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 import os
 import time
 import numpy as np
+import imgaug  # https://github.com/aleju/imgaug (pip3 install imageaug)
 
 # Download and install the Python COCO tools from https://github.com/waleedka/coco
 # That's a fork from the original https://github.com/pdollar/coco with a bug
@@ -482,6 +483,10 @@ if __name__ == '__main__':
         dataset_val.load_coco(args.dataset, "minival", year=args.year, auto_download=args.download)
         dataset_val.prepare()
 
+        # Image Augmentation
+        # Right/Left flip 50% of the time
+        augmentation = imgaug.augmenters.Fliplr(0.5)
+
         # *** This training schedule is an example. Update to your needs ***
 
         # Training - Stage 1
@@ -489,7 +494,8 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
                     epochs=40,
-                    layers='heads')
+                    layers='heads',
+                    augmentation=augmentation)
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
@@ -497,7 +503,8 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
                     epochs=120,
-                    layers='4+')
+                    layers='4+',
+                    augmentation=augmentation)
 
         # Training - Stage 3
         # Fine tune all layers
@@ -505,7 +512,8 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=160,
-                    layers='all')
+                    layers='all',
+                    augmentation=augmentation)
 
     elif args.command == "evaluate":
         # Validation dataset
