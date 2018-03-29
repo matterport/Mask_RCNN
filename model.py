@@ -18,6 +18,7 @@ import json
 import re
 import logging
 from collections import OrderedDict
+import multiprocessing
 import numpy as np
 import scipy.misc
 import tensorflow as tf
@@ -2226,7 +2227,7 @@ class MaskRCNN():
         if os.name is 'nt':
             workers = 0
         else:
-            workers = max(self.config.BATCH_SIZE // 2, 2)
+            workers = multiprocessing.cpu_count()
 
         self.keras_model.fit_generator(
             train_generator,
