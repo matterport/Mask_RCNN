@@ -808,7 +808,9 @@ class DetectionLayer(KE.Layer):
         return (None, self.config.DETECTION_MAX_INSTANCES, 6)
 
 
-# Region Proposal Network (RPN)
+############################################################
+#  Region Proposal Network (RPN)
+############################################################
 
 def rpn_graph(feature_map, anchors_per_location, anchor_stride):
     """Builds the computation graph of Region Proposal Network.
@@ -1223,7 +1225,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
             """Determines which augmenters to apply to masks."""
             return (augmenter.__class__.__name__ in MASK_AUGMENTERS)
 
-        # Store original shapes to compare
+        # Store shapes before augmentation to compare
         image_shape = image.shape
         mask_shape = mask.shape
         # Make augmenters deterministic to apply similarly to images and masks
@@ -1390,7 +1392,7 @@ def build_detection_targets(rpn_rois, gt_class_ids, gt_boxes, gt_masks, config):
     # Normalize bbox refinements
     bboxes /= config.BBOX_STD_DEV
 
-    # Generate class-specific target masks.
+    # Generate class-specific target masks
     masks = np.zeros((config.TRAIN_ROIS_PER_IMAGE, config.MASK_SHAPE[0], config.MASK_SHAPE[1], config.NUM_CLASSES),
                      dtype=np.float32)
     for i in pos_ids:
@@ -2223,9 +2225,17 @@ class MaskRCNN():
               3+: Train Resnet stage 3 and up
               4+: Train Resnet stage 4 and up
               5+: Train Resnet stage 5 and up
-        augmentation: Optional. An imgaug (https://github.com/aleju/imgaug) augmentation.
-            For example, passing imgaug.augmenters.Fliplr(0.5) flips images
-            right/left 50% of the time.
+        augmentation: Optional. An imgaug (https://github.com/aleju/imgaug)
+            augmentation. For example, passing imgaug.augmenters.Fliplr(0.5)
+            flips images right/left 50% of the time. You can pass complex
+            augmentations as well. This augmentation applies 50% of the
+            time, and when it does it flips images right/left half the time
+            and adds a Gausssian blur with a random sigma in range 0 to 5.
+
+                augmentation = imgaug.augmenters.Sometimes(0.5, [
+                    imgaug.augmenters.Fliplr(0.5),
+                    imgaug.augmenters.GaussianBlur(sigma=(0.0, 5.0))
+                ])
         """
         assert self.mode == "training", "Create model in training mode."
 
