@@ -736,3 +736,37 @@ def download_trained_weights(coco_model_path, verbose=1):
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")
+
+
+def norm_boxes(boxes, shape):
+    """Converts boxes from pixel coordinates to normalized coordinates.
+    boxes: [N, (y1, x1, y2, x2)] in pixel coordinates
+    shape: [..., (height, width)] in pixels
+
+    Note: In pixel coordinates (y2, x2) is outside the box. But in normalized
+    coordinates it's inside the box.
+
+    Returns:
+        [N, (y1, x1, y2, x2)] in normalized coordinates
+    """
+    h, w = shape
+    scale = np.array([h - 1, w - 1, h - 1, w - 1])
+    shift = np.array([0, 0, 1, 1])
+    return np.divide((boxes - shift).astype(np.float32), scale)
+
+
+def denorm_boxes(boxes, shape):
+    """Converts boxes from normalized coordinates to pixel coordinates.
+    boxes: [N, (y1, x1, y2, x2)] in normalized coordinates
+    shape: [..., (height, width)] in pixels
+
+    Note: In pixel coordinates (y2, x2) is outside the box. But in normalized
+    coordinates it's inside the box.
+
+    Returns:
+        [N, (y1, x1, y2, x2)] in pixel coordinates
+    """
+    h, w = shape
+    scale = np.array([h - 1, w - 1, h - 1, w - 1])
+    shift = np.array([0, 0, 1, 1])
+    return np.around(np.multiply(boxes, scale) + shift).astype(np.int32)

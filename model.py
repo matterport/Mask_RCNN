@@ -305,8 +305,8 @@ class ProposalLayer(KE.Layer):
         # According to Xinlei Chen's paper, this reduces detection accuracy
         # for small objects, so we're skipping it.
 
-        # Normalize dimensions to range of 0 to 1.
-        normalized_boxes = boxes / np.array([[height, width, height, width]])
+        # Normalize coordinates
+        normalized_boxes = norm_boxes_graph(boxes, self.config.IMAGE_SHAPE[:2])
 
         # Non-max suppression
         def nms(normalized_boxes, scores):
@@ -1857,9 +1857,8 @@ class MaskRCNN():
             input_gt_boxes = KL.Input(
                 shape=[None, 4], name="input_gt_boxes", dtype=tf.float32)
             # Normalize coordinates
-            h, w = K.shape(input_image)[1], K.shape(input_image)[2]
-            image_scale = K.cast(K.stack([h, w, h, w], axis=0), tf.float32)
-            gt_boxes = KL.Lambda(lambda x: x / image_scale)(input_gt_boxes)
+            gt_boxes = KL.Lambda(lambda x: norm_boxes_graph(
+                x, K.shape(input_image)[1:3]))(input_gt_boxes)
             # 3. GT Masks (zero padded)
             # [batch, height, width, MAX_GT_INSTANCES]
             if config.USE_MINI_MASK:
@@ -1949,9 +1948,9 @@ class MaskRCNN():
                 # Ignore predicted ROIs and use ROIs provided as an input.
                 input_rois = KL.Input(shape=[config.POST_NMS_ROIS_TRAINING, 4],
                                       name="input_roi", dtype=np.int32)
-                # Normalize coordinates to 0-1 range.
-                target_rois = KL.Lambda(lambda x: K.cast(
-                    x, tf.float32) / image_scale[:4])(input_rois)
+                # Normalize coordinates
+                target_rois = KL.Lambda(lambda x: norm_boxes_graph(
+                    x, K.shape(input_image)[1:3]))(input_rois)
             else:
                 target_rois = rpn_rois
 
@@ -2630,3 +2629,37 @@ def batch_pack_graph(x, counts, num_rows):
     for i in range(num_rows):
         outputs.append(x[i, :counts[i]])
     return tf.concat(outputs, axis=0)
+
+
+def norm_boxes_graph(boxes, shape):
+    """Converts boxes from pixel coordinates to normalized coordinates.
+    boxes: [..., (y1, x1, y2, x2)] in pixel coordinates
+    shape: [..., (height, width)] in pixels
+
+    Note: In pixel coordinates (y2, x2) is outside the box. But in normalized
+    coordinates it's inside the box.
+
+    Returns:
+        [..., (y1, x1, y2, x2)] in normalized coordinates
+    """
+    h, w = tf.split(tf.cast(shape, tf.float32), 2)
+    scale = tf.concat([h, w, h, w], axis=-1) - tf.constant(1.0)
+    shift = tf.constant([0., 0., 1., 1.])
+    return tf.divide(boxes - shift, scale)
+
+
+def denorm_boxes_graph(boxes, shape):
+    """Converts boxes from normalized coordinates to pixel coordinates.
+    boxes: [..., (y1, x1, y2, x2)] in normalized coordinates
+    shape: [..., (height, width)] in pixels
+
+    Note: In pixel coordinates (y2, x2) is outside the box. But in normalized
+    coordinates it's inside the box.
+
+    Returns:
+        [..., (y1, x1, y2, x2)] in pixel coordinates
+    """
+    h, w = tf.split(tf.cast(shape, tf.float32), 2)
+    scale = tf.concat([h, w, h, w], axis=-1) - tf.constant(1.0)
+    shift = tf.constant([0., 0., 1., 1.])
+    return tf.cast(tf.round(tf.multiply(boxes, scale) + shift), tf.int32)
