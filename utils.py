@@ -468,7 +468,8 @@ def minimize_mask(bbox, mask, mini_shape):
         m = m[y1:y2, x1:x2]
         if m.size == 0:
             raise Exception("Invalid bounding box with area of zero")
-        m = skimage.transform.resize(m, mini_shape, order=1, mode="reflect")
+        # Resize with bilinear interpolation
+        m = skimage.transform.resize(m, mini_shape, order=1)
         mini_mask[:, :, i] = np.around(m).astype(np.bool)
     return mini_mask
 
@@ -485,7 +486,8 @@ def expand_mask(bbox, mini_mask, image_shape):
         y1, x1, y2, x2 = bbox[i][:4]
         h = y2 - y1
         w = x2 - x1
-        m = skimage.transform.resize(m, (h, w), order=1, mode="reflect")
+        # Resize with bilinear interpolation
+        m = skimage.transform.resize(m, (h, w), order=1)
         mask[y1:y2, x1:x2, i] = np.around(m).astype(np.bool)
     return mask
 
@@ -505,12 +507,11 @@ def unmold_mask(mask, bbox, image_shape):
     """
     threshold = 0.5
     y1, x1, y2, x2 = bbox
-    mask = skimage.transform.resize(mask, (y2 - y1, x2 - x1),
-                                    order=1, mode="reflect")
-    mask = np.where(mask >= threshold, 1, 0).astype(np.uint8)
+    mask = skimage.transform.resize(mask, (y2 - y1, x2 - x1), order=1)
+    mask = np.where(mask >= threshold, 1, 0).astype(np.bool)
 
     # Put the mask in the right location.
-    full_mask = np.zeros(image_shape[:2], dtype=np.uint8)
+    full_mask = np.zeros(image_shape[:2], dtype=np.bool)
     full_mask[y1:y2, x1:x2] = mask
     return full_mask
 
