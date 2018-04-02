@@ -200,8 +200,8 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
 
 def apply_box_deltas_graph(boxes, deltas):
     """Applies the given deltas to the given boxes.
-    boxes: [N, 4] where each row is y1, x1, y2, x2
-    deltas: [N, 4] where each row is [dy, dx, log(dh), log(dw)]
+    boxes: [N, (y1, x1, y2, x2)] boxes to update
+    deltas: [N, (dy, dx, log(dh), log(dw))] refinements to apply
     """
     # Convert to y, x, h, w
     height = boxes[:, 2] - boxes[:, 0]
@@ -257,13 +257,13 @@ class ProposalLayer(KE.Layer):
     def __init__(self, proposal_count, nms_threshold, anchors,
                  config=None, **kwargs):
         """
-        anchors: [N, (y1, x1, y2, x2)] anchors defined in image coordinates
+        anchors: [N, (y1, x1, y2, x2)] anchors in normalized coordinates
         """
         super(ProposalLayer, self).__init__(**kwargs)
         self.config = config
         self.proposal_count = proposal_count
         self.nms_threshold = nms_threshold
-        self.anchors = anchors.astype(np.float32)
+        self.anchors = anchors
 
     def call(self, inputs):
         # Box Scores. Use the foreground class confidence. [Batch, num_rois, 1]
@@ -294,9 +294,9 @@ class ProposalLayer(KE.Layer):
                                   self.config.IMAGES_PER_GPU,
                                   names=["refined_anchors"])
 
-        # Clip to image boundaries. [batch, N, (y1, x1, y2, x2)]
-        height, width = self.config.IMAGE_SHAPE[:2]
-        window = np.array([0, 0, height, width]).astype(np.float32)
+        # Clip to image boundaries. Since we're in normalized coordinates,
+        # clip to 0..1 range. [batch, N, (y1, x1, y2, x2)]
+        window = np.array([0, 0, 1, 1], dtype=np.float32)
         boxes = utils.batch_slice(boxes,
                                   lambda x: clip_boxes_graph(x, window),
                                   self.config.IMAGES_PER_GPU,
@@ -306,20 +306,17 @@ class ProposalLayer(KE.Layer):
         # According to Xinlei Chen's paper, this reduces detection accuracy
         # for small objects, so we're skipping it.
 
-        # Normalize coordinates
-        normalized_boxes = norm_boxes_graph(boxes, self.config.IMAGE_SHAPE[:2])
-
         # Non-max suppression
-        def nms(normalized_boxes, scores):
+        def nms(boxes, scores):
             indices = tf.image.non_max_suppression(
-                normalized_boxes, scores, self.proposal_count,
+                boxes, scores, self.proposal_count,
                 self.nms_threshold, name="rpn_non_max_suppression")
-            proposals = tf.gather(normalized_boxes, indices)
+            proposals = tf.gather(boxes, indices)
             # Pad if needed
             padding = tf.maximum(self.proposal_count - tf.shape(proposals)[0], 0)
             proposals = tf.pad(proposals, [(0, padding), (0, 0)])
             return proposals
-        proposals = utils.batch_slice([normalized_boxes, scores], nms,
+        proposals = utils.batch_slice([boxes, scores], nms,
                                       self.config.IMAGES_PER_GPU)
         return proposals
 
@@ -341,12 +338,12 @@ class PyramidROIAlign(KE.Layer):
 
     Params:
     - pool_shape: [height, width] of the output pooled regions. Usually [7, 7]
-    - image_shape: [height, width, channels]. Shape of input image in pixels
 
     Inputs:
     - boxes: [batch, num_boxes, (y1, x1, y2, x2)] in normalized
              coordinates. Possibly padded with zeros if not enough
              boxes to fill the array.
+    - image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     - Feature maps: List of feature maps from different levels of the pyramid.
                     Each is [batch, height, width, channels]
 
@@ -356,28 +353,32 @@ class PyramidROIAlign(KE.Layer):
     constructor.
     """
 
-    def __init__(self, pool_shape, image_shape, **kwargs):
+    def __init__(self, pool_shape, **kwargs):
         super(PyramidROIAlign, self).__init__(**kwargs)
         self.pool_shape = tuple(pool_shape)
-        self.image_shape = tuple(image_shape)
 
     def call(self, inputs):
         # Crop boxes [batch, num_boxes, (y1, x1, y2, x2)] in normalized coords
         boxes = inputs[0]
 
+        # Image meta
+        # Holds details about the image. See compose_image_meta()
+        image_meta = inputs[1]
+
         # Feature Maps. List of feature maps from different level of the
         # feature pyramid. Each is [batch, height, width, channels]
-        feature_maps = inputs[1:]
+        feature_maps = inputs[2:]
 
         # Assign each ROI to a level in the pyramid based on the ROI area.
         y1, x1, y2, x2 = tf.split(boxes, 4, axis=2)
         h = y2 - y1
         w = x2 - x1
+        # Use shape of first image. Images in a batch must have the same size.
+        image_shape = parse_image_meta_graph(image_meta)['image_shape'][0]
         # Equation 1 in the Feature Pyramid Networks paper. Account for
         # the fact that our coordinates are normalized here.
         # e.g. a 224x224 ROI (in pixels) maps to P4
-        image_area = tf.cast(
-            self.image_shape[0] * self.image_shape[1], tf.float32)
+        image_area = tf.cast(image_shape[0] * image_shape[1], tf.float32)
         roi_level = log2_graph(tf.sqrt(h * w) / (224.0 / tf.sqrt(image_area)))
         roi_level = tf.minimum(5, tf.maximum(
             2, 4 + tf.cast(tf.round(roi_level), tf.int32)))
@@ -437,7 +438,7 @@ class PyramidROIAlign(KE.Layer):
         return pooled
 
     def compute_output_shape(self, input_shape):
-        return input_shape[0][:2] + self.pool_shape + (input_shape[1][-1], )
+        return input_shape[0][:2] + self.pool_shape + (input_shape[2][-1], )
 
 
 ############################################################
@@ -788,9 +789,15 @@ class DetectionLayer(KE.Layer):
         mrcnn_bbox = inputs[2]
         image_meta = inputs[3]
 
+        # Get windows of images in normalized coordinates. Windows are the area
+        # in the image that excludes the padding.
+        # Use the shape of the first image in the batch to normalize the window
+        # because we know that all images get resized to the same size.
+        m = parse_image_meta_graph(image_meta)
+        image_shape = m['image_shape'][0]
+        window = norm_boxes_graph(m['window'], image_shape[:2])
+        
         # Run detection refinement graph on each item in the batch
-        window = parse_image_meta_graph(image_meta)['window']
-        window = norm_boxes_graph(window, self.config.IMAGE_SHAPE[:2])
         detections_batch = utils.batch_slice(
             [rois, mrcnn_class, mrcnn_bbox, window],
             lambda x, y, w, z: refine_detections_graph(x, y, w, z, self.config),
@@ -881,8 +888,8 @@ def build_rpn_model(anchor_stride, anchors_per_location, depth):
 #  Feature Pyramid Network Heads
 ############################################################
 
-def fpn_classifier_graph(rois, feature_maps,
-                         image_shape, pool_size, num_classes, train_bn=True):
+def fpn_classifier_graph(rois, feature_maps, image_meta,
+                         pool_size, num_classes, train_bn=True):
     """Builds the computation graph of the feature pyramid network classifier
     and regressor heads.
 
@@ -890,7 +897,7 @@ def fpn_classifier_graph(rois, feature_maps,
           coordinates.
     feature_maps: List of feature maps from diffent layers of the pyramid,
                   [P2, P3, P4, P5]. Each has a different resolution.
-    image_shape: [height, width, depth]
+    - image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
     train_bn: Boolean. Train or freeze Batch Norm layres
@@ -903,8 +910,8 @@ def fpn_classifier_graph(rois, feature_maps,
     """
     # ROI Pooling
     # Shape: [batch, num_boxes, pool_height, pool_width, channels]
-    x = PyramidROIAlign([pool_size, pool_size], image_shape,
-                        name="roi_align_classifier")([rois] + feature_maps)
+    x = PyramidROIAlign([pool_size, pool_size],
+                        name="roi_align_classifier")([rois, image_meta] + feature_maps)
     # Two 1024 FC layers (implemented with Conv2D for consistency)
     x = KL.TimeDistributed(KL.Conv2D(1024, (pool_size, pool_size), padding="valid"),
                            name="mrcnn_class_conv1")(x)
@@ -935,7 +942,7 @@ def fpn_classifier_graph(rois, feature_maps,
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
 
 
-def build_fpn_mask_graph(rois, feature_maps, image_shape,
+def build_fpn_mask_graph(rois, feature_maps, image_meta,
                          pool_size, num_classes, train_bn=True):
     """Builds the computation graph of the mask head of Feature Pyramid Network.
 
@@ -943,7 +950,7 @@ def build_fpn_mask_graph(rois, feature_maps, image_shape,
           coordinates.
     feature_maps: List of feature maps from diffent layers of the pyramid,
                   [P2, P3, P4, P5]. Each has a different resolution.
-    image_shape: [height, width, depth]
+    image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
     train_bn: Boolean. Train or freeze Batch Norm layres
@@ -952,8 +959,8 @@ def build_fpn_mask_graph(rois, feature_maps, image_shape,
     """
     # ROI Pooling
     # Shape: [batch, boxes, pool_height, pool_width, channels]
-    x = PyramidROIAlign([pool_size, pool_size], image_shape,
-                        name="roi_align_mask")([rois] + feature_maps)
+    x = PyramidROIAlign([pool_size, pool_size],
+                        name="roi_align_mask")([rois, image_meta] + feature_maps)
 
     # Conv layers
     x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),
@@ -1636,7 +1643,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     of the lists differs depending on the received arguments:
     inputs list:
     - images: [batch, H, W, C]
-    - image_meta: [batch, size of image meta]
+    - image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     - rpn_match: [batch, N] Integer (1=positive anchor, -1=negative, 0=neutral)
     - rpn_bbox: [batch, N, (dy, dx, log(dh), log(dw))] Anchor bbox deltas.
     - gt_class_ids: [batch, MAX_GT_INSTANCES] Integer class IDs
@@ -1826,7 +1833,8 @@ class MaskRCNN():
         # Inputs
         input_image = KL.Input(
             shape=config.IMAGE_SHAPE.tolist(), name="input_image")
-        input_image_meta = KL.Input(shape=[None], name="input_image_meta")
+        input_image_meta = KL.Input(shape=[config.IMAGE_META_SIZE],
+                                    name="input_image_meta")
         if mode == "training":
             # RPN GT
             input_rpn_match = KL.Input(
@@ -1913,6 +1921,9 @@ class MaskRCNN():
 
         rpn_class_logits, rpn_class, rpn_bbox = outputs
 
+        # Normalize anchors coordinates
+        normalized_anchors = utils.norm_boxes(self.anchors, self.config.IMAGE_SHAPE[:2])
+
         # Generate proposals
         # Proposals are [batch, N, (y1, x1, y2, x2)] in normalized coordinates
         # and zero padded.
@@ -1921,7 +1932,7 @@ class MaskRCNN():
         rpn_rois = ProposalLayer(proposal_count=proposal_count,
                                  nms_threshold=config.RPN_NMS_THRESHOLD,
                                  name="ROI",
-                                 anchors=self.anchors,
+                                 anchors=normalized_anchors,
                                  config=config)([rpn_class, rpn_bbox])
 
         if mode == "training":
@@ -1952,12 +1963,12 @@ class MaskRCNN():
             # Network Heads
             # TODO: verify that this handles zero padded ROIs
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
-                fpn_classifier_graph(rois, mrcnn_feature_maps, config.IMAGE_SHAPE,
+                fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN)
 
             mrcnn_mask = build_fpn_mask_graph(rois, mrcnn_feature_maps,
-                                              config.IMAGE_SHAPE,
+                                              input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
                                               train_bn=config.TRAIN_BN)
@@ -1991,7 +2002,7 @@ class MaskRCNN():
             # Network Heads
             # Proposal classifier and BBox regressor heads
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
-                fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, config.IMAGE_SHAPE,
+                fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN)
 
@@ -2004,7 +2015,7 @@ class MaskRCNN():
             # Create masks for detections
             detection_boxes = KL.Lambda(lambda x: x[..., :4])(detections)
             mrcnn_mask = build_fpn_mask_graph(detection_boxes, mrcnn_feature_maps,
-                                              config.IMAGE_SHAPE,
+                                              input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
                                               train_bn=config.TRAIN_BN)
@@ -2372,7 +2383,7 @@ class MaskRCNN():
         shift = np.array([wy1, wx1, wy1, wx1])
         wh = wy2 - wy1  # window height
         ww = wx2 - wx1  # window width
-        scale = np.array([wh, ww, wh, ww])  # todo:normalize
+        scale = np.array([wh, ww, wh, ww])
         # Convert boxes to normalized coordinates on the window
         boxes = np.divide(boxes - shift, scale)
         # Convert boxes to pixel coordinates on the original image

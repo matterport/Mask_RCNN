@@ -761,7 +761,7 @@ def norm_boxes(boxes, shape):
     h, w = shape
     scale = np.array([h - 1, w - 1, h - 1, w - 1])
     shift = np.array([0, 0, 1, 1])
-    return np.divide((boxes - shift).astype(np.float32), scale)
+    return np.divide((boxes - shift), scale).astype(np.float32)
 
 
 def denorm_boxes(boxes, shape):

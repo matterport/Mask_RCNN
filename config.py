@@ -175,6 +175,10 @@ class Config(object):
               int(math.ceil(self.IMAGE_SHAPE[1] / stride))]
              for stride in self.BACKBONE_STRIDES])
 
+        # Image meta data length
+        # See compose_image_meta() for details
+        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+
     def display(self):
         """Display Configuration values."""
         print("\nConfigurations:")
