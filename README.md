@@ -1,5 +1,9 @@
 # Mask R-CNN for Object Detection and Segmentation
 
+[![Build Status](https://travis-ci.org/Borda/Mask_RCNN.svg?branch=master)](https://travis-ci.org/Borda/Mask_RCNN)
+[![codecov](https://codecov.io/gh/Borda/Mask_RCNN/branch/master/graph/badge.svg)](https://codecov.io/gh/Borda/Mask_RCNN)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3e7424c4cc594e16995453fe105c8823)](https://www.codacy.com/app/Borda/Mask_RCNN?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Borda/Mask_RCNN&amp;utm_campaign=Badge_Grade)
+
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
 
 ![Instance Segmentation Sample](assets/street.png)
@@ -90,7 +94,7 @@ Training and evaluation code is in `samples/coco/coco.py`. You can import this
 module in Jupyter notebook (see the provided notebooks for examples) or you
 can run it directly from the command line as such:
 
-```
+```bash
 # Train a new model starting from pre-trained COCO weights
 python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=coco
 
@@ -106,7 +110,7 @@ python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=last
 ```
 
 You can also run the COCO evaluation code with:
-```
+```bash
 # Run COCO evaluation on the last trained model
 python3 samples/coco/coco.py evaluate --dataset=/path/to/coco/ --model=last
 ```
@@ -161,6 +165,9 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 
 ## Requirements
 Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.txt`.
+```bash
+pip3 install -r requirements.txt
+```
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
@@ -184,8 +191,8 @@ If you use Docker, the code has been verified to work on
     ```bash
     python3 setup.py install
     ``` 
-3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
-4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
+4. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
+5. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
     * Linux: https://github.com/waleedka/coco
     * Windows: https://github.com/philferriere/cocoapi.
