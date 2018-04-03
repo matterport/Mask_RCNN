@@ -386,15 +386,17 @@ class Dataset(object):
         return mask, class_ids
 
 
-def resize_image(image, min_dim=None, max_dim=None, padding=False):
-    """
-    Resizes an image keeping the aspect ratio.
+def resize_image(image, min_dim=None, max_dim=None, mode="square"):
+    """Resizes an image keeping the aspect ratio unchanged.
 
     min_dim: if provided, resizes the image such that it's smaller
         dimension == min_dim
     max_dim: if provided, ensures that the image longest side doesn't
         exceed this value.
-    padding: If true, pads image with zeros so it's size is max_dim x max_dim
+    mode: Resizing mode.
+        none: No resizing. Return the image unchanged
+        square: Resize and pad with zeros to get a square image
+            of size [max_dim, max_dim]
 
     Returns:
     image: the resized image
@@ -409,6 +411,10 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
     h, w = image.shape[:2]
     window = (0, 0, h, w)
     scale = 1
+    padding = [(0, 0), (0, 0), (0, 0)]
+
+    if mode == "none":
+        return image, window, scale, padding
 
     # Scale?
     if min_dim:
@@ -424,7 +430,7 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
         image = scipy.misc.imresize(
             image, (round(h * scale), round(w * scale)))
     # Need padding?
-    if padding:
+    if mode == "square":
         # Get new height and width
         h, w = image.shape[:2]
         top_pad = (max_dim - h) // 2
@@ -434,6 +440,8 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+    else:
+        raise Exception("Mode {} not supported".format(mode))
     return image, window, scale, padding
 
 

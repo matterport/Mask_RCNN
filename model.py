@@ -1198,7 +1198,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         image,
         min_dim=config.IMAGE_MIN_DIM,
         max_dim=config.IMAGE_MAX_DIM,
-        padding=config.IMAGE_PADDING)
+        mode=config.IMAGE_RESIZE_MODE)
     mask = utils.resize_mask(mask, scale, padding)
 
     # Random horizontal flips.
@@ -2313,13 +2313,13 @@ class MaskRCNN():
         image_metas = []
         windows = []
         for image in images:
-            # Resize image to fit the model expected size
+            # Resize image
             # TODO: move resizing to mold_image()
             molded_image, window, scale, padding = utils.resize_image(
                 image,
                 min_dim=self.config.IMAGE_MIN_DIM,
                 max_dim=self.config.IMAGE_MAX_DIM,
-                padding=self.config.IMAGE_PADDING)
+                mode=self.config.IMAGE_RESIZE_MODE)
             molded_image = mold_image(molded_image, self.config)
             # Build image_meta
             image_meta = compose_image_meta(
