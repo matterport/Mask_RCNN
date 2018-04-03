@@ -26,27 +26,27 @@ The goal is to improve OpenStreetMap by adding high quality baseball, soccer, te
     [![Mask RCNN on 4K Video](assets/4k_video.gif)](https://www.youtube.com/watch?v=OOT3UIXZztE)
 
 # Getting Started
-* [demo.ipynb](/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
+* [demo.ipynb](samples/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
 It includes code to run object detection and instance segmentation on arbitrary images.
 
-* [train_shapes.ipynb](train_shapes.ipynb) shows how to train Mask R-CNN on your own dataset. This notebook introduces a toy dataset (Shapes) to demonstrate training on a new dataset.
+* [train_shapes.ipynb](samples/train_shapes.ipynb) shows how to train Mask R-CNN on your own dataset. This notebook introduces a toy dataset (Shapes) to demonstrate training on a new dataset.
 
-* ([model.py](model.py), [utils.py](utils.py), [config.py](config.py)): These files contain the main Mask RCNN implementation. 
+* ([model.py](mrcnn/model.py), [utils.py](mrcnn/utils.py), [config.py](mrcnn/config.py)): These files contain the main Mask RCNN implementation. 
 
 
-* [inspect_data.ipynb](/inspect_data.ipynb). This notebook visualizes the different pre-processing steps
+* [inspect_data.ipynb](samples/inspect_data.ipynb). This notebook visualizes the different pre-processing steps
 to prepare the training data.
 
-* [inspect_model.ipynb](/inspect_model.ipynb) This notebook goes in depth into the steps performed to detect and segment objects. It provides visualizations of every step of the pipeline.
+* [inspect_model.ipynb](samples/inspect_model.ipynb) This notebook goes in depth into the steps performed to detect and segment objects. It provides visualizations of every step of the pipeline.
 
-* [inspect_weights.ipynb](/inspect_weights.ipynb)
+* [inspect_weights.ipynb](samples/inspect_weights.ipynb)
 This notebooks inspects the weights of a trained model and looks for anomalies and odd patterns.
 
 
 # Step by Step Detection
 To help with debugging and understanding the model, there are 3 notebooks 
-([inspect_data.ipynb](inspect_data.ipynb), [inspect_model.ipynb](inspect_model.ipynb),
-[inspect_weights.ipynb](inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
+([inspect_data.ipynb](samples/inspect_data.ipynb), [inspect_model.ipynb](samples/inspect_model.ipynb),
+[inspect_weights.ipynb](samples/inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
 
 
 
