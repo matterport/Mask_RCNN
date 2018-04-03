@@ -46,9 +46,8 @@ import zipfile
 import urllib.request
 import shutil
 
-from config import Config
-import utils
-import model as modellib
+from mrcnn.config import Config
+from mrcnn import model as modellib, utils
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
