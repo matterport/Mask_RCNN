@@ -161,10 +161,10 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 
 ## Requirements
 * Python 3.4+
-* TensorFlow 1.3+
-* Keras 2.0.8+
-* Jupyter Notebook
-* Numpy, skimage, scipy, Pillow, cython, h5py
+
+```bash
+pip3 install -r requirements.txt
+```
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
