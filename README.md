@@ -162,9 +162,18 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 ## Requirements
 * Python 3.4+
 
+All required packages are listed in standard file:
 ```bash
 pip3 install -r requirements.txt
 ```
+
+## Installation
+
+The installation as possible using following command:
+```bash
+python3 setup.py build_ext --inplace
+python3 setup.py install
+``` 
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
