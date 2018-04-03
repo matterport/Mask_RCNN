@@ -169,12 +169,6 @@ class Config(object):
         self.IMAGE_SHAPE = np.array(
             [self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM, 3])
 
-        # Compute backbone size from input image size
-        self.BACKBONE_SHAPES = np.array(
-            [[int(math.ceil(self.IMAGE_SHAPE[0] / stride)),
-              int(math.ceil(self.IMAGE_SHAPE[1] / stride))]
-             for stride in self.BACKBONE_STRIDES])
-
         # Image meta data length
         # See compose_image_meta() for details
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
