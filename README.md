@@ -29,7 +29,7 @@ The goal is to improve OpenStreetMap by adding high quality baseball, soccer, te
 * [demo.ipynb](samples/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
 It includes code to run object detection and instance segmentation on arbitrary images.
 
-* [train_shapes.ipynb](samples/train_shapes.ipynb) shows how to train Mask R-CNN on your own dataset. This notebook introduces a toy dataset (Shapes) to demonstrate training on a new dataset.
+* [train_shapes.ipynb](samples/shapes/train_shapes.ipynb) shows how to train Mask R-CNN on your own dataset. This notebook introduces a toy dataset (Shapes) to demonstrate training on a new dataset.
 
 * ([model.py](mrcnn/model.py), [utils.py](mrcnn/utils.py), [config.py](mrcnn/config.py)): These files contain the main Mask RCNN implementation. 
 
@@ -86,32 +86,32 @@ TensorBoard is another great debugging and visualization tool. The model is conf
 # Training on MS COCO
 We're providing pre-trained weights for MS COCO to make it easier to start. You can
 use those weights as a starting point to train your own variation on the network.
-Training and evaluation code is in coco.py. You can import this
+Training and evaluation code is in `samples/coco/coco.py`. You can import this
 module in Jupyter notebook (see the provided notebooks for examples) or you
 can run it directly from the command line as such:
 
 ```
 # Train a new model starting from pre-trained COCO weights
-python3 coco.py train --dataset=/path/to/coco/ --model=coco
+python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=coco
 
 # Train a new model starting from ImageNet weights
-python3 coco.py train --dataset=/path/to/coco/ --model=imagenet
+python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=imagenet
 
 # Continue training a model that you had trained earlier
-python3 coco.py train --dataset=/path/to/coco/ --model=/path/to/weights.h5
+python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=/path/to/weights.h5
 
 # Continue training the last model you trained. This will find
 # the last trained weights in the model directory.
-python3 coco.py train --dataset=/path/to/coco/ --model=last
+python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=last
 ```
 
 You can also run the COCO evaluation code with:
 ```
 # Run COCO evaluation on the last trained model
-python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
+python3 samples/coco/coco.py evaluate --dataset=/path/to/coco/ --model=last
 ```
 
-The training schedule, learning rate, and other parameters should be set in coco.py.
+The training schedule, learning rate, and other parameters should be set in `samples/coco/coco.py`.
 
 
 # Training on Your Own Dataset
@@ -129,7 +129,7 @@ all available in one dataset.
 
 The ```Dataset``` class itself is the base class. To use it, create a new
 class that inherits from it and adds functions specific to your dataset.
-See the base `Dataset` class in utils.py and examples of extending it in train_shapes.ipynb and coco.py.
+See the base `Dataset` class in `utils.py` and examples of extending it in `samples/coco/train_shapes.ipynb` and `samples/coco/coco.py`.
 
 ## Differences from the Official Paper
 This implementation follows the Mask RCNN paper for the most part, but there are a few cases where we deviated in favor of code simplicity and generalization. These are some of the differences we're aware of. If you encounter other differences, please do let us know.
