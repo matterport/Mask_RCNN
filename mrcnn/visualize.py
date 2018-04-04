@@ -7,14 +7,24 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
+import os
+import logging
 import random
 import itertools
 import colorsys
+
+import matplotlib
+# in case you are running on machine without display, e.g. server
+if os.environ.get('DISPLAY', '') == '' \
+        and matplotlib.rcParams['backend'] != 'agg':
+    logging.warning('No display found. Using non-interactive Agg backend')
+    # https://matplotlib.org/faq/usage_faq.html
+    matplotlib.use('Agg')
+
 import numpy as np
 from skimage.measure import find_contours
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.lines as lines
+from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
