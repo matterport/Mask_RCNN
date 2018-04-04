@@ -30,17 +30,17 @@ Open the `inspect_balloon_data.ipynb` or `inspect_balloon_model.ipynb` Jupter no
 ## Train the Balloon model
 
 Train a new model starting from pre-trained COCO weights
-```bash
+```
 python3 balloon.py train --dataset=/path/to/balloon/dataset --weights=coco
 ```
 
 Resume training a model that you had trained earlier
-```bash
+```
 python3 balloon.py train --dataset=/path/to/balloon/dataset --weights=last
 ```
 
 Train a new model starting from ImageNet weights
-```bash
+```
 python3 balloon.py train --dataset=/path/to/balloon/dataset --weights=imagenet
 ```
 

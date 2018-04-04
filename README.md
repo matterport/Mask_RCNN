@@ -167,14 +167,6 @@ All required packages are listed in standard file:
 pip3 install -r requirements.txt
 ```
 
-## Installation
-
-The installation as possible using following command:
-```bash
-python3 setup.py build_ext --inplace
-python3 setup.py install
-``` 
-
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
 * pycocotools (installation instructions below)
@@ -188,7 +180,10 @@ If you use Docker, the code has been verified to work on
 
 
 ## Installation
-1. Clone this repository
+1. Clone this repository. The installation as possible using following command:
+    ```bash
+    python3 setup.py install
+    ``` 
 2. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
 3. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
