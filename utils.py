@@ -13,7 +13,7 @@ import math
 import random
 import numpy as np
 import tensorflow as tf
-import scipy.misc
+import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
@@ -425,10 +425,11 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
             scale = max_dim / image_max
-    # Resize image and mask
+    # Resize image using bilinear interpolation
     if scale != 1:
-        image = scipy.misc.imresize(
-            image, (round(h * scale), round(w * scale)))
+        image = skimage.transform.resize(
+            image, (round(h * scale), round(w * scale)),
+            order=1, mode="constant", preserve_range=True)
     # Need padding?
     if mode == "square":
         # Get new height and width

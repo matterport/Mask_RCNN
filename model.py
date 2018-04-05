@@ -2596,7 +2596,7 @@ def parse_image_meta_graph(meta):
 
 
 def mold_image(images, config):
-    """Takes RGB images with 0-255 values and subtraces
+    """Expects an RGB image (or array of images) and subtraces
     the mean pixel and converts it to float. Expects image
     colors in RGB order.
     """
