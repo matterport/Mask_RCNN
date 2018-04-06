@@ -9,10 +9,16 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
+import os
+import sys
 import math
 import random
 import numpy as np
 import cv2
+
+# Add path to root
+sys.path += [os.path.abspath('.')] \
+            + [os.path.abspath(os.path.join(*('..',) * i)) for i in range(1, 3)]
 
 from mrcnn.config import Config
 from mrcnn import utils
