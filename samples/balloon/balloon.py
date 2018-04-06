@@ -35,16 +35,12 @@ import numpy as np
 import skimage.draw
 
 # Root directory of the project
-ROOT_DIR = os.getcwd()
-if ROOT_DIR.endswith("samples/balloon"):
-    # Go up two levels to the repo root
-    ROOT_DIR = os.path.dirname(os.path.dirname(ROOT_DIR))
+ROOT_DIR = os.path.abspath(os.path.join(*('..',) * 2))
+sys.path += [os.path.abspath('.')] \
+            + [os.path.abspath(os.path.join(*('..',) * i)) for i in range(1, 3)]
 
-# Import Mask RCNN
-sys.path.append(ROOT_DIR)
-from config import Config
-import utils
-import model as modellib
+from mrcnn.config import Config
+from mrcnn import model as modellib, utils
 
 # Path to trained weights file
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
