@@ -1,5 +1,5 @@
 # Mobile Mask R-CNN
-This Porject tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Backbone architecture to be finally able to deploy it on mobile devices such as the Nvidia Jetson TX2.
+This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Backbone architecture to be finally able to deploy it on mobile devices such as the Nvidia Jetson TX2.
 <br />
 <br />
 <br />
