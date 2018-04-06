@@ -150,6 +150,11 @@ class Config(object):
     # the RPN. For example, to debug the classifier head without having to
     # train the RPN.
     USE_RPN_ROIS = True
+    
+    # Neural network architecture. For example, 'resnet50', 'mobilenet'
+    # Choose the backbone for the feature pyramid network.
+    ARCH = None  # Override in sub-classes
+
 
     # Train or freeze batch normalization layers
     #     None: Train BN layers. This is the normal mode
