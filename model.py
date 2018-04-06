@@ -1,12 +1,14 @@
 """
-Mask R-CNN
+Mobile Mask R-CNN
 The main Mask R-CNN model implemenetation.
 
 Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
+Modified by github.com/GustavZ
 """
 
+## standard Mask R-CNN Imports
 import os
 import sys
 import glob
@@ -35,6 +37,41 @@ import utils
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+
+## MobileNetV1 Imports
+#from __future__ import print_function
+#from __future__ import absolute_import
+#from __future__ import division
+#import warnings
+#import numpy as np
+#from keras.preprocessing import image
+#from keras.models import Model
+#from keras.layers import Input
+#from keras.layers import Activation
+#from keras.layers import Dropout
+#from keras.layers import Reshape
+#from keras.layers import BatchNormalization
+#from keras.layers import GlobalAveragePooling2D
+#from keras.layers import GlobalMaxPooling2D
+#from keras.layers import Conv2D
+from keras import initializers
+from keras import regularizers
+from keras import constraints
+from keras.utils import conv_utils
+#from keras.utils.data_utils import get_file
+#from keras.engine.topology import get_source_inputs
+from keras.engine import InputSpec
+#from keras.applications.imagenet_utils import _obtain_input_shape
+#from keras.applications.imagenet_utils import decode_predictions
+#from keras import backend as K
+
+## MobileNetV2 Imports
+#from keras.models import Model
+#from keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dropout
+#from keras.layers import Activation, BatchNormalization, add, Reshape
+#from keras.applications.mobilenet import relu6, DepthwiseConv2D
+#from keras.utils.vis_utils import plot_model
+#from keras import backend as K
 
 
 ############################################################
@@ -193,6 +230,502 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
         C5 = None
     return [C1, C2, C3, C4, C5]
 
+
+############################################################
+#  Mobilenet V1 Graph
+############################################################
+
+# Code adopted from:
+# https://github.com/fchollet/deep-learning-models/blob/master/mobilenet.py
+
+def relu6(x):
+    return K.relu(x, max_value=6)
+
+
+def preprocess_input(x):
+    x /= 255.
+    x -= 0.5
+    x *= 2.
+    return x
+
+
+class DepthwiseConv2D(KL.Conv2D):
+    """Depthwise separable 2D convolution.
+    Depthwise Separable convolutions consists in performing
+    just the first step in a depthwise spatial convolution
+    (which acts on each input channel separately).
+    The `depth_multiplier` argument controls how many
+    output channels are generated per input channel in the depthwise step.
+    # Arguments
+        kernel_size: An integer or tuple/list of 2 integers, specifying the
+            width and height of the 2D convolution window.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+        strides: An integer or tuple/list of 2 integers,
+            specifying the strides of the convolution along the width and height.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+            Specifying any stride value != 1 is incompatible with specifying
+            any `dilation_rate` value != 1.
+        padding: one of `"valid"` or `"same"` (case-insensitive).
+        depth_multiplier: The number of depthwise convolution output channels
+            for each input channel.
+            The total number of depthwise convolution output
+            channels will be equal to `filters_in * depth_multiplier`.
+        data_format: A string,
+            one of `channels_last` (default) or `channels_first`.
+            The ordering of the dimensions in the inputs.
+            `channels_last` corresponds to inputs with shape
+            `(batch, height, width, channels)` while `channels_first`
+            corresponds to inputs with shape
+            `(batch, channels, height, width)`.
+            It defaults to the `image_data_format` value found in your
+            Keras config file at `~/.keras/keras.json`.
+            If you never set it, then it will be "channels_last".
+        activation: Activation function to use
+            (see [activations](keras./activations.md)).
+            If you don't specify anything, no activation is applied
+            (ie. "linear" activation: `a(x) = x`).
+        use_bias: Boolean, whether the layer uses a bias vector.
+        depthwise_initializer: Initializer for the depthwise kernel matrix
+            (see [initializers](keras./initializers.md)).
+        bias_initializer: Initializer for the bias vector
+            (see [initializers](keras./initializers.md)).
+        depthwise_regularizer: Regularizer function applied to
+            the depthwise kernel matrix
+            (see [regularizer](keras./regularizers.md)).
+        bias_regularizer: Regularizer function applied to the bias vector
+            (see [regularizer](keras./regularizers.md)).
+        activity_regularizer: Regularizer function applied to
+            the output of the layer (its "activation").
+            (see [regularizer](keras./regularizers.md)).
+        depthwise_constraint: Constraint function applied to
+            the depthwise kernel matrix
+            (see [constraints](keras./constraints.md)).
+        bias_constraint: Constraint function applied to the bias vector
+            (see [constraints](keras./constraints.md)).
+    # Input shape
+        4D tensor with shape:
+        `[batch, channels, rows, cols]` if data_format='channels_first'
+        or 4D tensor with shape:
+        `[batch, rows, cols, channels]` if data_format='channels_last'.
+    # Output shape
+        4D tensor with shape:
+        `[batch, filters, new_rows, new_cols]` if data_format='channels_first'
+        or 4D tensor with shape:
+        `[batch, new_rows, new_cols, filters]` if data_format='channels_last'.
+        `rows` and `cols` values might have changed due to padding.
+    """
+
+    def __init__(self,
+                 kernel_size,
+                 strides=(1, 1),
+                 padding='valid',
+                 depth_multiplier=1,
+                 data_format=None,
+                 activation=None,
+                 use_bias=True,
+                 depthwise_initializer='glorot_uniform',
+                 bias_initializer='zeros',
+                 depthwise_regularizer=None,
+                 bias_regularizer=None,
+                 activity_regularizer=None,
+                 depthwise_constraint=None,
+                 bias_constraint=None,
+                 **kwargs):
+        super(DepthwiseConv2D, self).__init__(
+            filters=None,
+            kernel_size=kernel_size,
+            strides=strides,
+            padding=padding,
+            data_format=data_format,
+            activation=activation,
+            use_bias=use_bias,
+            bias_regularizer=bias_regularizer,
+            activity_regularizer=activity_regularizer,
+            bias_constraint=bias_constraint,
+            **kwargs)
+        self.depth_multiplier = depth_multiplier
+        self.depthwise_initializer = initializers.get(depthwise_initializer)
+        self.depthwise_regularizer = regularizers.get(depthwise_regularizer)
+        self.depthwise_constraint = constraints.get(depthwise_constraint)
+        self.bias_initializer = initializers.get(bias_initializer)
+
+    def build(self, input_shape):
+        if len(input_shape) < 4:
+            raise ValueError('Inputs to `DepthwiseConv2D` should have rank 4. '
+                             'Received input shape:', str(input_shape))
+        if self.data_format == 'channels_first':
+            channel_axis = 1
+        else:
+            channel_axis = 3
+        if input_shape[channel_axis] is None:
+            raise ValueError('The channel dimension of the inputs to '
+                             '`DepthwiseConv2D` '
+                             'should be defined. Found `None`.')
+        input_dim = int(input_shape[channel_axis])
+        depthwise_kernel_shape = (self.kernel_size[0],
+                                  self.kernel_size[1],
+                                  input_dim,
+                                  self.depth_multiplier)
+
+        self.depthwise_kernel = self.add_weight(
+            shape=depthwise_kernel_shape,
+            initializer=self.depthwise_initializer,
+            name='depthwise_kernel',
+            regularizer=self.depthwise_regularizer,
+            constraint=self.depthwise_constraint)
+
+        if self.use_bias:
+            self.bias = self.add_weight(shape=(input_dim * self.depth_multiplier,),
+                                        initializer=self.bias_initializer,
+                                        name='bias',
+                                        regularizer=self.bias_regularizer,
+                                        constraint=self.bias_constraint)
+        else:
+            self.bias = None
+        # Set input spec.
+        self.input_spec = InputSpec(ndim=4, axes={channel_axis: input_dim})
+        self.built = True
+
+    def call(self, inputs, training=None):
+        outputs = K.depthwise_conv2d(
+            inputs,
+            self.depthwise_kernel,
+            strides=self.strides,
+            padding=self.padding,
+            dilation_rate=self.dilation_rate,
+            data_format=self.data_format)
+
+        if self.bias:
+            outputs = K.bias_add(
+                outputs,
+                self.bias,
+                data_format=self.data_format)
+
+        if self.activation is not None:
+            return self.activation(outputs)
+
+        return outputs
+
+    def compute_output_shape(self, input_shape):
+        if self.data_format == 'channels_first':
+            rows = input_shape[2]
+            cols = input_shape[3]
+            out_filters = input_shape[1] * self.depth_multiplier
+        elif self.data_format == 'channels_last':
+            rows = input_shape[1]
+            cols = input_shape[2]
+            out_filters = input_shape[3] * self.depth_multiplier
+
+        rows = conv_utils.conv_output_length(rows, self.kernel_size[0],
+                                             self.padding,
+                                             self.strides[0])
+        cols = conv_utils.conv_output_length(cols, self.kernel_size[1],
+                                             self.padding,
+                                             self.strides[1])
+
+        if self.data_format == 'channels_first':
+            return (input_shape[0], out_filters, rows, cols)
+        elif self.data_format == 'channels_last':
+            return (input_shape[0], rows, cols, out_filters)
+
+    def get_config(self):
+        config = super(DepthwiseConv2D, self).get_config()
+        config.pop('filters')
+        config.pop('kernel_initializer')
+        config.pop('kernel_regularizer')
+        config.pop('kernel_constraint')
+        config['depth_multiplier'] = self.depth_multiplier
+        config['depthwise_initializer'] = initializers.serialize(self.depthwise_initializer)
+        config['depthwise_regularizer'] = regularizers.serialize(self.depthwise_regularizer)
+        config['depthwise_constraint'] = constraints.serialize(self.depthwise_constraint)
+        return config
+
+def _conv_block(inputs, filters, alpha, kernel=(3, 3), strides=(1, 1)):
+    """Adds an initial convolution layer (with batch normalization and relu6).
+    # Arguments
+        inputs: Input tensor of shape `(rows, cols, 3)`
+            (with `channels_last` data format) or
+            (3, rows, cols) (with `channels_first` data format).
+            It should have exactly 3 inputs channels,
+            and width and height should be no smaller than 32.
+            E.g. `(224, 224, 3)` would be one valid value.
+        filters: Integer, the dimensionality of the output space
+            (i.e. the number output of filters in the convolution).
+        alpha: controls the width of the network.
+            - If `alpha` < 1.0, proportionally decreases the number
+                of filters in each layer.
+            - If `alpha` > 1.0, proportionally increases the number
+                of filters in each layer.
+            - If `alpha` = 1, default number of filters from the paper
+                 are used at each layer.
+        kernel: An integer or tuple/list of 2 integers, specifying the
+            width and height of the 2D convolution window.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+        strides: An integer or tuple/list of 2 integers,
+            specifying the strides of the convolution along the width and height.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+            Specifying any stride value != 1 is incompatible with specifying
+            any `dilation_rate` value != 1.
+    # Input shape
+        4D tensor with shape:
+        `(samples, channels, rows, cols)` if data_format='channels_first'
+        or 4D tensor with shape:
+        `(samples, rows, cols, channels)` if data_format='channels_last'.
+    # Output shape
+        4D tensor with shape:
+        `(samples, filters, new_rows, new_cols)` if data_format='channels_first'
+        or 4D tensor with shape:
+        `(samples, new_rows, new_cols, filters)` if data_format='channels_last'.
+        `rows` and `cols` values might have changed due to stride.
+    # Returns
+        Output tensor of block.
+    """
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+    filters = int(filters * alpha)
+    x = KL.Conv2D(filters, kernel,
+               padding='same',
+               use_bias=False,
+               strides=strides,
+               name='conv1')(inputs)
+    x = KL.BatchNormalization(axis=channel_axis, name='conv1_bn')(x)
+    return KL.Activation(relu6, name='conv1_relu')(x)
+
+
+def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
+                          depth_multiplier=1, strides=(1, 1), block_id=1):
+    """Adds a depthwise convolution block.
+    A depthwise convolution block consists of a depthwise conv,
+    batch normalization, relu6, pointwise convolution,
+    batch normalization and relu6 activation.
+    # Arguments
+        inputs: Input tensor of shape `(rows, cols, channels)`
+            (with `channels_last` data format) or
+            (channels, rows, cols) (with `channels_first` data format).
+        pointwise_conv_filters: Integer, the dimensionality of the output space
+            (i.e. the number output of filters in the pointwise convolution).
+        alpha: controls the width of the network.
+            - If `alpha` < 1.0, proportionally decreases the number
+                of filters in each layer.
+            - If `alpha` > 1.0, proportionally increases the number
+                of filters in each layer.
+            - If `alpha` = 1, default number of filters from the paper
+                 are used at each layer.
+        depth_multiplier: The number of depthwise convolution output channels
+            for each input channel.
+            The total number of depthwise convolution output
+            channels will be equal to `filters_in * depth_multiplier`.
+        strides: An integer or tuple/list of 2 integers,
+            specifying the strides of the convolution along the width and height.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+            Specifying any stride value != 1 is incompatible with specifying
+            any `dilation_rate` value != 1.
+        block_id: Integer, a unique identification designating the block number.
+    # Input shape
+        4D tensor with shape:
+        `(batch, channels, rows, cols)` if data_format='channels_first'
+        or 4D tensor with shape:
+        `(batch, rows, cols, channels)` if data_format='channels_last'.
+    # Output shape
+        4D tensor with shape:
+        `(batch, filters, new_rows, new_cols)` if data_format='channels_first'
+        or 4D tensor with shape:
+        `(batch, new_rows, new_cols, filters)` if data_format='channels_last'.
+        `rows` and `cols` values might have changed due to stride.
+    # Returns
+        Output tensor of block.
+    """
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+    pointwise_conv_filters = int(pointwise_conv_filters * alpha)
+
+    x = DepthwiseConv2D((3, 3),
+                        padding='same',
+                        depth_multiplier=depth_multiplier,
+                        strides=strides,
+                        use_bias=False,
+                        name='conv_dw_%d' % block_id)(inputs)
+    x = KL.BatchNormalization(axis=channel_axis, name='conv_dw_%d_bn' % block_id)(x)
+    x = KL.Activation(relu6, name='conv_dw_%d_relu' % block_id)(x)
+
+    x = KL.Conv2D(pointwise_conv_filters, (1, 1),
+               padding='same',
+               use_bias=False,
+               strides=(1, 1),
+               name='conv_pw_%d' % block_id)(x)
+    x = KL.BatchNormalization(axis=channel_axis, name='conv_pw_%d_bn' % block_id)(x)
+    return KL.Activation(relu6, name='conv_pw_%d_relu' % block_id)(x)
+
+
+def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
+    assert architecture in ["mobilenetv1"]
+    # Stage 1
+    x = _conv_block(img_input, 32, alpha, strides=(2, 2))
+    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1)
+
+    # Stage 2
+    x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,
+                              strides=(2, 2), block_id=2)
+    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3)
+
+    # Stage 3
+    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,
+                              strides=(2, 2), block_id=4)
+    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5)
+
+    # Stage 4
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,
+                              strides=(2, 2), block_id=6)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=10)
+    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11)
+
+    # Stage 5
+    x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier,
+                              strides=(2, 2), block_id=12)
+    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)
+return [C1, C2, C3, C4, C5]
+
+
+############################################################
+#  MobileNetV2 Graph
+############################################################
+
+# Code adpated from:
+# https://github.com/xiaochus/MobileNetV2/blob/master/mobilenet_v2.py
+
+"""MobileNet v2 models for Keras.
+# Reference
+- [Inverted Residuals and Linear Bottlenecks Mobile Networks for
+   Classification, Detection and Segmentation]
+   (https://arxiv.org/abs/1801.04381)
+"""
+
+## _conv_block without alpha parameter
+#def _conv_block(inputs, filters, kernel, strides):
+    """Convolution Block
+    This function defines a 2D convolution operation with BN and relu6.
+    # Arguments
+        inputs: Tensor, input tensor of conv layer.
+        filters: Integer, the dimensionality of the output space.
+        kernel: An integer or tuple/list of 2 integers, specifying the
+            width and height of the 2D convolution window.
+        strides: An integer or tuple/list of 2 integers,
+            specifying the strides of the convolution along the width and height.
+            Can be a single integer to specify the same value for
+            all spatial dimensions.
+    # Returns
+        Output tensor.
+    """
+
+#    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+
+#    x = KL.Conv2D(filters, kernel, padding='same', strides=strides)(inputs)
+#    x = KL.BatchNormalization(axis=channel_axis)(x)
+#    return KL.Activation(relu6)(x)
+
+
+def _bottleneck(img_input, filters, kernel, t, s, r=False, alpha):
+    """Bottleneck
+    This function defines a basic bottleneck structure.
+    # Arguments
+        inputs: Tensor, input tensor of conv layer.
+        filters: Integer, the dimensionality of the output space.
+        kernel: An integer or tuple/list of 2 integers, specifying the
+            width and height of the 2D convolution window.
+        t: Integer, expansion factor.
+            t is always applied to the input size.
+        s: An integer or tuple/list of 2 integers,specifying the strides
+            of the convolution along the width and height.Can be a single
+            integer to specify the same value for all spatial dimensions.
+        r: Boolean, Whether to use the residuals.
+    # Returns
+        Output tensor.
+    """
+
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+    tchannel = K.int_shape(img_input)[channel_axis] * t
+
+    x = _conv_block(img_input, tchannel, alpha, (1, 1), (1, 1))
+
+    x = KL.DepthwiseConv2D(kernel, strides=(s, s), depth_multiplier=1, padding='same')(x)
+    x = KL.BatchNormalization(axis=channel_axis)(x)
+    x = KL.Activation(relu6)(x)
+
+    x = KL.Conv2D(filters, (1, 1), strides=(1, 1), padding='same')(x)
+    x = KL.BatchNormalization(axis=channel_axis)(x)
+
+    if r:
+        x = KL.add([x, img_input])
+    return x
+
+
+def _inverted_residual_block(img_input, filters, kernel, t, strides, n, alpha):
+    """Inverted Residual Block
+    This function defines a sequence of 1 or more identical layers.
+    # Arguments
+        inputs: Tensor, input tensor of conv layer.
+        filters: Integer, the dimensionality of the output space.
+        kernel: An integer or tuple/list of 2 integers, specifying the
+            width and height of the 2D convolution window.
+        t: Integer, expansion factor.
+            t is always applied to the input size.
+        s: An integer or tuple/list of 2 integers,specifying the strides
+            of the convolution along the width and height.Can be a single
+            integer to specify the same value for all spatial dimensions.
+        n: Integer, layer repeat times.
+    # Returns
+        Output tensor.
+    """
+
+    x = _bottleneck(img_input, filters, kernel, t, strides, alpha)
+
+    for i in range(1, n):
+        x = _bottleneck(x, filters, kernel, t, 1, True, alpha)
+
+    return x
+
+
+def mobilenetv2_graph(img_input, k, alpha = 1.0):
+    """MobileNetv2
+    This function defines a MobileNetv2 architectures.
+    # Arguments
+        input_shape: An integer or tuple/list of 3 integers, shape
+            of input tensor.
+        k: Integer, number of classes.
+    # Returns
+        MobileNetv2 model.
+    """
+    assert architecture in ["mobilenetv2"]
+    #inputs = Input(shape=input_shape)
+    x = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))
+
+    x = _inverted_residual_block(x, 16, (3, 3), t=1, strides=1, n=1, alpha)
+    x = _inverted_residual_block(x, 24, (3, 3), t=6, strides=2, n=2, alpha)
+    x = _inverted_residual_block(x, 32, (3, 3), t=6, strides=2, n=3, alpha)
+    x = _inverted_residual_block(x, 64, (3, 3), t=6, strides=2, n=4, alpha)
+    x = _inverted_residual_block(x, 96, (3, 3), t=6, strides=1, n=3, alpha)
+    x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)
+    x = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)
+
+    x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))
+    #x = GlobalAveragePooling2D()(x)
+    #x = Reshape((1, 1, 1280))(x)
+    #x = Dropout(0.3, name='Dropout')(x)
+    #x = Conv2D(k, (1, 1), padding='same')(x)
+
+    #x = Activation('softmax', name='softmax')(x)
+    #output = Reshape((k,))(x)
+
+    #model = Model(inputs, output)
+    #plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
+
+return [C1,C2,C3,C4,C5]
 
 ############################################################
 #  Proposal Layer
