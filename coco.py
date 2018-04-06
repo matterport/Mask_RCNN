@@ -83,6 +83,9 @@ class CocoConfig(Config):
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 80  # COCO has 80 classes
+       
+    # Which architecture type
+    ARCH = "resnet50"
 
 
 ############################################################
@@ -421,6 +424,10 @@ if __name__ == '__main__':
                         default=500,
                         metavar="<image count>",
                         help='Images to use for evaluation (default=500)')
+    parser.add_argument('--architecture', required=False,
+                        default="resnet50",
+                        metavar="<architecture>",
+                        help='Feature Pyramid Network backbone type')
     parser.add_argument('--download', required=False,
                         default=False,
                         metavar="<True|False>",
@@ -433,6 +440,7 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
+    print("Architecture: ", args.architecture)
 
     # Configurations
     if args.command == "train":
@@ -446,6 +454,14 @@ if __name__ == '__main__':
             DETECTION_MIN_CONFIDENCE = 0
         config = InferenceConfig()
     config.display()
+
+    # Configure backbone architecture
+    if args.architecture.lower() == "resnet50":
+        config.ARCH = "resnet50"
+    elif args.architecture.lower() == "mobilenetv1":
+        config.ARCH = "mobilenetv1"
+    elif args.architecture.lower() == "mobilenetv2":
+        config.ARCH = "mobilenetv2"
 
     # Create model
     if args.command == "train":
@@ -498,14 +514,18 @@ if __name__ == '__main__':
                     epochs=40,
                     layers='heads',
                     augmentation=augmentation)
-
+       
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
-        print("Fine tune Resnet stage 4 and up")
+        print("Fine tune {} stage 4 and up".format(config.ARCH)
+        if config.ARCH == "resnet50":
+              finetune_layers = '4R+'
+        elif config.Arsch == "mobilenetV1":
+              finetune_layers = "11M+"
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
                     epochs=120,
-                    layers='4+',
+                    layers=finetune_layers,
                     augmentation=augmentation)
 
         # Training - Stage 3
