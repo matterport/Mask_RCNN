@@ -28,6 +28,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 """
 
 import os
+import sys
 import time
 import numpy as np
 import imgaug  # https://github.com/aleju/imgaug (pip3 install imageaug)
@@ -46,11 +47,13 @@ import zipfile
 import urllib.request
 import shutil
 
+# Root directory of the project
+ROOT_DIR = os.path.abspath("../../")
+
+# Import Mask RCNN
+sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
-
-# Root directory of the project
-ROOT_DIR = os.getcwd()
 
 # Path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")

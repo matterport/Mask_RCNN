@@ -8,18 +8,11 @@ Written by Waleed Abdulla
 """
 
 import os
+import sys
 import logging
 import random
 import itertools
 import colorsys
-
-import matplotlib
-# in case you are running on machine without display, e.g. server
-if os.environ.get('DISPLAY', '') == '' \
-        and matplotlib.rcParams['backend'] != 'agg':
-    logging.warning('No display found. Using non-interactive Agg backend')
-    # https://matplotlib.org/faq/usage_faq.html
-    matplotlib.use('Agg')
 
 import numpy as np
 from skimage.measure import find_contours
@@ -28,6 +21,11 @@ from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
 
+# Root directory of the project
+ROOT_DIR = os.path.abspath("../")
+
+# Import Mask RCNN
+sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn import utils
 
 

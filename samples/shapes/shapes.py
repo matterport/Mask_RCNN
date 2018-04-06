@@ -9,11 +9,18 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
+import os
+import sys
 import math
 import random
 import numpy as np
 import cv2
 
+# Root directory of the project
+ROOT_DIR = os.path.abspath("../../")
+
+# Import Mask RCNN
+sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import utils
 

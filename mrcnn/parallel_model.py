@@ -118,10 +118,10 @@ if __name__ == "__main__":
     GPU_COUNT = 2
 
     # Root directory of the project
-    ROOT_DIR = os.getcwd()
+    ROOT_DIR = os.path.abspath("../")
 
     # Directory to save logs and trained model
-    MODEL_DIR = os.path.join(ROOT_DIR, "logs/parallel")
+    MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
     def build_model(x_train, num_classes):
         # Reset default graph. Keras leaves old ops in the graph,

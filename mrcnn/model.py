@@ -11,6 +11,7 @@ import os
 import random
 import datetime
 import re
+import math
 import logging
 from collections import OrderedDict
 import multiprocessing
@@ -1980,7 +1981,7 @@ class MaskRCNN():
                        mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_mask,
                        rpn_rois, output_rois,
                        rpn_class_loss, rpn_bbox_loss, class_loss, bbox_loss, mask_loss]
-            model = KM.Model(inputs, outputs, name='mrcnn')
+            model = KM.Model(inputs, outputs, name='mask_rcnn')
         else:
             # Network Heads
             # Proposal classifier and BBox regressor heads
@@ -2006,7 +2007,7 @@ class MaskRCNN():
             model = KM.Model([input_image, input_image_meta],
                              [detections, mrcnn_class, mrcnn_bbox,
                                  mrcnn_mask, rpn_rois, rpn_class, rpn_bbox],
-                             name='mrcnn')
+                             name='mask_rcnn')
 
         # Add multi-GPU support.
         if config.GPU_COUNT > 1:
