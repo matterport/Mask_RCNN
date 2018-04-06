@@ -518,7 +518,7 @@ if __name__ == '__main__':
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune {} stage 4 and up".format(config.ARCH)
-        if config.ARCH == "resnet50":
+        if config.ARCH in ["resnet50", "resnet101"]:
               finetune_layers = '4R+'
         elif config.Arsch == "mobilenetV1":
               finetune_layers = "11M+"
