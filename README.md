@@ -160,12 +160,7 @@ Contributions to this repository are welcome. Examples of things you can contrib
 You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
 
 ## Requirements
-* Python 3.4+
-
-All required packages are listed in standard file:
-```bash
-pip3 install -r requirements.txt
-```
+Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.txt`.
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
@@ -180,12 +175,17 @@ If you use Docker, the code has been verified to work on
 
 
 ## Installation
-1. Clone this repository. The installation as possible using following command:
+1. Install dependencies
+   ```bash
+   pip3 install -r requirements.txt
+   ```
+2. Clone this repository
+3. Run setup from the repository root directory
     ```bash
     python3 setup.py install
     ``` 
-2. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
-3. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
+3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
+4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
     * Linux: https://github.com/waleedka/coco
     * Windows: https://github.com/philferriere/cocoapi.
