@@ -691,7 +691,7 @@ def _inverted_residual_block(img_input, filters, kernel, t, strides, n, alpha):
     return x
 
 
-def mobilenetv2_graph(img_input, k, alpha = 1.0):
+def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     """MobileNetv2
     This function defines a MobileNetv2 architectures.
     # Arguments
@@ -2394,8 +2394,10 @@ class MaskRCNN():
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
-                                         stage5=True, train_bn=config.TRAIN_BN)
+        if config.ARCH in ["resnet50", "resnet101"]:
+            _, C2, C3, C4, C5 = resnet_graph(input_image, config.ARCH, stage5=True, train_bn=config.TRAIN_BN)
+        elif config.ARCH in ["mobilenet"]:
+            _, C2, C3, C4, C5 = mobilenet_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
@@ -2786,9 +2788,13 @@ class MaskRCNN():
             # all layers but the backbone
             "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # From a specific Resnet stage and up
-            "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "3R+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "4R+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "5R+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            # From a specific Mobilenet stage and up
+            "5M+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "11M+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(bn4.*)|(mob5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "13M+": r"(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # All layers
             "all": ".*",
         }
