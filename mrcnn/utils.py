@@ -394,9 +394,14 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
     max_dim: if provided, ensures that the image longest side doesn't
         exceed this value.
     mode: Resizing mode.
-        none: No resizing. Return the image unchanged
+        none: No resizing. Return the image unchanged.
         square: Resize and pad with zeros to get a square image
-            of size [max_dim, max_dim]
+            of size [max_dim, max_dim].
+        pad64: Pads width and height with zeros to make them multiples of 64.
+               If min_dim is provided, it scales the small side to >= min_dim
+               before padding. max_dim is ignored in this mode.
+               The multiple of 64 is needed to ensure smooth scaling of feature
+               maps up and down the 6 levels of the FPN pyramid (2**6=64).
 
     Returns:
     image: the resized image
@@ -423,10 +428,11 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         # Scale up but not down
         scale = max(1, min_dim / min(h, w))
     # Does it exceed max dim?
-    if max_dim:
+    if max_dim and mode == "square":
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
             scale = max_dim / image_max
+
     # Resize image using bilinear interpolation
     if scale != 1:
         image = skimage.transform.resize(
@@ -440,6 +446,27 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         bottom_pad = max_dim - h - top_pad
         left_pad = (max_dim - w) // 2
         right_pad = max_dim - w - left_pad
+        padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
+        image = np.pad(image, padding, mode='constant', constant_values=0)
+        window = (top_pad, left_pad, h + top_pad, w + left_pad)
+    elif mode == "pad64":
+        h, w = image.shape[:2]
+        # Both sides must be divisible by 64
+        assert min_dim % 64 == 0, "Minimum dimension must be a multiple of 64"
+        # Height
+        if h % 64 > 0:
+            max_h = h - (h % 64) + 64
+            top_pad = (max_h - h) // 2
+            bottom_pad = max_h - h - top_pad
+        else:
+            top_pad = bottom_pad = 0
+        # Width
+        if w % 64 > 0:
+            max_w = w - (w % 64) + 64
+            left_pad = (max_w - w) // 2
+            right_pad = max_w - w - left_pad
+        else:
+            left_pad = right_pad = 0
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)

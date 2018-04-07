@@ -88,13 +88,21 @@ class Config(object):
     MINI_MASK_SHAPE = (56, 56)  # (height, width) of the mini-mask
 
     # Input image resizing
-    # Images are resized such that the small side is IMAGE_MIN_DIM and
-    # the long side is <= IMAGE_MAX_DIM. If both conditions can't be
-    # satisfied at the same time then IMAGE_MAX_DIM is enforced.
-    # Resizing modes:
-    #     none: No resizing
-    #     square: Pad with zeros to make it a square (MAX_DIM, MAX_DIM)
-    # TODO: currently, only 'square' mode is supported
+    # Generally, use the "square" resizing mode for training and inferencing
+    # and it should work well in most cases. In this mode, images are scaled
+    # up such that the small side is = IMAGE_MIN_DIM, but ensuring that the
+    # scaling doesn't make the long side > IMAGE_MAX_DIM. Then the image is
+    # padded with zeros to make it a square so multiple images can be put
+    # in one batch.
+    # Available resizing modes:
+    # none:   No resizing or padding. Return the image unchanged.
+    # square: Resize and pad with zeros to get a square image
+    #         of size [max_dim, max_dim].
+    # pad64:  Pads width and height with zeros to make them multiples of 64.
+    #         If IMAGE_MIN_DIM is not None, then scale the small side to
+    #         that size before padding. IMAGE_MAX_DIM is ignored in this mode.
+    #         The multiple of 64 is needed to ensure smooth scaling of feature
+    #         maps up and down the 6 levels of the FPN pyramid (2**6=64).
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
     IMAGE_MAX_DIM = 1024
