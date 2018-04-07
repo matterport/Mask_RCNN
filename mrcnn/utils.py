@@ -407,6 +407,8 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
     scale: The scale factor used to resize the image
     padding: Padding added to the image [(top, bottom), (left, right), (0, 0)]
     """
+    # Keep track of image dtype and return results in the same dtype
+    image_dtype = image.dtype
     # Default window (y1, x1, y2, x2) and default scale == 1.
     h, w = image.shape[:2]
     window = (0, 0, h, w)
@@ -443,7 +445,7 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
     else:
         raise Exception("Mode {} not supported".format(mode))
-    return image, window, scale, padding
+    return image.astype(image_dtype), window, scale, padding
 
 
 def resize_mask(mask, scale, padding):
@@ -472,7 +474,8 @@ def minimize_mask(bbox, mask, mini_shape):
     """
     mini_mask = np.zeros(mini_shape + (mask.shape[-1],), dtype=bool)
     for i in range(mask.shape[-1]):
-        m = mask[:, :, i]
+        # Pick slice and cast to bool in case load_mask() returned wrong dtype
+        m = mask[:, :, i].astype(bool)
         y1, x1, y2, x2 = bbox[i][:4]
         m = m[y1:y2, x1:x2]
         if m.size == 0:

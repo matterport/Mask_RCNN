@@ -2570,8 +2570,9 @@ class MaskRCNN():
             inputs += [K.learning_phase()]
         kf = K.function(model.inputs, list(outputs.values()))
 
-        # Run inference
+        # Prepare inputs
         molded_images, image_metas, windows = self.mold_inputs(images)
+        image_shape = molded_images[0].shape
         # TODO: support training mode?
         # if TEST_MODE == "training":
         #     model_in = [molded_images, image_metas,
@@ -2583,8 +2584,14 @@ class MaskRCNN():
         #         model_in.append(1.)
         #     outputs_np = kf(model_in)
         # else:
+        # Anchors
+        anchors = self.get_anchors(image_shape)
+        # Duplicate across the batch dimension because Keras requires it
+        # TODO: can this be optimized to avoid duplicating the anchors?
+        anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
+        model_in = [molded_images, image_metas, anchors]
 
-        model_in = [molded_images, image_metas]
+        # Run inference
         if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
             model_in.append(0.)
         outputs_np = kf(model_in)
@@ -2624,6 +2631,30 @@ def compose_image_meta(image_id, original_image_shape, image_shape,
         list(active_class_ids)        # size=num_classes
     )
     return meta
+
+
+def parse_image_meta(meta):
+    """Parses an array that contains image attributes to its components.
+    See compose_image_meta() for more details.
+
+    meta: [batch, meta length] where meta length depends on NUM_CLASSES
+
+    Returns a dict of the parsed values.
+    """
+    image_id = meta[:, 0]
+    original_image_shape = meta[:, 1:4]
+    image_shape = meta[:, 4:7]
+    window = meta[:, 7:11]  # (y1, x1, y2, x2) window of image in in pixels
+    scale = meta[:, 11]
+    active_class_ids = meta[:, 12:]
+    return {
+        "image_id": image_id.astype(np.int32),
+        "original_image_shape": original_image_shape.astype(np.int32),
+        "image_shape": image_shape.astype(np.int32),
+        "window": window.astype(np.int32),
+        "scale": scale.astype(np.float32),
+        "active_class_ids": active_class_ids.astype(np.int32),
+    }
 
 
 def parse_image_meta_graph(meta):
