@@ -662,8 +662,8 @@ def compute_matches(gt_boxes, gt_class_ids, gt_masks,
 
     # Loop through predictions and find matching ground truth boxes
     match_count = 0
-    pred_match = np.zeros([pred_boxes.shape[0]])
-    gt_match = np.zeros([gt_boxes.shape[0]])
+    pred_match = -1 * np.ones([pred_boxes.shape[0]])
+    gt_match = -1 * np.ones([gt_boxes.shape[0]])
     for i in range(len(pred_boxes)):
         # Find best matching ground truth box
         # 1. Sort matches by score
@@ -709,8 +709,8 @@ def compute_ap(gt_boxes, gt_class_ids, gt_masks,
         iou_threshold)
 
     # Compute precision and recall at each prediction box step
-    precisions = np.cumsum(pred_match > 0) / (np.arange(len(pred_match)) + 1)
-    recalls = np.cumsum(pred_match > 0).astype(np.float32) / len(gt_match)
+    precisions = np.cumsum(pred_match > -1) / (np.arange(len(pred_match)) + 1)
+    recalls = np.cumsum(pred_match > -1).astype(np.float32) / len(gt_match)
 
     # Pad with start and end values to simplify the math
     precisions = np.concatenate([[0], precisions, [0]])
