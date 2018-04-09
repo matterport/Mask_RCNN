@@ -32,7 +32,7 @@ Please follow the instructions on the relevant notebooks for the training, predi
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/crowdai/crowdai-mapping-challenge-mask-rcnn}},
-  commit = {a83c04bf906c2e286cddb2911e2b96d0e7d56bac}
+  commit = {bac1cf19adbc9d078122c6933da6f808c4ee590d}
 }
 ```
 # Acknowledgements
