@@ -105,8 +105,11 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     else:
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
+    # If no axis is passed, create one and automatically call show()
+    auto_show = False
     if not ax:
         _, ax = plt.subplots(1, figsize=figsize)
+        auto_show = True
 
     # Generate random colors
     colors = colors or random_colors(N)
@@ -162,7 +165,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.show()
+    if auto_show:
+        plt.show()
 
 
 def display_differences(image,
@@ -187,7 +191,7 @@ def display_differences(image,
     masks = np.concatenate([gt_mask, pred_mask], axis=-1)
     # Captions per instance show score/IoU
     captions = ["" for m in gt_match] + ["{:.2f} / {:.2f}".format(
-        r['scores'][i],
+        scores[i],
         (overlaps[i, int(pred_match[i])]
             if pred_match[i] > -1 else overlaps[i].max()))
             for i in range(len(pred_match))]
