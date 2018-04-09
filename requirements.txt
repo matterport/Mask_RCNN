@@ -9,4 +9,7 @@ keras>=2.0.8
 opencv-python
 h5py
 imgaug
-IPython[all]tqdm==4.19.9
+IPython[all]
+tqdm==4.19.9
+jupyter-client==5.2.3
+jupyter-core==4.4.0
