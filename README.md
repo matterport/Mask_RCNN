@@ -17,7 +17,8 @@ python setup.py install
 Please follow the instructions on the relevant notebooks for the training, prediction and submissions.
 
 * [Training](Training.ipynb)
-* [Prediction and Submission](Prediction and Submission.ipynb) (pre-trained weights for baseline submission included)
+* [Prediction and Submission](Prediction and Submission.ipynb)
+  (_pre-trained weights for baseline submission included_)
 
 # Results
 ![sample_predictions](images/predictions.png)
