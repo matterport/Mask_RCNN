@@ -2480,6 +2480,64 @@ class MaskRCNN():
             })
         return results
 
+    def detect_molded(self, molded_images, image_metas, verbose=0):
+        """Runs the detection pipeline, but expect inputs that are
+        molded already. Used mostly for debugging and inspecting
+        the model.
+
+        molded_images: List of images loaded using load_image_gt()
+        image_metas: image meta data, also retruned by load_image_gt()
+
+        Returns a list of dicts, one dict per image. The dict contains:
+        rois: [N, (y1, x1, y2, x2)] detection bounding boxes
+        class_ids: [N] int class IDs
+        scores: [N] float probability scores for the class IDs
+        masks: [H, W, N] instance binary masks
+        """
+        assert self.mode == "inference", "Create model in inference mode."
+        assert len(molded_images) == self.config.BATCH_SIZE,\
+            "Number of images must be equal to BATCH_SIZE"
+
+        if verbose:
+            log("Processing {} images".format(len(molded_images)))
+            for image in molded_images:
+                log("image", image)
+
+        # Validate image sizes
+        # All images in a batch MUST be of the same size
+        image_shape = molded_images[0].shape
+        for g in molded_images[1:]:
+            assert g.shape == image_shape, "Images must have the same size"
+
+        # Anchors
+        anchors = self.get_anchors(image_shape)
+        # Duplicate across the batch dimension because Keras requires it
+        # TODO: can this be optimized to avoid duplicating the anchors?
+        anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
+
+        if verbose:
+            log("molded_images", molded_images)
+            log("image_metas", image_metas)
+            log("anchors", anchors)
+        # Run object detection
+        detections, _, _, mrcnn_mask, _, _, _ =\
+            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+        # Process detections
+        results = []
+        for i, image in enumerate(molded_images):
+            window = [0, 0, image.shape[0], image.shape[1]]
+            final_rois, final_class_ids, final_scores, final_masks =\
+                self.unmold_detections(detections[i], mrcnn_mask[i],
+                                       image.shape, molded_images[i].shape,
+                                       window)
+            results.append({
+                "rois": final_rois,
+                "class_ids": final_class_ids,
+                "scores": final_scores,
+                "masks": final_masks,
+            })
+        return results
+
     def get_anchors(self, image_shape):
         """Returns anchor pyramid for the given image size."""
         backbone_shapes = compute_backbone_shapes(self.config, image_shape)
@@ -2551,9 +2609,12 @@ class MaskRCNN():
                 layers.append(l)
         return layers
 
-    def run_graph(self, images, outputs):
+    def run_graph(self, images, outputs, image_metas=None):
         """Runs a sub-set of the computation graph that computes the given
         outputs.
+
+        image_metas: If provided, the images are assumed to be already
+            molded (i.e. resized, padded, and noramlized)
 
         outputs: List of tuples (name, tensor) to compute. The tensors are
             symbolic TensorFlow tensors and the names are for easy tracking.
@@ -2575,19 +2636,11 @@ class MaskRCNN():
         kf = K.function(model.inputs, list(outputs.values()))
 
         # Prepare inputs
-        molded_images, image_metas, windows = self.mold_inputs(images)
+        if image_metas is None:
+            molded_images, image_metas, _ = self.mold_inputs(images)
+        else:
+            molded_images = images
         image_shape = molded_images[0].shape
-        # TODO: support training mode?
-        # if TEST_MODE == "training":
-        #     model_in = [molded_images, image_metas,
-        #                 target_rpn_match, target_rpn_bbox,
-        #                 gt_boxes, gt_masks]
-        #     if not config.USE_RPN_ROIS:
-        #         model_in.append(target_rois)
-        #     if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
-        #         model_in.append(1.)
-        #     outputs_np = kf(model_in)
-        # else:
         # Anchors
         anchors = self.get_anchors(image_shape)
         # Duplicate across the batch dimension because Keras requires it
