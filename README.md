@@ -38,6 +38,7 @@ Please follow the instructions on the relevant notebooks for the training, predi
 # Acknowledgements
 This repository heavily reuses code from the amazing [tensorflow Mask RCNN implementation](https://github.com/matterport/Mask_RCNN) by [@waleedka](https://github.com/waleedka/).
 Many thanks to all the contributors of that project.
+You are encouraged to checkout [https://github.com/matterport/Mask_RCNN](https://github.com/matterport/Mask_RCNN) for documentation on many other aspects of this code.
 
 # Author
 Sharada Mohanty [sharada.mohanty@epfl.ch](sharada.mohanty@epfl.ch)
