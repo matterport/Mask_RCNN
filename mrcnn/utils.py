@@ -386,22 +386,28 @@ class Dataset(object):
         return mask, class_ids
 
 
-def resize_image(image, min_dim=None, max_dim=None, mode="square"):
+def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square"):
     """Resizes an image keeping the aspect ratio unchanged.
 
     min_dim: if provided, resizes the image such that it's smaller
         dimension == min_dim
     max_dim: if provided, ensures that the image longest side doesn't
         exceed this value.
+    min_scale: if provided, ensure that the image is scaled up by at least
+        this percent even if min_dim doesn't require it.
     mode: Resizing mode.
         none: No resizing. Return the image unchanged.
         square: Resize and pad with zeros to get a square image
             of size [max_dim, max_dim].
         pad64: Pads width and height with zeros to make them multiples of 64.
-               If min_dim is provided, it scales the small side to >= min_dim
+               If min_dim or min_scale are provided, it scales the image up
                before padding. max_dim is ignored in this mode.
                The multiple of 64 is needed to ensure smooth scaling of feature
                maps up and down the 6 levels of the FPN pyramid (2**6=64).
+        crop: Picks random crops from the image. First, scales the image based
+              on min_dim and min_scale, then picks a random crop of
+              size min_dim x min_dim. Can be used in training only.
+              max_dim is not used in this mode.
 
     Returns:
     image: the resized image
@@ -419,14 +425,18 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
     window = (0, 0, h, w)
     scale = 1
     padding = [(0, 0), (0, 0), (0, 0)]
+    crop = None
 
     if mode == "none":
-        return image, window, scale, padding
+        return image, window, scale, padding, crop
 
     # Scale?
     if min_dim:
         # Scale up but not down
         scale = max(1, min_dim / min(h, w))
+    if scale < min_scale:
+        scale = min_scale
+
     # Does it exceed max dim?
     if max_dim and mode == "square":
         image_max = max(h, w)
@@ -438,7 +448,8 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         image = skimage.transform.resize(
             image, (round(h * scale), round(w * scale)),
             order=1, mode="constant", preserve_range=True)
-    # Need padding?
+
+    # Need padding or cropping?
     if mode == "square":
         # Get new height and width
         h, w = image.shape[:2]
@@ -470,12 +481,20 @@ def resize_image(image, min_dim=None, max_dim=None, mode="square"):
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+    elif mode == "crop":
+        # Pick a random crop
+        h, w = image.shape[:2]
+        y = random.randint(0, (h - min_dim))
+        x = random.randint(0, (w - min_dim))
+        crop = (y, x, min_dim, min_dim)
+        image = image[y:y + min_dim, x:x + min_dim]
+        window = (0, 0, min_dim, min_dim)
     else:
         raise Exception("Mode {} not supported".format(mode))
-    return image.astype(image_dtype), window, scale, padding
+    return image.astype(image_dtype), window, scale, padding, crop
 
 
-def resize_mask(mask, scale, padding):
+def resize_mask(mask, scale, padding, crop=None):
     """Resizes a mask using the given scale and padding.
     Typically, you get the scale and padding from resize_image() to
     ensure both, the image and the mask, are resized consistently.
@@ -489,7 +508,11 @@ def resize_mask(mask, scale, padding):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         mask = scipy.ndimage.zoom(mask, zoom=[scale, scale, 1], order=0)
-    mask = np.pad(mask, padding, mode='constant', constant_values=0)
+    if crop is not None:
+        y, x, h, w = crop
+        mask = mask[y:y + h, x:x + w]
+    else:
+        mask = np.pad(mask, padding, mode='constant', constant_values=0)
     return mask
 
 
