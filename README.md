@@ -6,7 +6,7 @@ This repository contains the details of implementation of the Baseline submissio
 
 # Installation
 ```
-git clone https://github.com/spMohanty/crowdai-mapping-challenge-mask-rcnn
+git clone https://github.com/crowdai/crowdai-mapping-challenge-mask-rcnn
 cd crowdai-mapping-challenge-mask-rcnn
 # Please ensure that you use python3.6
 pip install -r requirements.txt
@@ -31,7 +31,7 @@ Please follow the instructions on the relevant notebooks for the training, predi
   year = {2018},
   publisher = {GitHub},
   journal = {GitHub repository},
-  howpublished = {\url{https://github.com/spMohanty/crowdai-mapping-challenge-mask-rcnn}},
+  howpublished = {\url{https://github.com/crowdai/crowdai-mapping-challenge-mask-rcnn}},
   commit = {a83c04bf906c2e286cddb2911e2b96d0e7d56bac}
 }
 ```
