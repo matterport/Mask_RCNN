@@ -35,16 +35,12 @@ import numpy as np
 import skimage.draw
 
 # Root directory of the project
-ROOT_DIR = os.getcwd()
-if ROOT_DIR.endswith("samples/balloon"):
-    # Go up two levels to the repo root
-    ROOT_DIR = os.path.dirname(os.path.dirname(ROOT_DIR))
+ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
-sys.path.append(ROOT_DIR)
-from config import Config
-import utils
-import model as modellib
+sys.path.append(ROOT_DIR)  # To find local version of the library
+from mrcnn.config import Config
+from mrcnn import model as modellib, utils
 
 # Path to trained weights file
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
@@ -164,7 +160,7 @@ class BalloonDataset(utils.Dataset):
 
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s
-        return mask, np.ones([mask.shape[-1]], dtype=np.int32)
+        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
 
     def image_reference(self, image_id):
         """Return the path of the image."""
