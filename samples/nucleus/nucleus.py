@@ -226,7 +226,7 @@ class NucleusDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         # Get mask directory from image path
-        mask_dir = os.path.join(os.path.dirname(os.path.dirname(path)), "masks")
+        mask_dir = os.path.join(os.path.dirname(os.path.dirname(info['path'])), "masks")
 
         # Read mask files from .png image
         mask = []
