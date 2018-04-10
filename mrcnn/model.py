@@ -569,21 +569,21 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
     return KL.Activation(relu6, name='conv_pw_%d_relu' % block_id)(x)
 
 
-def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
+def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1): 
     assert architecture in ["mobilenetv1"]
     # Stage 1
-    x = _conv_block(img_input, 32, alpha, strides=(2, 2))
-    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1)
+    x = _conv_block(img_input, 32, alpha, strides=(2, 2))							#Input Resolution: 224 x 224
+    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1) 		#Input Resolution: 112 x 112
 
     # Stage 2
     x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,
                               strides=(2, 2), block_id=2)
-    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3)
+    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3) 	#Input Resolution: 56 x 56
 
     # Stage 3
     x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,
                               strides=(2, 2), block_id=4)
-    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5)
+    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5) 	#Input Resolution: 28 x 28
 
     # Stage 4
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,
@@ -592,12 +592,12 @@ def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=10)
-    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11)
+    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11)	#Input Resolution: 14 x 14
 
     # Stage 5
     x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier,
                               strides=(2, 2), block_id=12)
-    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)
+    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)	#Input Resolution: 7x7
 return [C1, C2, C3, C4, C5]
 
 
@@ -712,17 +712,17 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     """
     assert architecture in ["mobilenetv2"]
     #inputs = Input(shape=input_shape)
-    x = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))
-
-    x = _inverted_residual_block(x, 16, (3, 3), t=1, strides=1, n=1, alpha)
-    x = _inverted_residual_block(x, 24, (3, 3), t=6, strides=2, n=2, alpha)
-    x = _inverted_residual_block(x, 32, (3, 3), t=6, strides=2, n=3, alpha)
-    x = _inverted_residual_block(x, 64, (3, 3), t=6, strides=2, n=4, alpha)
-    x = _inverted_residual_block(x, 96, (3, 3), t=6, strides=1, n=3, alpha)
-    x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)
-    x = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)
-
-    x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))
+    
+    x      = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))				# Input Res: 1
+    C1 = x = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha)	# Input Res: 1/2
+    x      = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha)	# Input Res: 1/2
+    C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/4
+    C3 = x = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha)	# Input Res: 1/8
+    x      = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha)	# Input Res: 1/8
+    C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/16
+    x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)	# Input Res: 1/32
+    C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))					# Input Res: 1/32
+    
     #x = GlobalAveragePooling2D()(x)
     #x = Reshape((1, 1, 1280))(x)
     #x = Dropout(0.3, name='Dropout')(x)
