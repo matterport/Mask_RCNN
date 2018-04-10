@@ -437,7 +437,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     if min_dim:
         # Scale up but not down
         scale = max(1, min_dim / min(h, w))
-    if scale < min_scale:
+    if min_scale and scale < min_scale:
         scale = min_scale
 
     # Does it exceed max dim?

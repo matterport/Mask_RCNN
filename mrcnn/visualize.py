@@ -191,7 +191,7 @@ def display_differences(image,
     masks = np.concatenate([gt_mask, pred_mask], axis=-1)
     # Captions per instance show score/IoU
     captions = ["" for m in gt_match] + ["{:.2f} / {:.2f}".format(
-        scores[i],
+        pred_score[i],
         (overlaps[i, int(pred_match[i])]
             if pred_match[i] > -1 else overlaps[i].max()))
             for i in range(len(pred_match))]

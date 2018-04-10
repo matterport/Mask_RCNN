@@ -100,9 +100,7 @@ VAL_IMAGE_IDS = [
 ############################################################
 
 class NucleusConfig(Config):
-    """Configuration for training on the toy  dataset.
-    Derives from the base Config class and overrides some values.
-    """
+    """Configuration for training on the nucleus segmentation dataset."""
     # Give the configuration a recognizable name
     NAME = "nucleus"
 
