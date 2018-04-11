@@ -714,11 +714,11 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     #inputs = Input(shape=input_shape)
     
     x      = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))				# Input Res: 1
-    C1 = x = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha)	# Input Res: 1/2
-    x      = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha)	# Input Res: 1/2
+    x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha)	# Input Res: 1/2
+    C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha)	# Input Res: 1/2
     C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/4
-    C3 = x = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha)	# Input Res: 1/8
-    x      = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha)	# Input Res: 1/8
+    x      = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha)	# Input Res: 1/8
+    C3 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha)	# Input Res: 1/8
     C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/16
     x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)	# Input Res: 1/32
     C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))					# Input Res: 1/32
