@@ -107,12 +107,12 @@ class BatchNorm(KL.BatchNormalization):
 
 def compute_backbone_shapes(config, image_shape):
     """Computes the width and height of each stage of the backbone network.
-    
+
     Returns:
         [N, (height, width)]. Where N is the number of stages
     """
     # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101"]
+    assert config.BACKBONE in ["resnet50", "resnet101", "mobilenetv1"]
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
             int(math.ceil(image_shape[1] / stride))]
@@ -569,7 +569,7 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
     return KL.Activation(relu6, name='conv_pw_%d_relu' % block_id)(x)
 
 
-def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1): 
+def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
     assert architecture in ["mobilenetv1"]
     # Stage 1
     x = _conv_block(img_input, 32, alpha, strides=(2, 2))							#Input Resolution: 224 x 224
@@ -712,7 +712,7 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     """
     assert architecture in ["mobilenetv2"]
     #inputs = Input(shape=input_shape)
-    
+
     x      = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))				# Input Res: 1
     x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha)	# Input Res: 1/2
     C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha)	# Input Res: 1/2
@@ -722,7 +722,7 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/16
     x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)	# Input Res: 1/32
     C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))					# Input Res: 1/32
-    
+
     #x = GlobalAveragePooling2D()(x)
     #x = Reshape((1, 1, 1280))(x)
     #x = Dropout(0.3, name='Dropout')(x)
@@ -1334,7 +1334,7 @@ class DetectionLayer(KE.Layer):
         m = parse_image_meta_graph(image_meta)
         image_shape = m['image_shape'][0]
         window = norm_boxes_graph(m['window'], image_shape[:2])
-        
+
         # Run detection refinement graph on each item in the batch
         detections_batch = utils.batch_slice(
             [rois, mrcnn_class, mrcnn_bbox, window],
@@ -2411,8 +2411,10 @@ class MaskRCNN():
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
         if config.ARCH in ["resnet50", "resnet101"]:
             _, C2, C3, C4, C5 = resnet_graph(input_image, config.ARCH, stage5=True, train_bn=config.TRAIN_BN)
-        elif config.ARCH in ["mobilenet"]:
-            _, C2, C3, C4, C5 = mobilenet_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
+        elif config.ARCH in ["mobilenetv1"]:
+            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
+        elif config.ARCH in ["mobilenetv2"]:
+            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
@@ -2550,7 +2552,7 @@ class MaskRCNN():
                                      train_bn=config.TRAIN_BN)
 
             # Detections
-            # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in 
+            # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in
             # normalized coordinates
             detections = DetectionLayer(config, name="mrcnn_detection")(
                 [rpn_rois, mrcnn_class, mrcnn_bbox, input_image_meta])

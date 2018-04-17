@@ -5,6 +5,7 @@ Configurations and data loading code for MS COCO.
 Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
+adopted by github.com/GustavZ
 
 ------------------------------------------------------------
 
@@ -58,10 +59,11 @@ from mrcnn import model as modellib, utils
 # Path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
+
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-DEFAULT_DATASET_YEAR = "2014"
+DEFAULT_DATASET_YEAR = "2017" #"2014"
 
 ############################################################
 #  Configurations
@@ -85,9 +87,34 @@ class CocoConfig(Config):
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 80  # COCO has 80 classes
-       
+
     # Which architecture type
     ARCH = "resnet50"
+
+
+class MobileCocoConfig(Config):
+    """Configuration for training on MS COCO.
+    Derives from the base Config class and overrides values specific
+    to the COCO dataset.
+    """
+    # Configuration  name
+    NAME = "mobileCoco"
+
+    # GPU
+    IMAGES_PER_GPU = 1
+    GPU_COUNT = 1
+
+    # Number of classes (including background)
+    NUM_CLASSES = 1 + 1  # COCO has 80 classes (1+80)
+
+    # Architecture
+    ARCH = "mobilenetv1"
+    BACKBONE = "mobilenetv1"
+    BACKBONE_STRIDES = [2, 4, 8, 16, 32]
+
+    # Input Resolution
+    IMAGE_MIN_DIM = 256
+    IMAGE_MAX_DIM = 256
 
 
 ############################################################
@@ -427,7 +454,7 @@ if __name__ == '__main__':
                         metavar="<image count>",
                         help='Images to use for evaluation (default=500)')
     parser.add_argument('--architecture', required=False,
-                        default="resnet50",
+                        default="mobilenetv1",
                         metavar="<architecture>",
                         help='Feature Pyramid Network backbone type')
     parser.add_argument('--download', required=False,
@@ -446,9 +473,9 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoConfig()
+        config = MobileCocoConfig()
     else:
-        class InferenceConfig(CocoConfig):
+        class InferenceConfig(MobileCocoConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
@@ -513,10 +540,10 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=40,
+                    epochs=160,
                     layers='heads',
                     augmentation=augmentation)
-       
+
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune {} stage 4 and up".format(config.ARCH)
@@ -535,7 +562,7 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=160,
+                    epochs=160,#40
                     layers='all',
                     augmentation=augmentation)
 
