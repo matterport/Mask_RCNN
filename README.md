@@ -16,5 +16,5 @@ This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Bac
 - imgaug
 - IPython[all]
 <br />
-<br />
+
 [Original Matterport README](https://github.com/matterport/Mask_RCNN/blob/master/README.md)
