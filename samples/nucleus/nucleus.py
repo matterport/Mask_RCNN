@@ -226,7 +226,8 @@ class NucleusDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         # Get mask directory from image path
-        mask_dir = os.path.join(info["path"].split("/images/")[0], "masks")
+        mask_dir = os.path.join(os.path.dirname(os.path.dirname(info['path'])), "masks")
+
         # Read mask files from .png image
         mask = []
         for f in next(os.walk(mask_dir))[2]:
@@ -251,16 +252,16 @@ class NucleusDataset(utils.Dataset):
 #  Training
 ############################################################
 
-def train(model):
+def train(model, dataset_dir, subset):
     """Train the model."""
     # Training dataset.
     dataset_train = NucleusDataset()
-    dataset_train.load_nucleus(args.dataset, "train")
+    dataset_train.load_nucleus(dataset_dir, subset)
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = NucleusDataset()
-    dataset_val.load_nucleus(args.dataset, "val")
+    dataset_val.load_nucleus(dataset_dir, "val")
     dataset_val.prepare()
 
     # Image augmentation
@@ -334,6 +335,9 @@ def rle_decode(rle, shape):
 def mask_to_rle(image_id, mask, scores):
     "Encodes instance masks to submission format."
     assert mask.ndim == 3, "Mask must be [H, W, count]"
+    # If mask is empty, return line with image ID only
+    if mask.shape[-1] == 0:
+        return "{},".format(image_id)
     # Remove mask overlaps
     # Multiply each instance mask by its score order
     # then take the maximum across the last dimension
@@ -480,7 +484,7 @@ if __name__ == '__main__':
 
     # Train or evaluate
     if args.command == "train":
-        train(model)
+        train(model, args.dataset, args.subset)
     elif args.command == "detect":
         detect(model, args.dataset, args.subset)
     else:
