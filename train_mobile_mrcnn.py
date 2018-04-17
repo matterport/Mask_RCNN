@@ -15,7 +15,7 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 import zipfile
-import urllib.request
+#import urllib.request
 import shutil
 
 # Import Mobile Mask R-CNN
@@ -37,26 +37,33 @@ MODEL_DIR = os.path.join(ROOT_dir, "logs")
 
 # Model
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
-model.get_imagenet_weights()
+model_path = model.get_imagenet_weights()
+print("Loading weights ", model_path)
+model.load_weights(model_path, by_name=True)
 model.keras_model.summary()
 
 # Training - Stage 1
-print("Train heads")
-model.train(train_dataset_keypoints, val_dataset_keypoints,
-           learning_rate=config.LEARNING_RATE,
-           epochs=15,
-           layers='heads')
+print("Training network heads")
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE,
+            epochs=160,
+            layers='heads',
+            augmentation=augmentation)
+
 # Training - Stage 2
-# Finetune layers from stage 4 and up
-print("Training Resnet layer 4+")
-model.train(train_dataset_keypoints, val_dataset_keypoints,
-           learning_rate=config.LEARNING_RATE / 10,
-           epochs=20,
-           layers='4+')
+# Finetune layers from ResNet stage 4 and up
+print("Fine tune {} stage 4 and up".format(config.ARCH))
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE,
+            epochs=120,
+            layers="11M+",
+            augmentation=augmentation)
+
 # Training - Stage 3
-# Finetune layers from stage 3 and up
-print("Training Resnet layer 3+")
-model.train(train_dataset_keypoints, val_dataset_keypoints,
-           learning_rate=config.LEARNING_RATE / 100,
-           epochs=100,
-           layers='all')
+# Fine tune all layers
+print("Fine tune all layers")
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE / 10,
+            epochs=40,
+            layers='all',
+            augmentation=augmentation)

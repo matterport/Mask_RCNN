@@ -617,20 +617,20 @@ return [C1, C2, C3, C4, C5]
 
 ## _conv_block without alpha parameter
 #def _conv_block(inputs, filters, kernel, strides):
-    """Convolution Block
-    This function defines a 2D convolution operation with BN and relu6.
-    # Arguments
-        inputs: Tensor, input tensor of conv layer.
-        filters: Integer, the dimensionality of the output space.
-        kernel: An integer or tuple/list of 2 integers, specifying the
-            width and height of the 2D convolution window.
-        strides: An integer or tuple/list of 2 integers,
-            specifying the strides of the convolution along the width and height.
-            Can be a single integer to specify the same value for
-            all spatial dimensions.
-    # Returns
-        Output tensor.
-    """
+"""Convolution Block
+This function defines a 2D convolution operation with BN and relu6.
+# Arguments
+    inputs: Tensor, input tensor of conv layer.
+    filters: Integer, the dimensionality of the output space.
+    kernel: An integer or tuple/list of 2 integers, specifying the
+        width and height of the 2D convolution window.
+    strides: An integer or tuple/list of 2 integers,
+        specifying the strides of the convolution along the width and height.
+        Can be a single integer to specify the same value for
+        all spatial dimensions.
+# Returns
+    Output tensor.
+"""
 
 #    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
