@@ -26,6 +26,9 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
     # Run COCO evaluatoin on the last model you trained
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
+
+    # OWN TRAINING START
+    python samples/coco/coco.py train --dataset=/data/coco --model=imagenet --architecture='mobilenetv1'
 """
 
 import os
@@ -45,7 +48,10 @@ from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
 import zipfile
-import urllib.request
+try: #python3
+    from urllib.request import urlopen
+except: #python2
+    from urllib2 import urlopen
 import shutil
 
 # Root directory of the project
@@ -58,7 +64,6 @@ from mrcnn import model as modellib, utils
 
 # Path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
@@ -204,7 +209,7 @@ class CocoDataset(utils.Dataset):
         if not os.path.exists(imgDir):
             os.makedirs(imgDir)
             print("Downloading images to " + imgZipFile + " ...")
-            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
+            with urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
                 shutil.copyfileobj(resp, out)
             print("... done downloading.")
             print("Unzipping " + imgZipFile)
@@ -238,7 +243,7 @@ class CocoDataset(utils.Dataset):
         if not os.path.exists(annFile):
             if not os.path.exists(annZipFile):
                 print("Downloading zipped annotations to " + annZipFile + " ...")
-                with urllib.request.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
+                with urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
                     shutil.copyfileobj(resp, out)
                 print("... done downloading.")
             print("Unzipping " + annZipFile)

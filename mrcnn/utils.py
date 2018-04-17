@@ -17,7 +17,10 @@ import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
-import urllib.request
+try: #python3
+    from urllib.request import urlopen
+except: #python2
+    from urllib2 import urlopen
 import shutil
 import warnings
 
@@ -762,7 +765,7 @@ def compute_ap_range(gt_box, gt_class_id, gt_mask,
     """Compute AP over a range or IoU thresholds. Default range is 0.5-0.95."""
     # Default is 0.5 to 0.95 with increments of 0.05
     iou_thresholds = iou_thresholds or np.arange(0.5, 1.0, 0.05)
-    
+
     # Compute AP over range of IoU thresholds
     AP = []
     for iou_threshold in iou_thresholds:
@@ -849,7 +852,7 @@ def download_trained_weights(coco_model_path, verbose=1):
     """
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
-    with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
+    with urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")

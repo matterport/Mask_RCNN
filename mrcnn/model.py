@@ -569,10 +569,10 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
     return KL.Activation(relu6, name='conv_pw_%d_relu' % block_id)(x)
 
 
-def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
+def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1):
     assert architecture in ["mobilenetv1"]
     # Stage 1
-    x = _conv_block(img_input, 32, alpha, strides=(2, 2))							#Input Resolution: 224 x 224
+    x = _conv_block(inputs, 32, alpha, strides=(2, 2))							#Input Resolution: 224 x 224
     C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1) 		#Input Resolution: 112 x 112
 
     # Stage 2
@@ -598,7 +598,7 @@ def mobilenetv1_graph(img_input, architecture, alpha=1.0, depth_multiplier=1):
     x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier,
                               strides=(2, 2), block_id=12)
     C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)	#Input Resolution: 7x7
-return [C1, C2, C3, C4, C5]
+    return [C1, C2, C3, C4, C5]
 
 
 ############################################################
@@ -639,7 +639,7 @@ This function defines a 2D convolution operation with BN and relu6.
 #    return KL.Activation(relu6)(x)
 
 
-def _bottleneck(img_input, filters, kernel, t, s, r=False, alpha):
+def _bottleneck(inputs, filters, kernel, t, s, r=False, alpha=1.0):
     """Bottleneck
     This function defines a basic bottleneck structure.
     # Arguments
@@ -658,9 +658,9 @@ def _bottleneck(img_input, filters, kernel, t, s, r=False, alpha):
     """
 
     channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    tchannel = K.int_shape(img_input)[channel_axis] * t
+    tchannel = K.int_shape(inputs)[channel_axis] * t
 
-    x = _conv_block(img_input, tchannel, alpha, (1, 1), (1, 1))
+    x = _conv_block(inputs, tchannel, alpha, (1, 1), (1, 1))
 
     x = KL.DepthwiseConv2D(kernel, strides=(s, s), depth_multiplier=1, padding='same')(x)
     x = KL.BatchNormalization(axis=channel_axis)(x)
@@ -670,11 +670,11 @@ def _bottleneck(img_input, filters, kernel, t, s, r=False, alpha):
     x = KL.BatchNormalization(axis=channel_axis)(x)
 
     if r:
-        x = KL.add([x, img_input])
+        x = KL.add([x, inputs])
     return x
 
 
-def _inverted_residual_block(img_input, filters, kernel, t, strides, n, alpha):
+def _inverted_residual_block(inputs, filters, kernel, t, strides, n, alpha):
     """Inverted Residual Block
     This function defines a sequence of 1 or more identical layers.
     # Arguments
@@ -692,7 +692,7 @@ def _inverted_residual_block(img_input, filters, kernel, t, strides, n, alpha):
         Output tensor.
     """
 
-    x = _bottleneck(img_input, filters, kernel, t, strides, alpha)
+    x = _bottleneck(inputs, filters, kernel, t, strides, alpha)
 
     for i in range(1, n):
         x = _bottleneck(x, filters, kernel, t, 1, True, alpha)
@@ -700,7 +700,7 @@ def _inverted_residual_block(img_input, filters, kernel, t, strides, n, alpha):
     return x
 
 
-def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
+def mobilenetv2_graph(inputs, architecture, k, alpha = 1.0):
     """MobileNetv2
     This function defines a MobileNetv2 architectures.
     # Arguments
@@ -713,15 +713,15 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
     assert architecture in ["mobilenetv2"]
     #inputs = Input(shape=input_shape)
 
-    x      = _conv_block(img_input, 32, alpha, (3, 3), strides=(2, 2))				# Input Res: 1
-    x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha)	# Input Res: 1/2
-    C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha)	# Input Res: 1/2
-    C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/4
-    x      = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha)	# Input Res: 1/8
-    C3 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha)	# Input Res: 1/8
-    C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha)	# Input Res: 1/16
-    x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha)	# Input Res: 1/32
-    C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))					# Input Res: 1/32
+    x      = _conv_block(inputs, 32, alpha, (3, 3), strides=(2, 2))                     # Input Res: 1
+    x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha=1.0)	# Input Res: 1/2
+    C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha=1.0)	# Input Res: 1/2
+    C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha=1.0)	# Input Res: 1/4
+    x      = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha=1.0)	# Input Res: 1/8
+    C3 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha=1.0)	# Input Res: 1/8
+    C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha=1.0)	# Input Res: 1/16
+    x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha=1.0)	# Input Res: 1/32
+    C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1))                        # Input Res: 1/32
 
     #x = GlobalAveragePooling2D()(x)
     #x = Reshape((1, 1, 1280))(x)
@@ -733,8 +733,7 @@ def mobilenetv2_graph(img_input, architecture, k, alpha = 1.0):
 
     #model = Model(inputs, output)
     #plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
-
-return [C1,C2,C3,C4,C5]
+    return [C1,C2,C3,C4,C5]
 
 ############################################################
 #  Proposal Layer
@@ -2412,9 +2411,9 @@ class MaskRCNN():
         if config.ARCH in ["resnet50", "resnet101"]:
             _, C2, C3, C4, C5 = resnet_graph(input_image, config.ARCH, stage5=True, train_bn=config.TRAIN_BN)
         elif config.ARCH in ["mobilenetv1"]:
-            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
+            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.ARCH, alpha=1.0)
         elif config.ARCH in ["mobilenetv2"]:
-            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.ARCH config.ARCH, alpha=1.0)
+            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.ARCH, alpha=1.0)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
@@ -2645,7 +2644,7 @@ class MaskRCNN():
         Returns path to weights file.
         """
         from keras.utils.data_utils import get_file
-        if arch == "resnet50":
+        if self.config.ARCH == "resnet50":
             TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/'\
                                      'releases/download/v0.2/'\
                                      'resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
@@ -2653,7 +2652,7 @@ class MaskRCNN():
                                     TF_WEIGHTS_PATH_NO_TOP,
                                     cache_subdir='models',
                                     md5_hash='a268eb855778b3df3c7506639542a6af')
-        elif arch == "mobilenetv1":
+        elif self.config.ARCH == "mobilenetv1":
             TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/'\
                                      'releases/download/v0.6/mobilenet_1_0_224_tf.h5'
             weights_path = get_file('mobilenet_1_0_224_tf.h5',

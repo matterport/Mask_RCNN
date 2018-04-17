@@ -9,41 +9,40 @@ adopted from github.com/matterport
 # Import Packages
 import os
 import sys
-import time
-import numpy as np
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
-from pycocotools import mask as maskUtils
-import zipfile
-#import urllib.request
-import shutil
+import imgaug
 
 # Import Mobile Mask R-CNN
-ROOT_DIR = os.getcwd()
-sys.path.append(ROOT_DIR)
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from samples.coco import coco
 
-# Weights and Logs
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-DEFAULT_DATASET_YEAR = "2017"
-
-# COCO Dataset
-config = coco.MobileCocoConfig()
-COCO_DIR = os.path.join(ROOT_DIR,"data/coco")
-MODEL_DIR = os.path.join(ROOT_dir, "logs")
+# Paths
+ROOT_DIR = os.getcwd()
+MODEL_DIR = os.path.join(ROOT_DIR, "logs")
+COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 
 # Model
+config = coco.MobileCocoConfig()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 model_path = model.get_imagenet_weights()
-print("Loading weights ", model_path)
+print("> Loading weights ", model_path)
 model.load_weights(model_path, by_name=True)
-model.keras_model.summary()
+#model.keras_model.summary()
+
+# Dataset
+class_ids = [1]
+dataset_train = coco.CocoDataset()
+dataset_train.load_coco(COCO_DIR, "train", class_ids=class_ids)
+dataset_train.prepare()
+dataset_eval = coco.CocoDataset()
+dataset_eval.load_coco(COCO_DIR, "eval", class_ids=class_ids)
+dataset_eval.prepare()
+
+# Training - Config
+augmentation = imgaug.augmenters.Fliplr(0.5)
 
 # Training - Stage 1
-print("Training network heads")
+print("> Training network heads")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=160,
@@ -51,8 +50,8 @@ model.train(dataset_train, dataset_val,
             augmentation=augmentation)
 
 # Training - Stage 2
-# Finetune layers from ResNet stage 4 and up
-print("Fine tune {} stage 4 and up".format(config.ARCH))
+# Finetune layers  stage 4 and up
+print("> Fine tune {} stage 4 and up".format(config.ARCH))
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=120,
@@ -61,9 +60,14 @@ model.train(dataset_train, dataset_val,
 
 # Training - Stage 3
 # Fine tune all layers
-print("Fine tune all layers")
+print("> Fine tune all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=40,
             layers='all',
             augmentation=augmentation)
+
+# Evaluation
+NUM_EVALS = 500
+print("Running COCO evaluation on {} images.".format(NUM_EVALS))
+coco.evaluate_coco(model, dataset_val, coco, "bbox", limit=NUM_EVALS)
