@@ -22,7 +22,7 @@ MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 
 # Model
-config = coco.MobileCocoConfig()
+config = coco.CocoConfig()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 model_path = model.get_imagenet_weights()
 print("> Loading weights ", model_path)
@@ -30,13 +30,13 @@ model.load_weights(model_path, by_name=True)
 #model.keras_model.summary()
 
 # Dataset
-class_ids = [1]
+class_names = ['person']
 dataset_train = coco.CocoDataset()
-dataset_train.load_coco(COCO_DIR, "train", class_ids=class_ids)
+dataset_train.load_coco(COCO_DIR, "train", class_ids=class_names)
 dataset_train.prepare()
-dataset_eval = coco.CocoDataset()
-dataset_eval.load_coco(COCO_DIR, "eval", class_ids=class_ids)
-dataset_eval.prepare()
+dataset_val = coco.CocoDataset()
+dataset_val.load_coco(COCO_DIR, "val", class_ids=class_names)
+dataset_val.prepare()
 
 # Training - Config
 augmentation = imgaug.augmenters.Fliplr(0.5)

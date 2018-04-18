@@ -2,7 +2,7 @@
 This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Backbone architecture to be finally able to deploy it on mobile devices such as the Nvidia Jetson TX2.
 <br />
 <br />
-## Requirements (may be deprecated)
+## Requirements
 - numpy
 - scipy
 - Pillow
@@ -15,6 +15,7 @@ This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Bac
 - h5py
 - imgaug
 - IPython[all]
+- pycocotools
 <br />
 
 [Original Matterport README](https://github.com/matterport/Mask_RCNN/blob/master/README.md)

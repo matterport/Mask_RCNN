@@ -83,28 +83,6 @@ class CocoConfig(Config):
     # Give the configuration a recognizable name
     NAME = "coco"
 
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
-
-    # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
-
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 80  # COCO has 80 classes
-
-    # Which architecture type
-    ARCH = "resnet50"
-
-
-class MobileCocoConfig(Config):
-    """Configuration for training on MS COCO.
-    Derives from the base Config class and overrides values specific
-    to the COCO dataset.
-    """
-    # Configuration  name
-    NAME = "mobileCoco"
-
     # GPU
     IMAGES_PER_GPU = 1
     GPU_COUNT = 1
@@ -114,8 +92,9 @@ class MobileCocoConfig(Config):
 
     # Architecture
     ARCH = "mobilenetv1"
-    BACKBONE = "mobilenetv1"
-    BACKBONE_STRIDES = [2, 4, 8, 16, 32]
+    #BACKBONE_STRIDES = [2, 4, 8, 16, 32] #mnv1
+    BACKBONE_STRIDES = [8, 16, 32] #mnv2
+    RPN_ANCHOR_SCALES = (32, 64, 128)
 
     # Input Resolution
     IMAGE_MIN_DIM = 256
@@ -127,23 +106,24 @@ class MobileCocoConfig(Config):
 ############################################################
 
 class CocoDataset(utils.Dataset):
-    def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_ids=None,
+    def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_names=None,
                   class_map=None, return_coco=False, auto_download=False):
         """Load a subset of the COCO dataset.
         dataset_dir: The root directory of the COCO dataset.
         subset: What to load (train, val, minival, valminusminival)
         year: What dataset year to load (2014, 2017) as a string, not an integer
-        class_ids: If provided, only loads images that have the given classes.
+        class_names: If provided, only loads images that have the given classes.
         class_map: TODO: Not implemented yet. Supports maping classes from
             different datasets to the same class ID.
         return_coco: If True, returns the COCO object.
         auto_download: Automatically download and unzip MS-COCO images and annotations
         """
-
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
         coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        class_ids = coco.getCatIds(catNms=class_names)
+
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
         image_dir = "{}/{}{}".format(dataset_dir, subset, year)
@@ -467,6 +447,10 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
+    parser.add_argument('--classes', required=False,
+                        default=None,
+                        metavar="<class names>",
+                        help='classes that should be trained on. Default are all')
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -475,12 +459,13 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
     print("Architecture: ", args.architecture)
+    print("Classes (None means all):", args.classes)
 
     # Configurations
     if args.command == "train":
-        config = MobileCocoConfig()
+        config = CocoConfig()
     else:
-        class InferenceConfig(MobileCocoConfig):
+        class InferenceConfig(CocoConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
@@ -526,13 +511,16 @@ if __name__ == '__main__':
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = CocoDataset()
-        dataset_train.load_coco(args.dataset, "train", year=args.year, auto_download=args.download)
-        dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
+        dataset_train.load_coco(args.dataset, "train", year=args.year, class_names=args.classes, auto_download=args.download)
+        if args.year is "2014":
+            dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, class_names=args.classes, auto_download=args.download)
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = CocoDataset()
-        dataset_val.load_coco(args.dataset, "minival", year=args.year, auto_download=args.download)
+        if args.year is "2014":
+            dataset_val.load_coco(args.dataset, "minival", year=args.year, class_names=args.classes, auto_download=args.download)
+        dataset_val.load_coco(args.dataset, "val", year=args.year, class_names=args.classes, auto_download=args.download)
         dataset_val.prepare()
 
         # Image Augmentation
@@ -554,7 +542,7 @@ if __name__ == '__main__':
         print("Fine tune {} stage 4 and up".format(config.ARCH))
         if config.ARCH in ["resnet50", "resnet101"]:
               finetune_layers = '4R+'
-        elif config.Arsch == "mobilenetV1":
+        elif config.Arsch in  ['mobilenetv1','mobilenetv2']:
               finetune_layers = "11M+"
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
@@ -574,7 +562,10 @@ if __name__ == '__main__':
     elif args.command == "evaluate":
         # Validation dataset
         dataset_val = CocoDataset()
-        coco = dataset_val.load_coco(args.dataset, "minival", year=args.year, return_coco=True, auto_download=args.download)
+        if args.year is "2014":
+            coco = dataset_val.load_coco(args.dataset, "minival", year=args.year, class_names=args.classes, return_coco=True, auto_download=args.download)
+        else:
+            coco = dataset_val.load_coco(args.dataset, "val", year=args.year, class_names=args.classes, return_coco=True, auto_download=args.download)
         dataset_val.prepare()
         print("Running COCO evaluation on {} images.".format(args.limit))
         evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))

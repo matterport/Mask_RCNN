@@ -34,39 +34,11 @@ assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 
 ## MobileNetV1 Imports
-#from __future__ import print_function
-#from __future__ import absolute_import
-#from __future__ import division
-#import warnings
-#import numpy as np
-#from keras.preprocessing import image
-#from keras.models import Model
-#from keras.layers import Input
-#from keras.layers import Activation
-#from keras.layers import Dropout
-#from keras.layers import Reshape
-#from keras.layers import BatchNormalization
-#from keras.layers import GlobalAveragePooling2D
-#from keras.layers import GlobalMaxPooling2D
-#from keras.layers import Conv2D
 from keras import initializers
 from keras import regularizers
 from keras import constraints
 from keras.utils import conv_utils
-#from keras.utils.data_utils import get_file
-#from keras.engine.topology import get_source_inputs
 from keras.engine import InputSpec
-#from keras.applications.imagenet_utils import _obtain_input_shape
-#from keras.applications.imagenet_utils import decode_predictions
-#from keras import backend as K
-
-## MobileNetV2 Imports
-#from keras.models import Model
-#from keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dropout
-#from keras.layers import Activation, BatchNormalization, add, Reshape
-#from keras.applications.mobilenet import relu6, DepthwiseConv2D
-#from keras.utils.vis_utils import plot_model
-#from keras import backend as K
 
 
 ############################################################
@@ -111,8 +83,8 @@ def compute_backbone_shapes(config, image_shape):
     Returns:
         [N, (height, width)]. Where N is the number of stages
     """
-    # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101", "mobilenetv1"]
+    # Currently supports ResNet and Mobilenet
+    assert config.ARCH in ["resnet50", "resnet101", "mobilenetv1", "mobilenetv2"]
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
             int(math.ceil(image_shape[1] / stride))]
@@ -576,18 +548,15 @@ def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1):
     C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1) 		#Input Resolution: 112 x 112
 
     # Stage 2
-    x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,
-                              strides=(2, 2), block_id=2)
+    x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,strides=(2, 2), block_id=2)
     C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3) 	#Input Resolution: 56 x 56
 
     # Stage 3
-    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,
-                              strides=(2, 2), block_id=4)
+    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,strides=(2, 2), block_id=4)
     C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5) 	#Input Resolution: 28 x 28
 
     # Stage 4
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,
-                              strides=(2, 2), block_id=6)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,strides=(2, 2), block_id=6)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8)
     x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9)
@@ -2601,7 +2570,7 @@ class MaskRCNN():
         checkpoint = os.path.join(dir_name, checkpoints[-1])
         return dir_name, checkpoint
 
-    def load_weights(self, filepath, by_name=False, exclude=None):
+    def load_weights(self, filepath, by_name=True, exclude=None):
         """Modified version of the correspoding Keras function with
         the addition of multi-GPU support and the ability to exclude
         some layers from loading.
@@ -2681,7 +2650,7 @@ class MaskRCNN():
             if layer.output in self.keras_model.losses:
                 continue
             loss = (
-                tf.reduce_mean(layer.output, keep_dims=True)
+                tf.reduce_mean(layer.output, keepdims=True)
                 * self.config.LOSS_WEIGHTS.get(name, 1.))
             self.keras_model.add_loss(loss)
 
@@ -2705,7 +2674,7 @@ class MaskRCNN():
             layer = self.keras_model.get_layer(name)
             self.keras_model.metrics_names.append(name)
             loss = (
-                tf.reduce_mean(layer.output, keep_dims=True)
+                tf.reduce_mean(layer.output, keepdims=True)
                 * self.config.LOSS_WEIGHTS.get(name, 1.))
             self.keras_model.metrics_tensors.append(loss)
 
@@ -2735,7 +2704,7 @@ class MaskRCNN():
             if not layer.weights:
                 continue
             # Is it trainable?
-            trainable = bool(re.fullmatch(layer_regex, layer.name))
+            trainable = bool(re.match(layer_regex, layer.name))
             # Update layer. If layer is a container, update inner layer.
             if layer.__class__.__name__ == 'TimeDistributed':
                 layer.layer.trainable = trainable
@@ -3068,7 +3037,7 @@ class MaskRCNN():
         # Anchors
         anchors = self.get_anchors(image_shape)
         # Duplicate across the batch dimension because Keras requires it
-        # TODO: can this be optimized to avoid duplicating the anchors?
+        # TODO: can this be optimized to avoid duplicating the anchoBACKrs?
         anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
 
         if verbose:
@@ -3136,7 +3105,7 @@ class MaskRCNN():
         for p in parents:
             if p in checked:
                 continue
-            if bool(re.fullmatch(name, p.name)):
+            if bool(re.match(name, p.name)):
                 return p
             checked.append(p)
             a = self.ancestor(p, name, checked)
@@ -3299,12 +3268,18 @@ def mold_image(images, config):
     the mean pixel and converts it to float. Expects image
     colors in RGB order.
     """
-    return images.astype(np.float32) - config.MEAN_PIXEL
+    if config.ARCH in ["mobilenetv1","mobilenetv2"]:
+        return images.astype(np.float32)/127.5 - 1.0
+    if config.ARCH in ["resnet50","resnet101"]:
+        images.astype(np.float32) - config.MEAN_PIXEL
 
 
 def unmold_image(normalized_images, config):
     """Takes a image normalized with mold() and returns the original."""
-    return (normalized_images + config.MEAN_PIXEL).astype(np.uint8)
+    if config.ARCH in ["mobilenetv1","mobilenetv2"]:
+        return ((normalized_images +1)*127.5).astype(np.unit8)
+    if config.ARCH in ["resnet50","resnet101"]:
+        return (normalized_images + config.MEAN_PIXEL).astype(np.uint8)
 
 
 ############################################################
