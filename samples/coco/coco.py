@@ -28,7 +28,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
 
     # OWN TRAINING START
-    python samples/coco/coco.py train --dataset=/data/coco --model=imagenet --architecture='mobilenetv1'
+    python samples/coco/coco.py train --dataset=/data/coco --model=imagenet --architecture='mobilenetv1' --classes='person'
 """
 
 import os
@@ -460,6 +460,9 @@ if __name__ == '__main__':
     print("Auto Download: ", args.download)
     print("Architecture: ", args.architecture)
     print("Classes (None means all):", args.classes)
+
+    # classes must be a list
+    args.classes = list(args.classes)
 
     # Configurations
     if args.command == "train":
