@@ -28,8 +28,12 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
 
     # OWN TRAINING START
-    python samples/coco/coco.py train --dataset=/data/coco --model=imagenet --architecture='mobilenetv1' --classes='person'
+    python coco.py train --model=imagenet --architecture='mobilenetv1' --classes='person'
 """
+# python 2 compability
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import os
 import sys
@@ -68,6 +72,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+DEFAULT_DATASET_DIR = os.path.join(ROOT_DIR, "data/coco")
 DEFAULT_DATASET_YEAR = "2017" #"2014"
 
 ############################################################
@@ -81,7 +86,7 @@ class CocoConfig(Config):
     to the COCO dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "coco"
+    NAME = "mmrcnn_cocoperson"
 
     # GPU
     IMAGES_PER_GPU = 1
@@ -92,13 +97,19 @@ class CocoConfig(Config):
 
     # Architecture
     ARCH = "mobilenetv1"
-    #BACKBONE_STRIDES = [2, 4, 8, 16, 32] #mnv1
-    BACKBONE_STRIDES = [8, 16, 32] #mnv2
-    RPN_ANCHOR_SCALES = (32, 64, 128)
+
+    # Size Options
+    #BACKBONE_STRIDES = [4, 8, 16, 32, 64] #resnet
+    BACKBONE_STRIDES = [2, 4, 8, 16, 32] #mnv1
+    #BACKBONE_STRIDES = [8, 16, 32] #mnv2
+    #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256) #resnet
+    RPN_ANCHOR_SCALES = (8 , 16, 32, 64, 128)
+    MINI_MASK_SHAPE = (56, 56) #resnet
+    #MINI_MASK_SHAPE = (28, 28)
 
     # Input Resolution
-    IMAGE_MIN_DIM = 256
-    IMAGE_MAX_DIM = 256
+    #IMAGE_MIN_DIM = 400
+    IMAGE_MAX_DIM = 512
 
 
 ############################################################
@@ -420,7 +431,8 @@ if __name__ == '__main__':
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'evaluate' on MS COCO")
-    parser.add_argument('--dataset', required=True,
+    parser.add_argument('--dataset', required=False,
+                        default = DEFAULT_DATASET_DIR,
                         metavar="/path/to/coco/",
                         help='Directory of the MS-COCO dataset')
     parser.add_argument('--year', required=False,
@@ -523,7 +535,8 @@ if __name__ == '__main__':
         dataset_val = CocoDataset()
         if args.year is "2014":
             dataset_val.load_coco(args.dataset, "minival", year=args.year, class_names=args.classes, auto_download=args.download)
-        dataset_val.load_coco(args.dataset, "val", year=args.year, class_names=args.classes, auto_download=args.download)
+        else:
+            dataset_val.load_coco(args.dataset, "val", year=args.year, class_names=args.classes, auto_download=args.download)
         dataset_val.prepare()
 
         # Image Augmentation

@@ -6,6 +6,10 @@ Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
+# python 2 compability
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import sys
 import os
@@ -23,6 +27,10 @@ except: #python2
     from urllib2 import urlopen
 import shutil
 import warnings
+
+# debugging
+import logging, sys
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
@@ -448,6 +456,8 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
             scale = max_dim / image_max
+
+    #logging.debug("h,w,scale: {},{},{}".format(h,w,scale))
 
     # Resize image using bilinear interpolation
     if scale != 1:

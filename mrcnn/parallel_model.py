@@ -12,6 +12,10 @@ https://medium.com/@kuza55/transparent-multi-gpu-training-on-tensorflow-with-ker
 https://github.com/avolkov1/keras_experiments/blob/master/keras_exp/multigpu/
 https://github.com/fchollet/keras/blob/master/keras/utils/training_utils.py
 """
+# python 2 compability
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import tensorflow as tf
 import keras.backend as K

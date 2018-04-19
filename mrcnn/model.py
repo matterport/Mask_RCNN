@@ -7,7 +7,10 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 Modified by github.com/GustavZ
 """
-
+# python 2 compability
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 ## standard Mask R-CNN Imports
 import os
 import random
@@ -2657,8 +2660,8 @@ class MaskRCNN():
             if layer.output in self.keras_model.losses:
                 continue
             loss = (
-                tf.reduce_mean(layer.output, keep_dims=True)
-                * self.config.LOSS_WEIGHTS.get(name, 1.))
+                tf.reduce_mean(layer.output, keep_dims=True))
+                #* self.config.LOSS_WEIGHTS.get(name, 1.))
             self.keras_model.add_loss(loss)
 
         # Add L2 Regularization
@@ -2681,8 +2684,8 @@ class MaskRCNN():
             layer = self.keras_model.get_layer(name)
             self.keras_model.metrics_names.append(name)
             loss = (
-                tf.reduce_mean(layer.output, keep_dims=True)
-                * self.config.LOSS_WEIGHTS.get(name, 1.))
+                tf.reduce_mean(layer.output, keep_dims=True))
+                #* self.config.LOSS_WEIGHTS.get(name, 1.))
             self.keras_model.metrics_tensors.append(loss)
 
     def set_trainable(self, layer_regex, keras_model=None, indent=0, verbose=1):
@@ -2770,7 +2773,7 @@ class MaskRCNN():
         layers: Allows selecting wich layers to train. It can be:
             - A regular expression to match layer names to train
             - One of these predefined values:
-              heaads: The RPN, classifier and mask heads of the network
+              heads: The RPN, classifier and mask heads of the network
               all: All the layers
               3+: Train Resnet stage 3 and up
               4+: Train Resnet stage 4 and up
@@ -2846,7 +2849,7 @@ class MaskRCNN():
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
             workers=workers,
-            use_multiprocessing=True,
+            use_multiprocessing=self.config.USE_MULTIPROCESSING,
         )
         self.epoch = max(self.epoch, epochs)
 

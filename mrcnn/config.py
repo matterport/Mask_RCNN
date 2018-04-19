@@ -6,6 +6,10 @@ Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
+# python 2 compability
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 import math
 import numpy as np
@@ -27,6 +31,9 @@ class Config(object):
 
     # NUMBER OF GPUs to use. For CPU training, use 1
     GPU_COUNT = 1
+
+    # Use Multiprocessing in MaskRCNN.train()
+    USE_MULTIPROCESSING = True
 
     # Number of images to train with on each GPU. A 12GB GPU can typically
     # handle 2 images of 1024x1024px.
@@ -179,7 +186,7 @@ class Config(object):
     USE_RPN_ROIS = True
 
     # Backbone architecture. For example, 'resnet50', 'mobilenetv1'
-    ARCH = 'mobilenetv1'
+    ARCH = None
 
     # Train or freeze batch normalization layers
     #     None: Train BN layers. This is the normal mode
