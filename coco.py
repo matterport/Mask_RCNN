@@ -83,28 +83,30 @@ class CocoConfig(Config):
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
     """
-    # Give the configuration a recognizable name
+    ## Give the configuration a recognizable name
     NAME = "mmrcnn_cocoperson"
 
-    # GPU
+    ## GPU
     IMAGES_PER_GPU = 1
-    GPU_COUNT = 1
+    GPU_COUNT = 2
 
-    # Number of classes (including background)
+    ## Number of classes (including background)
     NUM_CLASSES = 1 + 1  # COCO has 80 classes (1+80)
 
-    # Architecture
+    ## Architecture
     ARCH = "mobilenetv1"
 
-    # Size Options
+    ## Size Options
     BACKBONE_STRIDES = [4, 8, 16, 32, 64] #resnet
     #BACKBONE_STRIDES = [2, 4, 8, 16, 32] #mnv1
+
     #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256) #resnet
     RPN_ANCHOR_SCALES = (8 , 16, 32, 64, 128)
+
     MINI_MASK_SHAPE = (56, 56) #resnet
     #MINI_MASK_SHAPE = (28, 28)
 
-    # Input Resolution
+    ## Input Resolution
     #IMAGE_MIN_DIM = 400
     IMAGE_MAX_DIM = 512
 

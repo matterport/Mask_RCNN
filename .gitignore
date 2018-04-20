@@ -1,4 +1,6 @@
+.gitignore
 *.pyc
 /data
 /weights
 /logs
+/.ipynb_checkpoints
