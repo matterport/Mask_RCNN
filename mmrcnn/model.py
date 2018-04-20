@@ -2556,6 +2556,8 @@ class MaskRCNN():
         if config.GPU_COUNT > 1:
             from mmrcnn.parallel_model import ParallelModel
             model = ParallelModel(model, config.GPU_COUNT)
+        else:
+            utils.activate_gpu(config.GPU_COUNT)
 
         return model
 

@@ -899,3 +899,21 @@ def denorm_boxes(boxes, shape):
     scale = np.array([h - 1, w - 1, h - 1, w - 1])
     shift = np.array([0, 0, 1, 1])
     return np.around(np.multiply(boxes, scale) + shift).astype(np.int32)
+
+
+############################################################
+#  System
+############################################################
+
+def activate_gpu(gpu_count):
+    """ Makes CUDA Devices Visible / Activates GPUs.
+    gpu_count: Number of GPUs to activate
+    """
+    gpu_count = int(gpu_count)
+    if gpu_count < 1:
+        gpu_str = '-1'
+    else:
+        gpu_str = '0'
+        for g in range(1,gpu_count):
+            gpu_str += ',' + str(g)
+    os.environ['CUDA_VISIBLE_DEVICES'] = gpu_str
