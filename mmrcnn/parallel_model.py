@@ -22,6 +22,7 @@ import keras.layers as KL
 import keras.models as KM
 
 import sys
+import os
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 

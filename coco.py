@@ -65,7 +65,7 @@ from mmrcnn.config import Config
 from mmrcnn import model as modellib,utils
 
 # Path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mobile_mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
