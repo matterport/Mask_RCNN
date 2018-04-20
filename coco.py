@@ -164,6 +164,9 @@ class CocoDataset(utils.Dataset):
                 height=coco.imgs[i]["height"],
                 annotations=coco.loadAnns(coco.getAnnIds(
                     imgIds=[i], catIds=class_ids, iscrowd=None)))
+
+        print ("{} Images Loaded for {}".format(len(image_ids, subset)))
+        
         if return_coco:
             return coco
 
