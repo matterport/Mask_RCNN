@@ -3,7 +3,6 @@ Mobile Mask R-CNN Train & Eval Script
 for Training on the COCO Dataset
 
 written by github.com/GustavZ
-adopted from github.com/matterport
 """
 
 # Import Packages
@@ -12,9 +11,9 @@ import sys
 import imgaug
 
 # Import Mobile Mask R-CNN
-from mrcnn.config import Config
-from mrcnn import model as modellib, utils
-from samples.coco import coco
+from mmrcnn.config import Config
+from mmrcnn import model as modellib, utils
+import coco
 
 # Paths
 ROOT_DIR = os.getcwd()
@@ -32,10 +31,10 @@ model.load_weights(model_path, by_name=True)
 # Dataset
 class_names = ['person']
 dataset_train = coco.CocoDataset()
-dataset_train.load_coco(COCO_DIR, "train", class_ids=class_names)
+dataset_train.load_coco(COCO_DIR, "train", class_names=class_names)
 dataset_train.prepare()
 dataset_val = coco.CocoDataset()
-dataset_val.load_coco(COCO_DIR, "val", class_ids=class_names)
+dataset_val.load_coco(COCO_DIR, "val", class_names=class_names)
 dataset_val.prepare()
 
 # Training - Config
