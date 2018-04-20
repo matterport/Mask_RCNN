@@ -20,10 +20,8 @@ import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
-try: #python3
-    from urllib.request import urlopen
-except: #python2
-    from urllib2 import urlopen
+from zipfile import ZipFile
+from six.moves import urllib
 import shutil
 import warnings
 
@@ -592,6 +590,19 @@ def unmold_mask(mask, bbox, image_shape):
     full_mask[y1:y2, x1:x2] = mask
     return full_mask
 
+def download_zipfile(zipname,url,dest_dir):
+    zip_file = zipname + '.zip'
+    dest_dir = os.path.join(dest_dir, zipname)
+    if not os.path.isdir(dest_dir):
+        print ("> {} not found. downloading it".format(zipname))
+        opener = urllib.request.URLopener()
+        opener.retrieve(url + zip_file, zip_file)
+        zipfile = ZipFile(zip_file)
+        zipfile.extractall(dest_dir)
+        zipfile.close()
+        os.remove(zip_file)
+    else:
+        print('> {} Found. Proceed.'.format(zipname))
 
 ############################################################
 #  Anchors
@@ -861,7 +872,7 @@ def download_trained_weights(coco_model_path, verbose=1):
     """
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
-    with urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
+    with urllib.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")
