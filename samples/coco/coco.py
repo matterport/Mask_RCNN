@@ -14,8 +14,8 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     # Train a new model starting from pre-trained COCO weights
     python3 coco.py train --dataset=/path/to/coco/ --model=coco
 
-    # Train a new model starting from ImageNet weights
-    python3 coco.py train --dataset=/path/to/coco/ --model=imagenet
+    # Train a new model starting from ImageNet weights. Also auto download COCO dataset
+    python3 coco.py train --dataset=/path/to/coco/ --model=imagenet --download=True
 
     # Continue training a model that you had trained earlier
     python3 coco.py train --dataset=/path/to/coco/ --model=/path/to/weights.h5
