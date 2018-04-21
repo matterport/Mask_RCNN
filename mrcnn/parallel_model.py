@@ -89,16 +89,18 @@ class ParallelModel(KM.Model):
         with tf.device('/cpu:0'):
             merged = []
             for outputs, name in zip(outputs_all, output_names):
-                # If outputs are numbers without dimensions, add a batch dim.
-                def add_dim(tensor):
-                    """Add a dimension to tensors that don't have any."""
-                    if K.int_shape(tensor) == ():
-                        return KL.Lambda(lambda t: K.reshape(t, [1, 1]))(tensor)
-                    return tensor
-                outputs = list(map(add_dim, outputs))
-
-                # Concatenate
-                merged.append(KL.Concatenate(axis=0, name=name)(outputs))
+                # Concatenate or average outputs?
+                # Outputs usually have a batch dimension and we concatenate
+                # across it. If they don't, then the output is likely a loss
+                # or a metric value that gets averaged across the batch.
+                # Keras expects losses and metrics to be scalars.
+                if K.int_shape(outputs[0]) == ():
+                    # Average
+                    m = KL.Lambda(lambda o: tf.add_n(o) / len(outputs), name=name)(outputs)
+                else:
+                    # Concatenate
+                    m = KL.Concatenate(axis=0, name=name)(outputs)
+                merged.append(m)
         return merged
 
 
