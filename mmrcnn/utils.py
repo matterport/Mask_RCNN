@@ -915,8 +915,8 @@ def denorm_boxes(boxes, shape):
 #  System
 ############################################################
 
-def activate_gpu(gpu_count):
-    """ Makes CUDA Devices Visible / Activates GPUs.
+def set_cuda_visible_devices(gpu_count):
+    """ Sets CUDA Devices Visible / Activates GPUs.
     gpu_count: Number of GPUs to activate
     """
     gpu_count = int(gpu_count)

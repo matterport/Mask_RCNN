@@ -6,6 +6,9 @@ written by github.com/GustavZ
 
 to use tensorboard run inside model_dir with file "events.out.tfevents.123":
 tensorboard --logdir="$(pwd)"
+
+keras h5 to tensorflow pb file:
+python keras_to_tensorflow.py -input_model_file saved_model_mrcnn_eval -output_model_file model.pb -num_outputs=7
 """
 
 # Import Packages
@@ -24,6 +27,7 @@ COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 
 # Model
 config = coco.CocoConfig()
+config.display()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 model_path = model.get_imagenet_weights()
 print("> Loading weights ", model_path)
@@ -72,3 +76,5 @@ model.train(dataset_train, dataset_val,
 NUM_EVALS = 500
 print("Running COCO evaluation on {} images.".format(NUM_EVALS))
 coco.evaluate_coco(model, dataset_val, coco, "bbox", limit=NUM_EVALS)
+
+model.keras_model.save("movile_mrcnn_eval.h5")

@@ -343,17 +343,17 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
                         depth_multiplier=depth_multiplier,
                         strides=strides,
                         use_bias=False,
-                        name='conv_dw_%d' % block_id)(inputs)
-    x = BatchNorm(axis=channel_axis, name='conv_dw_%d_bn' % block_id)(x, training=train_bn)
-    x = KL.Activation(relu6, name='conv_dw_%d_relu' % block_id)(x)
+                        name='conv_dw_{}'.format(block_id))(inputs)
+    x = BatchNorm(axis=channel_axis, name='conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
+    x = KL.Activation(relu6, name='conv_dw_{}_relu'.format(block_id))(x)
 
     x = KL.Conv2D(pointwise_conv_filters, (1, 1),
                padding='same',
                use_bias=False,
                strides=(1, 1),
-               name='conv_pw_%d' % block_id)(x)
-    x = BatchNorm(axis=channel_axis, name='conv_pw_%d_bn' % block_id)(x, training=train_bn)
-    return KL.Activation(relu6, name='conv_pw_%d_relu' % block_id)(x)
+               name='conv_pw_{}'.format(block_id))(x)
+    x = BatchNorm(axis=channel_axis, name='conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
+    return KL.Activation(relu6, name='conv_pw_{}_relu'.format(block_id))(x)
 
 
 def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1, train_bn = False):
@@ -1184,7 +1184,7 @@ def build_rpn_model(anchor_stride, anchors_per_location, depth):
 ############################################################
 
 def fpn_classifier_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True):
+                         pool_size, num_classes, train_bn=False):# default train_bn=False
     """Builds the computation graph of the feature pyramid network classifier
     and regressor heads.
 
@@ -1238,7 +1238,7 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True):
+                         pool_size, num_classes, train_bn=False):# default train_bn=False
     """Builds the computation graph of the mask head of Feature Pyramid Network.
 
     rois: [batch, num_rois, (y1, x1, y2, x2)] Proposal boxes in normalized
@@ -2335,7 +2335,7 @@ class MaskRCNN():
             from mmrcnn.parallel_model import ParallelModel
             model = ParallelModel(model, config.GPU_COUNT)
         else:
-            utils.activate_gpu(config.GPU_COUNT)
+            utils.set_cuda_visible_devices(config.GPU_COUNT)
 
         return model
 

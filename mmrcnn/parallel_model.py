@@ -46,7 +46,7 @@ class ParallelModel(KM.Model):
         """
         self.inner_model = keras_model
         self.gpu_count = gpu_count
-        utils.activate_gpu(self.gpu_count)
+        utils.set_cuda_visible_devices(self.gpu_count)
         merged_outputs = self.make_parallel()
         super(ParallelModel, self).__init__(inputs=self.inner_model.inputs,
                                             outputs=merged_outputs)
@@ -81,8 +81,8 @@ class ParallelModel(KM.Model):
 
         # Run the model call() on each GPU to place the ops there
         for i in range(self.gpu_count):
-            with tf.device('/gpu:%d' % i):
-                with tf.name_scope('tower_%d' % i):
+            with tf.device('/gpu:{}'.format(i)):
+                with tf.name_scope('tower_{}'.format(i)):
                     # Run a slice of inputs through this replica
                     zipped_inputs = zip(self.inner_model.input_names,
                                         self.inner_model.inputs)

@@ -76,11 +76,14 @@ def random_colors(N, bright=True):
 def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
     """
+    #for c in range(3):
+    #    image[:, :, c] = np.where(mask == 1,
+    #                              image[:, :, c] *
+    #                              (1 - alpha) + alpha * color[c] * 255,
+    #                              image[:, :, c])
+    mask_px = np.where(mask)
     for c in range(3):
-        image[:, :, c] = np.where(mask == 1,
-                                  image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c] * 255,
-                                  image[:, :, c])
+        image[mask_px[0], mask_px[1], c] = (1 - alpha)*image[mask_px[0], mask_px[1], c] + alpha * color[c] * 255
     return image
 
 

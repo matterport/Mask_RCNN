@@ -81,34 +81,40 @@ class CocoConfig(Config):
     to the COCO dataset.
     """
     ## Give the configuration a recognizable name
-    NAME = "mmrcnn_cocoperson"
+    NAME = "cocoperson"
 
     ## GPU
     IMAGES_PER_GPU = 1
-    GPU_COUNT = 2
+    GPU_COUNT = 1
+    USE_MULTIPROCESSING = True
 
     ## Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # COCO has 80 classes (1+80)
+    NUM_CLASSES = 1 + 1
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
 
+    ## Resolution
+    IMAGE_MAX_DIM = 256
+
     ## Size Options
-    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
-    #BACKBONE_STRIDES = [2, 4, 8, 16, 32]
+    #BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
+    BACKBONE_STRIDES = [2, 4, 8, 16, 32]
 
-    #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256) #ResNet
-    RPN_ANCHOR_SCALES = (8 , 16, 32, 64, 128)
-
-    MINI_MASK_SHAPE = (56, 56) #ResNet
+    USE_MINI_MASK = False
+    #MINI_MASK_SHAPE = (56, 56) #ResNet
     #MINI_MASK_SHAPE = (28, 28)
-
-    ## Input Resolution
-    #IMAGE_MIN_DIM = 400
-    IMAGE_MAX_DIM = 512
 
     #TRAIN_ROIS_PER_IMAGE = 200 #ResNet
     #TRAIN_ROIS_PER_IMAGE = 128
+    #MAX_GT_INSTANCES = 100 #ResNet
+    #POOL_SIZE = 7
+    #MASK_POOL_SIZE = 14
+
+    ## Steps
+    STEPS_PER_EPOCH = 500
+    VALIDATION_STEPS = 25
+
 
 
 ############################################################
@@ -168,7 +174,7 @@ class CocoDataset(utils.Dataset):
                 annotations=coco.loadAnns(coco.getAnnIds(
                     imgIds=[i], catIds=class_ids, iscrowd=None)))
 
-        #print ("{} Images Loaded for {}".format(len(image_ids, subset)))
+        print ("{} images loaded of coco subset-{}".format(len(image_ids), subset))
 
         if return_coco:
             return coco
