@@ -474,7 +474,6 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
-    print("Backbone Architecture: ", args.backbone)
     print("Classes (None means all):", args.classes)
 
     # classes must be a list
