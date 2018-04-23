@@ -1,6 +1,5 @@
 # Mobile Mask R-CNN
 This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Backbone architecture to be finally able to deploy it on mobile devices such as the Nvidia Jetson TX2.
-<br />
 
 ## Requirements
 - numpy
@@ -16,7 +15,6 @@ This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Bac
 - imgaug
 - IPython[all]
 - pycocotools
-<br />
 
 ## Getting Started
 - install required packages (mostly over pip)
@@ -27,7 +25,7 @@ This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Bac
 - evaluate your trained model with: `eval_coco.py`
 - do both interactively with the notebook `train_coco.ipynb`
 - alternatively train and evaluate with `coco.py` with a command like: <br />
-`python coco.py train --model=imagenet --classes='person'``
+`python coco.py train --model=imagenet --classes='person'`
 - convert keras h5 to tensorflow .pb model file run: <br />
 `python helper/keras_to_tensorflow.py -input_model_file saved_model_mrcnn_eval -output_model_file model.pb -num_outputs=7`
 <br />
