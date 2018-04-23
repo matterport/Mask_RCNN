@@ -238,7 +238,7 @@ def relu6(x):
     return K.relu(x, max_value=6)
 
 
-def _conv_block(inputs, filters, alpha, kernel=(3, 3), strides=(1, 1), train_bn = False):
+def _conv_block(inputs, filters, alpha, kernel=(3, 3), strides=(1, 1), train_bn=False):
     """Adds an initial convolution layer (with batch normalization and relu6).
     # Arguments
         inputs: Input tensor of shape `(rows, cols, 3)`
@@ -292,7 +292,7 @@ def _conv_block(inputs, filters, alpha, kernel=(3, 3), strides=(1, 1), train_bn 
 
 
 def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
-                          depth_multiplier=1, strides=(1, 1), block_id=1, train_bn = False):
+                          depth_multiplier=1, strides=(1, 1), block_id=1, train_bn=False):
     """Adds a depthwise convolution block.
     A depthwise convolution block consists of a depthwise conv,
     batch normalization, relu6, pointwise convolution,
@@ -359,28 +359,28 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
 def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1, train_bn = False):
     assert architecture in ["mobilenetv1"]
     # Stage 1
-    x = _conv_block(inputs, 32, alpha, strides=(2, 2), training=train_bn)                               #Input Resolution: 224 x 224
-    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1, training=train_bn)       #Input Resolution: 112 x 112
+    x = _conv_block(inputs, 32, alpha, strides=(2, 2), train_bn=train_bn)                               #Input Resolution: 224 x 224
+    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1, train_bn=train_bn)       #Input Resolution: 112 x 112
 
     # Stage 2
-    x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,strides=(2, 2), block_id=2, training=train_bn)
-    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3, training=train_bn)      #Input Resolution: 56 x 56
+    x = _depthwise_conv_block(x, 128, alpha, depth_multiplier,strides=(2, 2), block_id=2, train_bn=train_bn)
+    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3, train_bn=train_bn)      #Input Resolution: 56 x 56
 
     # Stage 3
-    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,strides=(2, 2), block_id=4, training=train_bn)
-    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5, training=train_bn)      #Input Resolution: 28 x 28
+    x = _depthwise_conv_block(x, 256, alpha, depth_multiplier,strides=(2, 2), block_id=4, train_bn=train_bn)
+    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5, train_bn=train_bn)      #Input Resolution: 28 x 28
 
     # Stage 4
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,strides=(2, 2), block_id=6, training=train_bn)
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7, training=train_bn)
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8, training=train_bn)
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9, training=train_bn)
-    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=10, training=train_bn)
-    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11, training=train_bn)     #Input Resolution: 14 x 14
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier,strides=(2, 2), block_id=6, train_bn=train_bn)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7, train_bn=train_bn)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8, train_bn=train_bn)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9, train_bn=train_bn)
+    x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=10, train_bn=train_bn)
+    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11, train_bn=train_bn)     #Input Resolution: 14 x 14
 
     # Stage 5
-    x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, strides=(2, 2), block_id=12, training=train_bn)
-    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13, training=train_bn)    #Input Resolution: 7x7
+    x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, strides=(2, 2), block_id=12, train_bn=train_bn)
+    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13, train_bn=train_bn)    #Input Resolution: 7x7
     return [C1, C2, C3, C4, C5]
 
 
@@ -2347,8 +2347,7 @@ class MaskRCNN():
             checkpoint_path: the path to the last checkpoint file
         """
         # Get directory names. Each directory corresponds to a model
-        dir_names = next(os.walk(self.model_dir))[1]
-        key = self.config.NAME.lower()
+        dir_names = next(os.walk(self.model_dir))[1]        key = self.config.NAME.lower()
         dir_names = filter(lambda f: f.startswith(key), dir_names)
         dir_names = sorted(dir_names)
         if not dir_names:
