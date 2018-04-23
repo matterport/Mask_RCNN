@@ -26,9 +26,9 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
 
     # OWN TRAINING START
-    python coco.py train --model=imagenet --architecture='mobilenetv1' --classes='person'
+    python coco.py train --model=imagenet --classes='person'
 """
-# python 2 compability
+# py2/3 compability
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -50,7 +50,7 @@ from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
 import zipfile
-from six.moves import urllib
+from six.moves import urllib # py2/3 compability
 import shutil
 
 # Root directory of the project
@@ -90,22 +90,25 @@ class CocoConfig(Config):
     ## Number of classes (including background)
     NUM_CLASSES = 1 + 1  # COCO has 80 classes (1+80)
 
-    ## Architecture
-    ARCH = "mobilenetv1"
+    ## Backbone Architecture
+    BACKBONE = "mobilenetv1"
 
     ## Size Options
-    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #resnet
-    #BACKBONE_STRIDES = [2, 4, 8, 16, 32] #mnv1
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
+    #BACKBONE_STRIDES = [2, 4, 8, 16, 32]
 
-    #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256) #resnet
+    #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256) #ResNet
     RPN_ANCHOR_SCALES = (8 , 16, 32, 64, 128)
 
-    MINI_MASK_SHAPE = (56, 56) #resnet
+    MINI_MASK_SHAPE = (56, 56) #ResNet
     #MINI_MASK_SHAPE = (28, 28)
 
     ## Input Resolution
     #IMAGE_MIN_DIM = 400
     IMAGE_MAX_DIM = 512
+
+    #TRAIN_ROIS_PER_IMAGE = 200 #ResNet
+    #TRAIN_ROIS_PER_IMAGE = 128
 
 
 ############################################################
@@ -449,10 +452,6 @@ if __name__ == '__main__':
                         default=500,
                         metavar="<image count>",
                         help='Images to use for evaluation (default=500)')
-    parser.add_argument('--architecture', required=False,
-                        default="mobilenetv1",
-                        metavar="<architecture>",
-                        help='Feature Pyramid Network backbone type')
     parser.add_argument('--download', required=False,
                         default=False,
                         metavar="<True|False>",
@@ -469,7 +468,7 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
-    print("Architecture: ", args.architecture)
+    print("Backbone Architecture: ", args.backbone)
     print("Classes (None means all):", args.classes)
 
     # classes must be a list
@@ -487,14 +486,6 @@ if __name__ == '__main__':
             DETECTION_MIN_CONFIDENCE = 0
         config = InferenceConfig()
     config.display()
-
-    # Configure backbone architecture
-    if args.architecture.lower() == "resnet50":
-        config.ARCH = "resnet50"
-    elif args.architecture.lower() == "mobilenetv1":
-        config.ARCH = "mobilenetv1"
-    elif args.architecture.lower() == "mobilenetv2":
-        config.ARCH = "mobilenetv2"
 
     # Create model
     if args.command == "train":
@@ -554,8 +545,8 @@ if __name__ == '__main__':
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
-        print("Fine tune {} stage 4 and up".format(config.ARCH))
-        if config.ARCH in ["resnet50", "resnet101"]:
+        print("Fine tune {} stage 4 and up".format(config.BACKBONE))
+        if config.BACKBONE in ["resnet50", "resnet101"]:
               finetune_layers = '4R+'
         elif config.Arsch in  ['mobilenetv1','mobilenetv2']:
               finetune_layers = "11M+"

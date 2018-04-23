@@ -54,6 +54,10 @@ class Config(object):
     # down the training.
     VALIDATION_STEPS = 50
 
+    # Backbone Architecture,
+    # Currently supported: ['resnet50','resnet101', 'mobilenetv1','mobilenetv2']
+    BACKBONE = None # Override in sub-classes
+
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64] #resnet
@@ -183,9 +187,6 @@ class Config(object):
     # the RPN. For example, to debug the classifier head without having to
     # train the RPN.
     USE_RPN_ROIS = True
-
-    # Backbone architecture. For example, 'resnet50', 'mobilenetv1'
-    ARCH = None
 
     # Train or freeze batch normalization layers
     #     None: Train BN layers. This is the normal mode

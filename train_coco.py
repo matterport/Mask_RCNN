@@ -52,7 +52,7 @@ model.train(dataset_train, dataset_val,
 
 # Training - Stage 2
 # Finetune layers  stage 4 and up
-print("> Fine tune {} stage 4 and up".format(config.ARCH))
+print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=120,
