@@ -592,8 +592,7 @@ def unmold_mask(mask, bbox, image_shape):
 
 def download_zipfile(zipname,url,dest_dir):
     zip_file = zipname + '.zip'
-    dest_dir = os.path.join(dest_dir, zipname)
-    if not os.path.isdir(dest_dir):
+    if not os.path.isdir(os.path.join(dest_dir, zipname)):
         print ("> {} not found. downloading it".format(zipname))
         opener = urllib.request.URLopener()
         opener.retrieve(url + zip_file, zip_file)
