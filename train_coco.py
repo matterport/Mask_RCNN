@@ -33,11 +33,11 @@ config.display()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 
 # Weights
-model_path = model.get_imagenet_weights()
+#model_path = model.get_imagenet_weights()
 #model_path = model.find_last()[1]
 #model_path = DEFAULT_WEIGHTS_DIR
-print("> Loading weights from {}".format(model_path))
-model.load_weights(model_path, by_name=True)
+#print("> Loading weights from {}".format(model_path))
+#model.load_weights(model_path, by_name=True)
 model.keras_model.summary()
 
 # Dataset
@@ -51,7 +51,7 @@ dataset_val.prepare()
 
 # Training - Config
 augmentation = imgaug.augmenters.Fliplr(0.5)
-
+"""
 # Training - Stage 1
 print("> Training network heads")
 model.train(dataset_train, dataset_val,
@@ -68,13 +68,13 @@ model.train(dataset_train, dataset_val,
             epochs=120,
             layers="11M+",
             augmentation=augmentation)
-
+"""
 # Training - Stage 3
 # Fine tune all layers
 print("> Fine tune all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=160,
+            epochs=500,
             layers='all',
             augmentation=augmentation)
 

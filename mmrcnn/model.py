@@ -460,7 +460,7 @@ def _inverted_residual_block(inputs, filters, kernel, t, strides, n, alpha, bloc
         Output tensor.
     """
 
-    x = _bottleneck(inputs, filters, kernel, t, strides, alpha, block_id, train_bn)
+    x = _bottleneck(inputs, filters, kernel, t, strides, False, alpha, block_id, train_bn)
 
     for i in range(1, n):
         block_id += 1
@@ -469,7 +469,7 @@ def _inverted_residual_block(inputs, filters, kernel, t, strides, n, alpha, bloc
     return x
 
 
-def mobilenetv2_graph(inputs, architecture, k, alpha = 1.0, train_bn = False):
+def mobilenetv2_graph(inputs, architecture, alpha = 1.0, train_bn = False):
     """MobileNetv2
     This function defines a MobileNetv2 architectures.
     # Arguments
@@ -480,9 +480,8 @@ def mobilenetv2_graph(inputs, architecture, k, alpha = 1.0, train_bn = False):
         MobileNetv2 model.
     """
     assert architecture in ["mobilenetv2"]
-    #inputs = Input(shape=input_shape)
 
-    x      = _conv_block(inputs, 32, alpha, (3, 3), strides=(2, 2), block_id=1, train_bn=train_bn)                      # Input Res: 1
+    x      = _conv_block(inputs, 32, alpha, (3, 3), strides=(2, 2), block_id=0, train_bn=train_bn)                      # Input Res: 1
     x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha=1.0, block_id=1, train_bn=train_bn)	# Input Res: 1/2
     C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha=1.0, block_id=2, train_bn=train_bn)	# Input Res: 1/2
     C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=4, train_bn=train_bn)	# Input Res: 1/4
@@ -491,17 +490,7 @@ def mobilenetv2_graph(inputs, architecture, k, alpha = 1.0, train_bn = False):
     C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=14, train_bn=train_bn)	# Input Res: 1/16
     x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha=1.0, block_id=17, train_bn=train_bn)	# Input Res: 1/32
     C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1), block_id=18, train_bn=train_bn)                        # Input Res: 1/32
-
-    #x = GlobalAveragePooling2D()(x)
-    #x = Reshape((1, 1, 1280))(x)
-    #x = Dropout(0.3, name='Dropout')(x)
-    #x = Conv2D(k, (1, 1), padding='same')(x)
-
-    #x = Activation('softmax', name='softmax')(x)
-    #output = Reshape((k,))(x)
-
-    #model = Model(inputs, output)
-    #plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
+    
     return [C1,C2,C3,C4,C5]
 
 ############################################################

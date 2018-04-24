@@ -86,7 +86,7 @@ class CocoConfig(Config):
 
     ## GPU
     IMAGES_PER_GPU = 1
-    GPU_COUNT = 1
+    GPU_COUNT = 2
     #USE_MULTIPROCESSING = True
 
     ## Number of classes (including background)
@@ -97,13 +97,13 @@ class CocoConfig(Config):
     #BACKBONE = "resnet50"
 
     ## Resolution
-    IMAGE_MAX_DIM = 256
+    IMAGE_MAX_DIM = 512
 
     ## Size Options
-    #BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
-    BACKBONE_STRIDES = [2, 4, 8, 16, 32]
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
+    #BACKBONE_STRIDES = [2, 4, 8, 16, 32]
 
-    USE_MINI_MASK = False
+    USE_MINI_MASK = True
     #MINI_MASK_SHAPE = (56, 56) #ResNet
     #MINI_MASK_SHAPE = (28, 28)
 
