@@ -56,7 +56,7 @@ augmentation = imgaug.augmenters.Fliplr(0.5)
 print("> Training network heads")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=160,
+            epochs=40,
             layers='heads',
             augmentation=augmentation)
 
@@ -74,12 +74,12 @@ model.train(dataset_train, dataset_val,
 print("> Fine tune all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=40,
+            epochs=160,
             layers='all',
             augmentation=augmentation)
 
 # Save Model
-if not os.path.isdir(WEIGHTS_DIR):
-    os.mkdirs(WEIGHTS_DIR)
-model_path = os.path.join(WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
-model.keras_model.save(model_path)
+#if not os.path.isdir(WEIGHTS_DIR):
+#    os.mkdirs(WEIGHTS_DIR)
+#model_path = os.path.join(WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
+#model.keras_model.save(model_path)

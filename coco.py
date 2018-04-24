@@ -87,7 +87,7 @@ class CocoConfig(Config):
     ## GPU
     IMAGES_PER_GPU = 1
     GPU_COUNT = 1
-    USE_MULTIPROCESSING = False
+    #USE_MULTIPROCESSING = True
 
     ## Number of classes (including background)
     NUM_CLASSES = 1 + 1
@@ -114,8 +114,8 @@ class CocoConfig(Config):
     #MASK_POOL_SIZE = 14
 
     ## Steps
-    STEPS_PER_EPOCH = 500
-    VALIDATION_STEPS = 25
+    STEPS_PER_EPOCH = 10
+    VALIDATION_STEPS = 1
 
 
 
