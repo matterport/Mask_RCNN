@@ -2602,7 +2602,7 @@ class MaskRCNN():
         self.checkpoint_path = os.path.join(self.log_dir, "mask_rcnn_{}_*epoch*.h5".format(
             self.config.NAME.lower()))
         self.checkpoint_path = self.checkpoint_path.replace("*epoch*", "{epoch:04d}")
-        
+
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
               augmentation=None):
         """Train the model.

@@ -114,8 +114,8 @@ class CocoConfig(Config):
     #MASK_POOL_SIZE = 14
 
     ## Steps
-    STEPS_PER_EPOCH = 10
-    VALIDATION_STEPS = 1
+    STEPS_PER_EPOCH = 1000
+    VALIDATION_STEPS = 50
 
 
 
