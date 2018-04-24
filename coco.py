@@ -61,14 +61,15 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mmrcnn.config import Config
 from mmrcnn import model as modellib,utils
 
-# Path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mobile_mask_rcnn_coco.h5")
-
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
+DEFAULT_WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 DEFAULT_DATASET_DIR = os.path.join(ROOT_DIR, "data/coco")
 DEFAULT_DATASET_YEAR = "2017" #"2014"
+
+# Path to trained weights file
+COCO_MODEL_PATH = os.path.join(DEFAULT_WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
 
 ############################################################
 #  Configurations
@@ -86,13 +87,14 @@ class CocoConfig(Config):
     ## GPU
     IMAGES_PER_GPU = 1
     GPU_COUNT = 1
-    USE_MULTIPROCESSING = True
+    USE_MULTIPROCESSING = False
 
     ## Number of classes (including background)
     NUM_CLASSES = 1 + 1
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
+    #BACKBONE = "resnet50"
 
     ## Resolution
     IMAGE_MAX_DIM = 256
@@ -174,7 +176,7 @@ class CocoDataset(utils.Dataset):
                 annotations=coco.loadAnns(coco.getAnnIds(
                     imgIds=[i], catIds=class_ids, iscrowd=None)))
 
-        print ("{} images loaded of coco subset-{}".format(len(image_ids), subset))
+        print ("> {} images of classes {} from coco subset-{} loaded".format(len(image_ids), class_names, subset))
 
         if return_coco:
             return coco
@@ -207,15 +209,15 @@ class CocoDataset(utils.Dataset):
         # Download images if not available locally
         if not os.path.exists(imgDir):
             os.makedirs(imgDir)
-            print("Downloading images to " + imgZipFile + " ...")
+            print("> Downloading images to " + imgZipFile + " ...")
             with urllib.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
                 shutil.copyfileobj(resp, out)
             print("... done downloading.")
-            print("Unzipping " + imgZipFile)
+            print("> Unzipping " + imgZipFile)
             with zipfile.ZipFile(imgZipFile, "r") as zip_ref:
                 zip_ref.extractall(dataDir)
             print("... done unzipping")
-        print("Will use images in " + imgDir)
+        print("> Will use images in " + imgDir)
 
         # Setup annotations data paths
         annDir = "{}/annotations".format(dataDir)
@@ -241,15 +243,15 @@ class CocoDataset(utils.Dataset):
             os.makedirs(annDir)
         if not os.path.exists(annFile):
             if not os.path.exists(annZipFile):
-                print("Downloading zipped annotations to " + annZipFile + " ...")
+                print("> Downloading zipped annotations to " + annZipFile + " ...")
                 with urllib.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
                     shutil.copyfileobj(resp, out)
                 print("... done downloading.")
-            print("Unzipping " + annZipFile)
+            print("> Unzipping " + annZipFile)
             with zipfile.ZipFile(annZipFile, "r") as zip_ref:
                 zip_ref.extractall(unZipDir)
             print("... done unzipping")
-        print("Will use annotations in " + annFile)
+        print("> Will use annotations in " + annFile)
 
     def load_mask(self, image_id):
         """Load instance masks for the given image.
@@ -420,9 +422,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     cocoEval.accumulate()
     cocoEval.summarize()
 
-    print("Prediction time: {}. Average {}/image".format(
+    print("> Prediction time: {}. Average {}/image".format(
         t_prediction, t_prediction / len(image_ids)))
-    print("Total time: ", time.time() - t_start)
+    print("> Total time: ", time.time() - t_start)
 
 
 ############################################################
@@ -513,7 +515,7 @@ if __name__ == '__main__':
         model_path = args.model
 
     # Load weights
-    print("Loading weights ", model_path)
+    print("> Loading weights from {} ".format(model_path))
     model.load_weights(model_path, by_name=True)
 
     # Train or evaluate
@@ -541,7 +543,7 @@ if __name__ == '__main__':
         # *** This training schedule is an example. Update to your needs ***
 
         # Training - Stage 1
-        print("Training network heads")
+        print("> Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
                     epochs=160,
@@ -550,7 +552,7 @@ if __name__ == '__main__':
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
-        print("Fine tune {} stage 4 and up".format(config.BACKBONE))
+        print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
         if config.BACKBONE in ["resnet50", "resnet101"]:
               finetune_layers = '4R+'
         elif config.Arsch in  ['mobilenetv1','mobilenetv2']:
@@ -563,7 +565,7 @@ if __name__ == '__main__':
 
         # Training - Stage 3
         # Fine tune all layers
-        print("Fine tune all layers")
+        print("> Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=40,
@@ -578,8 +580,8 @@ if __name__ == '__main__':
         else:
             coco = dataset_val.load_coco(args.dataset, "val", year=args.year, class_names=args.classes, return_coco=True, auto_download=args.download)
         dataset_val.prepare()
-        print("Running COCO evaluation on {} images.".format(args.limit))
+        print("> Running COCO evaluation on {} images.".format(args.limit))
         evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
     else:
-        print("'{}' is not recognized. "
+        print("> '{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))

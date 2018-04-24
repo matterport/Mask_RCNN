@@ -24,15 +24,21 @@ import coco
 ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
+WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
+DEFAULT_WEIGHTS_DIR = os.path.join(MODEL_DIR, 'cocoperson20180423T1626/mask_rcnn_cocoperson_0160.h5')
 
 # Model
 config = coco.CocoConfig()
 config.display()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
+
+# Weights
 model_path = model.get_imagenet_weights()
-print("> Loading weights ", model_path)
+#model_path = model.find_last()[1]
+#model_path = DEFAULT_WEIGHTS_DIR
+print("> Loading weights from {}".format(model_path))
 model.load_weights(model_path, by_name=True)
-#model.keras_model.summary()
+model.keras_model.summary()
 
 # Dataset
 class_names = ['person']
@@ -72,9 +78,8 @@ model.train(dataset_train, dataset_val,
             layers='all',
             augmentation=augmentation)
 
-# Evaluation
-NUM_EVALS = 500
-print("Running COCO evaluation on {} images.".format(NUM_EVALS))
-coco.evaluate_coco(model, dataset_val, coco, "bbox", limit=NUM_EVALS)
-
-model.keras_model.save("movile_mrcnn_eval.h5")
+# Save Model
+if not os.path.isdir(WEIGHTS_DIR):
+    os.mkdirs(WEIGHTS_DIR)
+model_path = os.path.join(WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
+model.keras_model.save(model_path)
