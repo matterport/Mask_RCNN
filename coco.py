@@ -87,33 +87,21 @@ class CocoConfig(Config):
     ## GPU
     IMAGES_PER_GPU = 1
     GPU_COUNT = 1
-    #USE_MULTIPROCESSING = True
 
     ## Number of classes (including background)
     NUM_CLASSES = 1 + 1
 
     ## Backbone Architecture
-    BACKBONE = "mobilenetv2"
-    #BACKBONE = "resnet50"
+    BACKBONE = "mobilenetv1"
 
     ## Resolution
     IMAGE_MAX_DIM = 256
 
     ## Size Options
-    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
-    #BACKBONE_STRIDES = [2, 4, 8, 16, 32]
-    #RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64]
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
 
     USE_MINI_MASK = False
-    #MINI_MASK_SHAPE = (56, 56) #ResNet
-    #MINI_MASK_SHAPE = (28, 28)
-
-    #TRAIN_ROIS_PER_IMAGE = 200 #ResNet
-    #TRAIN_ROIS_PER_IMAGE = 128
-    #MAX_GT_INSTANCES = 100 #ResNet
-    #POOL_SIZE = 7
-    #MASK_POOL_SIZE = 14
 
     ## Losses
     LOSS_WEIGHTS = {
@@ -125,7 +113,7 @@ class CocoConfig(Config):
     }
 
     ## Steps
-    STEPS_PER_EPOCH = 5000
+    STEPS_PER_EPOCH = 500
     VALIDATION_STEPS = 25
 
 

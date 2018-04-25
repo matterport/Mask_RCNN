@@ -86,10 +86,8 @@ print("mAP: ", np.mean(APs))
 
 image_ids = np.random.choice(dataset_val.image_ids, 10)
 
-image_ids
-
 image, image_meta, gt_class_id, gt_bbox, gt_mask =\
         modellib.load_image_gt(dataset_val, config,
                                image_ids[0], use_mini_mask=False)
 
-r['masks']
+print (r['masks'])

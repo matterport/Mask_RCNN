@@ -1296,6 +1296,20 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
     # Shape: [batch, boxes, pool_height, pool_width, channels]
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
+    """
+    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
+    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv2")(x)
+    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn2')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv3")(x)
+    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn3')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv4")(x)
+    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn4')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+    """
     if backbone in ['resnet50','resnet101']:
         x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
         x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
@@ -2594,7 +2608,7 @@ class MaskRCNN():
         self.checkpoint_path = self.checkpoint_path.replace("*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None):
+              augmentation=None, save_weights_only = True):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2664,7 +2678,7 @@ class MaskRCNN():
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0, write_graph=True, write_images=False),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                            verbose=0, save_weights_only=save_weights_only),
         ]
 
         # Train
