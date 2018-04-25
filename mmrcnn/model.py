@@ -1291,25 +1291,11 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
 
     Returns: Masks [batch, roi_count, height, width, num_classes]
     """
+    assert backbone in ['resnet50','resnet101','mobilenetv1','mobilenetv2']
     # ROI Pooling
     # Shape: [batch, boxes, pool_height, pool_width, channels]
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
-
-    # Conv layers # SeparableConv2D instead of Conv2D ?
-    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv1")(x)
-    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
-    x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv2")(x)
-    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn2')(x, training=train_bn)
-    x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv3")(x)
-    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn3')(x, training=train_bn)
-    x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv4")(x)
-    x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn4')(x, training=train_bn)
-    x = KL.Activation('relu')(x)
-    """
     if backbone in ['resnet50','resnet101']:
         x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
         x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
@@ -1325,11 +1311,11 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
         x = KL.Activation('relu')(x)
 
     if backbone in ['mobilenetv1','mobilenetv2']:
-        x = _timedistributed_depthwise_conv_block(x, 256, strides = (3,3), block_id = 1, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, strides = (3,3), block_id = 2, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, strides = (3,3), block_id = 3, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, strides = (3,3), block_id = 4, train_bn = train_bn)
-    """
+        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 1, train_bn = train_bn)
+        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 2, train_bn = train_bn)
+        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 3, train_bn = train_bn)
+        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 4, train_bn = train_bn)
+
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
@@ -2660,7 +2646,7 @@ class MaskRCNN():
             stage_regex = { "3+": r"(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
                             "4+": r"(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
                             "5+": r"(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
-                            
+
         layer_regex.update(stage_regex)
 
         if layers in layer_regex.keys():
