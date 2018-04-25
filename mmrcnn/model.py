@@ -357,9 +357,20 @@ def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
 
 
 def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1, train_bn = False):
+    """MobileNetv1
+    This function defines a MobileNetv1 architectures.
+    # Arguments
+        inputs: Inuput Tensor, e.g. an image
+        architecture: to preserve consistency
+        alpha: Width Multiplier
+        depth_multiplier: Resolution Multiplier
+        train_bn: Boolean. Train or freeze Batch Norm layres
+    # Returns
+        five MobileNetv1 model stages.
+    """
     assert architecture in ["mobilenetv1"]
     # Stage 1
-    x      = _conv_block(inputs, 32, alpha, strides=(2, 2), block_id=1, train_bn=train_bn)              #Input Resolution: 224 x 224
+    x      = _conv_block(inputs, 32, alpha, strides=(2, 2), block_id=0, train_bn=train_bn)              #Input Resolution: 224 x 224
     C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1, train_bn=train_bn)       #Input Resolution: 112 x 112
 
     # Stage 2
@@ -473,24 +484,25 @@ def mobilenetv2_graph(inputs, architecture, alpha = 1.0, train_bn = False):
     """MobileNetv2
     This function defines a MobileNetv2 architectures.
     # Arguments
-        input_shape: An integer or tuple/list of 3 integers, shape
-            of input tensor.
-        k: Integer, number of classes.
+        inputs: Inuput Tensor, e.g. an image
+        architecture: to preserve consistency
+        alpha: Width Multiplier
+        train_bn: Boolean. Train or freeze Batch Norm layres
     # Returns
-        MobileNetv2 model.
+        five MobileNetv2 model stages.
     """
     assert architecture in ["mobilenetv2"]
 
     x      = _conv_block(inputs, 32, alpha, (3, 3), strides=(2, 2), block_id=0, train_bn=train_bn)                      # Input Res: 1
-    x      = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha=1.0, block_id=1, train_bn=train_bn)	# Input Res: 1/2
-    C1 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha=1.0, block_id=2, train_bn=train_bn)	# Input Res: 1/2
-    C2 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=4, train_bn=train_bn)	# Input Res: 1/4
+    C1 = x = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha=1.0, block_id=1, train_bn=train_bn)	# Input Res: 1/2
+    C2 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha=1.0, block_id=2, train_bn=train_bn)	# Input Res: 1/2
+    C3 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=4, train_bn=train_bn)	# Input Res: 1/4
     x      = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha=1.0, block_id=7, train_bn=train_bn)	# Input Res: 1/8
-    C3 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha=1.0, block_id=11, train_bn=train_bn)	# Input Res: 1/8
-    C4 = x = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=14, train_bn=train_bn)	# Input Res: 1/16
-    x      = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha=1.0, block_id=17, train_bn=train_bn)	# Input Res: 1/32
-    C5 = x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1), block_id=18, train_bn=train_bn)                        # Input Res: 1/32
-    
+    C4 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha=1.0, block_id=11, train_bn=train_bn)	# Input Res: 1/8
+    x      = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=14, train_bn=train_bn)	# Input Res: 1/16
+    C5 = x = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha=1.0, block_id=17, train_bn=train_bn)	# Input Res: 1/32
+    #x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1), block_id=18, train_bn=train_bn)                            # Input Res: 1/32
+
     return [C1,C2,C3,C4,C5]
 
 ############################################################
@@ -1235,12 +1247,14 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
 
-def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, strides=(1, 1), block_id=1, train_bn=True):
+def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, strides=(1, 1), block_id=1, train_bn=False):
     """Similiar to the _depthwise_conv_block used in the Backbone,
     but with each layer wrapped in a TimeDistributed layer,
     used to build the computation graph of the mask head of the FPN.
     """
-    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+    #channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+    channel_axis = 3
+
     # Depthwise
     x = KL.TimeDistributed(KL.DepthwiseConv2D(
                     (3, 3),
@@ -1251,8 +1265,7 @@ def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, stride
                     name='mrcnn_mask_conv_dw_{}'.format(block_id))(inputs)
     x = KL.TimeDistributed(BatchNorm(axis=channel_axis),
                     name='mrcnn_mask_conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
-    x = KL.TimeDistributed(KL.Activation(relu6),
-                    name='mrcnn_mask_conv_dw_{}_relu'.format(block_id))(x)
+    x = KL.Activation(relu6, name='mrcnn_mask_conv_dw_{}_relu'.format(block_id))(x)
     # Pointwise
     x = KL.TimeDistributed(KL.Conv2D(pointwise_conv_filters,
                     (1, 1),
@@ -1263,7 +1276,7 @@ def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, stride
     x = KL.TimeDistributed(BatchNorm(
                     axis=channel_axis),
                     name='mrcnn_mask_conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
-    return KL.TimeDistributed(KL.Activation(relu6), name='mrcnn_mask_conv_pw_{}_relu'.format(block_id))(x)
+    return KL.Activation(relu6, name='mrcnn_mask_conv_pw_{}_relu'.format(block_id))(x)
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes, backbone, train_bn):
     """Builds the computation graph of the mask head of Feature Pyramid Network.
@@ -1283,17 +1296,17 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
 
-    # Conv layers
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv1")(x)
+    # Conv layers # SeparableConv2D instead of Conv2D ?
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv1")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv2")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv2")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn2')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv3")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv3")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn3')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv4")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_sepconv4")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn4')(x, training=train_bn)
     x = KL.Activation('relu')(x)
     """
@@ -2207,9 +2220,9 @@ class MaskRCNN():
         if config.BACKBONE in ["resnet50", "resnet101"]:
             _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
         elif config.BACKBONE in ["mobilenetv1"]:
-            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.BACKBONE, alpha=1.0)
+            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.BACKBONE, alpha=1.0, train_bn=config.TRAIN_BN)
         elif config.BACKBONE in ["mobilenetv2"]:
-            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.BACKBONE, alpha=1.0)
+            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.BACKBONE, alpha=1.0, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
@@ -2443,6 +2456,8 @@ class MaskRCNN():
         """Downloads ImageNet trained weights from Keras.
         Returns path to weights file.
         """
+        assert self.config.BACKBONE in ["resnet50","mobilenetv1"]
+
         from keras.utils.data_utils import get_file
         if no_top:
             if self.config.BACKBONE == "resnet50":
@@ -2627,17 +2642,27 @@ class MaskRCNN():
         layer_regex = {
             # all layers but the backbone
             "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            # From a specific Resnet stage and up
-            "3R+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "4R+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "5R+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            # From a specific Mobilenet stage and up
-            "5M+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "11M+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(bn4.*)|(mob5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "13M+": r"(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # All layers
             "all": ".*",
         }
+        if self.config.BACKBONE in ["resnet50", "resnet101"]:
+            # From a specific Resnet stage and up
+            stage_regex = { "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
+        elif self.config.BACKBONE in ["mobilenetv1"]:
+            # From a specific Mobilenetv1 stage and up
+            stage_regex = { "3+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "4+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(bn4.*)|(mob5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "5+": r"(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
+        elif self.config.BACKBONE in ["mobilenetv2"]:
+            # From a specific Mobilenetv2 stage and up
+            stage_regex = { "3+": r"(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "4+": r"(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+                            "5+": r"(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
+                            
+        layer_regex.update(stage_regex)
+
         if layers in layer_regex.keys():
             layers = layer_regex[layers]
 

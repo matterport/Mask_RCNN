@@ -26,6 +26,10 @@ This Project tries to implement a Mask R-CNN Version with MobileNet V1/V2 as Bac
 - do both interactively with the notebook `train_coco.ipynb`
 - alternatively train and evaluate with `coco.py` with a command like: <br />
 `python coco.py train --model=imagenet --classes='person'`
+- visualize / control training with tensorboard: `cd` into your current log dir and run: <br />
+`tensorboard --logdir="$(pwd)"`
+- inspect your model with `notebooks/`: <br />
+`inspect_data.ipynb`,`inspect_model.ipynb`, `inspect_weights.ipynb`
 - convert keras h5 to tensorflow .pb model file run: <br />
 `python helper/keras_to_tensorflow.py -input_model_file saved_model_mrcnn_eval -output_model_file model.pb -num_outputs=7`
 <br />

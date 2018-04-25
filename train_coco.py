@@ -31,6 +31,7 @@ DEFAULT_WEIGHTS_DIR = os.path.join(MODEL_DIR, 'cocoperson20180423T1626/mask_rcnn
 config = coco.CocoConfig()
 config.display()
 model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
+model.keras_model.summary()
 
 # Weights
 #model_path = model.get_imagenet_weights()
@@ -38,10 +39,9 @@ model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 #model_path = DEFAULT_WEIGHTS_DIR
 #print("> Loading weights from {}".format(model_path))
 #model.load_weights(model_path, by_name=True)
-model.keras_model.summary()
 
 # Dataset
-class_names = ['person']
+class_names = ['person']  # all classes: None
 dataset_train = coco.CocoDataset()
 dataset_train.load_coco(COCO_DIR, "train", class_names=class_names)
 dataset_train.prepare()
@@ -51,7 +51,7 @@ dataset_val.prepare()
 
 # Training - Config
 augmentation = imgaug.augmenters.Fliplr(0.5)
-"""
+
 # Training - Stage 1
 print("> Training network heads")
 model.train(dataset_train, dataset_val,
@@ -66,9 +66,9 @@ print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
             epochs=120,
-            layers="11M+",
+            layers="4+",
             augmentation=augmentation)
-"""
+
 # Training - Stage 3
 # Fine tune all layers
 print("> Fine tune all layers")

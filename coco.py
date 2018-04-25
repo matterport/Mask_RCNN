@@ -93,15 +93,15 @@ class CocoConfig(Config):
     NUM_CLASSES = 1 + 1
 
     ## Backbone Architecture
-    BACKBONE = "mobilenetv1"
+    BACKBONE = "mobilenetv2"
     #BACKBONE = "resnet50"
 
     ## Resolution
     IMAGE_MAX_DIM = 256
 
     ## Size Options
-    #BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
-    BACKBONE_STRIDES = [2, 4, 8, 16, 32]
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64] #ResNet
+    #BACKBONE_STRIDES = [2, 4, 8, 16, 32]
     #RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
 
@@ -115,9 +115,18 @@ class CocoConfig(Config):
     #POOL_SIZE = 7
     #MASK_POOL_SIZE = 14
 
+    ## Losses
+    LOSS_WEIGHTS = {
+        "rpn_class_loss": 1.,
+        "rpn_bbox_loss": 1.,
+        "mrcnn_class_loss": 1.,
+        "mrcnn_bbox_loss": 1.,
+        "mrcnn_mask_loss": 1.
+    }
+
     ## Steps
-    STEPS_PER_EPOCH = 1000
-    VALIDATION_STEPS = 50
+    STEPS_PER_EPOCH = 5000
+    VALIDATION_STEPS = 25
 
 
 
@@ -548,21 +557,17 @@ if __name__ == '__main__':
         print("> Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=160,
+                    epochs=40,
                     layers='heads',
                     augmentation=augmentation)
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
         print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
-        if config.BACKBONE in ["resnet50", "resnet101"]:
-              finetune_layers = '4R+'
-        elif config.Arsch in  ['mobilenetv1','mobilenetv2']:
-              finetune_layers = "11M+"
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
                     epochs=120,
-                    layers=finetune_layers,
+                    layers='4+',
                     augmentation=augmentation)
 
         # Training - Stage 3
@@ -570,7 +575,7 @@ if __name__ == '__main__':
         print("> Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=40,
+                    epochs=160,
                     layers='all',
                     augmentation=augmentation)
 
