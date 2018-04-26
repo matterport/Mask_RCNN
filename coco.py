@@ -93,28 +93,28 @@ class CocoConfig(Config):
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64]
 
     ## Resolution
-    IMAGE_MAX_DIM = 256
-
-    ## Size Options
-    BACKBONE_STRIDES = [4, 8, 16, 32, 64]
-    RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
-
-    USE_MINI_MASK = False
+    RES_FACTOR = 4
+    IMAGE_MAX_DIM = 1024 // RES_FACTOR
+    RPN_ANCHOR_SCALES = tuple(np.divide((32, 64, 128, 256, 512),RES_FACTOR))
 
     ## Losses
     LOSS_WEIGHTS = {
-        "rpn_class_loss": 1.,
+        "rpn_class_loss": 0.,
         "rpn_bbox_loss": 1.,
-        "mrcnn_class_loss": 1.,
+        "mrcnn_class_loss": 0.,
         "mrcnn_bbox_loss": 1.,
         "mrcnn_mask_loss": 1.
     }
 
     ## Steps
-    STEPS_PER_EPOCH = 500
-    VALIDATION_STEPS = 25
+    STEPS_PER_EPOCH = 1000
+    VALIDATION_STEPS = 50
+
+    ## Additions
+    TRAIN_BN = False
 
 
 
@@ -161,6 +161,8 @@ class CocoDataset(utils.Dataset):
             # All images
             image_ids = list(coco.imgs.keys())
 
+        self.dataset_size = len(image_ids)
+
         # Add classes
         for i in class_ids:
             self.add_class("coco", i, coco.loadCats(i)[0]["name"])
@@ -175,7 +177,7 @@ class CocoDataset(utils.Dataset):
                 annotations=coco.loadAnns(coco.getAnnIds(
                     imgIds=[i], catIds=class_ids, iscrowd=None)))
 
-        print ("> {} images of classes {} from coco subset-{} loaded".format(len(image_ids), class_names, subset))
+        print ("> {} images of classes {} from coco subset-{} loaded".format(self.dataset_size, class_names, subset))
 
         if return_coco:
             return coco

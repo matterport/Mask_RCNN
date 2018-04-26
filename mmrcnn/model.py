@@ -1297,16 +1297,16 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
     """
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv2")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv2")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn2')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv3")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv3")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn3')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.SeparableConv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv4")(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv4")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn4')(x, training=train_bn)
     x = KL.Activation('relu')(x)
     """

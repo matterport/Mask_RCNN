@@ -25,20 +25,7 @@ ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
-DEFAULT_WEIGHTS_DIR = os.path.join(MODEL_DIR, 'cocoperson20180423T1626/mask_rcnn_cocoperson_0160.h5')
-
-## Model
-config = coco.CocoConfig()
-config.display()
-model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
-model.keras_model.summary()
-
-## Weights
-model_path = model.get_imagenet_weights()
-#model_path = model.find_last()[1]
-#model_path = DEFAULT_WEIGHTS_DIR
-print("> Loading weights from {}".format(model_path))
-model.load_weights(model_path, by_name=True)
+DEFAULT_WEIGHTS_DIR = "/home/gustav/workspace/Mobile_Mask_RCNN/logs/cocoperson20180425T1415/mask_rcnn_cocoperson_0160.h5"
 
 ## Dataset
 class_names = ['person']  # all classes: None
@@ -49,14 +36,31 @@ dataset_val = coco.CocoDataset()
 dataset_val.load_coco(COCO_DIR, "val", class_names=class_names)
 dataset_val.prepare()
 
-## Training - Config
-augmentation = imgaug.augmenters.Fliplr(0.5)
+## Model
+config = coco.CocoConfig()
+config.display()
+model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
+model.keras_model.summary()
 
+## Weights
+#model_path = model.get_imagenet_weights()
+#model_path = model.find_last()[1]
+model_path = DEFAULT_WEIGHTS_DIR
+print("> Loading weights from {}".format(model_path))
+model.load_weights(model_path, by_name=True)
+
+## Training - Config
+starting_epoch = model.epoch
+epoch = dataset_train.dataset_size // (config.STEPS_PER_EPOCH * config.BATCH_SIZE)
+epochs_heads = 2 * epoch + starting_epoch
+epochs_stage4 = 2 * epoch + starting_epoch
+epochs_all = 2 * epoch + starting_epoch
+augmentation = imgaug.augmenters.Fliplr(0.5)
 ## Training - Stage 1
 print("> Training network heads")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=40,
+            epochs=epochs_heads,
             layers='heads',
             augmentation=augmentation)
 
@@ -65,7 +69,7 @@ model.train(dataset_train, dataset_val,
 print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=120,
+            epochs=epoch_heads + epochs_stage4,
             layers="4+",
             augmentation=augmentation)
 
@@ -74,7 +78,7 @@ model.train(dataset_train, dataset_val,
 print("> Fine tune all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=160,
+            epochs=epochs_heads + epochs_stage4 + epochs_all,
             layers='all',
             augmentation=augmentation)
 
