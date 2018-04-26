@@ -56,6 +56,7 @@ epochs_heads = 2 * epoch + starting_epoch
 epochs_stage4 = 2 * epoch + starting_epoch
 epochs_all = 2 * epoch + starting_epoch
 augmentation = imgaug.augmenters.Fliplr(0.5)
+
 ## Training - Stage 1
 print("> Training network heads")
 model.train(dataset_train, dataset_val,

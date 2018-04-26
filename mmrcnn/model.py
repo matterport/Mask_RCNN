@@ -3143,7 +3143,7 @@ def mold_image(images, config):
 def unmold_image(normalized_images, config):
     """Takes a image normalized with mold() and returns the original."""
     if config.BACKBONE in ["mobilenetv1","mobilenetv2"]:
-        return ((normalized_images +1)*127.5).astype(np.unit8)
+        return ((normalized_images +1)*127.5).astype(np.uint8)
     if config.BACKBONE in ["resnet50","resnet101"]:
         return (normalized_images + config.MEAN_PIXEL).astype(np.uint8)
 
