@@ -99,9 +99,14 @@ def compute_overlaps_masks(masks1, masks2):
     '''Computes IoU overlaps between two sets of masks.
     masks1, masks2: [Height, Width, instances]
     '''
+    
+    #if the model detect nothing,the return r['mask'].shape=[0,28,28],and the following np.reshape（） would report an error. 
+    if masks1.shape[0]==0:
+        return np.zeros((masks1.shape[0],masks2.shape[-1]))
     # flatten masks
     masks1 = np.reshape(masks1 > .5, (-1, masks1.shape[-1])).astype(np.float32)
     masks2 = np.reshape(masks2 > .5, (-1, masks2.shape[-1])).astype(np.float32)
+
     area1 = np.sum(masks1, axis=0)
     area2 = np.sum(masks2, axis=0)
 
@@ -111,6 +116,7 @@ def compute_overlaps_masks(masks1, masks2):
     overlaps = intersections / union
 
     return overlaps
+
 
 
 def non_max_suppression(boxes, scores, threshold):
