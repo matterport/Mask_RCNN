@@ -207,7 +207,7 @@ def color_splash(image, mask):
     # We're treating all instances as one, so collapse the mask into one layer
     mask = (np.sum(mask, -1, keepdims=True) >= 1)
     # Copy color pixels from the original color image where mask is set
-    if mask.shape[0] > 0 and mask.shape[0] == gray.shape[0]:
+    if mask.shape[0] == gray.shape[0]:
         splash = np.where(mask, image, gray).astype(np.uint8)
     else:
         splash = gray.astype(np.uint8)
