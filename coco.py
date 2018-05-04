@@ -93,8 +93,7 @@ class CocoConfig(Config):
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
-    RPN_ANCHOR_STRIDE = 2
-    BACKBONE_STRIDES = list(np.divide([4, 8, 16, 32, 64],RPN_ANCHOR_STRIDE))
+    BACKBONE_STRIDES = [2, 4, 8, 16, 32]#[4, 8, 16, 32, 64]
 
     ## Resolution
     RES_FACTOR = 4

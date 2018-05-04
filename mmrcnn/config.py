@@ -212,7 +212,7 @@ class Config(object):
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
 
         # Add Resolution to config name
-        self.NAME = "{}_".format(IMAGE_MAX_DIM)+self.NAME
+        self.NAME = "{}_".format(self.IMAGE_MAX_DIM)+self.NAME
 
     def display(self):
         """Display Configuration values."""
