@@ -211,6 +211,9 @@ class Config(object):
         # See compose_image_meta() for details
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
 
+        # Add Resolution to config name
+        self.NAME = "{}_".format(IMAGE_MAX_DIM)+self.NAME
+
     def display(self):
         """Display Configuration values."""
         print("\nConfigurations:")

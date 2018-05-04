@@ -93,7 +93,8 @@ class CocoConfig(Config):
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
-    BACKBONE_STRIDES = [4, 8, 16, 32, 64]
+    RPN_ANCHOR_STRIDE = 2
+    BACKBONE_STRIDES = list(np.divide([4, 8, 16, 32, 64],RPN_ANCHOR_STRIDE))
 
     ## Resolution
     RES_FACTOR = 4
@@ -114,8 +115,7 @@ class CocoConfig(Config):
     VALIDATION_STEPS = 50
 
     ## Additions
-    TRAIN_BN = False
-
+    TRAIN_BN = True
 
 
 ############################################################
