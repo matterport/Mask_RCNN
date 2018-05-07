@@ -34,7 +34,7 @@ def merge_annotations(s1, s2, m):
     return filenames
 
 
-# filenames = merge_annotations('/tmp/annotations.json', '/tmp/wolf_11.json', '/tmp/merged.json')
+# Eg: filenames = merge_annotations('/tmp/annotations.json', '/tmp/wolf_11.json', '/tmp/merged.json')
 
 source_dir = '../images/imgnet_n02114100/images/'
 target_dir = '../images/imgnet_n02114100/train/'
@@ -48,3 +48,8 @@ def merge_images(original_via, new_via, source_image_dir, target_image_dir):
     # overwrite any that exist in the target.
     for f in filenames:
         shutil.copy(source_image_dir+f, target_image_dir+f)
+
+    print("Images copied. Overwriting annotation file.")
+    shutil.copy('/tmp/merged.json', target_image_dir+'/annotations.json')
+
+    return filenames
