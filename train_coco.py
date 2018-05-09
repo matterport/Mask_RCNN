@@ -56,7 +56,7 @@ epochs_all = 5 * epoch #+ starting_epoch
 augmentation = imgaug.augmenters.Fliplr(0.5)
 
 ## Training - WarmUp Stage
-print("> Fine tune all layers")
+print("> Warm Up all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=epochs_warmup,
