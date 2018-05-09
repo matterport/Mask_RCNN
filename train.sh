@@ -5,7 +5,7 @@
 echo "infinite training"
 export ROOT_DIR=$(pwd)
 while [ true ]; do
-    gnome-terminal -x sh -c "sleep 1m;tensorboard --logdir=${ROOT_DIR}"
+    gnome-terminal -x sh -c "tensorboard --logdir=${ROOT_DIR}"
     python train_coco.py
     sleep 30
     killall python

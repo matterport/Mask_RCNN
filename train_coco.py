@@ -39,8 +39,8 @@ model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 model.keras_model.summary()
 
 ## Weights
-#model_path = model.get_imagenet_weights()
-model_path = model.find_last()[1]
+model_path = model.get_imagenet_weights()
+#model_path = model.find_last()[1]
 #model_path = DEFAULT_MODEL_DIR
 print("> Loading weights from {}".format(model_path))
 model.load_weights(model_path, by_name=True)
@@ -48,7 +48,7 @@ model.load_weights(model_path, by_name=True)
 ## Training - Config
 starting_epoch = model.epoch
 epoch = dataset_train.dataset_size // (config.STEPS_PER_EPOCH * config.BATCH_SIZE)
-epochs_warmup = 0.5 * epoch
+epochs_warmup =  epoch // 2 #+ starting_epoch
 epochs_heads = 5 * epoch #+ starting_epoch
 epochs_stage4 = 5 * epoch #+ starting_epoch
 epochs_all = 5 * epoch #+ starting_epoch
