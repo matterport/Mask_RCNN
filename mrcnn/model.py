@@ -1860,7 +1860,6 @@ class MaskRCNN():
             print("Using LeakyReLU")
         else:
             use_activation = K.relu
-            print("Using ReLU")
 
         # Image size must be dividable by 2 multiple times
         h, w = config.IMAGE_SHAPE[:2]
