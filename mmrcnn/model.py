@@ -1296,7 +1296,7 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
     # Shape: [batch, boxes, pool_height, pool_width, channels]
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
-
+    """
     x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
     x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
     x = KL.Activation('relu')(x)
@@ -1329,7 +1329,7 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta, pool_size, num_classes,
         x = _timedistributed_depthwise_conv_block(x, 256, block_id = 2, train_bn = train_bn)
         x = _timedistributed_depthwise_conv_block(x, 256, block_id = 3, train_bn = train_bn)
         x = _timedistributed_depthwise_conv_block(x, 256, block_id = 4, train_bn = train_bn)
-    """
+
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
@@ -2725,45 +2725,7 @@ class MaskRCNN():
         image_metas = []
         windows = []
         for image in images:
-            # Resize image
-            # TODO: move resizing to mold_image()
-            molded_image, window, scale, padding, crop = utils.resize_image(
-                image,
-                min_dim=self.config.IMAGE_MIN_DIM,
-                min_scale=self.config.IMAGE_MIN_SCALE,
-                max_dim=self.config.IMAGE_MAX_DIM,
-                mode=self.config.IMAGE_RESIZE_MODE)
-            molded_image = mold_image(molded_image, self.config)
-            # Build image_meta
-            image_meta = compose_image_meta(
-                0, image.shape, molded_image.shape, window, scale,
-                np.zeros([self.config.NUM_CLASSES], dtype=np.int32))
-            # Append
-            molded_images.append(molded_image)
-            windows.append(window)
-            image_metas.append(image_meta)
-        # Pack into arrays
-        molded_images = np.stack(molded_images)
-        image_metas = np.stack(image_metas)
-        windows = np.stack(windows)
-        return molded_images, image_metas, windows
-
-    def unmold_detections(self, detections, mrcnn_mask, original_image_shape,
-                          image_shape, window):
-        """Reformats the detections of one image from the format of the neural
-        network output to a format suitable for use in the rest of the
-        application.
-
-        detections: [N, (y1, x1, y2, x2, class_id, score)] in normalized coordinates
-        mrcnn_mask: [N, height, width, num_classes]
-        original_image_shape: [H, W, C] Original image shape before resizing
-        image_shape: [H, W, C] Shape of the image after resizing and padding
-        window: [y1, x1, y2, x2] Pixel coordinates of box in the image where the real
-                image is excluding the padding.
-
-        Returns:
-        boxes: [N, (y1, x1, y2, x2)] Bounding boxes in pixels
-        class_ids: [N] Integer class IDs for each bounding box
+            # Resize image_masklass IDs for each bounding box
         scores: [N] Float probability scores of the class_id
         masks: [height, width, num_instances] Instance masks
         """
@@ -2787,6 +2749,7 @@ class MaskRCNN():
         ww = wx2 - wx1  # window width
         scale = np.array([wh, ww, wh, ww])
         # Convert boxes to normalized coordinates on the window
+        # ZERO DIVISION
         boxes = np.divide(boxes - shift, scale)
         # Convert boxes to pixel coordinates on the original image
         boxes = utils.denorm_boxes(boxes, original_image_shape[:2])

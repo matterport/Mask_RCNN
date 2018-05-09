@@ -19,7 +19,7 @@ import coco
 ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
-WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
+NUM_EVALS = 10
 
 # Load Model
 config = coco.CocoConfig()
@@ -27,7 +27,7 @@ model = modellib.MaskRCNN(mode="inference", config=config, model_dir=MODEL_DIR)
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-# model_path = os.path.join(WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
+#model_path = os.path.join(MODEL_DIR, "mask_rcnn_512_cocoperson_0396.h5")
 model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)
@@ -36,9 +36,14 @@ print("> Loading weights from {}".format(model_path))
 model.load_weights(model_path, by_name=True)
 
 # Dataset
+class_names = ['person']  # all classes: None
 dataset_val = coco.CocoDataset()
-dataset_val.load_coco(COCO_DIR, "val", class_names=class_names)
+COCO = dataset_val.load_coco(COCO_DIR, "val", class_names=class_names, return_coco=True)
 dataset_val.prepare()
+print("> Running COCO evaluation on {} images.".format(NUM_EVALS))
+coco.evaluate_coco(model, dataset_val, COCO, "bbox", limit=NUM_EVALS)
+model.keras_model.save(MODEL_DIR+"/mobile_mask_rcnn_{}.h5".format(config.NAME))
+
 
 # Test on a random image
 image_id = random.choice(dataset_val.image_ids)

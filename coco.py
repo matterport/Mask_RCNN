@@ -93,18 +93,18 @@ class CocoConfig(Config):
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
-    BACKBONE_STRIDES = [2, 4, 8, 16, 32]#[4, 8, 16, 32, 64]
+    BACKBONE_STRIDES = [4, 8, 16, 32, 64]
 
     ## Resolution
-    RES_FACTOR = 4
+    RES_FACTOR = 2
     IMAGE_MAX_DIM = 1024 // RES_FACTOR
     RPN_ANCHOR_SCALES = tuple(np.divide((32, 64, 128, 256, 512),RES_FACTOR))
 
     ## Losses
     LOSS_WEIGHTS = {
-        "rpn_class_loss": 0.,
+        "rpn_class_loss": 1.,
         "rpn_bbox_loss": 1.,
-        "mrcnn_class_loss": 0.,
+        "mrcnn_class_loss": 1.,
         "mrcnn_bbox_loss": 1.,
         "mrcnn_mask_loss": 1.
     }
@@ -114,7 +114,7 @@ class CocoConfig(Config):
     VALIDATION_STEPS = 50
 
     ## Additions
-    TRAIN_BN = True
+    TRAIN_BN = False
 
 
 ############################################################
@@ -413,6 +413,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         results.extend(image_results)
 
     # Load results. This modifies results with additional attributes.
+    print (results)
     coco_results = coco.loadRes(results)
 
     # Evaluate
