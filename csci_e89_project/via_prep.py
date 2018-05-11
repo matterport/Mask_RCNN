@@ -42,8 +42,7 @@ def preprocess(dataset_dir, src_file, dst_file='/tmp/annotations.json', validate
                 for x_idx, x in enumerate(all_points_x):
                     if x > width:
                         print('Correcting all_points_x for ', a['filename'])
-                        all_poi
-                        nts_x[x_idx] = width - 1
+                        all_points_x[x_idx] = width - 1
 
                 # Make sure y points are in bound
                 all_points_y = r['shape_attributes']['all_points_y']
