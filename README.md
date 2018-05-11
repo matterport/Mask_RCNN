@@ -14,8 +14,8 @@ This is a Mask R-CNN implementation with MobileNet V1/V2 as Backbone architectur
 `tensorboard --logdir="$(pwd)"`
 - inspect your model with `notebooks/`: <br />
 `inspect_data.ipynb`,`inspect_model.ipynb`, `inspect_weights.ipynb`
-- convert keras h5 to tensorflow .pb model file run: <br />
-`python helper/keras_to_tensorflow.py -input_model_file saved_model_mrcnn_eval -output_model_file model.pb -num_outputs=7`
+- convert keras h5 to tensorflow .pb model file, in `notebooks/` run: <br />
+`export_model.ipynb`
 <br />
 <br />
 
