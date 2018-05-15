@@ -74,6 +74,9 @@ def compute_backbone_shapes(config, image_shape):
     Returns:
         [N, (height, width)]. Where N is the number of stages
     """
+    if callable(config.BACKBONE):
+        return config.COMPUTE_BACKBONE_SHAPE(image_shape)
+
     # Currently supports ResNet only
     assert config.BACKBONE in ["resnet50", "resnet101"]
     return np.array(
@@ -560,7 +563,11 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
 
     # Assign positive ROIs to GT boxes.
     positive_overlaps = tf.gather(overlaps, positive_indices)
-    roi_gt_box_assignment = tf.argmax(positive_overlaps, axis=1)
+    roi_gt_box_assignment = tf.cond(
+        tf.greater(tf.shape(positive_overlaps)[1], 0),
+        true_fn = lambda: tf.argmax(positive_overlaps, axis=1),
+        false_fn = lambda: tf.cast(tf.constant([]),tf.int64)
+    )
     roi_gt_boxes = tf.gather(gt_boxes, roi_gt_box_assignment)
     roi_gt_class_ids = tf.gather(gt_class_ids, roi_gt_box_assignment)
 
@@ -894,7 +901,8 @@ def build_rpn_model(anchor_stride, anchors_per_location, depth):
 ############################################################
 
 def fpn_classifier_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True):
+                         pool_size, num_classes, train_bn=True,
+                         fc_layers_size=1024):
     """Builds the computation graph of the feature pyramid network classifier
     and regressor heads.
 
@@ -906,6 +914,7 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
     train_bn: Boolean. Train or freeze Batch Norm layres
+    fc_layers_size: Size of the 2 FC layers
 
     Returns:
         logits: [N, NUM_CLASSES] classifier logits (before softmax)
@@ -918,11 +927,11 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_classifier")([rois, image_meta] + feature_maps)
     # Two 1024 FC layers (implemented with Conv2D for consistency)
-    x = KL.TimeDistributed(KL.Conv2D(1024, (pool_size, pool_size), padding="valid"),
+    x = KL.TimeDistributed(KL.Conv2D(fc_layers_size, (pool_size, pool_size), padding="valid"),
                            name="mrcnn_class_conv1")(x)
     x = KL.TimeDistributed(BatchNorm(), name='mrcnn_class_bn1')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-    x = KL.TimeDistributed(KL.Conv2D(1024, (1, 1)),
+    x = KL.TimeDistributed(KL.Conv2D(fc_layers_size, (1, 1)),
                            name="mrcnn_class_conv2")(x)
     x = KL.TimeDistributed(BatchNorm(), name='mrcnn_class_bn2')(x, training=train_bn)
     x = KL.Activation('relu')(x)
@@ -1879,25 +1888,29 @@ class MaskRCNN():
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
-                                         stage5=True, train_bn=config.TRAIN_BN)
+        if callable(config.BACKBONE):
+            _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
+                                                train_bn=config.TRAIN_BN)
+        else:
+            _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
+                                             stage5=True, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
-        P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
+        P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c5p5')(C5)
         P4 = KL.Add(name="fpn_p4add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
-            KL.Conv2D(256, (1, 1), name='fpn_c4p4')(C4)])
+            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c4p4')(C4)])
         P3 = KL.Add(name="fpn_p3add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p4upsampled")(P4),
-            KL.Conv2D(256, (1, 1), name='fpn_c3p3')(C3)])
+            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c3p3')(C3)])
         P2 = KL.Add(name="fpn_p2add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p3upsampled")(P3),
-            KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
+            KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c2p2')(C2)])
         # Attach 3x3 conv to all P layers to get the final feature maps.
-        P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
-        P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(P3)
-        P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
-        P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
+        P2 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p2")(P2)
+        P3 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p3")(P3)
+        P4 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p4")(P4)
+        P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (3, 3), padding="SAME", name="fpn_p5")(P5)
         # P6 is used for the 5th anchor scale in RPN. Generated by
         # subsampling from P5 with stride of 2.
         P6 = KL.MaxPooling2D(pool_size=(1, 1), strides=2, name="fpn_p6")(P5)
@@ -1919,7 +1932,7 @@ class MaskRCNN():
 
         # RPN Model
         rpn = build_rpn_model(config.RPN_ANCHOR_STRIDE,
-                              len(config.RPN_ANCHOR_RATIOS), 256)
+                              len(config.RPN_ANCHOR_RATIOS), config.TOP_DOWN_PYRAMID_SIZE)
         # Loop through pyramid layers
         layer_outputs = []  # list of lists
         for p in rpn_feature_maps:
@@ -1976,7 +1989,8 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
-                                     train_bn=config.TRAIN_BN)
+                                     train_bn=config.TRAIN_BN,
+                                     fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
             mrcnn_mask = build_fpn_mask_graph(rois, mrcnn_feature_maps,
                                               input_image_meta,
@@ -2015,7 +2029,8 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
-                                     train_bn=config.TRAIN_BN)
+                                     train_bn=config.TRAIN_BN,
+                                     fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
             # Detections
             # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in 
@@ -2222,7 +2237,7 @@ class MaskRCNN():
             # Continue from we left of. Get epoch and date from the file name
             # A sample model path might look like:
             # /path/to/logs/coco20171029T2315/mask_rcnn_coco_0001.h5
-            regex = r".*/\w+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_\w+(\d{4})\.h5"
+            regex = r".*/[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_[\w-]+(\d{4})\.h5"
             m = re.match(regex, model_path)
             if m:
                 now = datetime.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
@@ -2230,6 +2245,7 @@ class MaskRCNN():
                 # Epoch number in file is 1-based, and in Keras code it's 0-based.
                 # So, adjust for that then increment by one to start from the next epoch
                 self.epoch = int(m.group(6)) - 1 + 1
+                print('Re-starting from epoch %d' % self.epoch)
 
         # Directory for training logs
         self.log_dir = os.path.join(self.model_dir, "{}{:%Y%m%dT%H%M}".format(
