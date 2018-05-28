@@ -32,6 +32,10 @@ assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
 
 
+def fullmatch(regex, string, flags=0):
+    """Emulate python-3.4 re.fullmatch()."""
+    return re.match("(?:" + regex + r")\Z", string, flags=flags)
+
 ############################################################
 #  Utility Functions
 ############################################################
@@ -2194,7 +2198,7 @@ class MaskRCNN():
             if not layer.weights:
                 continue
             # Is it trainable?
-            trainable = bool(re.fullmatch(layer_regex, layer.name))
+            trainable = bool(fullmatch(layer_regex, layer.name))
             # Update layer. If layer is a container, update inner layer.
             if layer.__class__.__name__ == 'TimeDistributed':
                 layer.layer.trainable = trainable
@@ -2591,7 +2595,7 @@ class MaskRCNN():
         for p in parents:
             if p in checked:
                 continue
-            if bool(re.fullmatch(name, p.name)):
+            if bool(fullmatch(name, p.name)):
                 return p
             checked.append(p)
             a = self.ancestor(p, name, checked)
