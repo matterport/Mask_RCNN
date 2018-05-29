@@ -469,9 +469,10 @@ if __name__ == '__main__':
     else:
         model_path = args.model
 
-    # Load weights
-    print("Loading weights ", model_path)
-    model.load_weights(model_path, by_name=True)
+    # Load weights if model_path is defined.
+    if model_path is not None:
+        print("Loading weights ", model_path)
+        model.load_weights(model_path, by_name=True)
 
     # Train or evaluate
     if args.command == "train":
