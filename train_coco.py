@@ -6,9 +6,6 @@ written by github.com/GustavZ
 
 to use tensorboard run inside model_dir with file "events.out.tfevents.123":
 tensorboard --logdir="$(pwd)"
-
-keras h5 to tensorflow pb file:
-python keras_to_tensorflow.py -input_model_file saved_model_mrcnn_eval -output_model_file model.pb -num_outputs=7
 """
 
 ## Import Packages
@@ -43,9 +40,9 @@ model = modellib.MaskRCNN(mode="training", model_dir = MODEL_DIR, config=config)
 model.keras_model.summary()
 
 ## Weights
-#model_path = model.get_imagenet_weights()
+model_path = model.get_imagenet_weights()
 #model_path = model.find_last()[1]
-model_path = DEFAULT_WEIGHTS_DIR
+#model_path = DEFAULT_MODEL_DIR
 print("> Loading weights from {}".format(model_path))
 model.load_weights(model_path, by_name=True)
 
@@ -68,6 +65,14 @@ print("> Training Schedule: \
 
 ## Training - WarmUp
 print("> Warmup all layers")
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE / 10,
+            epochs=epochs_warmup,
+            layers='all',
+            augmentation=augmentation)
+
+## Training - WarmUp Stage
+print("> Warm Up all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
             epochs=epochs_warmup,

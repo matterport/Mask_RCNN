@@ -39,7 +39,7 @@ from mmrcnn import utils
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
-assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+assert LooseVersion(keras.__version__) >= LooseVersion('2.1.5')
 
 ## MobileNetV1 Imports
 import keras.initializers as KI
@@ -2786,6 +2786,7 @@ class MaskRCNN():
         ww = wx2 - wx1  # window width
         scale = np.array([wh, ww, wh, ww])
         # Convert boxes to normalized coordinates on the window
+        # ZERO DIVISION
         boxes = np.divide(boxes - shift, scale)
         # Convert boxes to pixel coordinates on the original image
         boxes = utils.denorm_boxes(boxes, original_image_shape[:2])

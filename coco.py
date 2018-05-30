@@ -117,7 +117,6 @@ class CocoConfig(Config):
     TRAIN_BN = True
 
 
-
 ############################################################
 #  Dataset
 ############################################################
@@ -414,6 +413,7 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         results.extend(image_results)
 
     # Load results. This modifies results with additional attributes.
+    print (results)
     coco_results = coco.loadRes(results)
 
     # Evaluate
