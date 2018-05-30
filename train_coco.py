@@ -25,10 +25,10 @@ ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
-DEFAULT_WEIGHTS_DIR = "/home/gustav/workspace/Mobile_Mask_RCNN/logs/cocoperson20180425T1415/mask_rcnn_cocoperson_0160.h5"
+DEFAULT_WEIGHTS_DIR = os.path.join(MODEL_DIR, "coco20180509T1746/mask_rcnn_coco_0110.h5")
 
 ## Dataset
-class_names = ['person']  # all classes: None
+class_names = None #['person']  # all classes: None
 dataset_train = coco.CocoDataset()
 dataset_train.load_coco(COCO_DIR, "train", class_names=class_names)
 dataset_train.prepare()
@@ -52,16 +52,33 @@ model.load_weights(model_path, by_name=True)
 ## Training - Config
 starting_epoch = model.epoch
 epoch = dataset_train.dataset_size // (config.STEPS_PER_EPOCH * config.BATCH_SIZE)
-epochs_heads = 2 * epoch + starting_epoch
-epochs_stage4 = 2 * epoch + starting_epoch
-epochs_all = 2 * epoch + starting_epoch
+epochs_warmup = 1* epoch
+epochs_heads = 7 * epoch #+ starting_epoch
+epochs_stage4 = 7 * epoch #+ starting_epoch
+epochs_all = 7 * epoch #+ starting_epoch
+epochs_breakOfDawn = 5 * epoch
 augmentation = imgaug.augmenters.Fliplr(0.5)
+print("> Training Schedule: \
+    \nwarmup: {} epochs \
+    \nheads: {} epochs \
+    \nstage4+: {} epochs \
+    \nall layers: {} epochs \
+    \ntill the break of Dawn: {} epochs".format(
+    epochs_warmup,epochs_heads,epochs_stage4,epochs_all,epochs_breakOfDawn))
+
+## Training - WarmUp
+print("> Warmup all layers")
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE / 10,
+            epochs=epochs_warmup,
+            layers='all',
+            augmentation=augmentation)
 
 ## Training - Stage 1
 print("> Training network heads")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=epochs_heads,
+            epochs=epochs_warmup + epochs_heads,
             layers='heads',
             augmentation=augmentation)
 
@@ -70,7 +87,7 @@ model.train(dataset_train, dataset_val,
 print("> Fine tune {} stage 4 and up".format(config.BACKBONE))
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=epoch_heads + epochs_stage4,
+            epochs=epochs_warmup + epochs_heads + epochs_stage4,
             layers="4+",
             augmentation=augmentation)
 
@@ -79,12 +96,15 @@ model.train(dataset_train, dataset_val,
 print("> Fine tune all layers")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=epochs_heads + epochs_stage4 + epochs_all,
+            epochs=epochs_warmup + epochs_heads + epochs_stage4 + epochs_all,
             layers='all',
             augmentation=augmentation)
 
-## Save Model
-#if not os.path.isdir(WEIGHTS_DIR):
-#    os.mkdirs(WEIGHTS_DIR)
-#model_path = os.path.join(WEIGHTS_DIR, "mobile_mask_rcnn_cocoperson.h5")
-#model.keras_model.save(model_path)
+## Training - Stage 3
+# Fine tune all layers
+print("> Fine tune all layers till the break of Dawn")
+model.train(dataset_train, dataset_val,
+            learning_rate=config.LEARNING_RATE / 100,
+            epochs=epochs_warmup + epochs_heads + epochs_stage4 + epochs_all + epochs_breakOfDawn,
+            layers='all',
+            augmentation=augmentation)

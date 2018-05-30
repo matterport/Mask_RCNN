@@ -1252,8 +1252,7 @@ def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, stride
     but with each layer wrapped in a TimeDistributed layer,
     used to build the computation graph of the mask head of the FPN.
     """
-    #channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    channel_axis = 3
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     # Depthwise
     x = KL.TimeDistributed(KL.DepthwiseConv2D(

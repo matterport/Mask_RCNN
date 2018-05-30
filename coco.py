@@ -82,39 +82,39 @@ class CocoConfig(Config):
     to the COCO dataset.
     """
     ## Give the configuration a recognizable name
-    NAME = "cocoperson"
+    NAME = "coco"
 
     ## GPU
     IMAGES_PER_GPU = 1
-    GPU_COUNT = 1
+    GPU_COUNT = 2
 
     ## Number of classes (including background)
-    NUM_CLASSES = 1 + 1
+    NUM_CLASSES = 1 + 80
 
     ## Backbone Architecture
     BACKBONE = "mobilenetv1"
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
 
     ## Resolution
-    RES_FACTOR = 4
+    RES_FACTOR = 2
     IMAGE_MAX_DIM = 1024 // RES_FACTOR
     RPN_ANCHOR_SCALES = tuple(np.divide((32, 64, 128, 256, 512),RES_FACTOR))
 
     ## Losses
     LOSS_WEIGHTS = {
-        "rpn_class_loss": 0.,
+        "rpn_class_loss": 1.,
         "rpn_bbox_loss": 1.,
-        "mrcnn_class_loss": 0.,
+        "mrcnn_class_loss": 1.,
         "mrcnn_bbox_loss": 1.,
         "mrcnn_mask_loss": 1.
     }
 
     ## Steps
-    STEPS_PER_EPOCH = 1000
+    STEPS_PER_EPOCH = 10000
     VALIDATION_STEPS = 50
 
     ## Additions
-    TRAIN_BN = False
+    TRAIN_BN = True
 
 
 
