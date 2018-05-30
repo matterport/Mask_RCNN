@@ -867,8 +867,8 @@ def norm_boxes(boxes, shape):
         [N, (y1, x1, y2, x2)] in normalized coordinates
     """
     h, w = shape
-    scale = np.array([h - 1, w - 1, h - 1, w - 1])
-    shift = np.array([0, 0, 1, 1])
+    scale = np.array([h - 1, w - 1, h - 1, w - 1]).astype(np.float32)
+    shift = np.array([0, 0, 1, 1]).astype(np.float32)
     return np.divide((boxes - shift), scale).astype(np.float32)
 
 
