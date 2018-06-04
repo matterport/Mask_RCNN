@@ -107,6 +107,12 @@ def compute_overlaps_masks(masks1, masks2):
     '''Computes IoU overlaps between two sets of masks.
     masks1, masks2: [Height, Width, instances]
     '''
+    #print("mask1: ", masks1) #DEBUGGING
+    #print("mask2: ", masks2) #DEBUGGING
+    # Condition for empty prediction
+    if not masks1.size:
+        return np.array([[0.]])
+
     # flatten masks
     masks1 = np.reshape(masks1 > .5, (-1, masks1.shape[-1])).astype(np.float32)
     masks2 = np.reshape(masks2 > .5, (-1, masks2.shape[-1])).astype(np.float32)
@@ -117,7 +123,7 @@ def compute_overlaps_masks(masks1, masks2):
     intersections = np.dot(masks1.T, masks2)
     union = area1[:, None] + area2[None, :] - intersections
     overlaps = intersections / union
-
+    #print("overlaps: ", overlaps) #DEBUGGING
     return overlaps
 
 
@@ -888,9 +894,14 @@ def norm_boxes(boxes, shape):
     Returns:
         [N, (y1, x1, y2, x2)] in normalized coordinates
     """
+    boxes = boxes.astype(np.float32)
     h, w = shape
+    #print("norm_boxes (h,w): ",h,w) #DEBUGGING
     scale = np.array([h - 1, w - 1, h - 1, w - 1])
     shift = np.array([0, 0, 1, 1])
+    #print("boxes: ", boxes) #DEBUGGING
+    #print("boxes-shift: ", boxes - shift) #DEBUGGING
+    #print("normed boxes: ", np.divide((boxes - shift), scale).astype(np.float32)) #DEBUGGING
     return np.divide((boxes - shift), scale).astype(np.float32)
 
 
@@ -905,6 +916,7 @@ def denorm_boxes(boxes, shape):
     Returns:
         [N, (y1, x1, y2, x2)] in pixel coordinates
     """
+    boxes = boxes.astype(np.float32)
     h, w = shape
     scale = np.array([h - 1, w - 1, h - 1, w - 1])
     shift = np.array([0, 0, 1, 1])
