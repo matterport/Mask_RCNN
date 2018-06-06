@@ -23,7 +23,10 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     # Continue training the last model you trained
     python3 coco.py train --dataset=/path/to/coco/ --model=last
 
-    # Run COCO evaluatoin on the last model you trained
+    # Train a new model from scratch
+    python3 coco.py train --dataset=/path/to/coco/
+
+    # Run COCO evaluation on the last model you trained
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
 """
 
@@ -412,7 +415,8 @@ if __name__ == '__main__':
                         default=DEFAULT_DATASET_YEAR,
                         metavar="<year>",
                         help='Year of the MS-COCO dataset (2014 or 2017) (default=2014)')
-    parser.add_argument('--model', required=True,
+    parser.add_argument('--model', required=False,
+                        default=None,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
@@ -456,23 +460,28 @@ if __name__ == '__main__':
     else:
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
+        if args.model is None:
+            raise ValueError("argument `model` can't be ignored when in evaluation")
 
-    # Select weights file to load
-    if args.model.lower() == "coco":
-        model_path = COCO_MODEL_PATH
-    elif args.model.lower() == "last":
-        # Find last trained weights
-        model_path = model.find_last()[1]
-    elif args.model.lower() == "imagenet":
-        # Start from ImageNet trained weights
-        model_path = model.get_imagenet_weights()
-    else:
-        model_path = args.model
+    if args.model is not None:
+        # Select weights file to load
+        if args.model.lower() == "coco":
+            model_path = COCO_MODEL_PATH
+        elif args.model.lower() == "last":
+            # Find last trained weights
+            model_path = model.find_last()[1]
+            if model_path is None:
+                raise ValueError("Can't find last trained weights.")
+        elif args.model.lower() == "imagenet":
+            # Start from ImageNet trained weights
+            model_path = model.get_imagenet_weights()
+        else:
+            model_path = args.model
 
-    # Load weights if model_path is defined.
-    if model_path is not None:
         print("Loading weights ", model_path)
         model.load_weights(model_path, by_name=True)
+    else:
+        print("Training from scratch")
 
     # Train or evaluate
     if args.command == "train":
