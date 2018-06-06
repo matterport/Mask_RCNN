@@ -462,7 +462,7 @@ if __name__ == '__main__':
         model_path = COCO_MODEL_PATH
     elif args.model.lower() == "last":
         # Find last trained weights
-        model_path = model.find_last()[1]
+        model_path = model.find_last()
     elif args.model.lower() == "imagenet":
         # Start from ImageNet trained weights
         model_path = model.get_imagenet_weights()

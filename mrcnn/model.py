@@ -2062,8 +2062,7 @@ class MaskRCNN():
         """Finds the last checkpoint file of the last trained model in the
         model directory.
         Returns:
-            log_dir: The directory where events and weights are saved
-            checkpoint_path: the path to the last checkpoint file
+            The path of the last checkpoint file
         """
         # Get directory names. Each directory corresponds to a model
         dir_names = next(os.walk(self.model_dir))[1]
@@ -2071,7 +2070,10 @@ class MaskRCNN():
         dir_names = filter(lambda f: f.startswith(key), dir_names)
         dir_names = sorted(dir_names)
         if not dir_names:
-            return None, None
+            import errno
+            raise FileNotFoundError(
+                errno.ENOENT,
+                "Could not find model directory under {}".format(self.model_dir))
         # Pick last directory
         dir_name = os.path.join(self.model_dir, dir_names[-1])
         # Find the last checkpoint
@@ -2079,9 +2081,11 @@ class MaskRCNN():
         checkpoints = filter(lambda f: f.startswith("mask_rcnn"), checkpoints)
         checkpoints = sorted(checkpoints)
         if not checkpoints:
-            return dir_name, None
+            import errno
+            raise FileNotFoundError(
+                errno.ENOENT, "Could not find weight files in {}".format(dir_name))
         checkpoint = os.path.join(dir_name, checkpoints[-1])
-        return dir_name, checkpoint
+        return checkpoint
 
     def load_weights(self, filepath, by_name=False, exclude=None):
         """Modified version of the correspoding Keras function with
