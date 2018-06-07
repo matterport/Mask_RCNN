@@ -1,5 +1,14 @@
 # Mobile Mask R-CNN
 This is a Mask R-CNN implementation with MobileNet V1/V2 as Backbone architecture to be finally able to deploy it on mobile devices such as the Nvidia Jetson TX2.
+The major changes to the original project are: <br />
+- [X] Add Mobilenet V1 and V2 as backbone options (besides ResNet 50 and 101) + dependencies in the model 
+- [X] Make the whole project py2 / py3 compatible (original only works on py3)
+- [X] Investigate Training Setup for Mobilenet V1 and implement it in `coco_train.py`
+- [X] Add a Speedhack to mold /unmold image functions
+- [X] Make the project lean and focused on COCO + direct training on passed class names (IDs before)
+- [ ] Inclue more speed up options to the Model (Light-Head RCNN)
+- [ ] Release a trained Mobile_Mask_RCNN Model
+
 
 ## Getting Started
 - install required packages (mostly over pip)
