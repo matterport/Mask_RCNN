@@ -37,8 +37,8 @@ This notebooks inspects the weights of a trained model and looks for anomalies a
 
 # Step by Step Detection
 To help with debugging and understanding the model, there are 3 notebooks 
-([inspect_data.ipynb](samples/inspect_data.ipynb), [inspect_model.ipynb](samples/inspect_model.ipynb),
-[inspect_weights.ipynb](samples/inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
+([inspect_data.ipynb](samples/coco/inspect_data.ipynb), [inspect_model.ipynb](samples/coco/inspect_model.ipynb),
+[inspect_weights.ipynb](samples/coco/inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
 
 
 
