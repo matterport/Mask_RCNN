@@ -19,6 +19,7 @@ import coco
 ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
+DEFAULT_WEIGHTS = os.path.join(ROOT_DIR, "mobile_mask_rcnn_coco.h5")
 NUM_EVALS = 10
 
 # Load Model
@@ -27,7 +28,7 @@ model = modellib.MaskRCNN(mode="inference", config=config, model_dir=MODEL_DIR)
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-#model_path = os.path.join(MODEL_DIR, "mask_rcnn_512_cocoperson_0396.h5")
+#model_path = DEFAULT_WEIGHTS
 model_path = model.find_last()[1]
 
 # Load trained weights (fill in path to trained weights here)

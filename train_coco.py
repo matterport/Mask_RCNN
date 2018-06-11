@@ -22,7 +22,7 @@ ROOT_DIR = os.getcwd()
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 COCO_DIR = os.path.join(ROOT_DIR, 'data/coco')
 WEIGHTS_DIR = os.path.join(ROOT_DIR, "weights")
-DEFAULT_WEIGHTS_DIR = os.path.join(MODEL_DIR, "coco20180509T1746/mask_rcnn_coco_0110.h5")
+DEFAULT_WEIGHTS = os.path.join(ROOT_DIR, "mobile_mask_rcnn_coco.h5")
 
 ## Dataset
 class_names = None #['person']  # all classes: None
@@ -42,7 +42,8 @@ model.keras_model.summary()
 ## Weights
 model_path = model.get_imagenet_weights()
 #model_path = model.find_last()[1]
-#model_path = DEFAULT_MODEL_DIR
+#model_path = DEFAULT_WEIGHTS
+
 print("> Loading weights from {}".format(model_path))
 model.load_weights(model_path, by_name=True)
 
