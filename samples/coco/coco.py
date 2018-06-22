@@ -31,7 +31,7 @@ import os
 import sys
 import time
 import numpy as np
-import imgaug  # https://github.com/aleju/imgaug (pip3 install imageaug)
+import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 
 # Download and install the Python COCO tools from https://github.com/waleedka/coco
 # That's a fork from the original https://github.com/pdollar/coco with a bug
@@ -462,7 +462,7 @@ if __name__ == '__main__':
         model_path = COCO_MODEL_PATH
     elif args.model.lower() == "last":
         # Find last trained weights
-        model_path = model.find_last()[1]
+        model_path = model.find_last()
     elif args.model.lower() == "imagenet":
         # Start from ImageNet trained weights
         model_path = model.get_imagenet_weights()

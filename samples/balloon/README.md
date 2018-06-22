@@ -3,12 +3,18 @@
 This is an example showing the use of Mask RCNN in a real application.
 We train the model to detect balloons only, and then we use the generated 
 masks to keep balloons in color while changing the rest of the image to
-grayscale. 
+grayscale.
+
+
+[This blog post](https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46) describes this sample in more detail.
+
+![Balloon Color Splash](/assets/balloon_color_splash.gif)
+
 
 ## Installation
 From the [Releases page](https://github.com/matterport/Mask_RCNN/releases) page:
 1. Download `mask_rcnn_balloon.h5`. Save it in the root directory of the repo (the `mask_rcnn` directory).
-2. Download `balloon_dataset.p3`. Expand it such that it's in the path `mask_rcnn/datasets/balloon/`.
+2. Download `balloon_dataset.zip`. Expand it such that it's in the path `mask_rcnn/datasets/balloon/`.
 
 ## Apply color splash using the provided weights
 Apply splash effect on an image:
