@@ -55,11 +55,19 @@ class ParallelModel(KM.Model):
         """Creates a new wrapper model that consists of multiple replicas of
         the original model placed on different GPUs.
         """
-        # Slice inputs. Slice inputs on the CPU to avoid sending a copy
-        # of the full inputs to all GPUs. Saves on bandwidth and memory.
-        input_slices = {name: tf.split(x, gpu_count)
-                        for name, x in zip(inner_model.input_names,
-                                           inner_model.inputs)}
+        def get_slice(data, i, parts):
+            shape = tf.shape(data)
+            batch_size = shape[:1]
+            input_shape = shape[1:]
+            step = batch_size // parts
+            if i == gpu_count - 1:
+                size = batch_size - step * i
+            else:
+                size = step
+            size = tf.concat([size, input_shape], axis=0)
+            stride = tf.concat([step, input_shape * 0], axis=0)
+            start = stride * i
+            return tf.slice(data, start, size)
 
         output_names = inner_model.output_names
         outputs_all = []
@@ -70,13 +78,19 @@ class ParallelModel(KM.Model):
         for i in range(gpu_count):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('tower_%d' % i):
-                    # Run a slice of inputs through this replica
-                    zipped_inputs = zip(inner_model.input_names,
-                                        inner_model.inputs)
-                    inputs = [
-                        KL.Lambda(lambda s: input_slices[name][i],
-                                  output_shape=lambda s: (None,) + s[1:])(tensor)
-                        for name, tensor in zipped_inputs]
+                    inputs = []
+                    # Retrieve a slice of the input.
+                    for x in inner_model.inputs:
+                        # In-place input splitting which is not only
+                        # 5% ~ 12% faster but also less GPU memory
+                        # duplication.
+                        with tf.device(x.device):
+                            input_shape = K.int_shape(x)[1:]
+                            slice_i = KL.Lambda(get_slice,
+                                                output_shape=input_shape,
+                                                arguments={'i': i,
+                                                           'parts': gpu_count})(x)
+                            inputs.append(slice_i)
                     # Create the model replica and get the outputs
                     outputs = inner_model(inputs)
                     if not isinstance(outputs, list):
