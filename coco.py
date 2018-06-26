@@ -115,6 +115,7 @@ class CocoConfig(Config):
 
     ## Additions
     TRAIN_BN = True
+    POST_NMS_ROIS_INFERENCE = 100
 
 
 ############################################################
