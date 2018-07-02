@@ -64,14 +64,6 @@ print("> Training Schedule: \
     \ntill the break of Dawn: {} epochs".format(
     epochs_warmup,epochs_heads,epochs_stage4,epochs_all,epochs_breakOfDawn))
 
-## Training - WarmUp
-print("> Warmup all layers")
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE / 10,
-            epochs=epochs_warmup,
-            layers='all',
-            augmentation=augmentation)
-
 ## Training - WarmUp Stage
 print("> Warm Up all layers")
 model.train(dataset_train, dataset_val,
