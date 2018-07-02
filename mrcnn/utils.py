@@ -63,7 +63,7 @@ def compute_iou(box, boxes, box_area, boxes_area):
     boxes_area: array of length boxes_count.
 
     Note: the areas are passed in rather than calculated here for
-          efficency. Calculate once in the caller to avoid duplicate work.
+    efficiency. Calculate once in the caller to avoid duplicate work.
     """
     # Calculate intersection areas
     y1 = np.maximum(box[0], boxes[:, 0])
@@ -96,9 +96,9 @@ def compute_overlaps(boxes1, boxes2):
 
 
 def compute_overlaps_masks(masks1, masks2):
-    '''Computes IoU overlaps between two sets of masks.
+    """Computes IoU overlaps between two sets of masks.
     masks1, masks2: [Height, Width, instances]
-    '''
+    """
     
     # If either set of masks is empty return empty result
     if masks1.shape[0] == 0 or masks2.shape[0] == 0:
@@ -118,7 +118,7 @@ def compute_overlaps_masks(masks1, masks2):
 
 
 def non_max_suppression(boxes, scores, threshold):
-    """Performs non-maximum supression and returns indicies of kept boxes.
+    """Performs non-maximum suppression and returns indices of kept boxes.
     boxes: [N, (y1, x1, y2, x2)]. Notice that (y2, x2) lays outside the box.
     scores: 1-D array of box scores.
     threshold: Float. IoU threshold to use for filtering.
@@ -145,10 +145,10 @@ def non_max_suppression(boxes, scores, threshold):
         # Compute IoU of the picked box with the rest
         iou = compute_iou(boxes[i], boxes[ixs[1:]], area[i], area[ixs[1:]])
         # Identify boxes with IoU over the threshold. This
-        # returns indicies into ixs[1:], so add 1 to get
-        # indicies into ixs.
+        # returns indices into ixs[1:], so add 1 to get
+        # indices into ixs.
         remove_ixs = np.where(iou > threshold)[0] + 1
-        # Remove indicies of the picked and overlapped boxes.
+        # Remove indices of the picked and overlapped boxes.
         ixs = np.delete(ixs, remove_ixs)
         ixs = np.delete(ixs, 0)
     return np.array(pick, dtype=np.int32)
@@ -356,7 +356,7 @@ class Dataset(object):
 
     def source_image_link(self, image_id):
         """Returns the path or URL to the image.
-        Override this to return a URL to the image if it's availble online for easy
+        Override this to return a URL to the image if it's available online for easy
         debugging.
         """
         return self.image_info[image_id]["path"]
