@@ -454,7 +454,7 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     if scale != 1:
         image = skimage.transform.resize(
             image, (round(h * scale), round(w * scale)),
-            order=1, mode="constant", preserve_range=True)
+            order=1, mode="constant", preserve_range=True, anti_aliasing=True)
 
     # Need padding or cropping?
     if mode == "square":
@@ -538,7 +538,7 @@ def minimize_mask(bbox, mask, mini_shape):
         if m.size == 0:
             raise Exception("Invalid bounding box with area of zero")
         # Resize with bilinear interpolation
-        m = skimage.transform.resize(m, mini_shape, order=1, mode="constant")
+        m = skimage.transform.resize(m, mini_shape, order=1, mode="constant", anti_aliasing=True)
         mini_mask[:, :, i] = np.around(m).astype(np.bool)
     return mini_mask
 
@@ -556,7 +556,7 @@ def expand_mask(bbox, mini_mask, image_shape):
         h = y2 - y1
         w = x2 - x1
         # Resize with bilinear interpolation
-        m = skimage.transform.resize(m, (h, w), order=1, mode="constant")
+        m = skimage.transform.resize(m, (h, w), order=1, mode="constant", anti_aliasing=True)
         mask[y1:y2, x1:x2, i] = np.around(m).astype(np.bool)
     return mask
 
@@ -576,7 +576,7 @@ def unmold_mask(mask, bbox, image_shape):
     """
     threshold = 0.5
     y1, x1, y2, x2 = bbox
-    mask = skimage.transform.resize(mask, (y2 - y1, x2 - x1), order=1, mode="constant")
+    mask = skimage.transform.resize(mask, (y2 - y1, x2 - x1), order=1, mode="constant", anti_aliasing=True)
     mask = np.where(mask >= threshold, 1, 0).astype(np.bool)
 
     # Put the mask in the right location.
