@@ -12,4 +12,4 @@ imgaug
 IPython[all]
 contextlib2
 lxml
-jupyterupyterPython[all]
+jupyter
