@@ -4,7 +4,7 @@ Pillow
 cython
 matplotlib
 scikit-image
-tf-nightly-gpu==1.7.0.dev20180321
+tf-nightly-gpu==1.7.0.dev20180320
 keras==2.1.0
 opencv-python
 h5py
