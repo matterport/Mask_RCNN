@@ -437,20 +437,26 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
             except ValueError:
                 ap = 0.
             ap_list.append(ap)
-            if (i + 1) % 100 == 0:
+            if (i + 1) % 1000 == 0:
                 print("{} / {}   mAP estimate: {}"
                       .format(str(i + 1).ljust(5), len(image_ids), np.mean(ap_list)))
 
-                if (i + 1) >= 200 and np.mean(ap_list) < 0.2:
-                    # mAP calculation is much more expensive than an actual
-                    # training epoch, so we bail out early if the stopping
-                    # criteria is not going to be met.
+                # Uncomment to stop mAP calculation early if it is clearly
+                # not going to reach the target. This code is not MLPerf
+                # compliant, but it can make testing much less painful.
 
-                    # TODO(vbittorf): determine if this is reasonable.
-                    print("Exiting mAP calculation early. Preliminary results are < 0.2.")
-                    return
+                # if (i + 1) >= 200 and np.mean(ap_list) < 0.2:
+                #     # mAP calculation is much more expensive than an actual
+                #     # training epoch, so we bail out early if the stopping
+                #     # criteria is not going to be met.
+                #
+                #     print("Exiting mAP calculation early. Preliminary results are < 0.2.")
+                #     return
 
-        print("Validation mAP: {:.4f}".format(np.mean(ap_list)))
+        mAP_score = np.mean(ap_list)
+        print("Validation mAP: {:.4f}".format(mAP_score))
+        if mAP_score >= 0.377:  # MLPerf target.
+            self.model.stop_training = True
 
 
 ############################################################
