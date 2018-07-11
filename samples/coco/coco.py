@@ -414,6 +414,7 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
 
     def on_epoch_end(self, epoch, logs=None):
         super().on_epoch_end(epoch, logs)
+        print("Beginning mAP calculation.")
         filepath = self.filepath.format(epoch=epoch + 1, **logs)
         if not os.path.exists(filepath):
             print("Skipping mAP calculation.")
@@ -422,7 +423,7 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
         self.mAP_eval_model.load_weights(filepath, by_name=True)
 
         ap_list = []
-        for image_id in self.mAP_dataset.image_ids:
+        for i, image_id in enumerate(self.mAP_dataset.image_ids):
             image, image_meta, gt_class_id, gt_bbox, gt_mask = \
                 modellib.load_image_gt(self.mAP_dataset, self.mAP_config, image_id, use_mini_mask=False)
             results = self.mAP_eval_model.detect([image], verbose=0)
@@ -436,6 +437,10 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
               if epoch > 0:
                 print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
             ap_list.append(AP)
+            if (i + 1) % 100 == 0:
+                print("{} / {}  running mAP: {}"
+                      .format(str(i + 1).ljust(5), len(self.mAP_dataset.image_ids), np.mean(ap_list)))
+
         print("Validation mAP: {:.4f}".format(np.mean(ap_list)))
 
 
