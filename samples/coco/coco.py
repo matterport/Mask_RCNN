@@ -431,19 +431,17 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
             results = self.mAP_eval_model.detect([image], verbose=0)
             r = results[0]
             try:
-                AP, precisions, recalls, overlaps = utils.compute_ap(
-                    gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
-                ap_list.append(AP)
+                ap, _, _, _ = utils.compute_ap(
+                    gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'],
+                    r['scores'], r['masks'])
             except ValueError:
-                AP = 0.
-                if epoch > 0:
-                    print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
-            ap_list.append(AP)
+                ap = 0.
+            ap_list.append(ap)
             if (i + 1) % 100 == 0:
-                print("{} / {}  running mAP: {}"
+                print("{} / {}   mAP estimate: {}"
                       .format(str(i + 1).ljust(5), len(image_ids), np.mean(ap_list)))
 
-                if (i + 1) >= 500 and np.mean(ap_list) < 0.2:
+                if (i + 1) >= 200 and np.mean(ap_list) < 0.2:
                     # mAP calculation is much more expensive than an actual
                     # training epoch, so we bail out early if the stopping
                     # criteria is not going to be met.
