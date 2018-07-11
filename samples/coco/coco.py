@@ -435,11 +435,20 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
             except ValueError:
                 AP = 0.
                 if epoch > 0:
-                  print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
+                    print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
             ap_list.append(AP)
             if (i + 1) % 100 == 0:
                 print("{} / {}  running mAP: {}"
                       .format(str(i + 1).ljust(5), len(self.mAP_dataset.image_ids), np.mean(ap_list)))
+
+                if (i + 1) >= 500 and np.mean(ap_list) < 0.2:
+                    # mAP calculation is much more expensive than an actual
+                    # training epoch, so we bail out early if the stopping
+                    # criteria is not going to be met.
+
+                    # TODO(vbittorf): determine if this is reasonable.
+                    print("Exiting mAP calculation early. Preliminary results are < 0.2.")
+                    return
 
         print("Validation mAP: {:.4f}".format(np.mean(ap_list)))
 
