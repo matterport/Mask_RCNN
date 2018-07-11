@@ -402,33 +402,36 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
                          save_weights_only, mode, period)
         assert data_dir
         assert model_dir
-        # self.mAP_dataset = CocoDataset()
-        # self.mAP_dataset.load_coco(data_dir, "val")
-        # self.mAP_dataset.prepare()
-        # self.mAP_config = CocoConfig()
-        # self.mAP_config.IMAGES_PER_GPU = 1
-        # self.mAP_config.GPU_COUNT = 1
-        # self.mAP_config.BATCH_SIZE = 1
-        # self.mAP_eval_model = modellib.MaskRCNN(
-        #     mode="inference", model_dir=model_dir, config=self.mAP_config)
+        self.mAP_dataset = CocoDataset()
+        self.mAP_dataset.load_coco(data_dir, "val")
+        self.mAP_dataset.prepare()
+        self.mAP_config = CocoConfig()
+        self.mAP_config.IMAGES_PER_GPU = 1
+        self.mAP_config.GPU_COUNT = 1
+        self.mAP_config.BATCH_SIZE = 1
+        self.mAP_eval_model = modellib.MaskRCNN(
+            mode="inference", model_dir=model_dir, config=self.mAP_config)
 
     def on_epoch_end(self, epoch, logs=None):
         super().on_epoch_end(epoch, logs)
-        print(os.listdir(self.filepath))
+        filepath = self.filepath.format(epoch=epoch + 1, **logs)
+        if not os.path.exists(filepath):
+            print("Skipping mAP calculation.")
+            return
 
-    # def on_epoch_end(self, epoch, logs=None):
-    #     self.eval_model.load_weights(self.eval_model.find_last(), by_name=True)
-    #     ap_list = []
-    #     for image_id in self.dataset.image_ids:
-    #         image, image_meta, gt_class_id, gt_bbox, gt_mask = \
-    #             modellib.load_image_gt(self.dataset, self.config, image_id, use_mini_mask=False)
-    #         # info = dataset.image_info[image_id]
-    #         results = self.eval_model.detect([image], verbose=1)
-    #         r = results[0]
-    #         AP, precisions, recalls, overlaps = utils.compute_ap(
-    #             gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
-    #         ap_list.append(AP)
-    #     print("Validation mAP: {}".format(np.mean(ap_list)))
+        self.mAP_eval_model.load_weights(filepath, by_name=True)
+
+        ap_list = []
+        for image_id in self.mAP_dataset.image_ids[:10]:
+            image, image_meta, gt_class_id, gt_bbox, gt_mask = \
+                modellib.load_image_gt(self.mAP_dataset, self.mAP_config, image_id, use_mini_mask=False)
+            print(image_id, type(image), image.shape)
+            results = self.mAP_eval_model.detect([image], verbose=0)
+            r = results[0]
+            AP, precisions, recalls, overlaps = utils.compute_ap(
+                gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
+            ap_list.append(AP)
+        print("Validation mAP: {}".format(np.mean(ap_list)))
 
 
 ############################################################
