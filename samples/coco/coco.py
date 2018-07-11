@@ -43,6 +43,7 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
+import keras
 import zipfile
 import urllib.request
 import shutil
@@ -80,8 +81,10 @@ class CocoConfig(Config):
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 2
 
-    # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
+    # Uncomment to train on multi GPUs (default is 1)
+    from tensorflow.python.client import device_lib
+    local_device_protos = device_lib.list_local_devices()
+    GPU_COUNT = len([x.name for x in local_device_protos if x.device_type == 'GPU'])
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 80  # COCO has 80 classes
@@ -391,6 +394,34 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     print("Total time: ", time.time() - t_start)
 
 
+class mAPCallback(keras.callbacks.Callback):
+    def __init__(self, model_dir, data_dir):
+        super().__init__()
+        self.dataset = CocoDataset()
+        self.dataset.load_coco(data_dir, "val")
+        self.dataset.prepare()
+        self.config = CocoConfig()
+        self.config.IMAGES_PER_GPU = 1
+
+        # TODO (robieta): use all GPUs
+        self.config.GPU_COUNT = 1
+        self.eval_model = modellib.MaskRCNN(
+            mode="inference", model_dir=model_dir, config=self.config)
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.eval_model.load_weights(self.eval_model.find_last(), by_name=True)
+        ap_list = []
+        for image_id in self.dataset.image_ids:
+            image, image_meta, gt_class_id, gt_bbox, gt_mask = \
+                modellib.load_image_gt(self.dataset, self.config, image_id, use_mini_mask=False)
+            # info = dataset.image_info[image_id]
+            results = self.eval_model.detect([image], verbose=1)
+            r = results[0]
+            AP, precisions, recalls, overlaps = utils.compute_ap(
+                gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
+            ap_list.append(AP)
+        print("Validation mAP: {}".format(np.mean(ap_list)))
+
 ############################################################
 #  Training
 ############################################################
@@ -492,6 +523,7 @@ if __name__ == '__main__':
         augmentation = imgaug.augmenters.Fliplr(0.5)
 
         # *** This training schedule is an example. Update to your needs ***
+        map_callback = mAPCallback(model_dir=args.logs, data_dir=args.dataset)
 
         # Training - Stage 1
         print("Training network heads")
@@ -499,7 +531,8 @@ if __name__ == '__main__':
                     learning_rate=config.LEARNING_RATE,
                     epochs=40,
                     layers='heads',
-                    augmentation=augmentation)
+                    augmentation=augmentation,
+                    extra_callbacks=[map_callback],)
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
@@ -508,7 +541,8 @@ if __name__ == '__main__':
                     learning_rate=config.LEARNING_RATE,
                     epochs=120,
                     layers='4+',
-                    augmentation=augmentation)
+                    augmentation=augmentation,
+                    extra_callbacks=[map_callback],)
 
         # Training - Stage 3
         # Fine tune all layers
@@ -517,7 +551,8 @@ if __name__ == '__main__':
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=160,
                     layers='all',
-                    augmentation=augmentation)
+                    augmentation=augmentation,
+                    extra_callbacks=[map_callback],)
 
     elif args.command == "evaluate":
         # Validation dataset
