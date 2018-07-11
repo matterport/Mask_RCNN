@@ -423,7 +423,9 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
         self.mAP_eval_model.load_weights(filepath, by_name=True)
 
         ap_list = []
-        for i, image_id in enumerate(self.mAP_dataset.image_ids):
+        image_ids = [i for i in self.mAP_dataset.image_ids]
+        np.random.shuffle(image_ids)
+        for i, image_id in enumerate(image_ids):
             image, image_meta, gt_class_id, gt_bbox, gt_mask = \
                 modellib.load_image_gt(self.mAP_dataset, self.mAP_config, image_id, use_mini_mask=False)
             results = self.mAP_eval_model.detect([image], verbose=0)
@@ -439,7 +441,7 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
             ap_list.append(AP)
             if (i + 1) % 100 == 0:
                 print("{} / {}  running mAP: {}"
-                      .format(str(i + 1).ljust(5), len(self.mAP_dataset.image_ids), np.mean(ap_list)))
+                      .format(str(i + 1).ljust(5), len(image_ids), np.mean(ap_list)))
 
                 if (i + 1) >= 500 and np.mean(ap_list) < 0.2:
                     # mAP calculation is much more expensive than an actual
