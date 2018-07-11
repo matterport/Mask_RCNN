@@ -2266,7 +2266,7 @@ class MaskRCNN():
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, extra_callbacks=None):
+              augmentation=None, custom_checkpointer=None, custom_checkpoint_kwargs=None):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2318,13 +2318,15 @@ class MaskRCNN():
                                        batch_size=self.config.BATCH_SIZE)
 
         # Callbacks
-        extra_callbacks = extra_callbacks or []
+        checkpointer = custom_checkpointer or keras.callbacks.ModelCheckpoint
+        custom_checkpoint_kwargs = custom_checkpoint_kwargs or {}
         callbacks = [
-            keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=0, write_graph=True, write_images=False),
-            keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
-        ] + extra_callbacks
+            keras.callbacks.TensorBoard(
+                log_dir=self.log_dir, histogram_freq=0, write_graph=True,
+                write_images=False),
+            checkpointer(self.checkpoint_path, verbose=0,
+                         save_weights_only=True, **custom_checkpoint_kwargs),
+        ]
 
         # Train
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
