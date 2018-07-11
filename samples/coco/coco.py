@@ -429,13 +429,13 @@ class mAPCallback(keras.callbacks.ModelCheckpoint):
             results = self.mAP_eval_model.detect([image], verbose=0)
             r = results[0]
             try:
-              AP, precisions, recalls, overlaps = utils.compute_ap(
-                  gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
-              ap_list.append(AP)
+                AP, precisions, recalls, overlaps = utils.compute_ap(
+                    gt_bbox, gt_class_id, gt_mask, r['rois'], r['class_ids'], r['scores'], r['masks'])
+                ap_list.append(AP)
             except ValueError:
-              AP = 0.
-              if epoch > 0:
-                print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
+                AP = 0.
+                if epoch > 0:
+                  print("Failed to compute mAP for image ID {}. Failures only expected in the first epoch".format(image_id))
             ap_list.append(AP)
             if (i + 1) % 100 == 0:
                 print("{} / {}  running mAP: {}"
