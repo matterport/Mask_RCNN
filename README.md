@@ -14,7 +14,7 @@ The repository includes:
 * Example of training on your own dataset
 
 
-The code is documented and designed to be easy to extend. If you use it in your research, please consider referencing this repository. If you work on 3D vision, you might find our recently released [Matterport3D](https://matterport.com/blog/2017/09/20/announcing-matterport3d-research-dataset/) dataset useful as well.
+The code is documented and designed to be easy to extend. If you use it in your research, please consider citing this repository (bibtex below). If you work on 3D vision, you might find our recently released [Matterport3D](https://matterport.com/blog/2017/09/20/announcing-matterport3d-research-dataset/) dataset useful as well.
 This dataset was created from 3D-reconstructed spaces captured by our customers who agreed to make them publicly available for academic use. You can see more examples [here](https://matterport.com/gallery/).
 
 # Getting Started
@@ -140,6 +140,19 @@ size. It might be related to differences between how Caffe and TensorFlow comput
 gradients (sum vs mean across batches and GPUs). Or, maybe the official model uses gradient
 clipping to avoid this issue. We do use gradient clipping, but don't set it too aggressively.
 We found that smaller learning rates converge faster anyway so we go with that.
+
+## Citation
+Use this bibtex to cite this repository:
+```
+@misc{matterport_maskrcnn_2017,
+  title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
+  author={Abdulla, Waleed},
+  year={2017},
+  publisher={Github},
+  journal={GitHub repository},
+  howpublished={\url{https://github.com/matterport/Mask_RCNN}},
+}
+```
 
 ## Contributing
 Contributions to this repository are welcome. Examples of things you can contribute:
