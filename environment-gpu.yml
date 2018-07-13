@@ -3,7 +3,7 @@ channels:
     - defaults
     - conda-forge
 dependencies:
-    - python=3.*
+    - python=3.6.*
     - matplotlib
     - numpy
     - opencv
@@ -14,9 +14,10 @@ dependencies:
     - jupyter
     - pandas
     - imageio
-    - tensorflow-gpu=1.8.*
+    - tensorflow-gpu=1.7.*
     - keras>=2.2.0
     - cython
+    - pytest
     - pip:
         - imgaug
         - git+https://github.com/waleedka/coco.git#subdirectory=PythonAPI
