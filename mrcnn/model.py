@@ -2259,9 +2259,22 @@ class MaskRCNN():
         if model_path:
             # Continue from we left of. Get epoch and date from the file name
             # A sample model path might look like:
-            # /path/to/logs/coco20171029T2315/mask_rcnn_coco_0001.h5
-            regex = r".*/[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_[\w-]+(\d{4})\.h5"
-            m = re.match(regex, model_path)
+            # /path/to/logs/coco20171029T2315/mask_rcnn_coco_0001.h5 (Linux)
+            # \path\to\logs\coco20171029T2315\mask_rcnn_coco_0001.h5 (Windows)
+
+            regex_linux = r".*/[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_[\w-]+(\d{4})\.h5"
+            m_linux = re.match(regex_linux, model_path)
+
+            regex_windows = r".*\\[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})\\mask\_rcnn\_[\w-]+(\d{4})\.h5"
+            m_windows = re.match(regex_windows, model_path)
+
+            if m_linux:
+                m = m_linux
+            elif m_windows:
+                m = m_windows
+            else:
+                m = False
+
             if m:
                 now = datetime.datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
                                         int(m.group(4)), int(m.group(5)))
