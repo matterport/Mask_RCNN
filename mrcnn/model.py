@@ -1955,7 +1955,6 @@ class MaskRCNN():
         # RPN Model
         rpn = build_rpn_model(config.RPN_ANCHOR_STRIDE,
                               len(config.RPN_ANCHOR_RATIOS), config.TOP_DOWN_PYRAMID_SIZE, use_activation)
-
         # Loop through pyramid layers
         layer_outputs = []  # list of lists
         for p in rpn_feature_maps:
