@@ -45,8 +45,8 @@ def log(text, array=None):
         text = text.ljust(25)
         text += ("shape: {:20}  min: {:10.5f}  max: {:10.5f}  {}".format(
             str(array.shape),
-            array.min() if array.size else "",
-            array.max() if array.size else "",
+            array.min() if array.size else 0,
+            array.max() if array.size else 0,
             array.dtype))
     print(text)
 
