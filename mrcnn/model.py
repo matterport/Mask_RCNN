@@ -1843,6 +1843,11 @@ class MaskRCNN():
         self.model_dir = model_dir
         self.set_log_dir()
         self.keras_model = self.build(mode=mode, config=config)
+        if config.NUM_INTRA > 0 and config.NUM_INTER > 0:
+            session_config = tf.ConfigProto(intra_op_parallelism_threads=config.NUM_INTRA,\
+                     inter_op_parallelism_threads=config.NUM_INTER)
+            session = tf.Session(config=session_config)
+            K.set_session(session)
 
     def build(self, mode, config):
         """Build Mask R-CNN architecture.

@@ -405,6 +405,14 @@ if __name__ == '__main__':
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'evaluate' on MS COCO")
+    parser.add_argument("--num_intra_threads", required=False,
+                        default=56,
+                        metavar="<num intra threads>",
+                        help="Num intra threads (default=56)")
+    parser.add_argument("--num_inter_threads", required=False,
+                        default=1,
+                        metavar="<num inter threads>",
+                        help="Num inter threads (default=1)")
     parser.add_argument('--dataset', required=True,
                         metavar="/path/to/coco/",
                         help='Directory of the MS-COCO dataset')
@@ -447,6 +455,8 @@ if __name__ == '__main__':
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
         config = InferenceConfig()
+    config.NUM_INTRA = int(args.num_intra_threads)
+    config.NUM_INTER = int(args.num_inter_threads)
     config.display()
 
     # Create model

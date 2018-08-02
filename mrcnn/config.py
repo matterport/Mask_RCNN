@@ -203,6 +203,11 @@ class Config(object):
     # Gradient norm clipping
     GRADIENT_CLIP_NORM = 5.0
 
+    # For num_intra_threads/num_inter_threads.
+    # Use default settings if no change for value 0.
+    NUM_INTRA = 0
+    NUM_INTER = 0
+
     def __init__(self):
         """Set values of computed attributes."""
         # Effective batch size
