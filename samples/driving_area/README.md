@@ -43,9 +43,9 @@ python3 driving_area.py detect --weights=/path/to/mask_rcnn/mask_rcnn_driveable.
 
 
 ## Run Jupyter notebooks
-Open the `inspect_data.ipynb` or `inspect_model.ipynb` Jupter notebooks. You can use these notebooks to explore the dataset and run through the detection pipelie step by step.
+Open the [inspect_driving_model](inspect_driving_model.ipynb) Jupter notebook. You can use the notebooks to run through the detection pipelie step by step.
 
-## Train the Balloon model
+## Train the model
 
 Train a new model starting from pre-trained COCO weights
 ```
