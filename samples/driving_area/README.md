@@ -3,7 +3,7 @@
 This is an example showing the use of Mask RCNN in a real application. In this application, we show how a Mask R-CNN model can be used to train and detect driveable regions from dashcam/car camera footage. 
 
 
-![Driveable Area Detection GIF](/assets/driving_area.gif)
+![Driveable Area Detection GIF](/assets/driving_area_0.gif)
 
 A high definition video of the above gif can be found [here](https://www.youtube.com/watch?v=NFeXQhzYN8Q&feature=youtu.be).
 
