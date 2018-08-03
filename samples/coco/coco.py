@@ -406,13 +406,13 @@ if __name__ == '__main__':
                         metavar="<command>",
                         help="'train' or 'evaluate' on MS COCO")
     parser.add_argument("--num_intra_threads", required=False,
-                        default=56,
+                        default=0,
                         metavar="<num intra threads>",
-                        help="Num intra threads (default=56)")
+                        help="Num intra threads (default=0)")
     parser.add_argument("--num_inter_threads", required=False,
-                        default=1,
+                        default=0,
                         metavar="<num inter threads>",
-                        help="Num inter threads (default=1)")
+                        help="Num inter threads (default=0)")
     parser.add_argument('--dataset', required=True,
                         metavar="/path/to/coco/",
                         help='Directory of the MS-COCO dataset')
