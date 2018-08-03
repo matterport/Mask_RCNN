@@ -3,7 +3,19 @@
 This is an example showing the use of Mask RCNN in a real application. In this application, we show how a Mask R-CNN model can be used to train and detect driveable regions from dashcam/car camera footage. 
 
 
-![Driveable Area Detection](/assets/driving_area.gif)
+![Driveable Area Detection GIF](/assets/driving_area.gif)
+
+A high definition video of the above gif can be found [here](https://www.youtube.com/watch?v=NFeXQhzYN8Q&feature=youtu.be).
+
+A few of the sample inferences are shown below.
+
+![Driveable Area Detection 1](/assets/driving_area_1.png)
+
+![Driveable Area Detection 2](/assets/driving_area_2.png)
+
+![Driveable Area Detection 3](/assets/driving_area_3.png)
+
+![Driveable Area Detection 4](/assets/driving_area_4.png)
 
 
 ## Dataset
@@ -14,6 +26,7 @@ This project uses the [BDD Dataset](http://bdd-data.berkeley.edu/). After downlo
 
 Here `${DATA_DIR}` is the root/parent directory for the dataset which will be passed into the training script as an argument.
 
+* _Note_:The BDD Dataset is explicitly non-commercial/research only license and all the above images/assets are therefore licensed under the same terms. Please refer to the original license when downloading the dataset. 
 
 ## Apply Driveable Area Filter
 Apply on an image:
