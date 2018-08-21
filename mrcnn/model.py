@@ -2283,7 +2283,6 @@ class MaskRCNN():
             self.config.NAME.lower()))
         self.checkpoint_path = self.checkpoint_path.replace(
             "*epoch*", "{epoch:04d}")
-        print('the log_dir and checkpoint path is ', self.log_dir, self.checkpoint_path)
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
               augmentation=None, custom_callbacks=None, no_augmentation_sources=None):
