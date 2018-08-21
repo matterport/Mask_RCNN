@@ -24,7 +24,7 @@ class Config(object):
     # experiment is running.
     NAME = None  # Override in sub-classes
 
-    # NUMBER OF GPUs to use. For CPU training, use 1
+    # NUMBER OF GPUs to use.
     GPU_COUNT = 1
 
     # Number of images to train with on each GPU. A 12GB GPU can typically
