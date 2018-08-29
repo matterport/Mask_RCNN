@@ -1,33 +1,40 @@
-# Mask R-CNN for Detection and Segmentation of Defects from XRay images
+# Detection and Segmentation of Manufacturing Defects using X-Ray Images
 
-This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
+This project uses the  [Mask R-CNN](https://arxiv.org/abs/1703.06870) framework to automatically detect casting defects in X-Ray images.
+The defect detection system is trained and tested on the [GDXray dataset](dmery.ing.puc.cl/index.php/material/gdxray/). For more details, read our paper:
 
-![Instance Segmentation Sample](assets/street.png)
+M. Ferguson, R. Ak, S. Jeong and K. H. Law, "[Detection and Segmentation of Manufacturing Defects with Convolutional Neural Networks and Transfer Learning](https://arxiv.org/pdf/1808.02518.pdf)", Smart and Sustainable Manufacturing Systems. 2018.
 
-The repository includes:
-* Source code of Mask R-CNN built on FPN and ResNet101.
-* Training code for MS COCO
-* Pre-trained weights for MS COCO
-* Jupyter notebooks to visualize the detection pipeline at every step
-* ParallelModel class for multi-GPU training
-* Evaluation on MS COCO metrics (AP)
-* Example of training on your own dataset
+![Instance Segmentation Sample](assets/detection.png)
 
 
 # Getting Started
+Start by cloning this dataset and downloading the GDXray dataset.
+## Training on GDXray Casting Set
 
-## Training on GDXray
-```python
-python3 gdxray.py --dataset=~/data/GDXray --subset=Castings --model=mask_rcnn_coco.h5 --logs=logs/gdxray --download=True
+```sh
+# Python 3.6
+python gdxray.py \
+--dataset=~/data/GDXray \
+--subset=Castings \
+--model=mask_rcnn_coco.h5 \
+--logs=logs/gdxray \
+--download=True
 ```
 
-* [demo.ipynb](/demo.ipynb) Is the easiest way to start. It shows an example of using a model pre-trained on MS COCO to segment objects in your own images.
-It includes code to run object detection and instance segmentation on arbitrary images.
+## Evaluating on GDXray Casting Set
 
-* [train_shapes.ipynb](train_shapes.ipynb) shows how to train Mask R-CNN on your own dataset. This notebook introduces a toy dataset (Shapes) to demonstrate training on a new dataset.
+```sh
+# Python 3.6
+python gdxray.py \
+--evaluate=True \
+--dataset=~/data/GDXray \
+--subset=Castings \
+--logs=logs/gdxray
+```
 
-* ([model.py](model.py), [utils.py](utils.py), [config.py](config.py)): These files contain the main Mask RCNN implementation. 
-
+## Inspecting the Model
+The iPython notebooks are a great way of inspecting the model results:
 
 * [inspect_data.ipynb](/inspect_data.ipynb). This notebook visualizes the different pre-processing steps
 to prepare the training data.
@@ -37,13 +44,15 @@ to prepare the training data.
 * [inspect_weights.ipynb](/inspect_weights.ipynb)
 This notebooks inspects the weights of a trained model and looks for anomalies and odd patterns.
 
+Run the notebook like this:
+```sh
+jupyter notebook inspect_model.ipynb
+```
 
 # Step by Step Detection
 To help with debugging and understanding the model, there are 3 notebooks 
 ([inspect_data.ipynb](inspect_data.ipynb), [inspect_model.ipynb](inspect_model.ipynb),
 [inspect_weights.ipynb](inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
-
-
 
 ## 1. Anchor sorting and filtering
 Visualizes every step of the first stage Region Proposal Network and displays positive and negative anchors along with anchor box refinement.
@@ -62,69 +71,6 @@ Examples of generated masks. These then get scaled and placed on the image in th
 Often it's useful to inspect the activations at different layers to look for signs of trouble (all zeros or random noise).
 
 ![](assets/detection_activations.png)
-
-## 5. Weight Histograms
-Another useful debugging tool is to inspect the weight histograms. These are included in the inspect_weights.ipynb notebook.
-
-![](assets/detection_histograms.png)
-
-## 6. Logging to TensorBoard
-TensorBoard is another great debugging and visualization tool. The model is configured to log losses and save weights at the end of every epoch.
-
-![](assets/detection_tensorboard.png)
-
-## 6. Composing the different pieces into a final result
-
-![](assets/detection_final.png)
-
-
-# Training on MS COCO
-We're providing pre-trained weights for MS COCO to make it easier to start. You can
-use those weights as a starting point to train your own variation on the network.
-Training and evaluation code is in coco.py. You can import this
-module in Jupyter notebook (see the provided notebooks for examples) or you
-can run it directly from the command line as such:
-
-```
-# Train a new model starting from pre-trained COCO weights
-python3 coco.py train --dataset=/path/to/coco/ --model=coco
-
-# Train a new model starting from ImageNet weights
-python3 coco.py train --dataset=/path/to/coco/ --model=imagenet
-
-# Continue training a model that you had trained earlier
-python3 coco.py train --dataset=/path/to/coco/ --model=/path/to/weights.h5
-
-# Continue training the last model you trained. This will find
-# the last trained weights in the model directory.
-python3 coco.py train --dataset=/path/to/coco/ --model=last
-```
-
-You can also run the COCO evaluation code with:
-```
-# Run COCO evaluation on the last trained model
-python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
-```
-
-The training schedule, learning rate, and other parameters should be set in coco.py.
-
-
-# Training on Your Own Dataset
-To train the model on your own dataset you'll need to sub-class two classes:
-
-```Config```
-This class contains the default configuration. Subclass it and modify the attributes you need to change.
-
-```Dataset```
-This class provides a consistent way to work with any dataset. 
-It allows you to use new datasets for training without having to change 
-the code of the model. It also supports loading multiple datasets at the
-same time, which is useful if the objects you want to detect are not 
-all available in one dataset. 
-
-The ```Dataset``` class itself is the base class. To use it, create a new
-class that inherits from it and adds functions specific to your dataset.
-See the base `Dataset` class in utils.py and examples of extending it in train_shapes.ipynb and coco.py.
 
 ## Differences from the Official Paper
 This implementation follows the Mask RCNN paper for the most part, but there are a few cases where we deviated in favor of code simplicity and generalization. These are some of the differences we're aware of. If you encounter other differences, please do let us know.
@@ -145,15 +91,6 @@ We found that smaller learning rates converge faster anyway so we go with that.
 
 * **Anchor Strides:** The lowest level of the pyramid has a stride of 4px relative to the image, so anchors are created at every 4 pixel intervals. To reduce computation and memory load we adopt an anchor stride of 2, which cuts the number of anchors by 4 and doesn't have a significant effect on accuracy.
 
-## Contributing
-Contributions to this repository are welcome. Examples of things you can contribute:
-* Speed Improvements. Like re-writing some Python code in TensorFlow or Cython.
-* Training on other datasets.
-* Accuracy Improvements.
-* Visualizations and examples.
-
-You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
-
 ## Requirements
 * Python 3.4+
 * TensorFlow 1.3+
@@ -161,27 +98,6 @@ You can also [join our team](https://matterport.com/careers/) and help us build 
 * Jupyter Notebook
 * Numpy, skimage, scipy, Pillow, cython, h5py
 
-### MS COCO Requirements:
-To train or test on MS COCO, you'll also need:
-* pycocotools (installation instructions below)
-* [MS COCO Dataset](http://cocodataset.org/#home)
-* Download the 5K [minival](https://dl.dropboxusercontent.com/s/o43o90bna78omob/instances_minival2014.json.zip?dl=0)
-  and the 35K [validation-minus-minival](https://dl.dropboxusercontent.com/s/s3tw5zcg7395368/instances_valminusminival2014.json.zip?dl=0)
-  subsets. More details in the original [Faster R-CNN implementation](https://github.com/rbgirshick/py-faster-rcnn/blob/master/data/README.md).
-
-If you use Docker, the code has been verified to work on
-[this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
-
-
-## Installation
-1. Clone this repository
-2. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
-3. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
-
-    * Linux: https://github.com/waleedka/coco
-    * Windows: https://github.com/philferriere/cocoapi.
-    You must have the Visual C++ 2015 build tools on your path (see the repo for additional details)
-
-## More Examples
-![Sheep](assets/sheep.png)
-![Donuts](assets/donuts.png)
+## Contributors
+* Max Ferguson: [@maxkferg](https://github.com/maxkferg)
+* Stanford Engineering Informatics Group: [eil.stanford.edu](http://eil.stanford.edu/index.html)
