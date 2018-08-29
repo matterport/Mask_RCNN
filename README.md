@@ -98,6 +98,14 @@ We found that smaller learning rates converge faster anyway so we go with that.
 * Jupyter Notebook
 * Numpy, skimage, scipy, Pillow, cython, h5py
 
+## More examples
+Detection of casting defects in a jet engine blade:
+![Jet Blade Segmentation Sample](assets/jet-blade-defects.png)
+
+Segmentation of defects in a manufacturing weld:
+![Weld Segmentation Sample](assets/weld-defects.png)
+
+
 ## Contributors
 * Max Ferguson: [@maxkferg](https://github.com/maxkferg)
 * Stanford Engineering Informatics Group: [eil.stanford.edu](http://eil.stanford.edu/index.html)
