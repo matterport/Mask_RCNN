@@ -56,10 +56,12 @@ To help with debugging and understanding the model, there are 3 notebooks
 
 ## 1. Anchor sorting and filtering
 Visualizes every step of the first stage Region Proposal Network and displays positive and negative anchors along with anchor box refinement.
+
 ![](assets/detection_anchors.png)
 
 ## 2. Bounding Box Refinement
 This is an example of final detection boxes (dotted lines) and the refinement applied to them (solid lines) in the second stage.
+
 ![](assets/detection_refinement.png)
 
 ## 3. Mask Generation
@@ -101,9 +103,11 @@ We found that smaller learning rates converge faster anyway so we go with that.
 
 ## More examples
 Detection of casting defects in a jet engine blade:
+
 ![Jet Blade Segmentation Sample](assets/jet-blade-defects.png)
 
 Segmentation of defects in a manufacturing weld:
+
 ![Weld Segmentation Sample](assets/weld-defects.png)
 
 
