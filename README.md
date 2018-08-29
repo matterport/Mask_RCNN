@@ -9,7 +9,8 @@ M. Ferguson, R. Ak, S. Jeong and K. H. Law, "[Detection and Segmentation of Manu
 
 
 # Getting Started
-Start by cloning this dataset and downloading the GDXray dataset.
+Start by cloning this repository and downloading the GDXray dataset.
+
 ## Training on GDXray Casting Set
 
 ```sh
