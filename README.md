@@ -92,8 +92,8 @@ We found that smaller learning rates converge faster anyway so we go with that.
 * **Anchor Strides:** The lowest level of the pyramid has a stride of 4px relative to the image, so anchors are created at every 4 pixel intervals. To reduce computation and memory load we adopt an anchor stride of 2, which cuts the number of anchors by 4 and doesn't have a significant effect on accuracy.
 
 ## Requirements
-* Python 3.4+
-* TensorFlow 1.3+
+* Python 3.6+
+* TensorFlow 1.6+
 * Keras 2.0.8+
 * Jupyter Notebook
 * Numpy, skimage, scipy, Pillow, cython, h5py
