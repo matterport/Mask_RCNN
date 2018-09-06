@@ -2262,10 +2262,7 @@ class MaskRCNN():
 	    # \path\to\logs\coco20171029T2315\mask_rcnn_coco_0001.h5 (Windows)
 	    # /path/to/logs/coco20171029T2315/mask_rcnn_coco_0001.h5 (Linux)
 
-            if os.name is 'nt':
-                regex = r".*\\[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})\\mask\_rcnn\_[\w-]+(\d{4})\.h5"
-            else:
-                regex = r".*/[\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/mask\_rcnn\_[\w-]+(\d{4})\.h5"
+	    regex = r".*[/\\][\w-]+(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})[/\\]mask\_rcnn\_[\w-]+(\d{4})\.h5"
 
             m = re.match(regex, model_path)
             if m:
