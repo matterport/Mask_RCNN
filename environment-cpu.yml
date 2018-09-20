@@ -1,0 +1,24 @@
+name: mask_rcnn_cpu
+channels:
+    - defaults
+    - conda-forge
+dependencies:
+    - python=3.6.*
+    - matplotlib
+    - numpy
+    - opencv
+    - pillow
+    - scipy
+    - scikit-image
+    - h5py
+    - jupyter
+    - pandas
+    - imageio
+    - tensorflow=1.7.*
+    - keras>=2.2.0
+    - cython
+    - pytest
+    - pip:
+        - imgaug
+        - git+https://github.com/waleedka/coco.git#subdirectory=PythonAPI
+        - importlib
