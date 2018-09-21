@@ -205,6 +205,9 @@ class Config(object):
 
     # For num_intra_threads/num_inter_threads.
     # Use default settings if no change for value 0.
+    # For intra_op_parallelism_threads: Nodes that can use multiple threads to parallelize
+    #     their execution will schedule the individual pieces into this pool.
+    # For inter_op_parallelism_threads: All ready nodes are scheduled in this pool.
     NUM_INTRA = 0
     NUM_INTER = 0
 
