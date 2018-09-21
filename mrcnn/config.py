@@ -210,6 +210,9 @@ class Config(object):
         """Set values of computed attributes."""
         # Effective batch size
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+        
+        # Determine IMAGE_CHANNEL_COUNT based on the number of elements of MEAN_PIXEL
+        self.IMAGE_CHANNEL_COUNT = self.MEAN_PIXEL.size
 
         # Input image size
         if self.IMAGE_RESIZE_MODE == "crop":
