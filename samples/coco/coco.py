@@ -48,7 +48,7 @@ import urllib.request
 import shutil
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../../")
+ROOT_DIR = os.getcwd()
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -425,9 +425,7 @@ if __name__ == '__main__':
                         help='Images to use for evaluation (default=500)')
     parser.add_argument('--download', required=False,
                         default=False,
-                        metavar="<True|False>",
-                        help='Automatically download and unzip MS-COCO files (default=False)',
-                        type=bool)
+                        action='store_true')
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
