@@ -222,7 +222,8 @@ A proof of concept project by [Esri](https://www.esri.com/), in collaboration wi
 ![3D Building Reconstruction](assets/project_3dbuildings.png)
 
 ### [Usiigaci: Label-free Cell Tracking in Phase Contrast Microscopy](https://github.com/oist/usiigaci)
-A project from Japan to automatically track cells in a microfluidics platform. Paper is pending, but the source code is released already.
+A project from Japan to automatically track cells in a microfluidics platform. Paper is pending, but the source code is released.
+
 ![](assets/project_usiigaci1.gif) ![](assets/project_usiigaci2.gif)
 
 ### [Characterization of Arctic Ice-Wedge Polygons in Very High Spatial Resolution Aerial Imagery](http://www.mdpi.com/2072-4292/10/9/1487)
