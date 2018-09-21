@@ -609,8 +609,8 @@ def generate_anchors(scales, ratios, shape, feature_stride, anchor_stride):
     widths = scales * np.sqrt(ratios)
 
     # Enumerate shifts in feature space
-    shifts_y = np.arange(0, shape[0], anchor_stride) * feature_stride
-    shifts_x = np.arange(0, shape[1], anchor_stride) * feature_stride
+    shifts_y = np.arange(0+anchor_stride/2, shape[0]+anchor_stride/2, anchor_stride) * feature_stride
+    shifts_x = np.arange(0+anchor_stride/2, shape[1]+anchor_stride/2, anchor_stride) * feature_stride
     shifts_x, shifts_y = np.meshgrid(shifts_x, shifts_y)
 
     # Enumerate combinations of shifts, widths, and heights
