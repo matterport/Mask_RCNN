@@ -207,7 +207,14 @@ class Config(object):
     # Use default settings if no change for value 0.
     # For intra_op_parallelism_threads: Nodes that can use multiple threads to parallelize
     #     their execution will schedule the individual pieces into this pool.
+    #     Setting this equal to the number of physical cores is recommended. 
+    #     Setting the value to 0, which is the default, 
+    #     results in the value being set to the number of logical cores
+    #     - this is an alternate option to try for some architectures.
     # For inter_op_parallelism_threads: All ready nodes are scheduled in this pool.
+    #     Setting this equal to the number of sockets is recommended.
+    #     Setting the value to 0, which is the default,
+    #     results in the value being set to the number of logical cores.
     NUM_INTRA = 0
     NUM_INTER = 0
 
