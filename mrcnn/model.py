@@ -1071,12 +1071,9 @@ def rpn_bbox_loss_graph(config, target_bbox, rpn_match, rpn_bbox):
     target_bbox = batch_pack_graph(target_bbox, batch_counts,
                                    config.IMAGES_PER_GPU)
 
-    # TODO: use smooth_l1_loss() rather than reimplementing here
-    #       to reduce code duplication
-    diff = K.abs(target_bbox - rpn_bbox)
-    less_than_one = K.cast(K.less(diff, 1.0), "float32")
-    loss = (less_than_one * 0.5 * diff**2) + (1 - less_than_one) * (diff - 0.5)
-
+    #use smooth_l1_loss() rather than reimplementing here to reduce code duplication
+    loss = smooth_l1_loss(target_bbox,rpn_bbox)
+    
     loss = K.switch(tf.size(loss) > 0, K.mean(loss), tf.constant(0.0))
     return loss
 
