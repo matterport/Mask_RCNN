@@ -17,7 +17,7 @@ import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
-import urllib.request
+from six.moves import urllib
 import shutil
 import warnings
 
@@ -448,10 +448,10 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
     if max_dim and mode == "square":
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
-            scale = max_dim / image_max
+            scale = float(max_dim) / float(image_max)
 
     # Resize image using bilinear interpolation
-    if scale != 1:
+    if scale != 1.0:
         image = skimage.transform.resize(
             image, (round(h * scale), round(w * scale)),
             order=1, mode="constant", preserve_range=True)
