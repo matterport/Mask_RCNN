@@ -368,7 +368,7 @@ class PyramidROIAlign(KE.Layer):
     def call(self, inputs):
         # Crop boxes [batch, num_boxes, (y1, x1, y2, x2)] in normalized coords
         boxes = inputs[0]
-	
+        
         # Image meta
         # Holds details about the image. See compose_image_meta()
         image_meta = inputs[1]
@@ -442,7 +442,7 @@ class PyramidROIAlign(KE.Layer):
         pooled = tf.gather(pooled, ix)
 
         # Re-add the batch dimension
-	pooled = tf.reshape(pooled, boxes.shape[:2].concatenate(pooled.shape[1:]))
+        pooled = tf.reshape(pooled, boxes.shape[:2].concatenate(pooled.shape[1:]))
         return pooled
 
     def compute_output_shape(self, input_shape):
