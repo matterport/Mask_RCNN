@@ -694,10 +694,10 @@ def refine_detections_graph(rois, probs, deltas, window, config):
         probs: [N, num_classes]. Class probabilities.
         deltas: [N, num_classes, (dy, dx, log(dh), log(dw))]. Class-specific
                 bounding box deltas.
-        window: (y1, x1, y2, x2) in image coordinates. The part of the image
+        window: (y1, x1, y2, x2) in normalized coordinates. The part of the image
             that contains the image excluding the padding.
 
-    Returns detections shaped: [N, (y1, x1, y2, x2, class_id, score)] where
+    Returns detections shaped: [num_detections, (y1, x1, y2, x2, class_id, score)] where
         coordinates are normalized.
     """
     # Class IDs per ROI
@@ -817,7 +817,7 @@ class DetectionLayer(KE.Layer):
             self.config.IMAGES_PER_GPU)
 
         # Reshape output
-        # [batch, num_detections, (y1, x1, y2, x2, class_score)] in
+        # [batch, num_detections, (y1, x1, y2, x2, class_id, class_score)] in
         # normalized coordinates
         return tf.reshape(
             detections_batch,
