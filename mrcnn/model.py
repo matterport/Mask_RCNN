@@ -575,7 +575,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     deltas /= config.BBOX_STD_DEV
 
     # Assign positive ROIs to GT masks
-    # Permute masks to [MAX_GT_INSTANCES, height, width, 1]
+    # Permute masks to [N, height, width, 1]
     transposed_masks = tf.expand_dims(tf.transpose(gt_masks, [2, 0, 1]), -1)
     # Pick the right mask for each ROI
     roi_masks = tf.gather(transposed_masks, roi_gt_box_assignment)
