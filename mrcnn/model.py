@@ -261,7 +261,7 @@ class ProposalLayer(KE.Layer):
     Inputs:
         rpn_probs: [batch, num_anchors, (bg prob, fg prob)]
         rpn_bbox: [batch, num_anchors, (dy, dx, log(dh), log(dw))]
-        anchors: [num_anchors, (y1, x1, y2, x2)] anchors in normalized coordinates
+        anchors: [batch, num_anchors, (y1, x1, y2, x2)] anchors in normalized coordinates
 
     Returns:
         Proposals in normalized coordinates [batch, rois, (y1, x1, y2, x2)]
