@@ -442,7 +442,8 @@ class PyramidROIAlign(KE.Layer):
         pooled = tf.gather(pooled, ix)
 
         # Re-add the batch dimension
-        pooled = tf.expand_dims(pooled, 0)
+        shape = tf.concat([tf.shape(boxes)[:2], tf.shape(pooled)[1:]], axis=0)
+        pooled = tf.reshape(pooled, shape)
         return pooled
 
     def compute_output_shape(self, input_shape):
