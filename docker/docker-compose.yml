@@ -1,0 +1,29 @@
+version: '2.3'
+
+services:
+  bash:
+    build:
+      context: ../.
+      dockerfile: ./docker/cpu/Dockerfile
+      network: host
+    image: mask-rcnn-cpu
+    command: bash
+    volumes:
+      - '../.:/app/src'
+    network_mode: host
+    ports: ["${TBPORT:-6006}:${TBPORT:-6006}", "${JNPORT:-8888}:${JNPORT:-8888}"]
+
+  bash-gpu:
+    build:
+      context: ../.
+      dockerfile: ./docker/gpu/Dockerfile
+      network: host
+    image: mask-rcnn-gpu
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    command: bash  
+    volumes:
+      - '../.:/app/src'
+    network_mode: host
+    ports: ["${TBPORT:-6006}:${TBPORT:-6006}", "${JNPORT:-8888}:${JNPORT:-8888}"]

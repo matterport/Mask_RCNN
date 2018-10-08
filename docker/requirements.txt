@@ -1,0 +1,5 @@
+scikit-image
+opencv-contrib-python
+h5py
+imgaug
+pycocotools
