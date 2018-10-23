@@ -2069,27 +2069,15 @@ class MaskRCNN():
         Returns:
             The path of the last checkpoint file
         """
-        # Get directory names. Each directory corresponds to a model
-        dir_names = next(os.walk(self.model_dir))[1]
-        key = self.config.NAME.lower()
-        dir_names = filter(lambda f: f.startswith(key), dir_names)
-        dir_names = sorted(dir_names)
-        if not dir_names:
-            import errno
-            raise FileNotFoundError(
-                errno.ENOENT,
-                "Could not find model directory under {}".format(self.model_dir))
-        # Pick last directory
-        dir_name = os.path.join(self.model_dir, dir_names[-1])
         # Find the last checkpoint
-        checkpoints = next(os.walk(dir_name))[2]
+        checkpoints = next(os.walk(self.log_dir))[2]
         checkpoints = filter(lambda f: f.startswith("mask_rcnn"), checkpoints)
         checkpoints = sorted(checkpoints)
         if not checkpoints:
             import errno
             raise FileNotFoundError(
-                errno.ENOENT, "Could not find weight files in {}".format(dir_name))
-        checkpoint = os.path.join(dir_name, checkpoints[-1])
+                errno.ENOENT, "Could not find weight files in {}".format(self.log_dir))
+        checkpoint = os.path.join(self.log_dir, checkpoints[-1])
         return checkpoint
 
     def load_weights(self, filepath, by_name=False, exclude=None):
