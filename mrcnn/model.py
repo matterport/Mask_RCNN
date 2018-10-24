@@ -2274,7 +2274,8 @@ class MaskRCNN():
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, custom_callbacks=None, no_augmentation_sources=None):
+              augmentation=None, custom_callbacks=None, no_augmentation_sources=None,
+              save_best_only=False, monitored_quantity='val_loss'):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2306,6 +2307,9 @@ class MaskRCNN():
         no_augmentation_sources: Optional. List of sources to exclude for
             augmentation. A source is string that identifies a dataset and is
             defined in the Dataset class.
+        save_best_only: Optional. If true, the latest best model 
+            according to the quantity monitored (monitored_quantity) will not be overwritten.
+        monitored_quantity: Optional. quantity to monitor (e.q: 'val_acc', 'val_loss')
         """
         assert self.mode == "training", "Create model in training mode."
 
@@ -2340,7 +2344,8 @@ class MaskRCNN():
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0, write_graph=True, write_images=False),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                            verbose=0, save_weights_only=True,
+                                            save_best_only=save_best_only, monitor=monitored_quantity),
         ]
 
         # Add custom callbacks to the list
