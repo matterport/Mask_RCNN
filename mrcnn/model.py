@@ -1211,12 +1211,7 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
     original_shape = image.shape
-    image, window, scale, padding, crop = utils.resize_image(
-        image,
-        min_dim=config.IMAGE_MIN_DIM,
-        min_scale=config.IMAGE_MIN_SCALE,
-        max_dim=config.IMAGE_MAX_DIM,
-        mode=config.IMAGE_RESIZE_MODE)
+    image, window, scale, padding, crop = mold_image(image, config)
     mask = utils.resize_mask(mask, scale, padding, crop)
 
     # Random horizontal flips.
@@ -1769,7 +1764,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
             batch_image_meta[b] = image_meta
             batch_rpn_match[b] = rpn_match[:, np.newaxis]
             batch_rpn_bbox[b] = rpn_bbox
-            batch_images[b] = mold_image(image.astype(np.float32), config)
+            batch_images[b] = image
             batch_gt_class_ids[b, :gt_class_ids.shape[0]] = gt_class_ids
             batch_gt_boxes[b, :gt_boxes.shape[0]] = gt_boxes
             batch_gt_masks[b, :, :, :gt_masks.shape[-1]] = gt_masks
@@ -2391,15 +2386,8 @@ class MaskRCNN():
         image_metas = []
         windows = []
         for image in images:
-            # Resize image
-            # TODO: move resizing to mold_image()
-            molded_image, window, scale, padding, crop = utils.resize_image(
-                image,
-                min_dim=self.config.IMAGE_MIN_DIM,
-                min_scale=self.config.IMAGE_MIN_SCALE,
-                max_dim=self.config.IMAGE_MAX_DIM,
-                mode=self.config.IMAGE_RESIZE_MODE)
-            molded_image = mold_image(molded_image, self.config)
+            # Mold image
+            molded_image, window, scale, padding, crop = mold_image(image, self.config)
             # Build image_meta
             image_meta = compose_image_meta(
                 0, image.shape, molded_image.shape, window, scale,
@@ -2795,15 +2783,24 @@ def parse_image_meta_graph(meta):
     }
 
 
-def mold_image(images, config):
-    """Expects an RGB image (or array of images) and subtracts
+def mold_image(image, config):
+    """Expects an RGB image and subtracts
     the mean pixel and converts it to float. Expects image
     colors in RGB order.
     """
-    return images.astype(np.float32) - config.MEAN_PIXEL
+    resized_image, window, scale, padding, crop = utils.resize_image(
+                image,
+                min_dim=config.IMAGE_MIN_DIM,
+                min_scale=config.IMAGE_MIN_SCALE,
+                max_dim=config.IMAGE_MAX_DIM,
+                mode=config.IMAGE_RESIZE_MODE)
+    resized_image = resized_image.astype(np.float32)
+    molded_image = resized_image - config.MEAN_PIXEL
+    return molded_image, window, scale, padding, crop
 
 
 def unmold_image(normalized_images, config):
+    # TODO: This needs to be revised to match the new mold_image()
     """Takes a image normalized with mold() and returns the original."""
     return (normalized_images + config.MEAN_PIXEL).astype(np.uint8)
 
