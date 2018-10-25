@@ -2690,7 +2690,7 @@ class MaskRCNN():
         inputs = model.inputs
         if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
             inputs += [K.learning_phase()]
-        kf = K.function(model.inputs, list(outputs.values()))
+        kf = K.function(inputs, list(outputs.values()))
 
         # Prepare inputs
         if image_metas is None:
