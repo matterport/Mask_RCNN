@@ -2666,12 +2666,16 @@ class MaskRCNN():
                 layers.append(l)
         return layers
 
-    def run_graph(self, images, outputs, image_metas=None):
+    def run_graph(self, inputs, outputs):
         """Runs a sub-set of the computation graph that computes the given
         outputs.
 
-        image_metas: If provided, the images are assumed to be already
-            molded (i.e. resized, padded, and normalized)
+        inputs: In training mode, it should be a list containing 
+            molded_images, image_metas, rpn_match, rpn_bbox,
+            gt_class_ids, gt_boxes, gt_masks.
+            In inference mode, it should be a length one list containing
+            unmolded image or a length two list containing molded_image 
+            (i.e. resized, padded, and normalized) and image_metas.
 
         outputs: List of tuples (name, tensor) to compute. The tensors are
             symbolic TensorFlow tensors and the names are for easy tracking.
@@ -2683,29 +2687,41 @@ class MaskRCNN():
 
         # Organize desired outputs into an ordered dict
         outputs = OrderedDict(outputs)
-        for o in outputs.values():
-            assert o is not None
+        for k, v in outputs.items():
+            assert v is not None, "{} should not be None".format(k)
 
         # Build a Keras function to run parts of the computation graph
-        inputs = model.inputs
+        model_inputs = model.inputs
         if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
-            inputs += [K.learning_phase()]
-        kf = K.function(inputs, list(outputs.values()))
+            model_inputs += [K.learning_phase()]
+        # TODO: Current kf only works when batch size=1
+        kf = K.function(model_inputs, list(outputs.values()))
 
-        # Prepare inputs
-        if image_metas is None:
-            molded_images, image_metas, _ = self.mold_inputs(images)
-        else:
-            molded_images = images
-        image_shape = molded_images[0].shape
-        # Anchors
-        anchors = self.get_anchors(image_shape)
-        # Duplicate across the batch dimension because Keras requires it
-        # TODO: can this be optimized to avoid duplicating the anchors?
-        anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
-        model_in = [molded_images, image_metas, anchors]
+	assert (self.mode=="training" and len(inputs)==7) or \
+            (self.mode=="inference" and len(inputs) in [1,2]), \
+            "argument 'inputs' should have length 7 in training mode, \
+            or have length 1 or 2 in inference mode"
+        
+	# Prepare inputs
+        if self.mode=="training":
+            # inputs: [molded_images, image_metas, rpn_match, rpn_bbox,
+            #              gt_class_ids, gt_boxes, gt_masks]
+            model_in = inputs
+        elif self.mode=="inference":
+            if len(inputs)==1:
+                [images] = inputs
+                molded_images, image_metas, _ = self.mold_inputs(images)
+            elif len(inputs)==2:
+                [molded_images, image_metas] = inputs
+            image_shape = molded_images[0].shape
+            # Anchors
+            anchors = self.get_anchors(image_shape)
+            # Duplicate across the batch dimension because Keras requires it
+            # TODO: can this be optimized to avoid duplicating the anchors?
+            anchors = np.broadcast_to(anchors, (self.config.BATCH_SIZE,) + anchors.shape)
+            model_in = [molded_images, image_metas, anchors]
 
-        # Run inference
+        # Run graph
         if model.uses_learning_phase and not isinstance(K.learning_phase(), int):
             model_in.append(0.)
         outputs_np = kf(model_in)
