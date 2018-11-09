@@ -2881,7 +2881,31 @@ class MeanAveragePrecisionCallback(Callback):
     def __init__(self, train_model: MaskRCNN, inference_model: MaskRCNN, dataset: Dataset,
                  calculate_at_every_X_epoch: int = 3, dataset_limit: int = None,
                  verbose: int = 1):
+        """
+        Callback which calculates the mAP on the defined test/validation dataset
+        :param train_model: Mask RCNN model in training mode
+        :param inference_model: Mask RCNN model in inference mode
+        :param dataset: test/validation dataset, it will calculate the mAP on this set
+        :param calculate_at_every_X_epoch: With this parameter we can define if we want to do the calculation at
+        every epoch or every second, etc...
+        :param dataset_limit: When we have a huge dataset calculation can take a lot of time, with this we can set a
+        limit to the number of data points used
+        :param verbose: set verbosity (1 = verbose, 0 = quiet)
+        """
+
         super().__init__()
+
+        if train_model.mode != "training":
+            raise ValueError("Train model should be in training mode, instead it is in: {0}".format(train_model.mode))
+
+        if inference_model.mode != "inference":
+            raise ValueError(
+                "Inference model should be in inference mode, instead it is in: {0}".format(train_model.mode))
+
+        if inference_model.config.BATCH_SIZE != 1:
+            raise ValueError("This callback only works with the bacth size of 1, instead: {0} was defined".format(
+                inference_model.config.BATCH_SIZE))
+
         self.train_model = train_model
         self.inference_model = inference_model
         self.dataset = dataset
@@ -2890,9 +2914,6 @@ class MeanAveragePrecisionCallback(Callback):
         if dataset_limit is not None:
             self.dataset_limit = dataset_limit
         self.dataset_image_ids = self.dataset.image_ids.copy()
-
-        if inference_model.config.BATCH_SIZE != 1:
-            raise ValueError("This callback only works with the bacth size of 1")
 
         self._verbose_print = print if verbose > 0 else lambda *a, **k: None
 
@@ -2921,7 +2942,6 @@ class MeanAveragePrecisionCallback(Callback):
     def _calculate_mean_average_precision(self):
         mAPs = []
 
-        # Use a random subset of the data when a limit is defined
         np.random.shuffle(self.dataset_image_ids)
 
         for image_id in self.dataset_image_ids[:self.dataset_limit]:
