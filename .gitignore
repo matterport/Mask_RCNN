@@ -6,6 +6,10 @@ results/
 temp/
 test/
 
+# ASHER ignore:
+samples/coco/annotations
+samples/coco/images
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
