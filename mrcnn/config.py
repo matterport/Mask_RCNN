@@ -22,9 +22,10 @@ class Config(object):
     # Name the configurations. For example, 'COCO', 'Experiment 3', ...etc.
     # Useful if your code needs to do things differently depending on which
     # experiment is running.
-    NAME = None  # Override in sub-classes
+    NAME = "Stage1_PassCucumberImageThroughNet"  # Override in sub-classes
 
     # NUMBER OF GPUs to use. When using only a CPU, this needs to be set to 1.
+    # asher todo: set to 2 later
     GPU_COUNT = 1
 
     # Number of images to train with on each GPU. A 12GB GPU can typically
