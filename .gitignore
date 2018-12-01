@@ -9,6 +9,8 @@ test/
 # ASHER ignore:
 samples/coco/annotations
 samples/coco/images
+samples/coco/train2014
+samples/coco/val2014
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
