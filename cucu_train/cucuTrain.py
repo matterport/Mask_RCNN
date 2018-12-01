@@ -35,7 +35,7 @@ import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
 
-get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().run_line_magic('matplotlib', 'inline')
 
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
@@ -526,14 +526,14 @@ class CucuDataset(utils.Dataset):
 
 
 # Training dataset
-dataset_train = CucuDataset('/object_folder','/background_folder')
+dataset_train = CucuDataset('./object_folder','./background_folder')
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(2, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = CucuDataset('/object_folder','/background_folder')
-dataset_val.load_shapes(50, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val = CucuDataset('./object_folder','./background_folder')
+dataset_val.load_shapes(2, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
@@ -643,7 +643,7 @@ model.keras_model.save_weights(model_path)
 
 
 # In[28]:
-asher todo: second part
+# asher todo: second part
 '''INFERENCING MODEL  '''
 
 class InferenceConfig(ShapesConfig):
