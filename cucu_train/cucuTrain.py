@@ -1,5 +1,4 @@
 
-#%%
 # coding: utf-8
 
 # In[1]:
@@ -9,7 +8,7 @@ from IPython.core.display import display, HTML
 display(HTML("<style>.container { width:95% !important; }</style>"))
 
 
-# In[2]:
+# In[73]:
 
 
 import os
@@ -26,7 +25,9 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../")
+# ROOT_DIR = os.path.abspath("../")
+# asher todo: it's for debug mode only
+ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -48,10 +49,10 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Download COCO trained weights from Releases if needed
 if not os.path.exists(COCO_MODEL_PATH):
     utils.download_trained_weights(COCO_MODEL_PATH)
-    
+  
 
 
-# In[4]:
+# In[92]:
 
 
 class ShapesConfig(Config):
@@ -66,7 +67,7 @@ class ShapesConfig(Config):
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
     #IMAGES_PER_GPU = 8
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
     
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # background + 1 shape (cucumber)
@@ -78,24 +79,24 @@ class ShapesConfig(Config):
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
-
+       
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 62
+    TRAIN_ROIS_PER_IMAGE = 32
     
     #asher todo: can we utilize it better?
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 10
+    STEPS_PER_EPOCH = 1
 
-    VALIDATION_STEPS = 5
+    VALIDATION_STEPS = 1
     
 config = ShapesConfig()
 config.display()
 
 
-# In[5]:
+# In[93]:
 
 
 def get_ax(rows=1, cols=1, size=8):
@@ -110,7 +111,7 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 
-# In[6]:
+# In[94]:
 
 
 def rotate_bound(image, angle):
@@ -146,7 +147,25 @@ def rotate_bound(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def pasteImageOnOtherWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scale, angle):
+def add_image(img1, img2, x_center, y_center, x_scale, y_scale, angle):
+    """
+    name I gave: pasteImageOnOther ruined the overriding of base class function
+    pasting re-scaled image on other image (collage effect)
+    """
+    img2 = img2.resize((int(x_scale*img2.size[0]),int(y_scale*img2.size[1])), Image.ANTIALIAS)
+
+    img2 = img2.rotate(angle, resample=Image.BICUBIC, expand=True)
+    
+
+    rows,cols,channels = np.asarray(img2).shape
+    x_from = x_center - math.floor(cols/2.)
+    y_from = y_center - math.floor(rows/2.)
+
+    img1.paste(img2, (x_from, y_from), img2)
+
+    return img1
+
+def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scale, angle):
     """
     pasting re-scaled image on other image (collage effect) without transparency
     """
@@ -198,23 +217,6 @@ def pasteImageOnOtherWithoutTransparency(img1, img2, x_center, y_center, x_scale
     img1[y_from:y_to, x_from:x_to] = dst
     return img1
 
-def pasteImageOnOther(img1, img2, x_center, y_center, x_scale, y_scale, angle):
-    """
-    pasting re-scaled image on other image (collage effect)
-    """
-    img2 = img2.resize((int(x_scale*img2.size[0]),int(y_scale*img2.size[1])), Image.ANTIALIAS)
-
-    img2 = img2.rotate(angle, resample=Image.BICUBIC, expand=True)
-    
-
-    rows,cols,channels = np.asarray(img2).shape
-    x_from = x_center - math.floor(cols/2.)
-    y_from = y_center - math.floor(rows/2.)
-
-    img1.paste(img2, (x_from, y_from), img2)
-    
-    return img1
-
 def image_to_mask(image):
     mask = np.zeros_like(image)
     while not np.any(mask):
@@ -232,7 +234,9 @@ def mask_to_image(mask):
     return image
 
 
-# In[6]:
+# In[130]:
+
+
 
 
 minimum_number_of_cucumbers = 10
@@ -260,14 +264,14 @@ class CucuDataset(utils.Dataset):
         for root, _, files in os.walk(self.folder_objects):
             for filename in files:
                 #self.img2.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.img2.append(Image.open(os.path.join(root, filename)))
+                self.img2.append(Image.open(os.path.join(root, filename)).convert('RGBA')) # asher todo: change back to RGBA
         _, _, files_objects = next(os.walk(self.folder_objects))
         self.number_of_cucumbers = len(files_objects)
                 
         for root, _, files in os.walk(self.folder_bgs):
             for filename in files:
                 #self.bg.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.bg.append(Image.open(os.path.join(root, filename)))
+                self.bg.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_bgs = next(os.walk(self.folder_bgs))
         self.number_of_bgs = len(files_bgs)
         print("folder: " + folder_objects + " inited")
@@ -293,14 +297,17 @@ class CucuDataset(utils.Dataset):
     def load_image(self, image_id):
         """
         for now we only have one shape- cucumber.
-        functions name missleading (FIXME:) - 
-        function creates 'collage' bg+one image
+        function creates 'collage' bg+one image.
+
+        function is called by load_image_gt - it is crucial for generating on-the-fly training set 
+        for NN.
         """
         info = self.image_info[image_id]
         
-        index = random.randint(0, self.number_of_bgs-1)
+        index = random.randint(0, self.number_of_bgs-1) # asher todo: change it back to 1
         
         y_max, x_max,channels = np.asarray(self.bg[index]).shape
+
         
         x = random.randint(0, x_max-1024)
         y = random.randint(0, y_max-1024)
@@ -311,7 +318,11 @@ class CucuDataset(utils.Dataset):
         
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
-        return np.array(image)
+        npImage = np.array(image)
+        # remove transparency channel to fit to network data
+        #asher todo: now: is it working?
+        ImageWithoutTransparency = npImage[:,:,:3]
+        return ImageWithoutTransparency
     
     def image_reference(self, image_id):
         """Return the shapes data of the image."""
@@ -366,16 +377,15 @@ class CucuDataset(utils.Dataset):
         
         x_location, y_location = location
         x_scale, y_scale = scale
-        mask = pasteImageOnOther(mask, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
+        mask = add_image(mask, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
         return mask
     
     def draw_shape_without_transparency(self, image, shape, location, scale, angle, index):
         """Draws a shape from the given specs."""
-        if shape == 'leaf':
+        if shape == 'cucumber':
             x_location, y_location = location
             x_scale, y_scale = scale
-            image = pasteImageOnOtherWithoutTransparency(image, np.array(self.img2[index]), \
-                                                            x_location, y_location, x_scale, y_scale, angle)
+            image = add_imageWithoutTransparency(image, np.array(self.img2[index]),                                                             x_location, y_location, x_scale, y_scale, angle)
         return image
 
 
@@ -394,7 +404,7 @@ class CucuDataset(utils.Dataset):
             x_location, y_location = location
             x_scale, y_scale = scale
             #print(type(self.img2[index]))
-            Collage = pasteImageOnOther(Collage, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
         # asher todo: else?
         return Collage
     
@@ -444,7 +454,7 @@ class CucuDataset(utils.Dataset):
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
             
-            image = pasteImageOnOther(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
+            image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
             y, x, _ = self.img2[index].shape
             
             #shapes.append((shape, color, dims))
@@ -478,7 +488,7 @@ class CucuDataset(utils.Dataset):
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
             # asher todo: do we need this?
-            #image = pasteImageOnOther(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
+            #image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
             #y, x, _ = self.img2[index].shape
             y, x,channels = np.asarray(self.img2[index]).shape
             shapes.append((shape, location, scale, angle, index))
@@ -523,22 +533,27 @@ class CucuDataset(utils.Dataset):
         return mask.astype(np.bool), class_ids.astype(np.int32)        
 
 
-# In[7]:
+# In[131]:
+
 
 
 # Training dataset
-dataset_train = CucuDataset('./object_folder','./background_folder')
+# asher todo: changed to full path for debug mode!
+dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(2, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
+print(np.asarray(dataset_train.bg[2]).shape)
+
+
 
 # Validation dataset
-dataset_val = CucuDataset('./object_folder','./background_folder')
-dataset_val.load_shapes(2, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
-# In[8]:
+# In[132]:
 
 
 #show n random image&mask train examples
@@ -551,14 +566,16 @@ for image_id in image_ids:
     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
-# In[9]:
+# In[133]:
+
+
 
 
 w = 16
 h = 16
 
 
-n = 5
+n = 1
 image_ids = np.random.choice(dataset_train.image_ids, n)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)
@@ -589,14 +606,16 @@ for image_id in image_ids:
     
 
 
-# In[10]:
+
+# In[134]:
 
 
 # Create model in training mode
+print(MODEL_DIR)
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
-# In[11]:
+# In[135]:
 
 
 # Which weights to start with?
@@ -611,13 +630,12 @@ elif init_with == "coco":
     model.load_weights(COCO_MODEL_PATH, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
                                 "mrcnn_bbox", "mrcnn_mask"])
-# asher todo: suply right path
 elif init_with == "last":
     # Load the last model you trained and continue training
     model.load_weights(model.find_by_name('/media/master/96DAE970DAE94CD5/Results/Project07 - MaskRCNN/shapes20181015T1115/mask_rcnn_shapes_1517.h5'), by_name=True)
 
 
-# In[12]:
+# In[136]:
 
 
 # Train the head branches
@@ -627,25 +645,24 @@ elif init_with == "last":
 #model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
 
 
-# In[13]:
+# In[137]:
 
 
-model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE / 5, epochs=1000, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE / 5, epochs=2, layers="all")
 
 
-# In[15]:
+# In[ ]:
 
 
 # Save weights
 # Typically not needed because callbacks save after every epoch
 # Uncomment to save manually
-model_path = os.path.join(MODEL_DIR, "MaskRcnnCucumberWeights.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
 model.keras_model.save_weights(model_path)
 
 
-# In[28]:
-# asher todo: second part
-'''INFERENCING MODEL  '''
+# In[ ]:
+
 
 class InferenceConfig(ShapesConfig):
     GPU_COUNT = 1
@@ -668,7 +685,7 @@ print("Loading weights from ", model_path)
 model.load_weights(model_path, by_name=True)
 
 
-# In[15]:
+# In[ ]:
 
 
 # Test on a random image
@@ -686,7 +703,7 @@ log("gt_mask", gt_mask)
 visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(8, 8))
 
 
-# In[29]:
+# In[ ]:
 
 
 t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N08/bananas/bananas_02.jpg'), cv2.COLOR_BGR2RGB)
@@ -695,12 +712,12 @@ results = model.detect([t], verbose=1)
 
 r = results[0]
 visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
-visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/media/global/gip-main/data/Dmitry/temp/result_0150_bananas.png')
+# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/media/global/gip-main/data/Dmitry/temp/result_0150_bananas.png')
 t= dataset_train.class_names
 print(t)
 
 
-# In[28]:
+# In[ ]:
 
 
 #from os import walk
