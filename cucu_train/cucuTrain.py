@@ -25,9 +25,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 # Root directory of the project
-# ROOT_DIR = os.path.abspath("../")
-# asher todo: it's for debug mode only
-ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
+ROOT_DIR = os.path.abspath("../")
+
+# DEBUG MODE:
+# ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -39,6 +40,7 @@ from mrcnn.model import log
 
 # get_ipython().run_line_magic('matplotlib', 'inline')
 
+#asher todo: change later to path inside cucu_train
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
@@ -264,7 +266,7 @@ class CucuDataset(utils.Dataset):
         for root, _, files in os.walk(self.folder_objects):
             for filename in files:
                 #self.img2.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.img2.append(Image.open(os.path.join(root, filename)).convert('RGBA')) # asher todo: change back to RGBA
+                self.img2.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_objects = next(os.walk(self.folder_objects))
         self.number_of_cucumbers = len(files_objects)
                 
@@ -304,7 +306,7 @@ class CucuDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         
-        index = random.randint(0, self.number_of_bgs-1) # asher todo: change it back to 1
+        index = random.randint(0, self.number_of_bgs-1) 
         
         y_max, x_max,channels = np.asarray(self.bg[index]).shape
 
@@ -320,7 +322,6 @@ class CucuDataset(utils.Dataset):
             image = self.draw_shape(image, shape, location, scale, angle, index)
         npImage = np.array(image)
         # remove transparency channel to fit to network data
-        #asher todo: now: is it working?
         ImageWithoutTransparency = npImage[:,:,:3]
         return ImageWithoutTransparency
     
@@ -391,8 +392,7 @@ class CucuDataset(utils.Dataset):
 
     def draw_shape(self, Collage, shape, location, scale, angle, index):
         """
-        Draws another cucumber on a 
-        asher todo: clarify this:
+        Draws another cucumber on a selected background
         Get the center x, y and the size s
         x, y, s = dims
         """
@@ -538,8 +538,12 @@ class CucuDataset(utils.Dataset):
 
 
 # Training dataset
-# asher todo: changed to full path for debug mode!
-dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+
+# DEBUG MODE:
+# dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+# REGULAR MODE:
+dataset_train = CucuDataset('./object_folder','./background_folder')
+
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
 dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
@@ -548,7 +552,12 @@ print(np.asarray(dataset_train.bg[2]).shape)
 
 
 # Validation dataset
-dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+
+# DEBUG MODE:
+# dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+# REGULAR MODE:
+dataset_val = CucuDataset('./object_folder','./background_folder')
+
 dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
@@ -589,7 +598,7 @@ for image_id in image_ids:
     fig.add_axes(ax)
 
     plt.imshow(image)
-    fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png') #asher todo: generalize path
+    fig.savefig(ROOT_DIR + '/cucu_train/peekOnDatasetSamples/' + str(image_id) + '.png') 
     
     
     fig = plt.figure(frameon=False, dpi=64)
@@ -677,12 +686,16 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 # Either set a specific path or find last trained weights
 # model_path = os.path.join(ROOT_DIR, ".h5 file name here")
 #model_path = model.find_last()
-model_path = model.find_by_name('/media/master/96DAE970DAE94CD5/Results/Project07 - MaskRCNN/shapes20180827T1511/mask_rcnn_shapes_0150.h5')
 
+# asher note: adding here: by_name=True, solved
+# a mismatch between weights and layers - peep later on it
+model.load_weights(filepath=MODEL_DIR + '/cucuWheights.h5',by_name=True)
 
-# Load trained weights
-print("Loading weights from ", model_path)
-model.load_weights(model_path, by_name=True)
+# asher todo: resolve it later, why Dima made another loading
+
+# # Load trained weights
+# print("Loading weights from ", model_path)
+# model.load_weights(model_path, by_name=True)
 
 
 # In[ ]:
@@ -705,16 +718,17 @@ visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, datas
 
 # In[ ]:
 
+#asher todo: put here random valid cucumbers img path to test net
 
-t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N08/bananas/bananas_02.jpg'), cv2.COLOR_BGR2RGB)
-#original_image.shape
-results = model.detect([t], verbose=1)
-
-r = results[0]
-visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
-# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/media/global/gip-main/data/Dmitry/temp/result_0150_bananas.png')
-t= dataset_train.class_names
-print(t)
+# t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N08/bananas/bananas_02.jpg'), cv2.COLOR_BGR2RGB)
+# #original_image.shape
+# results = model.detect([t], verbose=1)
+#
+# r = results[0]
+# visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
+# # visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/media/global/gip-main/data/Dmitry/temp/result_0150_bananas.png')
+# t= dataset_train.class_names
+# print(t)
 
 
 # In[ ]:
@@ -723,51 +737,45 @@ print(t)
 #from os import walk
 #from os import listdir
 
+# asher todo: figure out later what it does
 
-class InferenceConfig(ShapesConfig):
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+# model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=MODEL_DIR)
+# # Recreate the model in inference mode
+# mypath = '/home/master/Work/logs/shapes20180826T1036/'
+# mypath_out = '/home/master/Work/logs/temp_out/'
 
-inference_config = InferenceConfig()
-
-
-model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=MODEL_DIR)
-# Recreate the model in inference mode
-mypath = '/home/master/Work/logs/shapes20180826T1036/'
-mypath_out = '/home/master/Work/logs/temp_out/'
-
-# Get path to saved weights
-# Either set a specific path or find last trained weights
-# model_path = os.path.join(ROOT_DIR, ".h5 file name here")
-#model_path = model.find_last()
+# # Get path to saved weights
+# # Either set a specific path or find last trained weights
+# # model_path = os.path.join(ROOT_DIR, ".h5 file name here")
+# #model_path = model.find_last()
 
 
-t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N09/avocado/2018-06-21_AV_leaves_01_1024_02.jpg'), cv2.COLOR_BGR2RGB)
-#original_image.shape
+# t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N09/avocado/2018-06-21_AV_leaves_01_1024_02.jpg'), cv2.COLOR_BGR2RGB)
+# #original_image.shape
 
 
 
-#f = []
-#for (dirpath, dirnames, filenames) in walk(mypath):
-#    print(os.path.join(mypath,filenames))
-    #f.extend(filenames)
-    #break
+# #f = []
+# #for (dirpath, dirnames, filenames) in walk(mypath):
+# #    print(os.path.join(mypath,filenames))
+#     #f.extend(filenames)
+#     #break
     
-for filename in sorted(os.listdir(mypath)):
+# for filename in sorted(os.listdir(mypath)):
     
-    full_name = os.path.join(mypath,filename)
-    model_path = model.find_by_name(full_name)
-    # Load trained weights
-    print("Loading weights from ", model_path)
-    model.load_weights(model_path, by_name=True)
+#     full_name = os.path.join(mypath,filename)
+#     model_path = model.find_by_name(full_name)
+#     # Load trained weights
+#     print("Loading weights from ", model_path)
+#     model.load_weights(model_path, by_name=True)
     
-    results = model.detect([t], verbose=1)
+#     results = model.detect([t], verbose=1)
 
-    r = results[0]
-    base = os.path.splitext(filename)[0]
-    image_name = base + ".png"
+#     r = results[0]
+#     base = os.path.splitext(filename)[0]
+#     image_name = base + ".png"
     
-    visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to=os.path.join(mypath_out, image_name))
+#     visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to=os.path.join(mypath_out, image_name))
 
 
 # In[ ]:
@@ -781,23 +789,24 @@ visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'
 
 # In[ ]:
 
+#asher todo: use this information later when relevant for fine tuning
 
-# Compute VOC-Style mAP @ IoU=0.5
-# Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 100)
-APs = []
-for image_id in image_ids:
-    # Load image and ground truth data
-    image, image_meta, gt_class_id, gt_bbox, gt_mask =        modellib.load_image_gt(dataset_val, inference_config,
-                               image_id, use_mini_mask=False)
-    molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
-    # Run object detection
-    results = model.detect([image], verbose=0)
-    r = results[0]
-    # Compute AP
-    AP, precisions, recalls, overlaps =        utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                         r["rois"], r["class_ids"], r["scores"], r['masks'])
-    APs.append(AP)
+# # Compute VOC-Style mAP @ IoU=0.5
+# # Running on 10 images. Increase for better accuracy.
+# image_ids = np.random.choice(dataset_val.image_ids, 100)
+# APs = []
+# for image_id in image_ids:
+#     # Load image and ground truth data
+#     image, image_meta, gt_class_id, gt_bbox, gt_mask =        modellib.load_image_gt(dataset_val, inference_config,
+#                                image_id, use_mini_mask=False)
+#     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
+#     # Run object detection
+#     results = model.detect([image], verbose=0)
+#     r = results[0]
+#     # Compute AP
+#     AP, precisions, recalls, overlaps =        utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+#                          r["rois"], r["class_ids"], r["scores"], r['masks'])
+#     APs.append(AP)
     
-print("mAP: ", np.mean(APs))
+# print("mAP: ", np.mean(APs))
 
