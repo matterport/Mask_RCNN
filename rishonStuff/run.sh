@@ -6,4 +6,4 @@
 #SBATCH -o slurm.%N.%j.out # stdout goes here
 #SBATCH -e slurm.%N.%j.out # stderr goes here
 source activate cucuEnv
-python3 cucu_train/cucuTrain.py
+python3 ../cucu_train/cucuTrain.py
