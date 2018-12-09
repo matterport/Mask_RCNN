@@ -1,26 +1,14 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 
 # coding: utf-8
 
-
 # In[1]:
-
-
 
 
 from IPython.core.display import display, HTML
 display(HTML("<style>.container { width:95% !important; }</style>"))
 
 
-
-# In[15]:
-
-
+# In[73]:
 
 
 import os
@@ -66,10 +54,7 @@ if not os.path.exists(COCO_MODEL_PATH):
   
 
 
-
-# In[16]:
-
-
+# In[92]:
 
 
 class ShapesConfig(Config):
@@ -113,10 +98,7 @@ config = ShapesConfig()
 config.display()
 
 
-
-# In[17]:
-
-
+# In[93]:
 
 
 def get_ax(rows=1, cols=1, size=8):
@@ -131,10 +113,7 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 
-
-# In[18]:
-
-
+# In[94]:
 
 
 def rotate_bound(image, angle):
@@ -224,15 +203,10 @@ def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scal
     roi = img1[y_from:y_to, x_from:x_to]
 
     # Now create a mask of logo and create its inverse mask also
-    alpha_image = mask_from_RGBA(img2)
-    
-    # dilate the mask
-    # kernel = np.ones((5,5),np.uint8)
-    # alpha_image = cv2.dilate(alpha_image, kernel, iterations=1)
-    
-    # since alpha values are in range [0,1] and we know that transparent bg has alpha < 0.4 approx.    
-    _ , mask = cv2.threshold(alpha_image, 0.4 , 255, cv2.THRESH_BINARY)
-    
+    img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+    ret, mask = cv2.threshold(img2gray, 1, 255, cv2.THRESH_BINARY)
+    #TODO use my mask
+    #mask = image_to_mask(img2)
     mask_inv = cv2.bitwise_not(mask)
     # Now black-out the area of logo in ROI
     img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
@@ -245,9 +219,6 @@ def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scal
     img1[y_from:y_to, x_from:x_to] = dst
     return img1
 
-def mask_from_RGBA(image):
-    return image[:,:,-1]
-    
 def image_to_mask(image):
     mask = np.zeros_like(image)
     while not np.any(mask):
@@ -265,10 +236,7 @@ def mask_to_image(mask):
     return image
 
 
-
-# In[19]:
-
-
+# In[130]:
 
 
 
@@ -565,10 +533,7 @@ class CucuDataset(utils.Dataset):
         return mask.astype(np.bool), class_ids.astype(np.int32)        
 
 
-
-# In[20]:
-
-
+# In[131]:
 
 
 
@@ -589,7 +554,7 @@ print(np.asarray(dataset_train.bg[2]).shape)
 # Validation dataset
 
 # DEBUG MODE:
-# dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+# dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
 # REGULAR MODE:
 dataset_val = CucuDataset('./object_folder','./background_folder')
 
@@ -597,10 +562,7 @@ dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
-
-# In[21]:
-
-
+# In[132]:
 
 
 #show n random image&mask train examples
@@ -609,13 +571,11 @@ image_ids = np.random.choice(dataset_train.image_ids, n)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)
     mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
-
-# In[24]:
-
-
+# In[133]:
 
 
 
@@ -649,17 +609,14 @@ for image_id in image_ids:
     fig.add_axes(ax)
     
     plt.imshow(mask_to_image(mask))
-    fig.savefig(ROOT_DIR + '/cucu_train/samples/' + str(image_id) + '.png')
+    fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
 
     plt.show()
     
 
 
 
-
-# In[11]:
-
-
+# In[134]:
 
 
 # Create model in training mode
@@ -667,10 +624,7 @@ print(MODEL_DIR)
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
-
-# In[12]:
-
-
+# In[135]:
 
 
 # Which weights to start with?
@@ -690,10 +644,7 @@ elif init_with == "last":
     model.load_weights(model.find_by_name('/media/master/96DAE970DAE94CD5/Results/Project07 - MaskRCNN/shapes20181015T1115/mask_rcnn_shapes_1517.h5'), by_name=True)
 
 
-
-# In[13]:
-
-
+# In[136]:
 
 
 # Train the head branches
@@ -703,19 +654,13 @@ elif init_with == "last":
 #model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
 
 
-
-# In[14]:
-
+# In[137]:
 
 
-
-model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE / 5, epochs=1, layers="all")
-
+model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE / 5, epochs=2, layers="all")
 
 
-# In[15]:
-
-
+# In[ ]:
 
 
 # Save weights
@@ -725,10 +670,7 @@ model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
 model.keras_model.save_weights(model_path)
 
 
-
-# In[16]:
-
-
+# In[ ]:
 
 
 class InferenceConfig(ShapesConfig):
@@ -756,10 +698,7 @@ model.load_weights(filepath=MODEL_DIR + '/cucuWheights.h5',by_name=True)
 # model.load_weights(model_path, by_name=True)
 
 
-
-# In[17]:
-
-
+# In[ ]:
 
 
 # Test on a random image
@@ -777,10 +716,7 @@ log("gt_mask", gt_mask)
 visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(8, 8))
 
 
-
-# In[18]:
-
-
+# In[ ]:
 
 #asher todo: put here random valid cucumbers img path to test net
 
@@ -795,10 +731,7 @@ visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, datas
 # print(t)
 
 
-
-# In[19]:
-
-
+# In[ ]:
 
 
 #from os import walk
@@ -845,10 +778,7 @@ visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, datas
 #     visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to=os.path.join(mypath_out, image_name))
 
 
-
-# In[20]:
-
-
+# In[ ]:
 
 
 results = model.detect([original_image], verbose=1)
@@ -857,10 +787,7 @@ r = results[0]
 visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'], dataset_val.class_names, r['scores'], ax=get_ax())
 
 
-
-# In[21]:
-
-
+# In[ ]:
 
 #asher todo: use this information later when relevant for fine tuning
 
@@ -882,10 +809,4 @@ visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'
 #     APs.append(AP)
     
 # print("mAP: ", np.mean(APs))
-
-
-# In[ ]:
-
-
-
 
