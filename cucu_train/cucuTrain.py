@@ -143,7 +143,8 @@ class CucuDataset(utils.Dataset):
        
         # Add images
         for i in range(count):
-            print('Image', i, end='\r')
+            # print('Image', i, end='\r')
+            print('Image', i)
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes)
             
