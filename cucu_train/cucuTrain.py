@@ -15,12 +15,13 @@ import cv2
 from PIL import Image
 from cucu_utils import *
 
-
-# Root directory of the project
-ROOT_DIR = os.path.abspath("../")
-
-# DEBUG MODE:
-# ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
+debugFlag=True
+if debugFlag:
+    # DEBUG MODE:
+    ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
+else:
+    # Root directory of the project
+    ROOT_DIR = os.path.abspath("../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -394,9 +395,11 @@ class CucuDataset(utils.Dataset):
 # Training dataset
 
 # DEBUG MODE:
-# dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+if debugFlag:
+    dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+else:
 # REGULAR MODE:
-dataset_train = CucuDataset('./object_folder','./background_folder')
+    dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
 dataset_train.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
@@ -405,11 +408,12 @@ dataset_train.prepare()
 
 
 # Validation dataset
-
+if debugFlag:
 # DEBUG MODE:
-# dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
-# REGULAR MODE:
-dataset_val = CucuDataset('./object_folder','./background_folder')
+    dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+else:
+    # REGULAR MODE:
+    dataset_val = CucuDataset('./object_folder','./background_folder')
 
 dataset_val.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
