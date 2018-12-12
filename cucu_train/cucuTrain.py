@@ -4,25 +4,6 @@
 # In[1]:
 
 
-
-# coding: utf-8
-
-
-# In[1]:
-# test
-
-
-
-from IPython.core.display import display, HTML
-display(HTML("<style>.container { width:95% !important; }</style>"))
-
-
-
-# In[15]:
-
-
-
-
 import os
 import sys
 import random
@@ -31,8 +12,7 @@ import re
 import time
 import numpy as np
 import cv2
-import matplotlib
-import matplotlib.pyplot as plt
+
 
 from PIL import Image
 
@@ -47,7 +27,6 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import utils
 import mrcnn.model as modellib
-from mrcnn import visualize
 from mrcnn.model import log
 
 # get_ipython().run_line_magic('matplotlib', 'inline')
