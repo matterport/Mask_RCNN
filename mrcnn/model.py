@@ -18,12 +18,12 @@ import multiprocessing
 import numpy as np
 import tensorflow as tf
 
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.1
-config.gpu_options.visible_device_list = "0"
-# set_session(tf.Session(config=config))
-tf.Session(config=config)
+# config = tf.ConfigProto()
+# config.gpu_options.allow_growth = True
+# config.gpu_options.per_process_gpu_memory_fraction = 0.1
+# config.gpu_options.visible_device_list = "0"
+# # set_session(tf.Session(config=config))
+# tf.Session(config=config)
 
 import keras
 import keras.backend as K
@@ -33,7 +33,7 @@ import keras.models as KM
 
 from mrcnn import utils
 from keras.backend.tensorflow_backend import set_session
-set_session(tf.Session(config=config))
+# set_session(tf.Session(config=config))
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -2199,9 +2199,10 @@ class MaskRCNN():
         self.keras_model.add_loss(tf.add_n(reg_losses))
 
         # Compile
+        run_opts = tf.RunOptions(report_tensor_allocations_upon_oom = True)
         self.keras_model.compile(
             optimizer=optimizer,
-            loss=[None] * len(self.keras_model.outputs))
+            loss=[None] * len(self.keras_model.outputs), options=run_opts)
 
         # Add metrics for losses
         for name in loss_names:
@@ -2388,8 +2389,8 @@ class MaskRCNN():
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=workers,
-            use_multiprocessing=True,
+            workers=1,
+            use_multiprocessing=False,
         )
         self.epoch = max(self.epoch, epochs)
 
