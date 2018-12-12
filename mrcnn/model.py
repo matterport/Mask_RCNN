@@ -18,12 +18,12 @@ import multiprocessing
 import numpy as np
 import tensorflow as tf
 
-# config = tf.ConfigProto()
-# config.gpu_options.allow_growth = True
-# config.gpu_options.per_process_gpu_memory_fraction = 0.1
-# config.gpu_options.visible_device_list = "0"
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+# config.gpu_options.per_process_gpu_memory_fraction = 0.7
+config.gpu_options.visible_device_list = "0"
 # # set_session(tf.Session(config=config))
-# tf.Session(config=config)
+tf.Session(config=config)
 
 import keras
 import keras.backend as K
@@ -2389,8 +2389,8 @@ class MaskRCNN():
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=1,
-            use_multiprocessing=False,
+            workers=workers,
+            use_multiprocessing=True,
         )
         self.epoch = max(self.epoch, epochs)
 

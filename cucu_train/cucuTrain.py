@@ -61,7 +61,7 @@ class ShapesConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    IMAGES_PER_GPU = 2
     # IMAGES_PER_GPU = 2
     
     # Number of classes (including background)
@@ -69,8 +69,8 @@ class ShapesConfig(Config):
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM = 1024
+    IMAGE_MIN_DIM = 512
+    IMAGE_MAX_DIM = 512
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -83,7 +83,7 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 1
+    STEPS_PER_EPOCH = 5
 
     VALIDATION_STEPS = 1
     
@@ -403,7 +403,7 @@ else:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
@@ -416,7 +416,7 @@ else:
     # REGULAR MODE:
     dataset_val = CucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 

@@ -167,7 +167,7 @@ Image 9
 
 Starting at epoch 0. LR=0.001
 
-Checkpoint Path: /home/simon/Mask_RCNN/cucu_train/weightsAndGraphs/cucumbers20181212T1929/mask_rcnn_cucumbers_{epoch:04d}.h5
+Checkpoint Path: /home/simon/Mask_RCNN/cucu_train/weightsAndGraphs/cucumbers20181212T1932/mask_rcnn_cucumbers_{epoch:04d}.h5
 Selecting layers to train
 fpn_c5p5               (Conv2D)
 fpn_c4p4               (Conv2D)
