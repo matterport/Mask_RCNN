@@ -12,6 +12,8 @@ import re
 import time
 import numpy as np
 import cv2
+import matplotlib
+import matplotlib.pyplot as plt
 from PIL import Image
 from cucu_utils import *
 
@@ -28,6 +30,7 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import utils
 import mrcnn.model as modellib
+from mrcnn import visualize
 from mrcnn.model import log
 
 # get_ipython().run_line_magic('matplotlib', 'inline')
@@ -408,6 +411,57 @@ dataset_train.prepare()
 
 
 
+# In[48]:
+
+
+#show n random image&mask train examples
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+
+
+# In[49]:
+
+
+w = 16
+h = 16
+
+
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
+
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+
+    plt.imshow(image)
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+    
+    
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
+
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+    
+    plt.imshow(mask_to_image(mask))
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+
+    plt.show()
+    
+
+
 # Validation dataset
 if debugFlag:
 # DEBUG MODE:
@@ -467,7 +521,7 @@ model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epoc
 
 # asher todo: uncomment later when heads training is working
 newLearningRate = config.LEARNING_RATE / 5
-# model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
 
 
 
@@ -479,4 +533,148 @@ newLearningRate = config.LEARNING_RATE / 5
 # Uncomment to save manually
 model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
 model.keras_model.save_weights(model_path)
+
+
+# In[58]:
+
+
+class InferenceConfig(ShapesConfig):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+
+inference_config = InferenceConfig()
+
+# Recreate the model in inference mode
+model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=MODEL_DIR)
+
+# Get path to saved weights
+# Either set a specific path or find last trained weights
+model_path = os.path.join(MODEL_DIR, "cucuWeights.h5")
+# model_path = model.find_last()
+
+
+# Load trained weights
+print("Loading weights from ", model_path)
+model.load_weights(model_path, by_name=True)
+
+
+# In[59]:
+
+
+# Test on a random image
+image_id = random.choice(dataset_val.image_ids)
+print(image_id)
+#image_id = 1
+original_image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config, image_id, use_mini_mask=False)
+
+log("original_image", original_image)
+log("image_meta", image_meta)
+log("gt_class_id", gt_class_id)
+log("gt_bbox", gt_bbox)
+log("gt_mask", gt_mask)
+
+visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(8, 8))
+
+
+# In[61]:
+
+
+t = cv2.cvtColor(cv2.imread(ROOT_DIR+'/cucu_train/simple_test/test1.jpeg'), cv2.COLOR_BGR2RGB)
+#original_image.shape
+results = model.detect([t], verbose=1)
+
+r = results[0]
+visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
+# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
+t= dataset_train.class_names
+print(t)
+
+#asher todo: get inspiration from this later
+# # In[28]:
+
+
+# #from os import walk
+# #from os import listdir
+
+
+# class InferenceConfig(ShapesConfig):
+#     GPU_COUNT = 1
+#     IMAGES_PER_GPU = 1
+
+# inference_config = InferenceConfig()
+
+
+# model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=MODEL_DIR)
+# # Recreate the model in inference mode
+# mypath = '/home/simon/Mask_RCNN/cucu_train/weightsAndGraphs'
+# mypath_out = '/home/simon/Mask_RCNN/cucu_train/simple_test_OUT'
+
+# # Get path to saved weights
+# # Either set a specific path or find last trained weights
+# model_path = os.path.join(ROOT_DIR, ".h5 file name here")
+# #model_path = model.find_last()
+
+
+# t = cv2.cvtColor(cv2.imread('/home/master/Work/Tensorflow/Project07 - MaskRCNN/data/results/N09/avocado/2018-06-21_AV_leaves_01_1024_02.jpg'), cv2.COLOR_BGR2RGB)
+# #original_image.shape
+
+
+
+# #f = []
+# #for (dirpath, dirnames, filenames) in walk(mypath):
+# #    print(os.path.join(mypath,filenames))
+#     #f.extend(filenames)
+#     #break
+    
+# for filename in sorted(os.listdir(mypath)):
+    
+#     full_name = os.path.join(mypath,filename)
+#     # model_path = model.find_by_name(full_name)
+#     # Load trained weights
+#     print("Loading weights from ", full_name)
+#     model.load_weights(model_path=full_name, by_name=True)
+    
+#     results = model.detect([t], verbose=1)
+
+#     r = results[0]
+#     base = os.path.splitext(filename)[0]
+#     image_name = base + ".png"
+    
+#     visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to=os.path.join(mypath_out, image_name))
+
+
+# # In[ ]:
+
+
+# results = model.detect([original_image], verbose=1)
+
+# r = results[0]
+# visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'], dataset_val.class_names, r['scores'], ax=get_ax())
+
+
+# In[ ]:
+
+
+# Compute VOC-Style mAP @ IoU=0.5
+# Running on 10 images. Increase for better accuracy.
+image_ids = np.random.choice(dataset_val.image_ids, 100)
+APs = []
+for image_id in image_ids:
+    # Load image and ground truth data
+    image, image_meta, gt_class_id, gt_bbox, gt_mask =        modellib.load_image_gt(dataset_val, inference_config,
+                               image_id, use_mini_mask=False)
+    molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
+    # Run object detection
+    results = model.detect([image], verbose=0)
+    r = results[0]
+    # Compute AP
+    AP, precisions, recalls, overlaps =        utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                         r["rois"], r["class_ids"], r["scores"], r['masks'])
+    APs.append(AP)
+    
+print("mAP: ", np.mean(APs))
+
+
+# In[ ]:
+
 
