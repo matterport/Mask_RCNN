@@ -1698,7 +1698,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     # Keras requires a generator to run indefinitely.
     while True:
         try:
-            print("started loading another image")
             # Increment index to pick next image. Shuffle if at the start of an epoch.
             image_index = (image_index + 1) % len(image_ids)
             if shuffle and image_index == 0:
@@ -1713,11 +1712,15 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                 load_image_gt(dataset, config, image_id, augment=augment,
                               augmentation=None,
                               use_mini_mask=config.USE_MINI_MASK)
+                print("started loading another image (NO AUG)")
+
             else:
                 image, image_meta, gt_class_ids, gt_boxes, gt_masks = \
                     load_image_gt(dataset, config, image_id, augment=augment,
                                 augmentation=augmentation,
                                 use_mini_mask=config.USE_MINI_MASK)
+                print("started loading another image (AUG)")
+
 
             # Skip images that have no instances. This can happen in cases
             # where we train on a subset of classes and the image doesn't
