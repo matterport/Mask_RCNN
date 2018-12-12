@@ -27,6 +27,7 @@ from mrcnn import utils
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.3
+config.gpu_options.visible_device_list = "0"
 set_session(tf.Session(config=config))
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
