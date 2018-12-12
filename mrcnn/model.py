@@ -18,6 +18,12 @@ import multiprocessing
 import numpy as np
 import tensorflow as tf
 
+config = tf.ConfigProto()
+# config.gpu_options.allow_growth = True
+config.gpu_options.per_process_gpu_memory_fraction = 0.1
+config.gpu_options.visible_device_list = "0"
+# set_session(tf.Session(config=config))
+tf.Session(config=config)
 
 import keras
 import keras.backend as K
@@ -27,11 +33,6 @@ import keras.models as KM
 
 from mrcnn import utils
 from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.3
-config.gpu_options.visible_device_list = "0"
-set_session(tf.Session(config=config))
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
