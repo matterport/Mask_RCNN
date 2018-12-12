@@ -465,7 +465,8 @@ model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epoc
 
 
 # asher todo: uncomment later when heads training is working
-# model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE / 5, epochs=1, layers="all")
+newLearningRate = config.LEARNING_RATE / 5
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
 
 
 
