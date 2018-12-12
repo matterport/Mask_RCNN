@@ -17,6 +17,8 @@ from collections import OrderedDict
 import multiprocessing
 import numpy as np
 import tensorflow as tf
+
+
 import keras
 import keras.backend as K
 import keras.layers as KL
@@ -26,6 +28,7 @@ import keras.models as KM
 from mrcnn import utils
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.3
 config.gpu_options.visible_device_list = "0"
 set_session(tf.Session(config=config))
