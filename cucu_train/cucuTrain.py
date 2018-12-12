@@ -402,7 +402,7 @@ else:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
@@ -415,7 +415,7 @@ else:
     # REGULAR MODE:
     dataset_val = CucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
@@ -456,7 +456,7 @@ elif init_with == "last":
 # Passing layers="heads" freezes all layers except the head
 # layers. You can also pass a regular expression to select
 # which layers to train by name pattern.
-model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
+# model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
 
 
 
