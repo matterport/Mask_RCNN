@@ -15,7 +15,7 @@ import cv2
 from PIL import Image
 from cucu_utils import *
 
-debugFlag=True
+debugFlag=False
 if debugFlag:
     # DEBUG MODE:
     ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
