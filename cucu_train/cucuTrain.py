@@ -35,8 +35,6 @@ from mrcnn.model import log
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "cucu_train/weightsAndGraphs")
 
-print(ROOT_DIR)
-
 # Local path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Download COCO trained weights from Releases if needed
@@ -256,7 +254,7 @@ class CucuDataset(utils.Dataset):
             #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            #print(type(self.img2[index]))
+            print(type(self.img2[index]))
             Collage = add_image(Collage, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
         # asher todo: else?
         return Collage
@@ -403,7 +401,6 @@ dataset_train = CucuDataset('./object_folder','./background_folder')
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
 dataset_train.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
-print(np.asarray(dataset_train.bg[2]).shape)
 
 
 
@@ -419,7 +416,6 @@ dataset_val.prepare()
 
 
 # Create model in training mode
-print(MODEL_DIR)
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
