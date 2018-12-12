@@ -17,6 +17,14 @@ from collections import OrderedDict
 import multiprocessing
 import numpy as np
 import tensorflow as tf
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+# config.gpu_options.per_process_gpu_memory_fraction = 0.7
+config.gpu_options.visible_device_list = "0"
+# # set_session(tf.Session(config=config))
+tf.Session(config=config)
+
 import keras
 import keras.backend as K
 import keras.layers as KL
@@ -24,6 +32,8 @@ import keras.engine as KE
 import keras.models as KM
 
 from mrcnn import utils
+from keras.backend.tensorflow_backend import set_session
+# set_session(tf.Session(config=config))
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -1703,11 +1713,16 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                 load_image_gt(dataset, config, image_id, augment=augment,
                               augmentation=None,
                               use_mini_mask=config.USE_MINI_MASK)
+                print("started loading another image (NO AUG)")
+
             else:
                 image, image_meta, gt_class_ids, gt_boxes, gt_masks = \
                     load_image_gt(dataset, config, image_id, augment=augment,
                                 augmentation=augmentation,
                                 use_mini_mask=config.USE_MINI_MASK)
+                # gt_class_ids = np.ones_like(gt_class_ids)  # asher todo: TERRIBLE WORKARROUND DELETE AS SON AS POSSIBLE
+                print("started loading another image (AUG)")
+
 
             # Skip images that have no instances. This can happen in cases
             # where we train on a subset of classes and the image doesn't
@@ -2184,9 +2199,10 @@ class MaskRCNN():
         self.keras_model.add_loss(tf.add_n(reg_losses))
 
         # Compile
+        run_opts = tf.RunOptions(report_tensor_allocations_upon_oom = True)
         self.keras_model.compile(
             optimizer=optimizer,
-            loss=[None] * len(self.keras_model.outputs))
+            loss=[None] * len(self.keras_model.outputs), options=run_opts)
 
         # Add metrics for losses
         for name in loss_names:
@@ -2373,8 +2389,8 @@ class MaskRCNN():
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=1,
-            use_multiprocessing=False,
+            workers=workers,
+            use_multiprocessing=True,
         )
         self.epoch = max(self.epoch, epochs)
 
