@@ -1,0 +1,200 @@
+
+Configurations:
+BACKBONE                       resnet101
+BACKBONE_STRIDES               [4, 8, 16, 32, 64]
+BATCH_SIZE                     2
+BBOX_STD_DEV                   [0.1 0.1 0.2 0.2]
+COMPUTE_BACKBONE_SHAPE         None
+DETECTION_MAX_INSTANCES        100
+DETECTION_MIN_CONFIDENCE       0.7
+DETECTION_NMS_THRESHOLD        0.3
+FPN_CLASSIF_FC_LAYERS_SIZE     1024
+GPU_COUNT                      1
+GRADIENT_CLIP_NORM             5.0
+IMAGES_PER_GPU                 2
+IMAGE_CHANNEL_COUNT            3
+IMAGE_MAX_DIM                  1024
+IMAGE_META_SIZE                14
+IMAGE_MIN_DIM                  1024
+IMAGE_MIN_SCALE                0
+IMAGE_RESIZE_MODE              square
+IMAGE_SHAPE                    [1024 1024    3]
+LEARNING_MOMENTUM              0.9
+LEARNING_RATE                  0.001
+LOSS_WEIGHTS                   {'rpn_class_loss': 1.0, 'rpn_bbox_loss': 1.0, 'mrcnn_class_loss': 1.0, 'mrcnn_bbox_loss': 1.0, 'mrcnn_mask_loss': 1.0}
+MASK_POOL_SIZE                 14
+MASK_SHAPE                     [28, 28]
+MAX_GT_INSTANCES               100
+MEAN_PIXEL                     [123.7 116.8 103.9]
+MINI_MASK_SHAPE                (56, 56)
+NAME                           cucumbers
+NUM_CLASSES                    2
+POOL_SIZE                      7
+POST_NMS_ROIS_INFERENCE        1000
+POST_NMS_ROIS_TRAINING         2000
+PRE_NMS_LIMIT                  6000
+ROI_POSITIVE_RATIO             0.33
+RPN_ANCHOR_RATIOS              [0.5, 1, 2]
+RPN_ANCHOR_SCALES              (8, 16, 32, 64, 128)
+RPN_ANCHOR_STRIDE              1
+RPN_BBOX_STD_DEV               [0.1 0.1 0.2 0.2]
+RPN_NMS_THRESHOLD              0.7
+RPN_TRAIN_ANCHORS_PER_IMAGE    256
+STEPS_PER_EPOCH                5
+TOP_DOWN_PYRAMID_SIZE          256
+TRAIN_BN                       False
+TRAIN_ROIS_PER_IMAGE           32
+USE_MINI_MASK                  True
+USE_RPN_ROIS                   True
+VALIDATION_STEPS               1
+WEIGHT_DECAY                   0.0001
+
+
+folder: ./object_folder inited
+folder: ./background_folder inited
+Image 0
+Image 1
+Image 2
+Image 3
+Image 4
+Image 5
+Image 6
+Image 7
+Image 8
+Image 9
+Image 10
+Image 11
+Image 12
+Image 13
+Image 14
+Image 15
+Image 16
+Image 17
+Image 18
+Image 19
+Image 20
+Image 21
+Image 22
+Image 23
+Image 24
+Image 25
+Image 26
+Image 27
+Image 28
+Image 29
+Image 30
+Image 31
+Image 32
+Image 33
+Image 34
+Image 35
+Image 36
+Image 37
+Image 38
+Image 39
+Image 40
+Image 41
+Image 42
+Image 43
+Image 44
+Image 45
+Image 46
+Image 47
+Image 48
+Image 49
+Image 50
+Image 51
+Image 52
+Image 53
+Image 54
+Image 55
+Image 56
+Image 57
+Image 58
+Image 59
+Image 60
+Image 61
+Image 62
+Image 63
+Image 64
+Image 65
+Image 66
+Image 67
+Image 68
+Image 69
+Image 70
+Image 71
+Image 72
+Image 73
+Image 74
+Image 75
+Image 76
+Image 77
+Image 78
+Image 79
+Image 80
+Image 81
+Image 82
+Image 83
+Image 84
+Image 85
+Image 86
+Image 87
+Image 88
+Image 89
+Image 90
+Image 91
+Image 92
+Image 93
+Image 94
+Image 95
+Image 96
+Image 97
+Image 98
+Image 99
+folder: ./object_folder inited
+folder: ./background_folder inited
+Image 0
+Image 1
+Image 2
+Image 3
+Image 4
+Image 5
+Image 6
+Image 7
+Image 8
+Image 9
+
+Starting at epoch 0. LR=0.001
+
+Checkpoint Path: /home/simon/Mask_RCNN/cucu_train/weightsAndGraphs/cucumbers20181212T1929/mask_rcnn_cucumbers_{epoch:04d}.h5
+Selecting layers to train
+fpn_c5p5               (Conv2D)
+fpn_c4p4               (Conv2D)
+fpn_c3p3               (Conv2D)
+fpn_c2p2               (Conv2D)
+fpn_p5                 (Conv2D)
+fpn_p2                 (Conv2D)
+fpn_p3                 (Conv2D)
+fpn_p4                 (Conv2D)
+In model:  rpn_model
+    rpn_conv_shared        (Conv2D)
+    rpn_class_raw          (Conv2D)
+    rpn_bbox_pred          (Conv2D)
+mrcnn_mask_conv1       (TimeDistributed)
+mrcnn_mask_bn1         (TimeDistributed)
+mrcnn_mask_conv2       (TimeDistributed)
+mrcnn_mask_bn2         (TimeDistributed)
+mrcnn_class_conv1      (TimeDistributed)
+mrcnn_class_bn1        (TimeDistributed)
+mrcnn_mask_conv3       (TimeDistributed)
+mrcnn_mask_bn3         (TimeDistributed)
+mrcnn_class_conv2      (TimeDistributed)
+mrcnn_class_bn2        (TimeDistributed)
+mrcnn_mask_conv4       (TimeDistributed)
+mrcnn_mask_bn4         (TimeDistributed)
+mrcnn_bbox_fc          (TimeDistributed)
+mrcnn_mask_deconv      (TimeDistributed)
+mrcnn_class_logits     (TimeDistributed)
+mrcnn_mask             (TimeDistributed)
+Epoch 1/1
