@@ -1,7 +1,16 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
+
+
+#!/usr/bin/env python
+# coding: utf-8
+
+
+# In[5]:
+
+
 
 
 import os
@@ -48,7 +57,10 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 
 
-# In[16]:
+
+# In[6]:
+
+
 
 
 
@@ -64,7 +76,7 @@ class ShapesConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
     # IMAGES_PER_GPU = 2
     
     # Number of classes (including background)
@@ -72,8 +84,8 @@ class ShapesConfig(Config):
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 512
+    IMAGE_MIN_DIM = 1024
+    IMAGE_MAX_DIM = 1024
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -86,9 +98,9 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 5
+    STEPS_PER_EPOCH = 10
 
-    VALIDATION_STEPS = 1
+    VALIDATION_STEPS = 3
     
 config = ShapesConfig()
 config.display()
@@ -146,8 +158,7 @@ class CucuDataset(utils.Dataset):
        
         # Add images
         for i in range(count):
-            # print('Image', i, end='\r')
-            print('Image', i)
+            print('Image', i, end='\r')
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes)
             
@@ -390,7 +401,10 @@ class CucuDataset(utils.Dataset):
 
 
 
-# In[20]:
+
+# In[7]:
+
+
 
 
 
@@ -406,12 +420,27 @@ else:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
 
-# In[48]:
+
+# Validation dataset
+if debugFlag:
+# DEBUG MODE:
+    dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+else:
+    # REGULAR MODE:
+    dataset_val = CucuDataset('./object_folder','./background_folder')
+
+dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.prepare()
+
+
+# In[8]:
+
+
 
 
 #show n random image&mask train examples
@@ -424,7 +453,10 @@ for image_id in image_ids:
     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
-# In[49]:
+
+# In[9]:
+
+
 
 
 w = 16
@@ -462,24 +494,16 @@ for image_id in image_ids:
     
 
 
-# Validation dataset
-if debugFlag:
-# DEBUG MODE:
-    dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
-else:
-    # REGULAR MODE:
-    dataset_val = CucuDataset('./object_folder','./background_folder')
-
-dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_val.prepare()
-
 
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
 
-# In[12]:
+
+# In[ ]:
+
+
 
 
 
@@ -502,7 +526,10 @@ elif init_with == "last":
 
 
 
-# In[13]:
+
+# In[ ]:
+
+
 
 
 
@@ -511,21 +538,28 @@ elif init_with == "last":
 # Passing layers="heads" freezes all layers except the head
 # layers. You can also pass a regular expression to select
 # which layers to train by name pattern.
-model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
+#asher note: each time only one sort of train is possible as for now.
+# model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
 
 
 
-# In[14]:
+
+# In[ ]:
+
+
 
 
 
 # asher todo: uncomment later when heads training is working
-newLearningRate = config.LEARNING_RATE / 5
+newLearningRate = config.LEARNING_RATE // 5
 model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
 
 
 
-# In[15]:
+
+# In[12]:
+
+
 
 
 # Save weights
@@ -535,7 +569,10 @@ model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
 model.keras_model.save_weights(model_path)
 
 
-# In[58]:
+
+# In[14]:
+
+
 
 
 class InferenceConfig(ShapesConfig):
@@ -549,7 +586,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWeights.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
 # model_path = model.find_last()
 
 
@@ -558,7 +595,10 @@ print("Loading weights from ", model_path)
 model.load_weights(model_path, by_name=True)
 
 
-# In[59]:
+
+# In[15]:
+
+
 
 
 # Test on a random image
@@ -576,7 +616,26 @@ log("gt_mask", gt_mask)
 visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(8, 8))
 
 
-# In[61]:
+
+# In[17]:
+
+
+
+
+# In[7]:
+
+
+def get_ax(rows=1, cols=1, size=8):
+    """Return a Matplotlib Axes array to be used in
+    all visualizations in the notebook. Provide a
+    central point to control graph sizes.
+    
+    Change the default size attribute to control the size
+    of rendered images
+    """
+    _, ax = plt.subplots(rows, cols, figsize=(size*cols, size*rows))
+    return ax
+
 
 
 t = cv2.cvtColor(cv2.imread(ROOT_DIR+'/cucu_train/simple_test/test1.jpeg'), cv2.COLOR_BGR2RGB)
@@ -652,29 +711,35 @@ print(t)
 # visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'], dataset_val.class_names, r['scores'], ax=get_ax())
 
 
+
 # In[ ]:
 
 
-# Compute VOC-Style mAP @ IoU=0.5
-# Running on 10 images. Increase for better accuracy.
-image_ids = np.random.choice(dataset_val.image_ids, 100)
-APs = []
-for image_id in image_ids:
-    # Load image and ground truth data
-    image, image_meta, gt_class_id, gt_bbox, gt_mask =        modellib.load_image_gt(dataset_val, inference_config,
-                               image_id, use_mini_mask=False)
-    molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
-    # Run object detection
-    results = model.detect([image], verbose=0)
-    r = results[0]
-    # Compute AP
-    AP, precisions, recalls, overlaps =        utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                         r["rois"], r["class_ids"], r["scores"], r['masks'])
-    APs.append(AP)
+
+
+# # Compute VOC-Style mAP @ IoU=0.5
+# # Running on 10 images. Increase for better accuracy.
+# image_ids = np.random.choice(dataset_val.image_ids, 100)
+# APs = []
+# for image_id in image_ids:
+#     # Load image and ground truth data
+#     image, image_meta, gt_class_id, gt_bbox, gt_mask =        modellib.load_image_gt(dataset_val, inference_config,
+#                                image_id, use_mini_mask=False)
+#     molded_images = np.expand_dims(modellib.mold_image(image, inference_config), 0)
+#     # Run object detection
+#     results = model.detect([image], verbose=0)
+#     r = results[0]
+#     # Compute AP
+#     AP, precisions, recalls, overlaps =        utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+#                          r["rois"], r["class_ids"], r["scores"], r['masks'])
+#     APs.append(AP)
     
-print("mAP: ", np.mean(APs))
+# print("mAP: ", np.mean(APs))
+
 
 
 # In[ ]:
+
+
 
 

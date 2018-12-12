@@ -2347,7 +2347,7 @@ class MaskRCNN():
                                          no_augmentation_sources=no_augmentation_sources)
         val_generator = data_generator(val_dataset, self.config, shuffle=True,
                                        batch_size=self.config.BATCH_SIZE)
-
+        print("created data_generators")
         # Create log_dir if it does not exist
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
@@ -2376,10 +2376,9 @@ class MaskRCNN():
         if os.name is 'nt':
             workers = 0
         else:
+            # asher todo: num of workers should be as num of batches to create
             workers = multiprocessing.cpu_count()
 
-        # asher todo: return function call to have:
-        #  workers=workers,use_multiprocessing=False,
         self.keras_model.fit_generator(
             train_generator,
             initial_epoch=self.epoch,
