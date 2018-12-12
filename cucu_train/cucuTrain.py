@@ -255,7 +255,7 @@ class CucuDataset(utils.Dataset):
             #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            print(type(self.img2[index]))
+            # print(type(self.img2[index]))
             Collage = add_image(Collage, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
         # asher todo: else?
         return Collage

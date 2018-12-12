@@ -1689,6 +1689,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     # Keras requires a generator to run indefinitely.
     while True:
         try:
+            print("started loading another image")
             # Increment index to pick next image. Shuffle if at the start of an epoch.
             image_index = (image_index + 1) % len(image_ids)
             if shuffle and image_index == 0:
