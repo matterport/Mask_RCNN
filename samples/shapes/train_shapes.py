@@ -26,7 +26,7 @@ import cv2
 # ROOT_DIR = os.path.abspath("../../")
 
 #asher note: debug path
-ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
+ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
