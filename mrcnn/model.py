@@ -33,6 +33,7 @@ import keras.models as KM
 
 from mrcnn import utils
 from keras.backend.tensorflow_backend import set_session
+set_session(tf.Session(config=config))
 
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
