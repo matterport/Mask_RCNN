@@ -401,7 +401,7 @@ class CucuDataset(utils.Dataset):
 dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 print(np.asarray(dataset_train.bg[2]).shape)
 
@@ -414,7 +414,7 @@ print(np.asarray(dataset_train.bg[2]).shape)
 # REGULAR MODE:
 dataset_val = CucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(3, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
