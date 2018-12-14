@@ -14,6 +14,7 @@
 
 
 import os
+from os.path import dirname, abspath
 import sys
 import random
 import math
@@ -23,13 +24,15 @@ import numpy as np
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('QT5Agg')
 from PIL import Image
 from cucu_utils import *
 
-debugFlag=False
+debugFlag=True
 if debugFlag:
     # DEBUG MODE:
-    ROOT_DIR = os.path.abspath("/Users/AsherYartsev/Mask_RCNN")
+    ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
+    print(ROOT_DIR)
 else:
     # Root directory of the project
     ROOT_DIR = os.path.abspath("../")
@@ -85,7 +88,7 @@ class ShapesConfig(Config):
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM = 1024
+    IMAGE_MAX_DIM =1024
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -129,6 +132,9 @@ class CucuDataset(utils.Dataset):
         self.folder_bgs = folder_bgs
         self.img2 = []
         self.bg = []
+        # asher todo: temp debug param ->delete
+        self.image_counter=0
+
         for root, _, files in os.walk(self.folder_objects):
             for filename in files:
                 #self.img2.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
@@ -161,7 +167,6 @@ class CucuDataset(utils.Dataset):
             print('Image', i, end='\r')
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes)
-            
     def load_image(self, image_id):
         """
         for now we only have one shape- cucumber.
@@ -186,7 +191,10 @@ class CucuDataset(utils.Dataset):
         
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
+        # asher todo: erase it later
         npImage = np.array(image)
+        cv2.imwrite(ROOT_DIR+'/cucu_train/generated_images/img' + str(self.image_counter) + '.png', npImage) 
+        self.image_counter+=1
         # remove transparency channel to fit to network data
         ImageWithoutTransparency = npImage[:,:,:3]
         return ImageWithoutTransparency
@@ -414,13 +422,13 @@ class CucuDataset(utils.Dataset):
 
 # DEBUG MODE:
 if debugFlag:
-    dataset_train = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+    dataset_train = CucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
 else:
 # REGULAR MODE:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
@@ -429,12 +437,12 @@ dataset_train.prepare()
 # Validation dataset
 if debugFlag:
 # DEBUG MODE:
-    dataset_val = CucuDataset('/Users/AsherYartsev/Mask_RCNN/cucu_train/object_folder','/Users/AsherYartsev/Mask_RCNN/cucu_train/background_folder')
+    dataset_val = CucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
 else:
     # REGULAR MODE:
     dataset_val = CucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
@@ -443,54 +451,54 @@ dataset_val.prepare()
 
 
 
-#show n random image&mask train examples
-n = 1
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+# #show n random image&mask train examples
+# n = 1
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
+#     print(image.shape)
+#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
 
-# In[9]:
+# # In[9]:
 
 
 
 
-w = 16
-h = 16
+# w = 16
+# h = 16
 
 
-n = 1
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
+# n = 1
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
     
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
+#     fig = plt.figure(frameon=False, dpi=64)
+#     fig.set_size_inches(w,h)
 
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
+#     ax = plt.Axes(fig, [0., 0., 1., 1.])
+#     ax.set_axis_off()
+#     fig.add_axes(ax)
 
-    plt.imshow(image)
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+#     plt.imshow(image)
+#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
     
     
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
+#     fig = plt.figure(frameon=False, dpi=64)
+#     fig.set_size_inches(w,h)
 
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
+#     ax = plt.Axes(fig, [0., 0., 1., 1.])
+#     ax.set_axis_off()
+#     fig.add_axes(ax)
     
-    plt.imshow(mask_to_image(mask))
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+#     plt.imshow(mask_to_image(mask))
+#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
 
-    plt.show()
+#     plt.show()
     
 
 
