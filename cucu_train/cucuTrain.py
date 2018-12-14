@@ -45,8 +45,6 @@ import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
 
-# get_ipython().run_line_magic('matplotlib', 'inline')
-
 #asher todo: change later to path inside cucu_train
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "cucu_train/weightsAndGraphs")
@@ -101,9 +99,9 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 10
+    STEPS_PER_EPOCH = 1
 
-    VALIDATION_STEPS = 3
+    VALIDATION_STEPS = 1
     
 config = ShapesConfig()
 config.display()
@@ -557,9 +555,8 @@ elif init_with == "last":
 
 
 
-
 # asher todo: uncomment later when heads training is working
-newLearningRate = config.LEARNING_RATE // 5
+newLearningRate = config.LEARNING_RATE / 5
 model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
 
 
@@ -652,7 +649,7 @@ results = model.detect([t], verbose=1)
 
 r = results[0]
 visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
-# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
+visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
 t= dataset_train.class_names
 print(t)
 
