@@ -85,8 +85,8 @@ class ShapesConfig(Config):
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM =1024
+    IMAGE_MIN_DIM = 512
+    IMAGE_MAX_DIM =512
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -180,11 +180,10 @@ class CucuDataset(utils.Dataset):
         y_max, x_max,channels = np.asarray(self.bg[index]).shape
 
         
-        x = random.randint(0, x_max-1024)
-        y = random.randint(0, y_max-1024)
-        
+        x = random.randint(0, x_max- config.IMAGE_MAX_DIM)
+        y = random.randint(0, y_max- config.IMAGE_MAX_DIM)
         #image = self.bg[index][y:y+1024, x:x+1024,:]
-        area = (x, y, x+1024, y+1024)
+        area = (x, y, x+config.IMAGE_MAX_DIM, y+config.IMAGE_MAX_DIM)
         image = self.bg[index].crop(area)
         
         for shape, location, scale, angle, index in info['shapes']:
@@ -618,7 +617,7 @@ log("gt_class_id", gt_class_id)
 log("gt_bbox", gt_bbox)
 log("gt_mask", gt_mask)
 
-visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(8, 8))
+visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(config.IMAGE_MAX_DIM, config.IMAGE_MAX_DIM))
 
 
 
@@ -648,8 +647,8 @@ t = cv2.cvtColor(cv2.imread(ROOT_DIR+'/cucu_train/simple_test/test1.jpeg'), cv2.
 results = model.detect([t], verbose=1)
 
 r = results[0]
-visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax())
-visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
+visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax(),figsize=(config.IMAGE_MAX_DIM,config.IMAGE_MAX_DIM))
+# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
 t= dataset_train.class_names
 print(t)
 
