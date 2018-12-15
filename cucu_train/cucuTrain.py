@@ -1,14 +1,41 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
+
+
+
+# coding: utf-8
+
+
+# In[ ]:
+
+
+
+
+
+# coding: utf-8
+
+
+
+# In[ ]:
+
+
+
+
 
 
 #!/usr/bin/env python
 # coding: utf-8
 
 
-# In[5]:
+
+
+# In[1]:
+
+
+
+
 
 
 
@@ -29,7 +56,7 @@ matplotlib.use('QT5Agg')
 from PIL import Image
 from cucu_utils import *
 
-debugFlag=True
+debugFlag=False
 if debugFlag:
     # DEBUG MODE:
     ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
@@ -60,7 +87,13 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 
 
-# In[6]:
+
+
+# In[2]:
+
+
+
+
 
 
 
@@ -78,7 +111,7 @@ class ShapesConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    IMAGES_PER_GPU = 2
     # IMAGES_PER_GPU = 2
     
     # Number of classes (including background)
@@ -100,7 +133,7 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 1
+    STEPS_PER_EPOCH = 100
 
     VALIDATION_STEPS = 1
     
@@ -194,15 +227,14 @@ class CucuDataset(utils.Dataset):
         y_bottomLeft = random.randint(0, y_topRight- config.IMAGE_MAX_DIM)
 
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
-        area = (x_bottomLeft, y_bottomLeft, \
-                x_bottomLeft+config.IMAGE_MAX_DIM, y_bottomLeft+config.IMAGE_MAX_DIM)
+        area = (x_bottomLeft, y_bottomLeft,                 x_bottomLeft+config.IMAGE_MAX_DIM, y_bottomLeft+config.IMAGE_MAX_DIM)
         image = self.bg[index].crop(area)
         
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
         # asher todo: erase it later
         npImage = np.array(image)
-        cv2.imwrite(ROOT_DIR+'/cucu_train/generated_images/img' + str(self.image_counter) + '.png', npImage) 
+        # cv2.imwrite(ROOT_DIR+'/cucu_train/generated_images/img' + str(self.image_counter) + '.png', npImage) 
         self.image_counter+=1
         # remove transparency channel to fit to network data
         ImageWithoutTransparency = npImage[:,:,:3]
@@ -424,7 +456,13 @@ class CucuDataset(utils.Dataset):
 
 
 
-# In[7]:
+
+
+# In[3]:
+
+
+
+
 
 
 
@@ -442,7 +480,7 @@ else:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
@@ -456,64 +494,70 @@ else:
     # REGULAR MODE:
     dataset_val = CucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
-# In[8]:
 
 
-
-
-#show n random image&mask train examples
-n = 1
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
-
-
-
-# # In[9]:
+# In[4]:
 
 
 
 
 
-w = 16
-h = 16
 
 
-n = 1
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
+
+# #show n random image&mask train examples
+# n = 1
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
+#     print(image.shape)
+#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+
+
+
+# # # In[9]:
+
+
+
+
+
+# w = 16
+# h = 16
+
+
+# n = 1
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
     
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
+#     fig = plt.figure(frameon=False, dpi=64)
+#     fig.set_size_inches(w,h)
 
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
+#     ax = plt.Axes(fig, [0., 0., 1., 1.])
+#     ax.set_axis_off()
+#     fig.add_axes(ax)
 
-    plt.imshow(image)
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+#     plt.imshow(image)
+#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
     
     
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
+#     fig = plt.figure(frameon=False, dpi=64)
+#     fig.set_size_inches(w,h)
 
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
+#     ax = plt.Axes(fig, [0., 0., 1., 1.])
+#     ax.set_axis_off()
+#     fig.add_axes(ax)
     
-    plt.imshow(mask_to_image(mask))
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+#     plt.imshow(mask_to_image(mask))
+#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
 
-    plt.show()
+#     plt.show()
     
 
 
@@ -524,7 +568,13 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
 
-# In[ ]:
+
+
+# In[5]:
+
+
+
+
 
 
 
@@ -550,7 +600,13 @@ elif init_with == "last":
 
 
 
+
+
 # In[ ]:
+
+
+
+
 
 
 
@@ -567,19 +623,31 @@ elif init_with == "last":
 
 
 
+
+
 # In[ ]:
+
+
+
+
 
 
 
 
 # asher todo: uncomment later when heads training is working
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=10, layers="all")
 
 
 
 
-# In[12]:
+
+
+# In[ ]:
+
+
+
+
 
 
 
@@ -593,7 +661,13 @@ model.keras_model.save_weights(model_path)
 
 
 
-# In[14]:
+
+
+# In[6]:
+
+
+
+
 
 
 
@@ -609,7 +683,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-15 23:06:29.863529.h5")
 # model_path = model.find_last()
 
 
@@ -619,33 +693,40 @@ model.load_weights(model_path, by_name=True)
 
 
 
-# In[15]:
+
+
+# In[8]:
 
 
 
 
-# Test on a random image
-image_id = random.choice(dataset_val.image_ids)
-print(image_id)
-#image_id = 1
-original_image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config, image_id, use_mini_mask=False)
-
-log("original_image", original_image)
-log("image_meta", image_meta)
-log("gt_class_id", gt_class_id)
-log("gt_bbox", gt_bbox)
-log("gt_mask", gt_mask)
-
-visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names)
-
-
-
-# In[17]:
 
 
 
 
-# In[7]:
+# # Test on a random image
+# image_id = random.choice(dataset_val.image_ids)
+# print(image_id)
+# #image_id = 1
+# original_image, image_meta, gt_class_id, gt_bbox, gt_mask = modellib.load_image_gt(dataset_val, inference_config, image_id, use_mini_mask=False)
+
+# log("original_image", original_image)
+# log("image_meta", image_meta)
+# log("gt_class_id", gt_class_id)
+# log("gt_bbox", gt_bbox)
+# log("gt_mask", gt_mask)
+
+# visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names)
+
+
+
+
+
+# In[10]:
+
+
+
+
 
 
 def get_ax(rows=1, cols=1, size=8):
@@ -660,15 +741,16 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 
-
-t = cv2.cvtColor(cv2.imread(ROOT_DIR+'/cucu_train/simple_test/test1.jpeg'), cv2.COLOR_BGR2RGB)
-#original_image.shape
-results = model.detect([t], verbose=1)
-
-r = results[0]
-visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
-t= dataset_train.class_names
-print(t)
+tests_location = ROOT_DIR + "/cucu_train/simple_test/"
+for filename in sorted(os.listdir(tests_location)):
+    
+    testImage = os.path.join(tests_location,filename)
+    t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
+    results = model.detect([t], verbose=1)
+    r = results[0]
+    visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
+    t= dataset_train.class_names
+    print(t)
 
 #asher todo: get inspiration from this later
 # # In[28]:
@@ -701,11 +783,11 @@ print(t)
 
 
 
-# #f = []
-# #for (dirpath, dirnames, filenames) in walk(mypath):
-# #    print(os.path.join(mypath,filenames))
-#     #f.extend(filenames)
-#     #break
+# f = []
+# for (dirpath, dirnames, filenames) in walk(mypath):
+#    print(os.path.join(mypath,filenames))
+#     f.extend(filenames)
+#     break
     
 # for filename in sorted(os.listdir(mypath)):
     
@@ -734,7 +816,13 @@ print(t)
 
 
 
+
+
 # In[ ]:
+
+
+
+
 
 
 
@@ -760,7 +848,13 @@ print(t)
 
 
 
+
+
 # In[ ]:
+
+
+
+
 
 
 
