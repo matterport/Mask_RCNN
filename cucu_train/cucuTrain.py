@@ -20,6 +20,7 @@ import random
 import math
 import re
 import time
+import datetime
 import numpy as np
 import cv2
 import matplotlib
@@ -165,6 +166,7 @@ class CucuDataset(utils.Dataset):
             print('Image', i, end='\r')
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes)
+    
     def load_image(self, image_id):
         """
         for now we only have one shape- cucumber.
@@ -172,18 +174,28 @@ class CucuDataset(utils.Dataset):
 
         function is called by load_image_gt - it is crucial for generating on-the-fly training set 
         for NN.
+        image_id - associates with certain attributes (image_info) of this image generated 
+                   on constructing train_dataset and val_dataset
         """
         info = self.image_info[image_id]
         
         index = random.randint(0, self.number_of_bgs-1) 
         
-        y_max, x_max,channels = np.asarray(self.bg[index]).shape
+        # pull some random background from loaded bg set. which are typcally big
+        y_topRight, x_topRight,channels = np.asarray(self.bg[index]).shape
+        y_max, x_max ,_ = np.asarray(self.bg[index]).shape
 
-        
-        x = random.randint(0, x_max- config.IMAGE_MAX_DIM)
-        y = random.randint(0, y_max- config.IMAGE_MAX_DIM)
-        #image = self.bg[index][y:y+1024, x:x+1024,:]
-        area = (x, y, x+config.IMAGE_MAX_DIM, y+config.IMAGE_MAX_DIM)
+        # pick random up-right corner
+        x_topRight = random.randint(x_max- config.IMAGE_MAX_DIM , x_max)
+        y_topRight = random.randint(y_max- config.IMAGE_MAX_DIM , y_max)
+
+        # pick bottom-left corner for cropping the bg to fir image size which is (config.IMAGE_MAX_DIM)^2
+        x_bottomLeft = random.randint(0, x_topRight- config.IMAGE_MAX_DIM)
+        y_bottomLeft = random.randint(0, y_topRight- config.IMAGE_MAX_DIM)
+
+        # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
+        area = (x_bottomLeft, y_bottomLeft, \
+                x_bottomLeft+config.IMAGE_MAX_DIM, y_bottomLeft+config.IMAGE_MAX_DIM)
         image = self.bg[index].crop(area)
         
         for shape, location, scale, angle, index in info['shapes']:
@@ -254,11 +266,14 @@ class CucuDataset(utils.Dataset):
         return mask
     
     def draw_shape_without_transparency(self, image, shape, location, scale, angle, index):
-        """Draws a shape from the given specs."""
+        """
+        Draws a shape from the given specs.
+        image - is just initiated to zeroes matrix 
+        """
         if shape == 'cucumber':
             x_location, y_location = location
             x_scale, y_scale = scale
-            image = add_imageWithoutTransparency(image, np.array(self.img2[index]),                                                             x_location, y_location, x_scale, y_scale, angle)
+            image = add_imageWithoutTransparency(image, np.array(self.img2[index]), x_location, y_location, x_scale, y_scale, angle)
         return image
 
 
@@ -378,6 +393,8 @@ class CucuDataset(utils.Dataset):
     def load_mask(self, image_id):
         """
         Generate instance masks for shapes of the given image ID.
+        image_id = a key to get atttributes of Collage.
+        (a generated image with bg + different objects of different shapes)->(image_info)
         """
         info = self.image_info[image_id]
         shapes = info['shapes']
@@ -387,9 +404,9 @@ class CucuDataset(utils.Dataset):
         #asher note: for now itterates only once on cucumber shape
         for i, (shape, location, scale, angle, index) in enumerate(info['shapes']):
             image = np.zeros([info['height'], info['width'], 3], dtype=np.uint8)
-            #for now we save in temp for easier inspection
+            # save in temp for easier inspection if needed
             temp = image_to_mask(self.draw_shape_without_transparency(image, shape, location, scale, angle, index))
-            #np.set_printoptions(threshold=np.nan)
+            # construct array of masks related to all shapes of objescts in current Collage
             mask[:, :, i] = temp[:,:]
             
         # Handle occlusions
@@ -448,14 +465,14 @@ dataset_val.prepare()
 
 
 
-# #show n random image&mask train examples
-# n = 1
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
-#     print(image.shape)
-#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+#show n random image&mask train examples
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
 
@@ -464,38 +481,39 @@ dataset_val.prepare()
 
 
 
-# w = 16
-# h = 16
+
+w = 16
+h = 16
 
 
-# n = 1
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
     
-#     fig = plt.figure(frameon=False, dpi=64)
-#     fig.set_size_inches(w,h)
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
 
-#     ax = plt.Axes(fig, [0., 0., 1., 1.])
-#     ax.set_axis_off()
-#     fig.add_axes(ax)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
 
-#     plt.imshow(image)
-#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+    plt.imshow(image)
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
     
     
-#     fig = plt.figure(frameon=False, dpi=64)
-#     fig.set_size_inches(w,h)
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
 
-#     ax = plt.Axes(fig, [0., 0., 1., 1.])
-#     ax.set_axis_off()
-#     fig.add_axes(ax)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
     
-#     plt.imshow(mask_to_image(mask))
-#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+    plt.imshow(mask_to_image(mask))
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
 
-#     plt.show()
+    plt.show()
     
 
 
@@ -569,7 +587,8 @@ model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=1,
 # Save weights
 # Typically not needed because callbacks save after every epoch
 # Uncomment to save manually
-model_path = os.path.join(MODEL_DIR, "cucuWheights.h5")
+now = datetime.datetime.now()
+model_path = os.path.join(MODEL_DIR, "cucuWheights_" + str(now) + ".h5")
 model.keras_model.save_weights(model_path)
 
 
@@ -617,7 +636,7 @@ log("gt_class_id", gt_class_id)
 log("gt_bbox", gt_bbox)
 log("gt_mask", gt_mask)
 
-visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names, figsize=(config.IMAGE_MAX_DIM, config.IMAGE_MAX_DIM))
+visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id, dataset_train.class_names)
 
 
 
@@ -647,8 +666,7 @@ t = cv2.cvtColor(cv2.imread(ROOT_DIR+'/cucu_train/simple_test/test1.jpeg'), cv2.
 results = model.detect([t], verbose=1)
 
 r = results[0]
-visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax(),figsize=(config.IMAGE_MAX_DIM,config.IMAGE_MAX_DIM))
-# visualize.save_instances(t, r['rois'], r['masks'], r['class_ids'], dataset_train.class_names, r['scores'], ax=get_ax(), save_to='/Users/AsherYartsev/Desktop/temp/result_0150_bananas.png')
+visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
 t= dataset_train.class_names
 print(t)
 

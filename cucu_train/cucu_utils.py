@@ -66,15 +66,17 @@ def add_image(img1, img2, x_center, y_center, x_scale, y_scale, angle):
 def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scale, angle):
     """
     pasting re-scaled image on other image (collage effect) without transparency
+    img2 - an object on transparent background from ./objects folder
     """
-    
-    img2 = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
+    # apply all transformation-data saved on the object - so we have it's exact appearance in a certain Collage
+    # it belongs to.
+    objectInCollage = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
 
     #Rotate
-    img2 = rotate_bound(img2, 360-angle)
+    objectInCollage = rotate_bound(objectInCollage, 360-angle)
     
     # I want to put logo on top-left corner, So I create a ROI
-    rows,cols,channels = img2.shape
+    rows,cols,channels = objectInCollage.shape
     x_from = x_center - math.floor(cols/2.)
     x_to = x_center + math.ceil(cols/2.)
     y_from = y_center - math.floor(rows/2.)
@@ -84,22 +86,22 @@ def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scal
     
     #cases image out of bg image
     if x_from < 0:
-        img2 = img2[:,-x_from:]
+        objectInCollage = objectInCollage[:,-x_from:]
         x_from = 0
     if x_to >= x_max:
-        img2 = img2[:,:-(x_to-x_max+1)]
+        objectInCollage = objectInCollage[:,:-(x_to-x_max+1)]
         x_to = x_max-1
     if y_from < 0:
-        img2 = img2[-y_from:,:]
+        objectInCollage = objectInCollage[-y_from:,:]
         y_from = 0
     if y_to >= y_max:
-        img2 = img2[:-(y_to-y_max+1),:]
+        objectInCollage = objectInCollage[:-(y_to-y_max+1),:]
         y_to = y_max-1
     
     roi = img1[y_from:y_to, x_from:x_to]
 
     # Now create a mask of logo and create its inverse mask also
-    alpha_image = mask_from_RGBA(img2)
+    alpha_image = mask_from_RGBA(objectInCollage)
     
     # dilate the mask
     # kernel = np.ones((5,5),np.uint8)
@@ -112,7 +114,7 @@ def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scal
     # Now black-out the area of logo in ROI
     img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
     # Take only region of logo from logo image.
-    img2_fg = cv2.bitwise_and(img2,img2,mask = mask)
+    img2_fg = cv2.bitwise_and(objectInCollage,objectInCollage,mask = mask)
     # Put logo in ROI and modify the main image
     #print(img1.shape)
     #print(img2.shape)
