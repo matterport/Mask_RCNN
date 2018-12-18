@@ -30,14 +30,8 @@ from cocoapi.PythonAPI.pycocotools import mask as maskUtils
 
 
 
-debugFlag=False
-if debugFlag:
-    # DEBUG MODE:
-    ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
-    print(ROOT_DIR)
-else:
-    # Root directory of the project
-    ROOT_DIR = os.path.abspath("../")
+ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
+print(ROOT_DIR)
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -47,7 +41,6 @@ import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
 
-#asher todo: change later to path inside cucu_train
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "cucu_train/weightsAndGraphs")
 
@@ -590,12 +583,7 @@ dataset_train.prepare()
 
 
 # Validation dataset
-if debugFlag:
-# DEBUG MODE:
-    dataset_val = valCucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
-else:
-    # REGULAR MODE:
-    dataset_val = valCucuDataset('./object_folder','./background_folder')
+dataset_val = valCucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
 
 dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
