@@ -9,8 +9,8 @@ from nbformat.v4 import new_code_cell,new_notebook
 
 import codecs
 
-sourceFile = "cucuTrain.py"     # <<<< change
-destFile = "cucuTrain.ipynb"    # <<<< change
+sourceFile = "cucu_train.py"     # <<<< change
+destFile = "cucu_train.ipynb"    # <<<< change
 
 
 def parsePy(fn):

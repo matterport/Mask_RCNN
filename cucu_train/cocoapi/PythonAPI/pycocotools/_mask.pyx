@@ -16,8 +16,12 @@ PYTHON_VERSION = sys.version_info[0]
 # import both Python-level and C-level symbols of Numpy
 # the API uses Numpy to interface C and Python
 import numpy as np
+# asher note: I already compiled the module so converting back to
+# cimport numpy as np
+# from libc.stdlib cimport malloc, free
 cimport numpy as np
 from libc.stdlib cimport malloc, free
+
 
 # intialized Numpy. must do.
 np.import_array()

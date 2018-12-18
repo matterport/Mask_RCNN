@@ -1,5 +1,7 @@
 __author__ = 'tsungyi'
 
+import pyximport
+pyximport.install()
 from . import  _mask as _mask
 
 # Interface for manipulating masks stored in RLE format.
