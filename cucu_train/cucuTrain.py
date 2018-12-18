@@ -133,7 +133,7 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
 
     VALIDATION_STEPS = 1
     
@@ -480,7 +480,7 @@ else:
     dataset_train = CucuDataset('./object_folder','./background_folder')
 
 # asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(1000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 
@@ -636,7 +636,7 @@ elif init_with == "last":
 
 # asher todo: uncomment later when heads training is working
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=10, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=200, layers="all")
 
 
 
