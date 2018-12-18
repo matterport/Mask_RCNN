@@ -1,10 +1,10 @@
 # Data files and directories common in repo root
 datasets/
 logs/
-*.h5
 results/
 temp/
 test/
+*.h5
 
 # ASHER ignore:
 samples/coco/annotations
