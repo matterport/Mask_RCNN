@@ -735,7 +735,7 @@ elif init_with == "coco":
 
 # asher todo: uncomment later when heads training is working
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=30, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=2, layers="all")
 
 
 
@@ -743,8 +743,6 @@ model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=30
 
 
 # In[ ]:
-
-
 
 
 
