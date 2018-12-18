@@ -104,7 +104,7 @@ class ShapesConfig(Config):
 
     VALIDATION_STEPS = 1
      # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
+    DETECTION_MIN_CONFIDENCE = 0.6
     
 config = ShapesConfig()
 config.display()
@@ -117,6 +117,10 @@ maximum_number_of_cucumbers = 120
 min_scale = 0.4
 max_scale = 1.1
 
+
+############################################################
+#  validation Dataset
+############################################################
 
 class valCucuDataset(utils.Dataset):
     def __init__(self, folder_objects, folder_bgs):
@@ -432,7 +436,7 @@ class valCucuDataset(utils.Dataset):
 
 
 ############################################################
-#  Dataset
+#  Training Dataset
 ############################################################
 
 class trainCucuDataset(utils.Dataset):
