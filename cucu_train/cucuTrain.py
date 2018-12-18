@@ -1,35 +1,4 @@
 
-# coding: utf-8
-
-# In[ ]:
-
-
-
-# coding: utf-8
-
-
-# In[ ]:
-
-
-
-
-
-# coding: utf-8
-
-
-
-# In[ ]:
-
-
-
-
-
-
-#!/usr/bin/env python
-# coding: utf-8
-
-
-
 
 # In[1]:
 
@@ -55,6 +24,11 @@ import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from PIL import Image
 from cucu_utils import *
+import json
+from cocoapi.PythonAPI.pycocotools.coco import COCO
+from cocoapi.PythonAPI.pycocotools import mask as maskUtils
+
+
 
 debugFlag=False
 if debugFlag:
@@ -133,9 +107,11 @@ class ShapesConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 1000
+    STEPS_PER_EPOCH = 100
 
     VALIDATION_STEPS = 1
+     # Skip detections with < 90% confidence
+    DETECTION_MIN_CONFIDENCE = 0.9
     
 config = ShapesConfig()
 config.display()
@@ -149,7 +125,7 @@ min_scale = 0.4
 max_scale = 1.1
 
 
-class CucuDataset(utils.Dataset):
+class valCucuDataset(utils.Dataset):
     def __init__(self, folder_objects, folder_bgs):
         """
         self variables:
@@ -458,11 +434,144 @@ class CucuDataset(utils.Dataset):
 
 
 
+
+# In[1]:
+
+
+############################################################
+#  Dataset
+############################################################
+
+class trainCucuDataset(utils.Dataset):
+    def load_cucumber(self,annotations_path, dataset_dir):
+        """Load a subset of the COCO dataset.
+        dataset_dir: The root directory of the COCO dataset.
+        subset: What to load (train, val, minival, valminusminival)
+        year: What dataset year to load (2014, 2017) as a string, not an integer
+        class_ids: If provided, only loads images that have the given classes.
+        class_map: TODO: Not implemented yet. Supports maping classes from
+            different datasets to the same class ID.
+        return_coco: If True, returns the COCO object.
+        auto_download: Automatically download and unzip MS-COCO images and annotations
+        """
+
+        # if auto_download is True:
+        #     self.auto_download(dataset_dir, subset, year)
+
+        coco = COCO(annotations_path)
+        image_dir = "{}".format(dataset_dir)
+
+        # All classes
+        class_ids = sorted(coco.getCatIds())
+
+        # All images or a subset?
+        if class_ids:
+            image_ids = []
+            for id in class_ids:
+                image_ids.extend(list(coco.getImgIds(catIds=[id])))
+            # Remove duplicates
+            image_ids = list(set(image_ids))
+        else:
+            # All images
+            image_ids = list(coco.imgs.keys())
+
+        # Add classes
+        for i in class_ids:
+            self.add_class("coco", i, coco.loadCats(i)[0]["name"])
+
+        # Add images
+        for i in image_ids:
+            self.add_image(
+                "coco", image_id=i,
+                path=os.path.join(image_dir, coco.imgs[i]['file_name']),
+                width=coco.imgs[i]["width"],
+                height=coco.imgs[i]["height"],
+                annotations=coco.loadAnns(coco.getAnnIds(
+                    imgIds=[i], catIds=class_ids, iscrowd=None)))
+
+    def load_mask(self, image_id):
+        """Load instance masks for the given image.
+
+        Different datasets use different ways to store masks. This
+        function converts the different mask format to one format
+        in the form of a bitmap [height, width, instances].
+
+        Returns:
+        masks: A bool array of shape [height, width, instance count] with
+            one mask per instance.
+        class_ids: a 1D array of class IDs of the instance masks.
+        """
+        image_info = self.image_info[image_id]
+        # If not a COCO image, delegate to parent class.
+        # if image_info["source"] != "coco":
+        #     return super(trainCucuDataset, self).load_mask(image_id)
+
+        instance_masks = []
+        class_ids = []
+        annotations = self.image_info[image_id]["annotations"]
+        # Build mask of shape [height, width, instance_count] and list
+        # of class IDs that correspond to each channel of the mask.
+        for annotation in annotations:
+            class_id = self.map_source_class_id(
+                "coco.{}".format(annotation['category_id']))
+            if class_id:
+                m = self.annToMask(annotation, image_info["height"],
+                                   image_info["width"])
+                # Some objects are so small that they're less than 1 pixel area
+                # and end up rounded out. Skip those objects.
+                if m.max() < 1:
+                    continue
+                # Is it a crowd? If so, use a negative class ID.
+                if annotation['iscrowd']:
+                    # Use negative class ID for crowds
+                    class_id *= -1
+                    # For crowd masks, annToMask() sometimes returns a mask
+                    # smaller than the given dimensions. If so, resize it.
+                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
+                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                instance_masks.append(m)
+                class_ids.append(class_id)
+
+        # Pack instance masks into an array
+        if class_ids:
+            mask = np.stack(instance_masks, axis=2).astype(np.bool)
+            class_ids = np.array(class_ids, dtype=np.int32)
+            return mask, class_ids
+        else:
+            # Call super class to return an empty mask
+            return super(trainCucuDataset, self).load_mask(image_id)
+
+    # The following two functions are from pycocotools with a few changes.
+
+    def annToRLE(self, ann, height, width):
+        """
+        Convert annotation which can be polygons, uncompressed RLE to RLE.
+        :return: binary mask (numpy 2D array)
+        """
+        segm = ann['segmentation']
+        if isinstance(segm, list):
+            # polygon -- a single object might consist of multiple parts
+            # we merge all parts into one mask rle code
+            rles = maskUtils.frPyObjects(segm, height, width)
+            rle = maskUtils.merge(rles)
+        elif isinstance(segm['counts'], list):
+            # uncompressed RLE
+            rle = maskUtils.frPyObjects(segm, height, width)
+        else:
+            # rle
+            rle = ann['segmentation']
+        return rle
+
+    def annToMask(self, ann, height, width):
+        """
+        Convert annotation which can be polygons, uncompressed RLE, or RLE to binary mask.
+        :return: binary mask (numpy 2D array)
+        """
+        rle = self.annToRLE(ann, height, width)
+        m = maskUtils.decode(rle)
+        return m
+
 # In[3]:
-
-
-
-
 
 
 
@@ -472,15 +581,9 @@ class CucuDataset(utils.Dataset):
 
 # Training dataset
 
-# DEBUG MODE:
-if debugFlag:
-    dataset_train = CucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
-else:
-# REGULAR MODE:
-    dataset_train = CucuDataset('./object_folder','./background_folder')
 
-# asher todo: validation data might crossover training data due to random image picking of load_shapes
-dataset_train.load_shapes(1000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train = trainCucuDataset()
+dataset_train.load_cucumber(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
 
 
@@ -489,12 +592,12 @@ dataset_train.prepare()
 # Validation dataset
 if debugFlag:
 # DEBUG MODE:
-    dataset_val = CucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
+    dataset_val = valCucuDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder')
 else:
     # REGULAR MODE:
-    dataset_val = CucuDataset('./object_folder','./background_folder')
+    dataset_val = valCucuDataset('./object_folder','./background_folder')
 
-dataset_val.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
@@ -509,14 +612,14 @@ dataset_val.prepare()
 
 
 
-# #show n random image&mask train examples
-# n = 1
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
-#     print(image.shape)
-#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+#show n random image&mask train examples
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
 
@@ -593,10 +696,6 @@ elif init_with == "coco":
     model.load_weights(COCO_MODEL_PATH, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
                                 "mrcnn_bbox", "mrcnn_mask"])
-elif init_with == "last":
-    # Load the last model you trained and continue training
-    model.load_weights(model.find_by_name('/media/master/96DAE970DAE94CD5/Results/Project07 - MaskRCNN/shapes20181015T1115/mask_rcnn_shapes_1517.h5'), by_name=True)
-
 
 
 
@@ -636,7 +735,7 @@ elif init_with == "last":
 
 # asher todo: uncomment later when heads training is working
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=200, layers="all")
+model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=30, layers="all")
 
 
 
