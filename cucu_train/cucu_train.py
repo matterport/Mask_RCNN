@@ -80,9 +80,9 @@ class cucumberConfig(Config):
     #asher todo: enlarge to 100 when real training occures
     STEPS_PER_EPOCH = 100
 
-    VALIDATION_STEPS = 1
+    VALIDATION_STEPS = 5
      # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.6
+    DETECTION_MIN_CONFIDENCE = 0.7
     
 config = cucumberConfig()
 config.display()
@@ -93,7 +93,7 @@ config.display()
 
 # Training dataset
 dataset_train = realDataset()
-dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+dataset_train.load_dataset(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
 
 # Validation dataset
