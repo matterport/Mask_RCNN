@@ -96,7 +96,7 @@ config.display()
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
