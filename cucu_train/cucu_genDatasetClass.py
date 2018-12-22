@@ -205,7 +205,7 @@ class genDataset(utils.Dataset):
         x_scale = uniform(min_scale, max_scale)
         y_scale = uniform(min_scale, max_scale)
         # Angle
-        angle = choice([randint(260, 280), randint(80,100)])
+        angle = randint(-10,10)
         # Image index
         index = randint(0, self.number_of_cucumbers-1)
         
