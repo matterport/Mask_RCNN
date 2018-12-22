@@ -164,7 +164,7 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 # In[5]:
 
 # Which weights to start with?
-init_with = "coco"  # imagenet, coco, or last
+init_with = "cucumber"  # imagenet, coco, or last
 
 if init_with == "imagenet":
     model.load_weights(model.get_imagenet_weights(), by_name=True)
@@ -175,6 +175,12 @@ elif init_with == "coco":
     model.load_weights(COCO_MODEL_PATH, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
                                 "mrcnn_bbox", "mrcnn_mask"])
+elif init_with == "cucumber":
+    # Load weights trained on MS COCO, but skip layers that
+    # are different due to the different number of classes
+    # See README for instructions to download the COCO weights
+    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 02:39:37.129662.h5", by_name=True)
+
 
 
 # In[ ]:
@@ -187,9 +193,9 @@ elif init_with == "coco":
 
 
 # In[ ]:
-# asher todo: uncomment later when heads training is working
+# asher todo: update later to newLearning rate if needed
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=30, layers="all")
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
 
 
 # In[ ]:
@@ -212,7 +218,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-15 23:06:29.863529.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 02:39:37.129662.h5")
 # model_path = model.find_last()
 
 
