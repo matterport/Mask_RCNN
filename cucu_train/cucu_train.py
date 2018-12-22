@@ -1,9 +1,19 @@
 
+# coding: utf-8
+
+# In[ ]:
+
+
+
+
 
 # In[1]:
 
 
+
+
 import os
+import glob
 from os.path import dirname, abspath
 import sys
 import datetime
@@ -42,7 +52,10 @@ if not os.path.exists(COCO_MODEL_PATH):
     utils.download_trained_weights(COCO_MODEL_PATH)
   
 
-# In[2]:
+
+# In[11]:
+
+
 
 
 
@@ -83,14 +96,17 @@ class cucumberConfig(Config):
 
     VALIDATION_STEPS = 5
      # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.7
+    DETECTION_MIN_CONFIDENCE = 0.9
     
 config = cucumberConfig()
 config.display()
 
 
 
-# In[2]:
+
+# In[3]:
+
+
 
 # Training dataset
 # asher todo: add a choice from which dataset to generate
@@ -106,11 +122,14 @@ dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
-# In[4]:
+
+# In[ ]:
+
+
 
 # asher todo: change code to fit new load_image method of coco
 #show n random image&mask train examples
-n = 1
+n = 5
 image_ids = np.random.choice(dataset_train.image_ids, n)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)
@@ -124,51 +143,18 @@ for image_id in image_ids:
 
 
 
-
-
-w = 16
-h = 16
-
-
-n = 1
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
-
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
-
-    plt.imshow(image)
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
-    
-    
-    fig = plt.figure(frameon=False, dpi=64)
-    fig.set_size_inches(w,h)
-
-    ax = plt.Axes(fig, [0., 0., 1., 1.])
-    ax.set_axis_off()
-    fig.add_axes(ax)
-    
-    plt.imshow(mask_to_image(mask))
-    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
-
-    plt.show()
-    
-
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 
 
 
-# In[5]:
+
+# In[ ]:
+
+
 
 # Which weights to start with?
-init_with = "cucumber"  # imagenet, coco, or last
+init_with = "coco"  # imagenet, coco, or last
 
 if init_with == "imagenet":
     model.load_weights(model.get_imagenet_weights(), by_name=True)
@@ -183,11 +169,14 @@ elif init_with == "cucumber":
     # Load weights trained on MS COCO, but skip layers that
     # are different due to the different number of classes
     # See README for instructions to download the COCO weights
-    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 13:24:57.542274.h5", by_name=True)
+    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 17:17:10.830997.h5", by_name=True)
+
 
 
 
 # In[ ]:
+
+
 # Train the head branches
 # Passing layers="heads" freezes all layers except the head
 # layers. You can also pass a regular expression to select
@@ -196,14 +185,18 @@ elif init_with == "cucumber":
 # model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=1, layers='heads')
 
 
+
 # In[ ]:
-# asher todo: update later to newLearning rate if needed
+
+
 #asher todo: make for loop on generated and real data set
-newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=15, layers="all")
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+
 
 
 # In[ ]:
+
+
 # Save weights
 # Typically not needed because callbacks save after every epoch
 # Uncomment to save manually
@@ -211,7 +204,48 @@ now = datetime.datetime.now()
 model_path = os.path.join(MODEL_DIR, "cucuWheights_" + str(now) + ".h5")
 model.keras_model.save_weights(model_path)
 
-# In[6]:
+
+
+# In[8]:
+
+
+list_of_files = glob.glob(MODEL_DIR +'/*')
+latest_file = max(list_of_files, key=os.path.getctime)
+
+
+# In[ ]:
+
+
+
+# Training dataset
+# asher todo: add a choice from which dataset to generate
+# dataset_train = realDataset()
+# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.prepare()
+
+# Validation dataset
+dataset_val = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.prepare()
+# In[1]
+list_of_files = glob.glob(MODEL_DIR)
+latest_file = max(list_of_files, key=os.path.getctime)
+model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+model.load_weights(MODEL_DIR + '/' + latest_file, by_name=True)
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+# Save weights
+# Typically not needed because callbacks save after every epoch
+# Uncomment to save manually
+now = datetime.datetime.now()
+model_path = os.path.join(MODEL_DIR, "cucuWheights_" + str(now) + ".h5")
+model.keras_model.save_weights(model_path)
+
+
+# In[12]:
+
+
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
@@ -223,16 +257,19 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 17:17:10.830997.h5")
+# model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 17:17:10.830997.h5")
 # model_path = model.find_last()
 
 
 # Load trained weights
-print("Loading weights from ", model_path)
-model.load_weights(model_path, by_name=True)
+print("Loading weights from ", latest_file)
+model.load_weights(latest_file, by_name=True)
 
 
-# In[10]:
+
+# In[14]:
+
+
 def get_ax(rows=1, cols=1, size=8):
     """Return a Matplotlib Axes array to be used in
     all visualizations in the notebook. Provide a
@@ -261,7 +298,10 @@ for filename in sorted(os.listdir(tests_location)):
 
 
 
+
 # In[ ]:
+
+
 
 
 # # Compute VOC-Style mAP @ IoU=0.5
@@ -287,7 +327,10 @@ for filename in sorted(os.listdir(tests_location)):
 
 
 
+
 # In[ ]:
+
+
 
 
 
