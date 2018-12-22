@@ -10,10 +10,10 @@ from mrcnn import utils
 from PIL import Image
 from cucu_utils import *
 
-minimum_number_of_cucumbers = 5
+minimum_number_of_cucumbers = 10
 maximum_number_of_cucumbers = 20
 #number_of_cucumbers = 4
-min_scale = 0.4
+min_scale = 0.3
 max_scale = 0.5
 
 
@@ -243,7 +243,7 @@ class genDataset(utils.Dataset):
             
         # Apply non-max suppression wit 0.3 threshold to avoid
         # shapes covering each other
-        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.3)
+        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.4)
         shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
         return bg_color, shapes
     
