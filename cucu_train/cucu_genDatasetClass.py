@@ -36,29 +36,26 @@ class genDataset(utils.Dataset):
         self.folder_objects_flower = folder_objects_flower
         self.folder_bgs = folder_bgs
         self.cucumberObj = []
-        self.img3 = []
-        self.img4 = []
+        self.leafObj = []
+        self.flowerObj = []
         self.bg = []
  
         # asher todo: beautify calls -> pass a super folder which contains sub folders per object
         for root, _, files in os.walk(self.folder_objects_cucumber):
             for filename in files:
-                #self.cucumberObj.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
                 self.cucumberObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_objects = next(os.walk(self.folder_objects_cucumber))
         self.number_of_cucumbers = len(files_objects)
 
         for root, _, files in os.walk(self.folder_objects_flower):
             for filename in files:
-                #self.cucumberObj.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.img4.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
+                self.flowerObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_objects = next(os.walk(self.folder_objects_flower))
         self.number_of_flowers = len(files_objects)
         
-        for root, _, files in os.walk(self.folder_objects_cucumber):
+        for root, _, files in os.walk(self.folder_objects_leaf):
             for filename in files:
-                #self.cucumberObj.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.img3.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
+                self.leafObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_objects = next(os.walk(self.folder_objects_leaf))
         self.number_of_leaves = len(files_objects)
         
@@ -146,10 +143,18 @@ class genDataset(utils.Dataset):
         Draws a shape from the given specs.
         image - is just initiated to zeroes matrix 
         """
-        if shape == 'cucumber':
+        if 'cucumber' == shape:
             x_location, y_location = location
             x_scale, y_scale = scale
             image = add_imageWithoutTransparency(image, np.array(self.cucumberObj[index]), x_location, y_location, x_scale, y_scale, angle)
+        if 'leaf' == shape:
+            x_location, y_location = location
+            x_scale, y_scale = scale
+            image = add_imageWithoutTransparency(image, np.array(self.leafObj[index]), x_location, y_location, x_scale, y_scale, angle)
+        if 'flower' == shape:
+            x_location, y_location = location
+            x_scale, y_scale = scale
+            image = add_imageWithoutTransparency(image, np.array(self.flowerObj[index]), x_location, y_location, x_scale, y_scale, angle)
         return image
 
 
@@ -162,27 +167,17 @@ class genDataset(utils.Dataset):
         
 
         if shape == 'cucumber':
-            #print("leaf added")
-            #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            # print(type(self.cucumberObj[index]))
             Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle)
         if shape == 'leaf':
-            #print("leaf added")
-            #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            # print(type(self.cucumberObj[index]))
-            Collage = add_image(Collage, self.img3[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle)
         if shape == 'flower':
-            #print("leaf added")
-            #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            # print(type(self.cucumberObj[index]))
-            Collage = add_image(Collage, self.img4[index], x_location, y_location, x_scale, y_scale, angle)
-        # asher todo: else?
+            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle)
         return Collage
     
     
@@ -207,11 +202,16 @@ class genDataset(utils.Dataset):
         # Angle
         angle = randint(-10,10)
         # Image index
-        index = randint(0, self.number_of_cucumbers-1)
-        
+        if "cucumber" == shape:
+            index = randint(0, self.number_of_cucumbers-1)
+        elif "leaf" == shape:
+            index = randint(0, self.number_of_leaves-1)
+        elif "flower" == shape:
+            index = randint(0, self.number_of_flowers-1)
+
         return shape, (x_location, y_location), (x_scale, y_scale), angle, index
     
-    # asher note: we don't use this func. for now
+    # asher note: we don't use this func. for now ->doesn't support multi-shapes for now!!!!!!!!!!!!!!!!!!!!
     def random_image_opencv(self, height, width):
         """Creates random specifications of an image with multiple shapes.
         Returns the background color of the image and a list of shape
@@ -264,7 +264,12 @@ class genDataset(utils.Dataset):
             
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
-            y, x,channels = np.asarray(self.cucumberObj[index]).shape
+            if "cucumber" == shape:
+                y, x,channels = np.asarray(self.cucumberObj[index]).shape
+            elif "leaf" == shape:
+                y, x,channels = np.asarray(self.leafObj[index]).shape
+            elif "flower" == shape:
+                y, x,channels = np.asarray(self.flowerObj[index]).shape
             shapes.append((shape, location, scale, angle, index))
             boxes.append([location[1], location[0], location[1] + y, location[0] + x])
             

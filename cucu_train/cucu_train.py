@@ -113,15 +113,18 @@ config.display()
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 # asher todo: finish new classes calls
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers', 
-                            ROOT_DIR + '/cucu_train/leaves',
-                            ROOT_DIR + '/cucu_train/flowers',
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/leaves_objects',
+                            ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder', config)
 dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/leaves_objects',
+                            ROOT_DIR + '/cucu_train/flower_objects',
+                        ROOT_DIR + '/cucu_train/background_folder', config)
 dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
@@ -213,38 +216,38 @@ model.keras_model.save_weights(model_path)
 # In[8]:
 
 
-list_of_files = glob.glob(MODEL_DIR +'/*')
-latest_file = max(list_of_files, key=os.path.getctime)
+# list_of_files = glob.glob(MODEL_DIR +'/*')
+# latest_file = max(list_of_files, key=os.path.getctime)
 
 
-# In[ ]:
+# # In[ ]:
 
 
 
-# Training dataset
-# asher todo: add a choice from which dataset to generate
-# dataset_train = realDataset()
-# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_train.prepare()
+# # Training dataset
+# # asher todo: add a choice from which dataset to generate
+# # dataset_train = realDataset()
+# # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+# dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+# dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# dataset_train.prepare()
 
-# Validation dataset
-dataset_val = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_val.prepare()
-# In[1]
-list_of_files = glob.glob(MODEL_DIR)
-latest_file = max(list_of_files, key=os.path.getctime)
-model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
-model.load_weights(MODEL_DIR + '/' + latest_file, by_name=True)
-model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
-# Save weights
-# Typically not needed because callbacks save after every epoch
-# Uncomment to save manually
-now = datetime.datetime.now()
-model_path = os.path.join(MODEL_DIR, "cucuWheights_" + str(now) + ".h5")
-model.keras_model.save_weights(model_path)
+# # Validation dataset
+# dataset_val = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+# dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# dataset_val.prepare()
+# # In[1]
+# list_of_files = glob.glob(MODEL_DIR)
+# latest_file = max(list_of_files, key=os.path.getctime)
+# model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
+# model.load_weights(MODEL_DIR + '/' + latest_file, by_name=True)
+# model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+# # Save weights
+# # Typically not needed because callbacks save after every epoch
+# # Uncomment to save manually
+# now = datetime.datetime.now()
+# model_path = os.path.join(MODEL_DIR, "cucuWheights_" + str(now) + ".h5")
+# model.keras_model.save_weights(model_path)
 
 
 # In[12]:
