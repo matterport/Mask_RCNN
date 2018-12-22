@@ -3,18 +3,18 @@
 import os
 from os.path import dirname, abspath
 import sys
-import random
+from random import randint , choice, uniform
 import numpy as np
 import cv2
 from mrcnn import utils
 from PIL import Image
 from cucu_utils import *
 
-minimum_number_of_cucumbers = 10
-maximum_number_of_cucumbers = 120
+minimum_number_of_cucumbers = 5
+maximum_number_of_cucumbers = 20
 #number_of_cucumbers = 4
-min_scale = 0.4
-max_scale = 1.1
+min_scale = 0.2
+max_scale = 0.6
 
 
 
@@ -83,19 +83,19 @@ class genDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         
-        index = random.randint(0, self.number_of_bgs-1) 
+        index = randint(0, self.number_of_bgs-1) 
         
         # pull some random background from loaded bg set. which are typcally big
         y_topRight, x_topRight,channels = np.asarray(self.bg[index]).shape
         y_max, x_max ,_ = np.asarray(self.bg[index]).shape
 
         # pick random up-right corner
-        x_topRight = random.randint(x_max- self.config.IMAGE_MAX_DIM , x_max)
-        y_topRight = random.randint(y_max- self.config.IMAGE_MAX_DIM , y_max)
+        x_topRight = randint(x_max- self.config.IMAGE_MAX_DIM , x_max)
+        y_topRight = randint(y_max- self.config.IMAGE_MAX_DIM , y_max)
 
         # pick bottom-left corner for cropping the bg to fir image size which is (self.config.IMAGE_MAX_DIM)^2
-        x_bottomLeft = random.randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
-        y_bottomLeft = random.randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
+        x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
+        y_bottomLeft = randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
 
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
         area = (x_bottomLeft, y_bottomLeft,                 x_bottomLeft+self.config.IMAGE_MAX_DIM, y_bottomLeft+self.config.IMAGE_MAX_DIM)
@@ -161,18 +161,18 @@ class genDataset(utils.Dataset):
                             and location. Differs per shape type.
         """
         # Shape
-        shape = random.choice(["cucumber"])
+        shape = choice(["cucumber"])
         # Color
         # TopLeft x, y
-        x_location = random.randint(0, height)
-        y_location = random.randint(0, width)
+        x_location = randint(0, height)
+        y_location = randint(0, width)
         # Scale x, y
-        x_scale = random.uniform(min_scale, max_scale)
-        y_scale = random.uniform(min_scale, max_scale)
+        x_scale = uniform(min_scale, max_scale)
+        y_scale = uniform(min_scale, max_scale)
         # Angle
-        angle = random.randint(0, 359)
+        angle = choice([randint(260, 280), randint(80,100)])
         # Image index
-        index = random.randint(0, self.number_of_cucumbers-1)
+        index = randint(0, self.number_of_cucumbers-1)
         
         return shape, (x_location, y_location), (x_scale, y_scale), angle, index
     
@@ -183,13 +183,13 @@ class genDataset(utils.Dataset):
         specifications that can be used to draw the image.
         """
         # Pick random background color
-        bg_color = np.array([random.randint(0, 255) for _ in range(3)])
+        bg_color = np.array([randint(0, 255) for _ in range(3)])
         # Generate a few random shapes and record their
         # bounding boxes
         shapes = []
         boxes = []
         indexes  = []
-        N = random.randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
+        N = randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
         
         image = np.ones([height, width, 3], dtype=np.uint8)
         
@@ -219,13 +219,13 @@ class genDataset(utils.Dataset):
         specifications that can be used to draw the image.
         """
         # Pick random background color
-        bg_color = np.array([random.randint(0, 255) for _ in range(3)])
+        bg_color = np.array([randint(0, 255) for _ in range(3)])
         # Generate a few random shapes and record their
         # bounding boxes
         shapes = []
         boxes = []
         indexes  = []
-        N = random.randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
+        N = randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
             
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)

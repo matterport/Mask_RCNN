@@ -92,8 +92,11 @@ config.display()
 # In[2]:
 
 # Training dataset
-dataset_train = realDataset()
-dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+# asher todo: add a choice from which dataset to generate
+# dataset_train = realDataset()
+# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
@@ -105,14 +108,14 @@ dataset_val.prepare()
 # In[4]:
 
 # asher todo: change code to fit new load_image method of coco
-# #show n random image&mask train examples
-# n = 1
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
-#     print(image.shape)
-#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+#show n random image&mask train examples
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
 
 
 
@@ -122,38 +125,38 @@ dataset_val.prepare()
 
 
 
-# w = 16
-# h = 16
+w = 16
+h = 16
 
 
-# n = 1
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
+n = 1
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
     
-#     fig = plt.figure(frameon=False, dpi=64)
-#     fig.set_size_inches(w,h)
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
 
-#     ax = plt.Axes(fig, [0., 0., 1., 1.])
-#     ax.set_axis_off()
-#     fig.add_axes(ax)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
 
-#     plt.imshow(image)
-#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+    plt.imshow(image)
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
     
     
-#     fig = plt.figure(frameon=False, dpi=64)
-#     fig.set_size_inches(w,h)
+    fig = plt.figure(frameon=False, dpi=64)
+    fig.set_size_inches(w,h)
 
-#     ax = plt.Axes(fig, [0., 0., 1., 1.])
-#     ax.set_axis_off()
-#     fig.add_axes(ax)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
     
-#     plt.imshow(mask_to_image(mask))
-#     # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
+    plt.imshow(mask_to_image(mask))
+    # fig.savefig('/Users/AsherYartsev/Desktop' + str(image_id) + '.png')
 
-#     plt.show()
+    plt.show()
     
 
 # Create model in training mode

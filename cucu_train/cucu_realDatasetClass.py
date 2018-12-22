@@ -32,6 +32,7 @@ class realDataset(utils.Dataset):
         image_dir = "{}".format(dataset_dir)
 
         # All classes
+        # asher todo: instead of coco lets add our categories
         class_ids = sorted(coco.getCatIds())
 
         # All images or a subset?
