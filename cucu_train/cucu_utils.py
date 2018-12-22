@@ -45,32 +45,32 @@ def rotate_bound(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def add_image(img1, img2, x_center, y_center, x_scale, y_scale, angle):
+def add_image(img1, cucumberObj, x_center, y_center, x_scale, y_scale, angle):
     """
     name I gave: pasteImageOnOther ruined the overriding of base class function
     pasting re-scaled image on other image (collage effect)
     """
-    img2 = img2.resize((int(x_scale*img2.size[0]),int(y_scale*img2.size[1])), Image.ANTIALIAS)
+    cucumberObj = cucumberObj.resize((int(x_scale*cucumberObj.size[0]),int(y_scale*cucumberObj.size[1])), Image.ANTIALIAS)
 
-    img2 = img2.rotate(angle, resample=Image.BICUBIC, expand=True)
+    cucumberObj = cucumberObj.rotate(angle, resample=Image.BICUBIC, expand=True)
     
 
-    rows,cols,channels = np.asarray(img2).shape
+    rows,cols,channels = np.asarray(cucumberObj).shape
     x_from = x_center - math.floor(cols/2.)
     y_from = y_center - math.floor(rows/2.)
 
-    img1.paste(img2, (x_from, y_from), img2)
+    img1.paste(cucumberObj, (x_from, y_from), cucumberObj)
 
     return img1
 
-def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scale, angle):
+def add_imageWithoutTransparency(img1, cucumberObj, x_center, y_center, x_scale, y_scale, angle):
     """
     pasting re-scaled image on other image (collage effect) without transparency
-    img2 - an object on transparent background from ./objects folder
+    cucumberObj - an object on transparent background from ./objects folder
     """
     # apply all transformation-data saved on the object - so we have it's exact appearance in a certain Collage
     # it belongs to.
-    objectInCollage = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
+    objectInCollage = cv2.resize(cucumberObj,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
 
     #Rotate
     objectInCollage = rotate_bound(objectInCollage, 360-angle)
@@ -117,7 +117,7 @@ def add_imageWithoutTransparency(img1, img2, x_center, y_center, x_scale, y_scal
     img2_fg = cv2.bitwise_and(objectInCollage,objectInCollage,mask = mask)
     # Put logo in ROI and modify the main image
     #print(img1.shape)
-    #print(img2.shape)
+    #print(cucumberObj.shape)
     dst = cv2.add(img1_bg,img2_fg[:,:,0:3])
     img1[y_from:y_to, x_from:x_to] = dst
     return img1

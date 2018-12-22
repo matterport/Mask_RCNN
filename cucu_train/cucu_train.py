@@ -61,7 +61,7 @@ class cucumberConfig(Config):
     # IMAGES_PER_GPU = 2
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # background + 1 shape (cucumber)
+    NUM_CLASSES = 1 + 3  # background + cucumber, leaf, flower
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -96,7 +96,11 @@ config.display()
 # asher todo: add a choice from which dataset to generate
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
+# asher todo: finish new classes calls
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers', 
+                            ROOT_DIR + '/cucu_train/leaves',
+                            ROOT_DIR + '/cucu_train/flowers',
+                        ROOT_DIR + '/cucu_train/background_folder', config)
 dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 

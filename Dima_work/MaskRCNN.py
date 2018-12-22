@@ -137,23 +137,23 @@ def rotate_bound(image, angle):
     # perform the actual rotation and return the image
     return cv2.warpAffine(image, M, (nW, nH))
 
-def add_image_without_transparency_2(img1, img2, x_location, y_location, x_scale, y_scale, angle):
+def add_image_without_transparency_2(img1, cucumberObj, x_location, y_location, x_scale, y_scale, angle):
     #
     x_offset = x_location
     y_offset = y_location
 
-    img2 = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
+    cucumberObj = cv2.resize(cucumberObj,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
 
     #Rotate
-    img2 = rotate_bound(img2, angle)
+    cucumberObj = rotate_bound(cucumberObj, angle)
     
     # I want to put logo on top-left corner, So I create a ROI
-    rows,cols,channels = img2.shape
+    rows,cols,channels = cucumberObj.shape
 
     roi = img1[y_offset:rows+y_offset, x_offset:cols+x_offset ]
 
     # Now create a mask of logo and create its inverse mask also
-    img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+    img2gray = cv2.cvtColor(cucumberObj,cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(img2gray, 1, 255, cv2.THRESH_BINARY)
     mask_inv = cv2.bitwise_not(mask)
     # Now black-out the area of logo in ROI
@@ -161,20 +161,20 @@ def add_image_without_transparency_2(img1, img2, x_location, y_location, x_scale
     #TODO fix error for 512
     img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
     # Take only region of logo from logo image.
-    img2_fg = cv2.bitwise_and(img2,img2,mask = mask)
+    img2_fg = cv2.bitwise_and(cucumberObj,cucumberObj,mask = mask)
     # Put logo in ROI and modify the main image
     dst = cv2.add(img1_bg,img2_fg)
     img1[y_offset:rows+y_offset, x_offset:cols+x_offset ] = dst
     return img1
 
-def add_image_without_transparency(img1, img2, x_center, y_center, x_scale, y_scale, angle):
-    img2 = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
+def add_image_without_transparency(img1, cucumberObj, x_center, y_center, x_scale, y_scale, angle):
+    cucumberObj = cv2.resize(cucumberObj,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
 
     #Rotate
-    img2 = rotate_bound(img2, 360-angle)
+    cucumberObj = rotate_bound(cucumberObj, 360-angle)
     
     # I want to put logo on top-left corner, So I create a ROI
-    rows,cols,channels = img2.shape
+    rows,cols,channels = cucumberObj.shape
     x_from = x_center - math.floor(cols/2.)
     x_to = x_center + math.ceil(cols/2.)
     y_from = y_center - math.floor(rows/2.)
@@ -184,48 +184,48 @@ def add_image_without_transparency(img1, img2, x_center, y_center, x_scale, y_sc
     
     #cases image out of bg image
     if x_from < 0:
-        img2 = img2[:,-x_from:]
+        cucumberObj = cucumberObj[:,-x_from:]
         x_from = 0
     if x_to >= x_max:
-        img2 = img2[:,:-(x_to-x_max+1)]
+        cucumberObj = cucumberObj[:,:-(x_to-x_max+1)]
         x_to = x_max-1
     if y_from < 0:
-        img2 = img2[-y_from:,:]
+        cucumberObj = cucumberObj[-y_from:,:]
         y_from = 0
     if y_to >= y_max:
-        img2 = img2[:-(y_to-y_max+1),:]
+        cucumberObj = cucumberObj[:-(y_to-y_max+1),:]
         y_to = y_max-1
     
     roi = img1[y_from:y_to, x_from:x_to]
 
     # Now create a mask of logo and create its inverse mask also
-    img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+    img2gray = cv2.cvtColor(cucumberObj,cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(img2gray, 1, 255, cv2.THRESH_BINARY)
     #TODO use my mask
-    #mask = image_to_mask(img2)
+    #mask = image_to_mask(cucumberObj)
     mask_inv = cv2.bitwise_not(mask)
     # Now black-out the area of logo in ROI
     img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
     # Take only region of logo from logo image.
-    img2_fg = cv2.bitwise_and(img2,img2,mask = mask)
+    img2_fg = cv2.bitwise_and(cucumberObj,cucumberObj,mask = mask)
     # Put logo in ROI and modify the main image
     #print(img1.shape)
-    #print(img2.shape)
+    #print(cucumberObj.shape)
     dst = cv2.add(img1_bg,img2_fg[:,:,0:3])
     img1[y_from:y_to, x_from:x_to] = dst
     return img1
 
-def add_image(img1, img2, x_center, y_center, x_scale, y_scale, angle):
-    img2 = img2.resize((int(x_scale*img2.size[0]),int(y_scale*img2.size[1])), Image.ANTIALIAS)
+def add_image(img1, cucumberObj, x_center, y_center, x_scale, y_scale, angle):
+    cucumberObj = cucumberObj.resize((int(x_scale*cucumberObj.size[0]),int(y_scale*cucumberObj.size[1])), Image.ANTIALIAS)
 
-    img2 = img2.rotate(angle, resample=Image.BICUBIC, expand=True)
+    cucumberObj = cucumberObj.rotate(angle, resample=Image.BICUBIC, expand=True)
     
 
-    rows,cols,channels = np.asarray(img2).shape
+    rows,cols,channels = np.asarray(cucumberObj).shape
     x_from = x_center - math.floor(cols/2.)
     y_from = y_center - math.floor(rows/2.)
 
-    img1.paste(img2, (x_from, y_from), img2)
+    img1.paste(cucumberObj, (x_from, y_from), cucumberObj)
     
     return img1
 
@@ -261,12 +261,12 @@ class LeafsDataset(utils.Dataset):
         utils.Dataset.__init__(self)
         self.folder_objects = folder_objects
         self.folder_bgs = folder_bgs
-        self.img2 = []
+        self.cucumberObj = []
         self.bg = []
         for root, _, files in os.walk(self.folder_objects):
             for filename in files:
-                #self.img2.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.img2.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
+                #self.cucumberObj.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
+                self.cucumberObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
         _, _, files_objects = next(os.walk(self.folder_objects))
         self.number_of_leafs = len(files_objects)
                 
@@ -349,40 +349,40 @@ class LeafsDataset(utils.Dataset):
         fig, (ax1, ax2) = plt.subplots(1,2)
 
         
-        img2 = self.img2[index]
-        ax1.imshow(img2)
+        cucumberObj = self.cucumberObj[index]
+        ax1.imshow(cucumberObj)
 
         img1 = mask
-        img2 = cv2.resize(img2,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
+        cucumberObj = cv2.resize(cucumberObj,None,fx=x_scale, fy=y_scale, interpolation = cv2.INTER_CUBIC)
 
         # I want to put logo on top-left corner, So I create a ROI
-        rows,cols,channels = img2.shape
+        rows,cols,channels = cucumberObj.shape
 
         #Rotate
-        img2 = rotate_bound(img2, angle)
+        cucumberObj = rotate_bound(cucumberObj, angle)
 
         #ax2.imshow(mask, cmap='gray')
         
-        ax2.imshow(img2)
+        ax2.imshow(cucumberObj)
 
         
         roi = img1[y_location:rows+y_location, x_location:cols+x_location ]
 
         # Now create a mask of logo and create its inverse mask also
-        img2gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+        img2gray = cv2.cvtColor(cucumberObj,cv2.COLOR_BGR2GRAY)
         ret, mask = cv2.threshold(img2gray, 1, 255, cv2.THRESH_BINARY)
         mask_inv = cv2.bitwise_not(mask)
         # Now black-out the area of logo in ROI
         img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
         # Take only region of logo from logo image.
-        img2_fg = cv2.bitwise_and(img2,img2,mask = mask)
+        img2_fg = cv2.bitwise_and(cucumberObj,cucumberObj,mask = mask)
         # Put logo in ROI and modify the main image
         dst = cv2.add(img1_bg,img2_fg)
         img1[y_location:rows+y_location, x_offset:cols+x_location ] = dst
         
         x_location, y_location = location
         x_scale, y_scale = scale
-        mask = add_image(mask, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
+        mask = add_image(mask, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle)
         return mask
     
     def draw_shape_without_transparency(self, image, shape, location, scale, angle, index):
@@ -390,7 +390,7 @@ class LeafsDataset(utils.Dataset):
         if shape == 'leaf':
             x_location, y_location = location
             x_scale, y_scale = scale
-            image = add_image_without_transparency(image, np.array(self.img2[index]), x_location, y_location, x_scale, y_scale, angle)
+            image = add_image_without_transparency(image, np.array(self.cucumberObj[index]), x_location, y_location, x_scale, y_scale, angle)
 
         elif shape == 'square':
             cv2.rectangle(image, (x-s, y-s), (x+s, y+s), color, -1)
@@ -416,8 +416,8 @@ class LeafsDataset(utils.Dataset):
             #i=0
             x_location, y_location = location
             x_scale, y_scale = scale
-            #print(type(self.img2[index]))
-            image = add_image(image, self.img2[index], x_location, y_location, x_scale, y_scale, angle)
+            #print(type(self.cucumberObj[index]))
+            image = add_image(image, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle)
             #while(i!=1):
             #    try:
             #        
@@ -483,15 +483,15 @@ class LeafsDataset(utils.Dataset):
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
             
-            image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
-            y, x, _ = self.img2[index].shape
+            image = add_image(image, self.cucumberObj[index], location[0], location[1], scale[0], scale[1], angle)
+            y, x, _ = self.cucumberObj[index].shape
             
             #i=0
             #while(i!=1):
             #    shape, location, scale, angle, index = self.random_shape(height, width)
             #    try:
-            #        image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
-            #        y, x, _ = self.img2[index].shape
+            #        image = add_image(image, self.cucumberObj[index], location[0], location[1], scale[0], scale[1], angle)
+            #        y, x, _ = self.cucumberObj[index].shape
             #        i+=1
             #    except:
             #        pass
@@ -532,16 +532,16 @@ class LeafsDataset(utils.Dataset):
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
             
-            #image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
-            #y, x, _ = self.img2[index].shape
-            y, x,channels = np.asarray(self.img2[index]).shape
+            #image = add_image(image, self.cucumberObj[index], location[0], location[1], scale[0], scale[1], angle)
+            #y, x, _ = self.cucumberObj[index].shape
+            y, x,channels = np.asarray(self.cucumberObj[index]).shape
             
             #i=0
             #while(i!=1):
             #    shape, location, scale, angle, index = self.random_shape(height, width)
             #    try:
-            #        image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
-            #        y, x, _ = self.img2[index].shape
+            #        image = add_image(image, self.cucumberObj[index], location[0], location[1], scale[0], scale[1], angle)
+            #        y, x, _ = self.cucumberObj[index].shape
             #        i+=1
             #    except:
             #        pass
