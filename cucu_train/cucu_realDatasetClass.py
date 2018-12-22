@@ -13,7 +13,7 @@ from cocoapi.PythonAPI.pycocotools import mask as maskUtils
 
 
 class realDataset(utils.Dataset):
-    def load_image(self,annotations_path, dataset_dir):
+    def load_dataset(self,annotations_path, dataset_dir):
         """Load a subset of the COCO dataset.
         dataset_dir: The root directory of the COCO dataset.
         subset: What to load (train, val, minival, valminusminival)

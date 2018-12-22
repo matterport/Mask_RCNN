@@ -80,9 +80,9 @@ class cucumberConfig(Config):
     #asher todo: enlarge to 100 when real training occures
     STEPS_PER_EPOCH = 100
 
-    VALIDATION_STEPS = 1
+    VALIDATION_STEPS = 5
      # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.6
+    DETECTION_MIN_CONFIDENCE = 0.7
     
 config = cucumberConfig()
 config.display()
@@ -92,11 +92,16 @@ config.display()
 # In[2]:
 
 # Training dataset
+<<<<<<< HEAD
 # asher todo: add a choice from which dataset to generate
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
 dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+=======
+dataset_train = realDataset()
+dataset_train.load_dataset(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+>>>>>>> b13542e82763a33a3b3c5002e1d7839ac54c391a
 dataset_train.prepare()
 
 # Validation dataset
@@ -167,7 +172,7 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=MODEL_DIR)
 # In[5]:
 
 # Which weights to start with?
-init_with = "coco"  # imagenet, coco, or last
+init_with = "cucumber"  # imagenet, coco, or last
 
 if init_with == "imagenet":
     model.load_weights(model.get_imagenet_weights(), by_name=True)
@@ -178,6 +183,12 @@ elif init_with == "coco":
     model.load_weights(COCO_MODEL_PATH, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
                                 "mrcnn_bbox", "mrcnn_mask"])
+elif init_with == "cucumber":
+    # Load weights trained on MS COCO, but skip layers that
+    # are different due to the different number of classes
+    # See README for instructions to download the COCO weights
+    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 02:39:37.129662.h5", by_name=True)
+
 
 
 # In[ ]:
@@ -190,9 +201,9 @@ elif init_with == "coco":
 
 
 # In[ ]:
-# asher todo: uncomment later when heads training is working
+# asher todo: update later to newLearning rate if needed
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate=newLearningRate, epochs=2, layers="all")
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
 
 
 # In[ ]:
@@ -215,7 +226,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-15 23:06:29.863529.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 02:39:37.129662.h5")
 # model_path = model.find_last()
 
 
