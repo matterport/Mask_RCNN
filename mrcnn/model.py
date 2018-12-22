@@ -1720,7 +1720,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                     load_image_gt(dataset, config, image_id, augment=augment,
                                 augmentation=augmentation,
                                 use_mini_mask=config.USE_MINI_MASK)
-                # gt_class_ids = np.ones_like(gt_class_ids)  # asher todo: TERRIBLE WORKARROUND DELETE AS SON AS POSSIBLE
                 print("started loading another image (AUG)")
 
 
