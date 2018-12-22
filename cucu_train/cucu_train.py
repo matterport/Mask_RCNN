@@ -92,16 +92,11 @@ config.display()
 # In[2]:
 
 # Training dataset
-<<<<<<< HEAD
 # asher todo: add a choice from which dataset to generate
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train = genDataset( ROOT_DIR + '/cucu_train/object_folder', ROOT_DIR + '/cucu_train/background_folder', config)
 dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-=======
-dataset_train = realDataset()
-dataset_train.load_dataset(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
->>>>>>> b13542e82763a33a3b3c5002e1d7839ac54c391a
 dataset_train.prepare()
 
 # Validation dataset
