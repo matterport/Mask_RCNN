@@ -182,7 +182,7 @@ elif init_with == "cucumber":
     # Load weights trained on MS COCO, but skip layers that
     # are different due to the different number of classes
     # See README for instructions to download the COCO weights
-    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 02:39:37.129662.h5", by_name=True)
+    model.load_weights(MODEL_DIR + "/cucuWheights_2018-12-22 13:24:57.542274.h5", by_name=True)
 
 
 
@@ -198,7 +198,7 @@ elif init_with == "cucumber":
 # In[ ]:
 # asher todo: update later to newLearning rate if needed
 newLearningRate = config.LEARNING_RATE / 5
-model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=15, layers="all")
 
 
 # In[ ]:
