@@ -13,8 +13,8 @@ from cucu_utils import *
 minimum_number_of_cucumbers = 5
 maximum_number_of_cucumbers = 20
 #number_of_cucumbers = 4
-min_scale = 0.2
-max_scale = 0.6
+min_scale = 0.4
+max_scale = 0.5
 
 
 
@@ -229,19 +229,13 @@ class genDataset(utils.Dataset):
             
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
-            # asher todo: do we need this?
-            #image = add_image(image, self.img2[index], location[0], location[1], scale[0], scale[1], angle)
-            #y, x, _ = self.img2[index].shape
             y, x,channels = np.asarray(self.img2[index]).shape
             shapes.append((shape, location, scale, angle, index))
-            #TODO boxes
-            #x, y, s = dims
-            #boxes.append([y-s, x-s, y+s, x+s])
             boxes.append([location[1], location[0], location[1] + y, location[0] + x])
             
         # Apply non-max suppression wit 0.3 threshold to avoid
         # shapes covering each other
-        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.3)
+        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.7)
         shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
         return bg_color, shapes
     

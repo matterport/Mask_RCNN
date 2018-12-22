@@ -18,9 +18,10 @@ from cucu_realDatasetClass import *
 
 import json
 
+ROOT_DIR = os.path.abspath("../")
 
 
-ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
+# ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 print(ROOT_DIR)
 
 # Import Mask RCNN
@@ -197,6 +198,7 @@ elif init_with == "cucumber":
 
 # In[ ]:
 # asher todo: update later to newLearning rate if needed
+#asher todo: make for loop on generated and real data set
 newLearningRate = config.LEARNING_RATE / 5
 model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=15, layers="all")
 
@@ -221,7 +223,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=M
 
 # Get path to saved weights
 # Either set a specific path or find last trained weights
-model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 02:39:37.129662.h5")
+model_path = os.path.join(MODEL_DIR, "cucuWheights_2018-12-22 17:17:10.830997.h5")
 # model_path = model.find_last()
 
 
