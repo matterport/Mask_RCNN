@@ -142,7 +142,7 @@ for image_id in image_ids:
     image = dataset_train.load_image(image_id)
     mask, class_ids = dataset_train.load_mask(image_id)
     print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 1)
+    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
 
 

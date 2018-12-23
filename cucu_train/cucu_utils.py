@@ -126,7 +126,9 @@ def mask_from_RGBA(image):
     return image[:,:,-1]
     
 def image_to_mask(image):
+    # init mask with zeroes.
     mask = np.zeros_like(image)
+    # as long as mask is a zero-matrix - continue
     while not np.any(mask):
         color = (0, 0, 0)
         distance = np.sum(image, axis=-1)
