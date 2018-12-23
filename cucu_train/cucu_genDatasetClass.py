@@ -10,8 +10,9 @@ from mrcnn import utils
 from PIL import Image
 from cucu_utils import *
 
-minimum_number_of_cucumbers = 10
-maximum_number_of_cucumbers = 20
+#asher todo: change this variable name - to bum_of_object
+minimum_number_of_cucumbers = 20
+maximum_number_of_cucumbers = 30
 #number_of_cucumbers = 4
 min_scale = 0.3
 max_scale = 0.5
@@ -191,7 +192,7 @@ class genDataset(utils.Dataset):
                             and location. Differs per shape type.
         """
         # Shape
-        shape = choice(["cucumber", "leaf", "flower"])
+        shape = choice(["cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower"])
         # Color
         # TopLeft x, y
         x_location = randint(0, height)

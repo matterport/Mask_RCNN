@@ -2346,7 +2346,6 @@ class MaskRCNN():
                                          no_augmentation_sources=no_augmentation_sources)
         val_generator = data_generator(val_dataset, self.config, shuffle=True,
                                        batch_size=self.config.BATCH_SIZE)
-        print("created data_generators")
         # Create log_dir if it does not exist
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
@@ -2354,9 +2353,10 @@ class MaskRCNN():
         # Callbacks
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=0, write_graph=True, write_images=False),
-            keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                        histogram_freq=0, write_graph=True, write_images=False)
+            # asher todo: add hyper parameter to controll save_weights_only
+            # ,keras.callbacks.ModelCheckpoint(self.checkpoint_path,
+            #                                 verbose=0, save_weights_only=True),
         ]
 
         # Add custom callbacks to the list

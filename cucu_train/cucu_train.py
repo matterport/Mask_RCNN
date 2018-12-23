@@ -92,9 +92,9 @@ class cucumberConfig(Config):
     #ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 10
 
-    VALIDATION_STEPS = 5
+    VALIDATION_STEPS = 2
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
     
@@ -117,7 +117,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
@@ -125,7 +125,7 @@ dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 
@@ -197,7 +197,7 @@ elif init_with == "cucumber":
 
 
 #asher todo: make for loop on generated and real data set
-model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=600, layers="all")
 
 
 
@@ -216,8 +216,8 @@ model.keras_model.save_weights(model_path)
 # In[8]:
 
 
-# list_of_files = glob.glob(MODEL_DIR +'/*')
-# latest_file = max(list_of_files, key=os.path.getctime)
+list_of_files = glob.glob(MODEL_DIR +'/*')
+latest_file = max(list_of_files, key=os.path.getctime)
 
 
 # # In[ ]:
