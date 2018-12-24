@@ -11,8 +11,8 @@ from PIL import Image
 from cucu_utils import *
 
 #asher todo: change this variable name - to bum_of_object
-minimum_number_of_cucumbers = 20
-maximum_number_of_cucumbers = 30
+minimum_number_of_cucumbers = 30
+maximum_number_of_cucumbers = 40
 #number_of_cucumbers = 4
 min_scale = 0.3
 max_scale = 0.5
@@ -192,7 +192,7 @@ class genDataset(utils.Dataset):
                             and location. Differs per shape type.
         """
         # Shape
-        shape = choice(["cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower"])
+        shape = choice(["cucumber","cucumber","cucumber" "leaf","leaf","leaf","leaf", "flower", "flower"])
         # Color
         # TopLeft x, y
         x_location = randint(0, height)
