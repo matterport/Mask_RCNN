@@ -192,7 +192,7 @@ class genDataset(utils.Dataset):
                             and location. Differs per shape type.
         """
         # Shape
-        shape = choice(["cucumber","cucumber","cucumber" "leaf","leaf","leaf","leaf", "flower", "flower"])
+        shape = choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"])
         # Color
         # TopLeft x, y
         x_location = randint(0, height)
