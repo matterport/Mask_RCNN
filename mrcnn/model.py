@@ -1713,14 +1713,14 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                 load_image_gt(dataset, config, image_id, augment=augment,
                               augmentation=None,
                               use_mini_mask=config.USE_MINI_MASK)
-                print("started loading another image (NO AUG)")
+                # print("started loading another image (NO AUG)")
 
             else:
                 image, image_meta, gt_class_ids, gt_boxes, gt_masks = \
                     load_image_gt(dataset, config, image_id, augment=augment,
                                 augmentation=augmentation,
                                 use_mini_mask=config.USE_MINI_MASK)
-                print("started loading another image (AUG)")
+                # print("started loading another image (AUG)")
 
 
             # Skip images that have no instances. This can happen in cases
@@ -2386,7 +2386,7 @@ class MaskRCNN():
             callbacks=callbacks,
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
-            max_queue_size=1,
+            max_queue_size=10,
             workers=1,
             use_multiprocessing=False,
         )
