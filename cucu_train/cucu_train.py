@@ -28,11 +28,13 @@ from cucu_realDatasetClass import *
 
 import json
 
-ROOT_DIR = os.path.abspath("../")
-
-
-# ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
+# ROOT_DIR = os.path.abspath("../")
+ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 print(ROOT_DIR)
+
+import faulthandler
+faulthandler.enable()
+# faulthandler.dump_traceback(file=ROOT_DIR +"/cucu_train/Dumps/dumps", all_threads=True)
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -71,10 +73,9 @@ class cucumberConfig(Config):
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
     IMAGES_PER_GPU = 2
-    # IMAGES_PER_GPU = 2
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 3  # background + cucumber, leaf, flower
+    NUM_CLASSES = 1 + 1 # background + cucumber, leaf, flower
 
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
@@ -89,7 +90,7 @@ class cucumberConfig(Config):
     TRAIN_ROIS_PER_IMAGE = 32
     
     #asher todo: can we utilize it better?
-    #ROI_POSITIVE_RATIO = 66  
+    ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
     STEPS_PER_EPOCH = 10
@@ -108,41 +109,48 @@ config.display()
 
 
 
-# Training dataset
-# asher todo: add a choice from which dataset to generate
-# dataset_train = realDataset()
-# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
-# asher todo: finish new classes calls
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/leaves_objects',
-                            ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# # Training dataset
+# # asher todo: add a choice from which dataset to generate
+# # asher todo: finish new classes calls
+# dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
+#                             ROOT_DIR + '/cucu_train/leaves_objects',
+#                             ROOT_DIR + '/cucu_train/flower_objects',
+#                         ROOT_DIR + '/cucu_train/background_folder', config)
+# dataset_train.load_shapes(50, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# # dataset_train = realDataset()
+# # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+# dataset_train.prepare()
+
+# # Validation dataset
+# dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
+#                             ROOT_DIR + '/cucu_train/leaves_objects',
+#                             ROOT_DIR + '/cucu_train/flower_objects',
+#                         ROOT_DIR + '/cucu_train/background_folder', config)
+# dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# dataset_val.prepare()
+
+
+dataset_train = realDataset()
+dataset_train.load_dataset(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
 
-# Validation dataset
-dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/leaves_objects',
-                            ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val = realDataset()
+dataset_val.load_dataset(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_val.prepare()
-
-
 
 # In[ ]:
 
 
 
-# asher todo: change code to fit new load_image method of coco
-#show n random image&mask train examples
-n = 5
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+# # asher todo: change code to fit new load_image method of coco
+# #show n random image&mask train examples
+# n = 5
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
+#     print(image.shape)
+#     visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
 
 

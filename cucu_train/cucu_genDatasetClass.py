@@ -11,11 +11,11 @@ from PIL import Image
 from cucu_utils import *
 
 #asher todo: change this variable name - to bum_of_object
-minimum_number_of_cucumbers = 30
-maximum_number_of_cucumbers = 40
+minimum_number_of_cucumbers = 50
+maximum_number_of_cucumbers = 70
 #number_of_cucumbers = 4
-min_scale = 0.3
-max_scale = 0.5
+min_scale = 0.5
+max_scale = 0.8
 
 
 
@@ -111,13 +111,14 @@ class genDataset(utils.Dataset):
         y_max, x_max ,_ = np.asarray(self.bg[index]).shape
 
         # pick random up-right corner
-        x_topRight = randint(x_max- self.config.IMAGE_MAX_DIM , x_max)
-        y_topRight = randint(y_max- self.config.IMAGE_MAX_DIM , y_max)
-
+        x_topRight = randint(x_max- self.config.IMAGE_MAX_DIM//4 , x_max)
+        y_topRight = randint(y_max- self.config.IMAGE_MAX_DIM//4 , y_max)
+        # print("y_topRight:" , y_topRight , "index:", index) #asher todo: delete this
         # pick bottom-left corner for cropping the bg to fir image size which is (self.config.IMAGE_MAX_DIM)^2
-        x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
-        y_bottomLeft = randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
-
+        # x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
+        # y_bottomLeft = randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
+        x_bottomLeft =x_topRight- self.config.IMAGE_MAX_DIM
+        y_bottomLeft = y_topRight- self.config.IMAGE_MAX_DIM
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
         area = (x_bottomLeft, y_bottomLeft,   x_bottomLeft+self.config.IMAGE_MAX_DIM, y_bottomLeft+self.config.IMAGE_MAX_DIM)
         image = self.bg[index].crop(area)
