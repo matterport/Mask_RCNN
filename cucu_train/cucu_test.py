@@ -1,11 +1,4 @@
 
-# coding: utf-8
-
-# In[ ]:
-
-
-
-
 
 # In[1]:
 
@@ -25,6 +18,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from cucu_genDatasetClass import *
 from cucu_config import cucumberConfig
+
 # from cucu_realDatasetClass import *
 
 import json
@@ -41,6 +35,7 @@ dumpTo = ROOT_DIR + "/cucu_train/Dumps/coreDump"
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
+from mrcnn.config import Config
 from mrcnn import utils
 import mrcnn.model as modellib
 from mrcnn import visualize
@@ -70,82 +65,8 @@ config = cucumberConfig()
 config.display()
 
 
-
-
-# In[3]:
-
-
-
-# Training dataset
-# asher todo: add a choice from which dataset to generate
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/leaves_objects',
-                            ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-# dataset_train = realDataset()
-# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
-dataset_train.prepare()
-
-# Validation dataset
-dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/leaves_objects',
-                            ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_val.prepare()
-
-# In[ ]:
-
-
-
-# asher todo: change code to fit new load_image method of coco
-#show n random image&mask train examples
-n = 5
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
-
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
-
-
-
-
-# In[ ]:
-
-
-
-# seleect your weapon of choice
-init_with = "coco" 
-list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
-latest_trained_model = max(list_of_trained_models, key=os.path.getctime)
-if(len(list_of_trained_models) == 0):
-     model.load_weights(COCO_MODEL_PATH, by_name=True,
-                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
-                                "mrcnn_bbox", "mrcnn_mask"])
-
-# In[ ]:
-
-
-#asher todo: make for loop on generated and real data set
-for _ in range(100):
-    model.load_weights(latest_trained_model, by_name=True)
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="all")
-
-    # Save weights
-    now = datetime.datetime.now()
-    model_path = os.path.join(TRAINED_MODELS_DIR, "cucuWheights_" + str(now) + ".h5")
-    model.keras_model.save_weights(model_path)
-
-    list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
-    oldest_trained_model = min(list_of_trained_models, key=os.path.getctime)
-    if len(list_of_trained_models) > config.MAX_SAVED_TRAINED_MODELS:
-        os.remove(oldest_trained_model)
-        
 
 
 
@@ -186,6 +107,14 @@ def get_ax(rows=1, cols=1, size=8):
     return ax
 
 
+# Training dataset
+# asher todo: find a workaround to get rid of initiating a dataset object here
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/leaves_objects',
+                            ROOT_DIR + '/cucu_train/flower_objects',
+                        ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.prepare()
 tests_location = ROOT_DIR + "/cucu_train/simple_test/"
 for filename in sorted(os.listdir(tests_location)):
     
@@ -193,14 +122,11 @@ for filename in sorted(os.listdir(tests_location)):
     t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
     results = model.detect([t], verbose=1)
     r = results[0]
-    visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
+    # visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
+    visualize.display_top_masks(t, r['masks'], r['class_ids'] ,dataset_train.class_names)
+
     t= dataset_train.class_names
     print(t)
-
-#asher todo: get inspiration from this later
-# # In[28]:
-
-
 
 
 # In[ ]:
