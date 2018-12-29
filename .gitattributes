@@ -1,6 +1,6 @@
 /cucu_train/background_folder filter=lfs diff=lfs merge=lfs -text
 /cucu_train/object_folder filter=lfs diff=lfs merge=lfs -text
-/cucu_train/weightsAndGraphs filter=lfs diff=lfs merge=lfs -text
+#/cucu_train/weightsAndGraphs filter=lfs diff=lfs merge=lfs -text
 /cucu_train/samples filter=lfs diff=lfs merge=lfs -text
 /cucu_train/trained_models filter=lfs diff=lfs merge=lfs -text
 /cucu_train/trained_models_good_results filter=lfs diff=lfs merge=lfs -text
