@@ -82,7 +82,7 @@ config.display()
 dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
+                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
 dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
@@ -92,7 +92,7 @@ dataset_train.prepare()
 dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
+                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
 dataset_val.load_shapes(5, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
