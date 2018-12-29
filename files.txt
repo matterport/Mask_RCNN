@@ -1,1 +1,0 @@
-c:\users\slous\appdata\local\conda\conda\envs\cucu\lib\site-packages\mask_rcnn-2.1-py3.6.egg
