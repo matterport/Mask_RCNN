@@ -6,6 +6,9 @@ import sys
 from random import randint , choice, uniform
 import numpy as np
 import cv2
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)  # To find local version of the library
+
 from mrcnn import utils
 from PIL import Image
 from cucu_utils import *
@@ -171,15 +174,15 @@ class genDataset(utils.Dataset):
         if shape == 'cucumber':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
         if shape == 'leaf':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
         if shape == 'flower':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
         return Collage
     
     

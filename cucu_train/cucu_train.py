@@ -63,7 +63,8 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 # In[11]:
 
-
+import sys
+print(sys.version)
 
 #create configurations for model instentiating
 config = cucumberConfig()
@@ -82,7 +83,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
@@ -92,7 +93,7 @@ dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(5, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -101,7 +102,7 @@ dataset_val.prepare()
 
 # asher todo: change code to fit new load_image method of coco
 #show n random image&mask train examples
-n = 5
+n = 1
 image_ids = np.random.choice(dataset_train.image_ids, n)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)

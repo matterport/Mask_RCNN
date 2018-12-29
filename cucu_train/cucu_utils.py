@@ -45,7 +45,7 @@ def rotate_bound(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle):
+def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, erode=None):
     """
     name I gave: pasteImageOnOther ruined the overriding of base class function
     pasting re-scaled image on other image (collage effect)
@@ -53,13 +53,22 @@ def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle):
     objectShape = objectShape.resize((int(x_scale*objectShape.size[0]),int(y_scale*objectShape.size[1])), Image.ANTIALIAS)
 
     objectShape = objectShape.rotate(angle, resample=Image.BICUBIC, expand=True)
-    
+
+    shape_array = np.array(objectShape)
+    mask = mask_from_RGBA(shape_array)
+
+    # erode mask
+    if erode is not None:
+        kernel = np.ones((erode, erode), np.uint8)
+        mask = cv2.erode(mask, kernel, iterations=1)
+        gaussian_blend = 5
+        mask = cv2.GaussianBlur(mask, (gaussian_blend, gaussian_blend), 0)
 
     rows,cols,channels = np.asarray(objectShape).shape
     x_from = x_center - math.floor(cols/2.)
     y_from = y_center - math.floor(rows/2.)
 
-    img1.paste(objectShape, (x_from, y_from), objectShape)
+    img1.paste(objectShape, (x_from, y_from), Image.fromarray(mask, 'L'))
 
     return img1
 
