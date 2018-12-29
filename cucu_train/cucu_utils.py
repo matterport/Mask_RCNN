@@ -45,7 +45,7 @@ def rotate_bound(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, erode=None):
+def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, erode=None, gaussian=None):
     """
     name I gave: pasteImageOnOther ruined the overriding of base class function
     pasting re-scaled image on other image (collage effect)
@@ -61,7 +61,7 @@ def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, er
     if erode is not None:
         kernel = np.ones((erode, erode), np.uint8)
         mask = cv2.erode(mask, kernel, iterations=1)
-        gaussian_blend = 5
+        gaussian_blend = gaussian if gaussian is not None else 3
         mask = cv2.GaussianBlur(mask, (gaussian_blend, gaussian_blend), 0)
 
     rows,cols,channels = np.asarray(objectShape).shape
@@ -117,11 +117,13 @@ def add_imageWithoutTransparency(img1, objectShape, x_center, y_center, x_scale,
     # alpha_image = cv2.dilate(alpha_image, kernel, iterations=1)
     
     # since alpha values are in range [0,1] and we know that transparent bg has alpha < 0.4 approx.    
-    _ , mask = cv2.threshold(alpha_image, 0.4 , 255, cv2.THRESH_BINARY)
+    _, mask = cv2.threshold(alpha_image, 20, 255, cv2.THRESH_BINARY)
+
+    # Image.fromarray(mask).show()
     
     mask_inv = cv2.bitwise_not(mask)
     # Now black-out the area of logo in ROI
-    img1_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
+    img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
     # Take only region of logo from logo image.
     img2_fg = cv2.bitwise_and(objectInCollage,objectInCollage,mask = mask)
     # Put logo in ROI and modify the main image

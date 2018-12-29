@@ -127,7 +127,7 @@ class genDataset(utils.Dataset):
         # temporary values (left, upper, right, lower)-tuple
         area = (0, 0, 1024, 1024)
         image = self.bg[index].crop(area)
-        
+
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
         # asher todo: erase it later
@@ -165,26 +165,27 @@ class genDataset(utils.Dataset):
         return image
 
 
-    def draw_shape(self, Collage, shape, location, scale, angle, index):
+    def draw_shape(self, Collage, shape, location, scale, angle, index, erode_coeff=5, gaussian_coeff=3):
         """
         Draws another cucumber on a selected background
         Get the center x, y and the size s
         x, y, s = dims
+        :param erode_coeff: size of kernel for erosion to apply on mask when blending to image
+        :param gaussian_coeff: size of kernel for gaussian blur around mask when blending to image
         """
-        
 
         if shape == 'cucumber':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
+            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         if shape == 'leaf':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
+            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         if shape == 'flower':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle, 8)
+            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         return Collage
     
     

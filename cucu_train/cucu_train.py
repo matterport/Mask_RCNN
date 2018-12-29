@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from cucu_genDatasetClass import *
 from cucu_config import cucumberConfig
+from PIL import Image
 # from cucu_realDatasetClass import *
 
 import json
@@ -102,13 +103,32 @@ dataset_val.prepare()
 
 # asher todo: change code to fit new load_image method of coco
 #show n random image&mask train examples
-n = 1
+n = 3
 image_ids = np.random.choice(dataset_train.image_ids, n)
 for image_id in image_ids:
     image = dataset_train.load_image(image_id)
     mask, class_ids = dataset_train.load_mask(image_id)
     print(image.shape)
-    visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+    images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+
+    # save images for presentations
+    cm = plt.get_cmap('gist_earth', lut=50)
+
+    img = Image.fromarray(images[0])
+    img.save(str(image_id) + "_pic" + ".png", "PNG")
+
+    # apply color map to masks
+    img = (cm(images[1])[:, :, :3] * 255).astype(np.uint8)
+    img = Image.fromarray(img)
+    img.save(str(image_id) + "_mask_leaf" + ".png", "PNG")
+
+    img = (cm(images[2])[:, :, :3] * 255).astype(np.uint8)
+    img = Image.fromarray(img)
+    img.save(str(image_id) + "_mask_fruit" + ".png", "PNG")
+
+    img = (cm(images[3])[:, :, :3] * 255).astype(np.uint8)
+    img = Image.fromarray(img)
+    img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
 
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
