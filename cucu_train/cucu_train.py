@@ -84,7 +84,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
@@ -94,7 +94,7 @@ dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_val.load_shapes(5, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -112,23 +112,23 @@ for image_id in image_ids:
     images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
     # save images for presentations
-    cm = plt.get_cmap('gist_earth', lut=50)
+    # cm = plt.get_cmap('gist_earth', lut=50)
 
-    img = Image.fromarray(images[0])
-    img.save(str(image_id) + "_pic" + ".png", "PNG")
+    # img = Image.fromarray(images[0])
+    # img.save(str(image_id) + "_pic" + ".png", "PNG")
 
     # apply color map to masks
-    img = (cm(images[1])[:, :, :3] * 255).astype(np.uint8)
-    img = Image.fromarray(img)
-    img.save(str(image_id) + "_mask_leaf" + ".png", "PNG")
+    # img = (cm(images[1])[:, :, :3] * 255).astype(np.uint8)
+    # img = Image.fromarray(img)
+    # img.save(str(image_id) + "_mask_leaf" + ".png", "PNG")
 
-    img = (cm(images[2])[:, :, :3] * 255).astype(np.uint8)
-    img = Image.fromarray(img)
-    img.save(str(image_id) + "_mask_fruit" + ".png", "PNG")
+    # img = (cm(images[2])[:, :, :3] * 255).astype(np.uint8)
+    # img = Image.fromarray(img)
+    # img.save(str(image_id) + "_mask_fruit" + ".png", "PNG")
 
-    img = (cm(images[3])[:, :, :3] * 255).astype(np.uint8)
-    img = Image.fromarray(img)
-    img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
+    # img = (cm(images[3])[:, :, :3] * 255).astype(np.uint8)
+    # img = Image.fromarray(img)
+    # img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
 
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
@@ -155,7 +155,7 @@ if(len(list_of_trained_models) == 0):
 #asher todo: make for loop on generated and real data set
 for _ in range(100):
     model.load_weights(latest_trained_model, by_name=True)
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="all")
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
 
     # Save weights
     now = datetime.datetime.now()
