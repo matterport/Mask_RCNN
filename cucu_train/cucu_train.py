@@ -71,11 +71,26 @@ print(sys.version)
 config = cucumberConfig()
 config.display()
 
+# asher todo: add a choice from which dataset to generate
+dataset_train = genDataset(ROOT_DIR + '/cucu_train/cucumbers_objects',
+                           ROOT_DIR + '/cucu_train/leaves_objects',
+                           ROOT_DIR + '/cucu_train/flower_objects',
+                           ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+# dataset_train = realDataset()
+# dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
+dataset_train.prepare()
 
+# Validation dataset
+dataset_val = genDataset(ROOT_DIR + '/cucu_train/cucumbers_objects',
+                         ROOT_DIR + '/cucu_train/leaves_objects',
+                         ROOT_DIR + '/cucu_train/flower_objects',
+                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.prepare()
 
-
-# In[ ]:
-
+# Create model in training mode
+model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
 
 
 # asher todo: change code to fit new load_image method of coco
@@ -86,7 +101,7 @@ config.display()
 #     image = dataset_train.load_image(image_id)
 #     mask, class_ids = dataset_train.load_mask(image_id)
 #     print(image.shape)
-    # images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+#     images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
     # save images for presentations
     # cm = plt.get_cmap('gist_earth', lut=50)
@@ -117,27 +132,6 @@ init_with = "coco"
 
 for _ in range(100):
 
-    # asher todo: add a choice from which dataset to generate
-    dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                                ROOT_DIR + '/cucu_train/leaves_objects',
-                                ROOT_DIR + '/cucu_train/flower_objects',
-                            ROOT_DIR + '/cucu_train/background_folder/1024', config)
-    dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    # dataset_train = realDataset()
-    # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
-    dataset_train.prepare()
-
-    # Validation dataset
-    dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                                ROOT_DIR + '/cucu_train/leaves_objects',
-                                ROOT_DIR + '/cucu_train/flower_objects',
-                            ROOT_DIR + '/cucu_train/background_folder/1024', config)
-    dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    dataset_val.prepare()
-    
-    # Create model in training mode
-    model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
-
     # latest to saved weights
     list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
     latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
@@ -151,7 +145,7 @@ for _ in range(100):
     model.load_weights(latest_trained_model, by_name=True)
 
     # Training dataset
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads")
+    model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=2, layers="all")
 
     # Save weights
     now = datetime.datetime.now()
@@ -168,7 +162,7 @@ for _ in range(100):
 
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    IMAGES_PER_GPU = 2
 
 inference_config = InferenceConfig()
 
