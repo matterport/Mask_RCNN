@@ -42,11 +42,14 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
     norm: Optional. A Normalize instance to map values to colors.
     interpolation: Optional. Image interpolation to use for display.
     """
+    figure_size = 14
+    print("figure size:", figure_size)
     titles = titles if titles is not None else [""] * len(images)
     rows = len(images) // cols + 1
-    plt.figure(figsize=(14, 14 * rows // cols))
+    plt.figure(figsize=(figure_size, figure_size * rows // cols))
     i = 1
     for image, title in zip(images, titles):
+
         plt.subplot(rows, cols, i)
         plt.title(title, fontsize=9)
         plt.axis('off')
@@ -166,6 +169,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
         plt.show()
+    return masked_image.astype(np.uint8)
 
 
 def display_differences(image,
@@ -300,8 +304,8 @@ def display_top_masks(image, mask, class_ids, class_names, limit=4):
         m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
         to_display.append(m)
         titles.append(class_names[class_id] if class_id != -1 else "-")
-    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r")
-
+    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r", interpolation="bilinear")
+    return to_display
 
 def plot_precision_recall(AP, precisions, recalls):
     """Draw the precision-recall curve.

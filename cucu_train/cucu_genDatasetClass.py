@@ -6,6 +6,9 @@ import sys
 from random import randint , choice, uniform
 import numpy as np
 import cv2
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)  # To find local version of the library
+
 from mrcnn import utils
 from PIL import Image
 from cucu_utils import *
@@ -111,18 +114,20 @@ class genDataset(utils.Dataset):
         y_max, x_max ,_ = np.asarray(self.bg[index]).shape
 
         # pick random up-right corner
-        x_topRight = randint(x_max- self.config.IMAGE_MAX_DIM//4 , x_max)
-        y_topRight = randint(y_max- self.config.IMAGE_MAX_DIM//4 , y_max)
+        x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//4 , x_max)
+        y_topRight = randint(y_max - self.config.IMAGE_MAX_DIM//4 , y_max)
         # print("y_topRight:" , y_topRight , "index:", index) #asher todo: delete this
         # pick bottom-left corner for cropping the bg to fir image size which is (self.config.IMAGE_MAX_DIM)^2
         # x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
         # y_bottomLeft = randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
-        x_bottomLeft =x_topRight- self.config.IMAGE_MAX_DIM
-        y_bottomLeft = y_topRight- self.config.IMAGE_MAX_DIM
+        x_bottomLeft = x_topRight - self.config.IMAGE_MAX_DIM
+        y_bottomLeft = y_topRight - self.config.IMAGE_MAX_DIM
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
-        area = (x_bottomLeft, y_bottomLeft,   x_bottomLeft+self.config.IMAGE_MAX_DIM, y_bottomLeft+self.config.IMAGE_MAX_DIM)
+
+        # temporary values (left, upper, right, lower)-tuple
+        area = (0, 0, 1024, 1024)
         image = self.bg[index].crop(area)
-        
+
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
         # asher todo: erase it later
@@ -160,26 +165,27 @@ class genDataset(utils.Dataset):
         return image
 
 
-    def draw_shape(self, Collage, shape, location, scale, angle, index):
+    def draw_shape(self, Collage, shape, location, scale, angle, index, erode_coeff=5, gaussian_coeff=3):
         """
         Draws another cucumber on a selected background
         Get the center x, y and the size s
         x, y, s = dims
+        :param erode_coeff: size of kernel for erosion to apply on mask when blending to image
+        :param gaussian_coeff: size of kernel for gaussian blur around mask when blending to image
         """
-        
 
         if shape == 'cucumber':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.cucumberObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         if shape == 'leaf':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.leafObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         if shape == 'flower':
             x_location, y_location = location
             x_scale, y_scale = scale
-            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle)
+            Collage = add_image(Collage, self.flowerObj[index], x_location, y_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
         return Collage
     
     
