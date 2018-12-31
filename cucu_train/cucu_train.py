@@ -84,7 +84,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
@@ -94,7 +94,7 @@ dataset_val = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects',
                             ROOT_DIR + '/cucu_train/leaves_objects',
                             ROOT_DIR + '/cucu_train/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -109,7 +109,7 @@ for image_id in image_ids:
     image = dataset_train.load_image(image_id)
     mask, class_ids = dataset_train.load_mask(image_id)
     print(image.shape)
-    images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+    # images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
     # save images for presentations
     # cm = plt.get_cmap('gist_earth', lut=50)
@@ -134,8 +134,6 @@ for image_id in image_ids:
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
 
 
-
-
 # In[ ]:
 
 
@@ -143,7 +141,9 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD
 # seleect your weapon of choice
 init_with = "coco" 
 list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
-latest_trained_model = max(list_of_trained_models, key=os.path.getctime)
+
+# second latest to prevent from taking a broken file
+latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-2]
 if(len(list_of_trained_models) == 0):
      model.load_weights(COCO_MODEL_PATH, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
@@ -153,9 +153,10 @@ if(len(list_of_trained_models) == 0):
 
 
 #asher todo: make for loop on generated and real data set
+model.load_weights(latest_trained_model, by_name=True)
 for _ in range(100):
-    model.load_weights(latest_trained_model, by_name=True)
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=30, layers="all")
+
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads")
 
     # Save weights
     now = datetime.datetime.now()
@@ -169,10 +170,7 @@ for _ in range(100):
         
 
 
-
-
 # In[12]:
-
 
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
