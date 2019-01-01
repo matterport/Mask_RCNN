@@ -125,6 +125,7 @@ class genDataset(utils.Dataset):
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
 
         # temporary values (left, upper, right, lower)-tuple
+        # simon todo: restore generic vars
         area = (0, 0, 1024, 1024)
         image = self.bg[index].crop(area)
 
@@ -304,7 +305,7 @@ class genDataset(utils.Dataset):
             # save in temp for easier inspection if needed
             temp = image_to_mask(self.draw_shape_without_transparency(image, shape, location, scale, angle, index))
             # construct array of masks related to all shapes of objescts in current Collage
-            mask[:, :, i] = temp[:,:]
+            mask[:, :, i] = temp[:, :]
             
         # Handle occlusions
         occlusion = np.logical_not(mask[:, :, -1]).astype(np.uint8)

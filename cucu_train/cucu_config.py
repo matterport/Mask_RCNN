@@ -21,7 +21,7 @@ class cucumberConfig(Config):
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM =1024
+    IMAGE_MAX_DIM = 1024
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -34,9 +34,9 @@ class cucumberConfig(Config):
     # ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 10
+    STEPS_PER_EPOCH = 100
 
-    VALIDATION_STEPS = 2
+    VALIDATION_STEPS = 20
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
