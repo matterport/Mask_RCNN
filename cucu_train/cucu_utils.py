@@ -134,16 +134,15 @@ def add_imageWithoutTransparency(img1, objectShape, x_center, y_center, x_scale,
     return img1
 
 def mask_from_RGBA(image):
-    return image[:,:,-1]
+    return image[:, :, -1]
     
 def image_to_mask(image):
     # init mask with zeroes.
     mask = np.zeros_like(image)
     # as long as mask is a zero-matrix - continue
-    while not np.any(mask):
-        color = (0, 0, 0)
-        distance = np.sum(image, axis=-1)
-        mask = distance > 0
+    color = (0, 0, 0)
+    distance = np.sum(image, axis=-1)
+    mask = distance > 0
     return mask
 
 def mask_to_image(mask):
