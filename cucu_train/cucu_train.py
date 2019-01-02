@@ -90,7 +90,7 @@ dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = genDataset( ROOT_DIR + '  /cucu_train/valid_data/cucumbers_objects', 
+dataset_val = genDataset( ROOT_DIR +   '/cucu_train/train_data/cucumbers_objects', 
                             ROOT_DIR + '/cucu_train/valid_data/leaves_objects',
                             ROOT_DIR + '/cucu_train/valid_data/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)

@@ -43,7 +43,6 @@ class genDataset(utils.Dataset):
         self.leafObj = []
         self.flowerObj = []
         self.bg = []
- 
         # asher todo: beautify calls -> pass a super folder which contains sub folders per object
         for root, _, files in os.walk(self.folder_objects_cucumber):
             for filename in files:
