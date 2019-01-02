@@ -36,7 +36,7 @@ class cucumberConfig(Config):
     #asher todo: enlarge to 100 when real training occures
     STEPS_PER_EPOCH = 100
 
-    VALIDATION_STEPS = 20
+    VALIDATION_STEPS = 10
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 

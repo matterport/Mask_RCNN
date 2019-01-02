@@ -71,37 +71,45 @@ print(sys.version)
 config = cucumberConfig()
 config.display()
 
+
+
+
+# In[3]:
+
+
+
+# Training dataset
 # asher todo: add a choice from which dataset to generate
-dataset_train = genDataset(ROOT_DIR + '/cucu_train/cucumbers_objects',
-                           ROOT_DIR + '/cucu_train/leaves_objects',
-                           ROOT_DIR + '/cucu_train/flower_objects',
-                           ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/train_data/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/train_data/leaves_objects',
+                            ROOT_DIR + '/cucu_train/train_data/flower_objects',
+                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
 dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = genDataset(ROOT_DIR + '/cucu_train/cucumbers_objects',
-                         ROOT_DIR + '/cucu_train/leaves_objects',
-                         ROOT_DIR + '/cucu_train/flower_objects',
-                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_val = genDataset( ROOT_DIR + '  /cucu_train/valid_data/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/valid_data/leaves_objects',
+                            ROOT_DIR + '/cucu_train/valid_data/flower_objects',
+                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
 dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
-# Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
+# In[ ]:
+
 
 
 # asher todo: change code to fit new load_image method of coco
 #show n random image&mask train examples
-# n = 3
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
-#     print(image.shape)
-#     images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
+n = 3
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    # images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
     # save images for presentations
     # cm = plt.get_cmap('gist_earth', lut=50)
@@ -122,6 +130,9 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD
     # img = Image.fromarray(img)
     # img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
 
+# Create model in training mode
+model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
+
 
 # In[ ]:
 
@@ -129,29 +140,30 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD
 
 # seleect your weapon of choice
 init_with = "coco" 
+# list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
 
+# second latest to prevent from taking a broken file
+model.load_weights(COCO_MODEL_PATH, by_name=True,
+                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
+                                "mrcnn_bbox", "mrcnn_mask"])
+
+# In[ ]:
+
+
+#asher todo: make for loop on generated and real data set
 for _ in range(100):
 
-    # latest to saved weights
-    list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
-    latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
-    if(len(list_of_trained_models) == 0):
-        model.load_weights(COCO_MODEL_PATH, by_name=True,
-                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
-                                    "mrcnn_bbox", "mrcnn_mask"])
-    print("training upon ", latest_trained_model)
-
-    #asher todo: make for loop on generated and real data set
-    model.load_weights(latest_trained_model, by_name=True)
-
-    # Training dataset
-    model.train(dataset_train, dataset_val, learning_rate=config.LEARNING_RATE, epochs=2, layers="all")
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads")
 
     # Save weights
     now = datetime.datetime.now()
     model_path = os.path.join(TRAINED_MODELS_DIR, "cucuWheights_" + str(now) + ".h5")
     model.keras_model.save_weights(model_path)
+    #load just trained weights again
+    latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
+    model.load_weights(latest_trained_model, by_name=True)
 
+    list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
     oldest_trained_model = min(list_of_trained_models, key=os.path.getctime)
     if len(list_of_trained_models) > config.MAX_SAVED_TRAINED_MODELS:
         os.remove(oldest_trained_model)
@@ -162,7 +174,7 @@ for _ in range(100):
 
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
 
 inference_config = InferenceConfig()
 
