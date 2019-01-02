@@ -69,7 +69,7 @@ print(sys.version)
 
 #create configurations for model instentiating
 config = cucumberConfig()
-config.display()
+# config.display()
 
 
 
@@ -84,7 +84,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/train_data/cucumbers_objects
                             ROOT_DIR + '/cucu_train/train_data/leaves_objects',
                             ROOT_DIR + '/cucu_train/train_data/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
@@ -94,7 +94,7 @@ dataset_val = genDataset( ROOT_DIR + '  /cucu_train/valid_data/cucumbers_objects
                             ROOT_DIR + '/cucu_train/valid_data/leaves_objects',
                             ROOT_DIR + '/cucu_train/valid_data/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_val.load_shapes(200, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -139,7 +139,6 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD
 
 
 # seleect your weapon of choice
-init_with = "coco" 
 # list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
 
 # second latest to prevent from taking a broken file
@@ -153,7 +152,7 @@ model.load_weights(COCO_MODEL_PATH, by_name=True,
 #asher todo: make for loop on generated and real data set
 for _ in range(100):
 
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads")
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads",verbose=0)
 
     # Save weights
     now = datetime.datetime.now()
