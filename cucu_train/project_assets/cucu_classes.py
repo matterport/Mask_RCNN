@@ -621,3 +621,13 @@ class realDataset(utils.Dataset):
         rle = self.annToRLE(ann, height, width)
         m = maskUtils.decode(rle)
         return m
+
+
+class project_paths(object):
+    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir, cocoModelPath,trainDatasetDir, valDatasetDir):
+        self.projectRootDir=projectRootDir
+        self.TensorboardDir=TensorboardDir
+        self.trainedModelsDir=trainedModelsDir
+        self.cocoModelPath=cocoModelPath
+        self.trainDatasetDir=trainDatasetDir
+        self.valDatasetDir=valDatasetDir

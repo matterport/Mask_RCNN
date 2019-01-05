@@ -30,40 +30,26 @@ from project_assets.cucu_classes import *
 from cucu_config import cucumberConfig
 from PIL import Image
 # from cucu_realDatasetClass import *
-
-import json
-
-# ROOT_DIR = os.path.abspath("../")
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
-print(ROOT_DIR)
 
-import faulthandler
-# faulthandler.enable()
-dumpTo = ROOT_DIR + "/cucu_train/Dumps/coreDump"
-# dumpTo_fd = open(dumpTo, 'w')
-# faulthandler.dump_traceback(file=dumpTo_fd, all_threads=True)
-
+# create centralized class for used paths during training
+cucuPaths = project_paths(
+    projectRootDir=ROOT_DIR,
+    TensorboardDir=os.path.join(ROOT_DIR, "cucu_train/TensorBoardGraphs"),
+    trainedModelsDir=os.path.join(ROOT_DIR, "cucu_train/trained_models"),
+    cocoModelPath=os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
+    trainDatasetDir=os.path.join(ROOT_DIR, "cucu_train/project_dataset/train_data"),
+    valDatasetDir=os.path.join(ROOT_DIR, "cucu_train/project_dataset/valid_data")
+    # asher todo: add test dataset
+)
+import json
+print(cucuPaths.projectRootDir)
 # Import Mask RCNN
-sys.path.append(ROOT_DIR)  # To find local version of the library
+sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
 from mrcnn import utils
 import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
-
-# Directory to save logs 
-TENSOR_BOARD_DIR = os.path.join(ROOT_DIR, "cucu_train/TensorBoardGraphs")
-
-# Directory to save trained model:
-TRAINED_MODELS_DIR = os.path.join(ROOT_DIR, "cucu_train/trained_models")
-
-
-# Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-# Download COCO trained weights from Releases if needed
-if not os.path.exists(COCO_MODEL_PATH):
-    utils.download_trained_weights(COCO_MODEL_PATH)
-  
-
 
 # In[11]:
 
@@ -77,26 +63,27 @@ config = cucumberConfig()
 
 
 
+
 # In[3]:
 
 
 
 # Training dataset
 # asher todo: add a choice from which dataset to generate
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/train_data/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/train_data/leaves_objects',
-                            ROOT_DIR + '/cucu_train/train_data/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
+                            cucuPaths.trainDatasetDir + '/leaves_objects',
+                            cucuPaths.trainDatasetDir + '/flower_objects',
+                            cucuPaths.trainDatasetDir + '/background_folder/1024', config)
 dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
 
 # Validation dataset
-dataset_val = genDataset( ROOT_DIR +   '/cucu_train/train_data/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/valid_data/leaves_objects',
-                            ROOT_DIR + '/cucu_train/valid_data/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
+dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
+                            cucuPaths.valDatasetDir + '/leaves_objects',
+                            cucuPaths.valDatasetDir + '/flower_objects',
+                            cucuPaths.valDatasetDir + '/background_folder/1024', config)
 dataset_val.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
@@ -134,11 +121,12 @@ dataset_val.prepare()
     # img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
 
 # Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD_DIR)
+model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 
 # In[ ]:
-from cucu_callbacks import cucu_summaryCallback
+# add custom callbacks if needed
+from project_assets.cucu_classes import cucu_summaryCallback
 
 custom_callbacks=[
     cucu_summaryCallback(log_dir=model.log_dir,
@@ -146,12 +134,11 @@ custom_callbacks=[
 ]
 
 # seleect your weapon of choice
-list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
+list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
 latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
 model.load_weights(latest_trained_model, by_name=True)
 
-# # second latest to prevent from taking a broken file
-# model.load_weights(COCO_MODEL_PATH, by_name=True,
+# model.load_weights(cucuPaths.cocoModelPath, by_name=True,
 #                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
 #                                 "mrcnn_bbox", "mrcnn_mask"])
 
@@ -161,15 +148,15 @@ model.load_weights(latest_trained_model, by_name=True)
 #asher todo: make for loop on generated and real data set
 for _ in range(1):
 
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=2,\
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=1,\
                             custom_callbacks=custom_callbacks, layers="heads",verbose=0)
 
     # Save weights
     now = datetime.datetime.now()
-    model_path = os.path.join(TRAINED_MODELS_DIR, "cucuWheights_" + str(now) + ".h5")
+    model_path = os.path.join(cucuPaths.trainedModelsDir, "cucuWheights_" + str(now) + ".h5")
     model.keras_model.save_weights(model_path)
     #load just trained weights again
-    list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
+    list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
     latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
     model.load_weights(latest_trained_model, by_name=True)
 
@@ -188,10 +175,10 @@ class InferenceConfig(cucumberConfig):
 inference_config = InferenceConfig()
 
 # Recreate the model in inference mode
-model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=TENSOR_BOARD_DIR)
+model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=cucuPaths.TensorboardDir)
 
 # Load trained weights
-list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
+list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
 latest_trained_model = max(list_of_trained_models, key=os.path.getctime)
 
 print("Loading weights from ", latest_trained_model)
