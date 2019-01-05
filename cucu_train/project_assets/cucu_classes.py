@@ -86,17 +86,17 @@ class genDataset(utils.Dataset):
         self.add_class("shapes", 2, "leaf")
         self.add_class("shapes", 3, "flower")
 
-
+        # decide wich background:
+        bgIndex = randint(0, self.number_of_bgs-1) 
         # Add images
         for i in range(count):
-            print('Image', i, end='\r')
+            # print('Image', i, end='\r')
             bg_color, shapes = self.random_image(height, width)
-            self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes)
+            self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes, bgIndex=bgIndex)
     
     def load_image(self, image_id):
         """
-        for now we only have one shape- cucumber.
-        function creates 'collage' bg+one image.
+        function creates 'collage' bg+ objects image.
 
         function is called by load_image_gt - it is crucial for generating on-the-fly training set 
         for NN.
@@ -104,12 +104,10 @@ class genDataset(utils.Dataset):
                    on constructing train_dataset and val_dataset
         """
         info = self.image_info[image_id]
-        
-        index = randint(0, self.number_of_bgs-1) 
-        
+                
         # pull some random background from loaded bg set. which are typcally big
-        y_topRight, x_topRight,channels = np.asarray(self.bg[index]).shape
-        y_max, x_max ,_ = np.asarray(self.bg[index]).shape
+        y_topRight, x_topRight,channels = np.asarray(self.bg[info['bgIndex']]).shape
+        y_max, x_max ,_ = np.asarray(self.bg[info['bgIndex']]).shape
 
         # pick random up-right corner
         x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//4 , x_max)
@@ -125,7 +123,7 @@ class genDataset(utils.Dataset):
         # temporary values (left, upper, right, lower)-tuple
         # simon todo: restore generic vars
         area = (0, 0, 1024, 1024)
-        image = self.bg[index].crop(area)
+        image = self.bg[info['bgIndex']].crop(area)
 
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
@@ -465,7 +463,7 @@ class realDataset(utils.Dataset):
 
 
 class project_paths(object):
-    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer):
+    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer):
         self.projectRootDir=projectRootDir
         self.TensorboardDir=TensorboardDir
         self.trainedModelsDir=trainedModelsDir
@@ -475,3 +473,4 @@ class project_paths(object):
         self.testDatasetDir=testDatasetDir
         self.trainResultContainer=trainResultContainer
         self.visualizeEvaluationsDir=visualizeEvaluationsDir
+        self.trainOutputLog=trainOutputLog

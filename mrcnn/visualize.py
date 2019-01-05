@@ -367,7 +367,7 @@ def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
 
 def draw_boxes(image, boxes=None, refined_boxes=None,
                masks=None, captions=None, visibilities=None,
-               title="", ax=None):
+               title="", ax=None, savePath= None):
     """Draw bounding boxes and segmentation masks with different
     customizations.
 
@@ -466,6 +466,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
                 p = Polygon(verts, facecolor="none", edgecolor=color)
                 ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
+    plt.savefig(savePath)
 
 
 def display_table(table):
