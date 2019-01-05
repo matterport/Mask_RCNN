@@ -1,17 +1,19 @@
 '''
-pass here a .py file that was converted from ipynb via following command-line(example):
+pass here by arguments to script, a .py file that was converted from ipynb via following command-line(example):
 jupyter nbconvert --to=python MaskRCNN.ipynb
 '''
 
-
+import sys
 import nbformat
 from nbformat.v4 import new_code_cell,new_notebook
 
 import codecs
 
-sourceFile = "cucu_train.py"     # <<<< change
-destFile = "cucu_train.ipynb"    # <<<< change
-
+# extract path from argument to script
+sourceFile = sys.argv[1]
+destFile = sourceFile.split(".")[0]
+destFile = destFile + '.ipynb'
+print("source is:",sourceFile,"\ndest is:", destFile)
 
 def parsePy(fn):
     """ Generator that parses a .py file exported from a IPython notebook and
