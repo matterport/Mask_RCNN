@@ -138,8 +138,12 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=TENSOR_BOARD
 
 
 # In[ ]:
+from cucu_callbacks import cucu_summaryCallback
 
-
+custom_callbacks=[
+    cucu_summaryCallback(log_dir=model.log_dir,
+                                        histogram_freq=1, write_graph=True, write_images=True)
+]
 
 # seleect your weapon of choice
 list_of_trained_models = glob.glob(TRAINED_MODELS_DIR +'/*')
@@ -157,7 +161,8 @@ model.load_weights(latest_trained_model, by_name=True)
 #asher todo: make for loop on generated and real data set
 for _ in range(1):
 
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=2, layers="heads",verbose=0)
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=2,\
+                            custom_callbacks=custom_callbacks, layers="heads",verbose=0)
 
     # Save weights
     now = datetime.datetime.now()
