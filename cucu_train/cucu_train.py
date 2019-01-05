@@ -105,12 +105,12 @@ dataset_val.prepare()
 
 # asher todo: change code to fit new load_image method of coco
 #show n random image&mask train examples
-n = 3
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
+# n = 3
+# image_ids = np.random.choice(dataset_train.image_ids, n)
+# for image_id in image_ids:
+#     image = dataset_train.load_image(image_id)
+#     mask, class_ids = dataset_train.load_mask(image_id)
+#     print(image.shape)
     # images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
 
     # save images for presentations
