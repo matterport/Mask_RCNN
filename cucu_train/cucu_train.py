@@ -26,7 +26,7 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
-from cucu_genDatasetClass import *
+from project_assets.cucu_classes import *
 from cucu_config import cucumberConfig
 from PIL import Image
 # from cucu_realDatasetClass import *

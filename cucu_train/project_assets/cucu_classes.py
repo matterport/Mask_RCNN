@@ -1,4 +1,162 @@
 
+import tensorflow as tf
+from keras.callbacks import Callback
+
+import keras
+import keras.backend as K
+import keras.layers as KL
+import keras.engine as KE
+import keras.models as KM
+
+
+class cucu_summaryCallback(Callback):
+
+    def __init__(self, log_dir='./logs',
+                histogram_freq=0,
+                batch_size=32,
+                write_graph=True,
+                write_grads=False,
+                write_images=False):
+        super(cucu_summaryCallback, self).__init__()
+        if K.backend() != 'tensorflow':
+            raise RuntimeError('TensorBoard callback only works '
+                            'with the TensorFlow backend.')
+        self.log_dir = log_dir
+        self.histogram_freq = histogram_freq
+        self.mergedTensorboardSumm = None
+        self.write_graph = write_graph
+        self.write_grads = write_grads
+        self.write_images = write_images
+        self.batch_size = batch_size
+
+    def set_model(self, model):
+        self.model = model
+        self.sess = K.get_session()
+        with tf.name_scope('performance'):
+            if self.histogram_freq and self.mergedTensorboardSumm is None:
+                for layer in self.model.layers:
+
+                    for weight in layer.weights:
+                        mapped_weight_name = weight.name.replace(':', '_')
+                        tf.summary.histogram(mapped_weight_name, weight)
+                        if self.write_grads:
+                            grads = model.optimizer.get_gradients(model.total_loss,
+                                                                weight)
+
+                            def is_indexed_slices(grad):
+                                return type(grad).__name__ == 'IndexedSlices'
+                            grads = [
+                                grad.values if is_indexed_slices(grad) else grad
+                                for grad in grads]
+                            tf.summary.histogram('{}_grad'.format(mapped_weight_name), grads)
+                        if self.write_images:
+                            w_img = tf.squeeze(weight)
+                            shape = K.int_shape(w_img)
+                            if len(shape) == 2:  # dense layer kernel case
+                                if shape[0] > shape[1]:
+                                    w_img = tf.transpose(w_img)
+                                    shape = K.int_shape(w_img)
+                                w_img = tf.reshape(w_img, [1,
+                                                        shape[0],
+                                                        shape[1],
+                                                        1])
+                            elif len(shape) == 3:  # convnet case
+                                if K.image_data_format() == 'channels_last':
+                                    # switch to channels_first to display
+                                    # every kernel as a separate image
+                                    w_img = tf.transpose(w_img, perm=[2, 0, 1])
+                                    shape = K.int_shape(w_img)
+                                w_img = tf.reshape(w_img, [shape[0],
+                                                        shape[1],
+                                                        shape[2],
+                                                        1])
+                            elif len(shape) == 1:  # bias case
+                                w_img = tf.reshape(w_img, [1,
+                                                        shape[0],
+                                                        1,
+                                                        1])
+                            else:
+                                # not possible to handle 3D convnets etc.
+                                continue
+
+                            shape = K.int_shape(w_img)
+                            assert len(shape) == 4 and shape[-1] in [1, 3, 4]
+                            tf.summary.image(mapped_weight_name, w_img)
+
+                    # if hasattr(layer, 'output'):
+                    #     if(layer.output.dtype == bool):
+                    #         continue
+                    #     tf.summary.histogram('{}_out'.format(layer.name),
+                    #                         layer.output)
+            self.mergedTensorboardSumm = tf.summary.merge_all()
+
+            if self.write_graph:
+                self.writer = tf.summary.FileWriter(self.log_dir,
+                                                    self.sess.graph)
+            else:
+                self.writer = tf.summary.FileWriter(self.log_dir)
+    def on_batch_end(self, batch, logs=None):
+
+        self.validation_data = logs
+        del self.validation_data["batch"]
+        del self.validation_data["size"]
+        result = self.sess.run([self.mergedTensorboardSumm])
+        summary_str = result[0]
+        self.writer.add_summary(summary_str, batch)
+        
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+
+        # if not self.validation_data and self.histogram_freq:
+        #     raise ValueError('If printing histograms, validation_data must be '
+        #                     'provided, and cannot be a generator.')
+        # if self.validation_data and self.histogram_freq:
+        #     if epoch % self.histogram_freq == 0:
+
+        #         val_data = self.validation_data
+        #         tensors = (self.model.inputs +
+        #                 self.model.targets +
+        #                 self.model.sample_weights)
+
+        #         if self.model.uses_learning_phase:
+        #             tensors += [K.learning_phase()]
+
+        #         assert len(val_data) == len(tensors)
+        #         val_size = val_data[0].shape[0]
+        #         i = 0
+        #         while i < val_size:
+        #             step = min(self.batch_size, val_size - i)
+        #             if self.model.uses_learning_phase:
+        #                 # do not slice the learning phase
+        #                 batch_val = [x[i:i + step] for x in val_data[:-1]]
+        #                 batch_val.append(val_data[-1])
+        #             else:
+        #                 batch_val = [x[i:i + step] for x in val_data]
+        #             assert len(batch_val) == len(tensors)
+        #             feed_dict = dict(zip(tensors, batch_val))
+        #             result = self.sess.run([self.mergedTensorboardSumm], feed_dict=feed_dict)
+        #             summary_str = result[0]
+        #             self.writer.add_summary(summary_str, epoch)
+        #             i += self.batch_size
+        for name, value in logs.items():
+            if name in ['batch', 'size']:
+                continue
+            summary = tf.Summary()
+            summary_value = summary.value.add()
+            summary_value.simple_value = value.item()
+            summary_value.tag = name
+            self.writer.add_summary(summary, epoch)
+        self.writer.flush()
+
+    def on_train_end(self, _):
+        self.writer.close()
+
+
+
+
+
+
 
 import os
 from os.path import dirname, abspath
@@ -11,7 +169,7 @@ sys.path.append(ROOT_DIR)  # To find local version of the library
 
 from mrcnn import utils
 from PIL import Image
-from cucu_utils import *
+from project_assets.cucu_utils import *
 
 #asher todo: change this variable name - to bum_of_object
 minimum_number_of_cucumbers = 50
@@ -318,3 +476,148 @@ class genDataset(utils.Dataset):
         class_ids = np.array([self.class_names.index(s[0]) for s in shapes])
         return mask.astype(np.bool), class_ids.astype(np.int32)        
 
+
+
+
+import os
+import numpy as np
+import json
+from mrcnn import utils
+from project_assets.cocoapi.PythonAPI.pycocotools.coco import COCO
+from project_assets.cocoapi.PythonAPI.pycocotools import mask as maskUtils
+
+
+
+
+
+
+
+class realDataset(utils.Dataset):
+    def load_dataset(self,annotations_path, dataset_dir):
+        """Load a subset of the COCO dataset.
+        dataset_dir: The root directory of the COCO dataset.
+        subset: What to load (train, val, minival, valminusminival)
+        year: What dataset year to load (2014, 2017) as a string, not an integer
+        class_ids: If provided, only loads images that have the given classes.
+        class_map: TODO: Not implemented yet. Supports maping classes from
+            different datasets to the same class ID.
+        return_coco: If True, returns the COCO object.
+        auto_download: Automatically download and unzip MS-COCO images and annotations
+        """
+
+        # if auto_download is True:
+        #     self.auto_download(dataset_dir, subset, year)
+
+        coco = COCO(annotations_path)
+        image_dir = "{}".format(dataset_dir)
+
+        # All classes
+        # asher todo: instead of coco lets add our categories
+        class_ids = sorted(coco.getCatIds())
+
+        # All images or a subset?
+        if class_ids:
+            image_ids = []
+            for id in class_ids:
+                image_ids.extend(list(coco.getImgIds(catIds=[id])))
+            # Remove duplicates
+            image_ids = list(set(image_ids))
+        else:
+            # All images
+            image_ids = list(coco.imgs.keys())
+
+        # Add classes
+        for i in class_ids:
+            self.add_class("coco", i, coco.loadCats(i)[0]["name"])
+
+        # Add images
+        for i in image_ids:
+            self.add_image(
+                "coco", image_id=i,
+                path=os.path.join(image_dir, coco.imgs[i]['file_name']),
+                width=coco.imgs[i]["width"],
+                height=coco.imgs[i]["height"],
+                annotations=coco.loadAnns(coco.getAnnIds(
+                    imgIds=[i], catIds=class_ids, iscrowd=None)))
+
+    def load_mask(self, image_id):
+        """Load instance masks for the given image.
+
+        Different datasets use different ways to store masks. This
+        function converts the different mask format to one format
+        in the form of a bitmap [height, width, instances].
+
+        Returns:
+        masks: A bool array of shape [height, width, instance count] with
+            one mask per instance.
+        class_ids: a 1D array of class IDs of the instance masks.
+        """
+        image_info = self.image_info[image_id]
+        # If not a COCO image, delegate to parent class.
+        # if image_info["source"] != "coco":
+        #     return super(realDataset, self).load_mask(image_id)
+
+        instance_masks = []
+        class_ids = []
+        annotations = self.image_info[image_id]["annotations"]
+        # Build mask of shape [height, width, instance_count] and list
+        # of class IDs that correspond to each channel of the mask.
+        for annotation in annotations:
+            class_id = self.map_source_class_id(
+                "coco.{}".format(annotation['category_id']))
+            if class_id:
+                m = self.annToMask(annotation, image_info["height"],
+                                   image_info["width"])
+                # Some objects are so small that they're less than 1 pixel area
+                # and end up rounded out. Skip those objects.
+                if m.max() < 1:
+                    continue
+                # Is it a crowd? If so, use a negative class ID.
+                if annotation['iscrowd']:
+                    # Use negative class ID for crowds
+                    class_id *= -1
+                    # For crowd masks, annToMask() sometimes returns a mask
+                    # smaller than the given dimensions. If so, resize it.
+                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
+                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                instance_masks.append(m)
+                class_ids.append(class_id)
+
+        # Pack instance masks into an array
+        if class_ids:
+            mask = np.stack(instance_masks, axis=2).astype(np.bool)
+            class_ids = np.array(class_ids, dtype=np.int32)
+            return mask, class_ids
+        else:
+            # Call super class to return an empty mask
+            return super(realDataset, self).load_mask(image_id)
+
+    # The following two functions are from pycocotools with a few changes.
+
+    def annToRLE(self, ann, height, width):
+        """
+        Convert annotation which can be polygons, uncompressed RLE to RLE.
+        :return: binary mask (numpy 2D array)
+        """
+        segm = ann['segmentation']
+        if isinstance(segm, list):
+            # polygon -- a single object might consist of multiple parts
+            # we merge all parts into one mask rle code
+            rles = maskUtils.frPyObjects(segm, height, width)
+            rle = maskUtils.merge(rles)
+        elif isinstance(segm['counts'], list):
+            # uncompressed RLE
+            rle = maskUtils.frPyObjects(segm, height, width)
+        else:
+            # rle
+            rle = ann['segmentation']
+        return rle
+
+    def annToMask(self, ann, height, width):
+        """
+        Convert annotation which can be polygons, uncompressed RLE, or RLE to binary mask.
+        :return: binary mask (numpy 2D array)
+        """
+        rle = self.annToRLE(ann, height, width)
+        m = maskUtils.decode(rle)
+        return m
