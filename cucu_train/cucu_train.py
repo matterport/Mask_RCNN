@@ -13,6 +13,8 @@
 
 
 import os
+# asher note: macOS workaround
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import glob
 from os.path import dirname, abspath
 import sys
