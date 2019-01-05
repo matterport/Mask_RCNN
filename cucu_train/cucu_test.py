@@ -109,13 +109,13 @@ def get_ax(rows=1, cols=1, size=8):
 
 # Training dataset
 # asher todo: find a workaround to get rid of initiating a dataset object here
-dataset_train = genDataset( ROOT_DIR + '/cucu_train/cucumbers_objects', 
-                            ROOT_DIR + '/cucu_train/leaves_objects',
-                            ROOT_DIR + '/cucu_train/flower_objects',
-                        ROOT_DIR + '/cucu_train/background_folder', config)
+dataset_train = genDataset( ROOT_DIR + '/cucu_train/train_data/cucumbers_objects', 
+                            ROOT_DIR + '/cucu_train/train_data/leaves_objects',
+                            ROOT_DIR + '/cucu_train/train_data/flower_objects',
+                        ROOT_DIR + '/cucu_train/background_folder/1024', config)
 dataset_train.load_shapes(100, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
-tests_location = ROOT_DIR + "/cucu_train/simple_test/"
+tests_location = ROOT_DIR + "/cucu_train/simple_test/1024"
 for filename in sorted(os.listdir(tests_location)):
     
     testImage = os.path.join(tests_location,filename)
