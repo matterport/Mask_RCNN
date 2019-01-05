@@ -2512,7 +2512,7 @@ class MaskRCNN():
         #asher todo: create cucu_callbacks list
         callbacks = [
             cucu_summaryCallback(log_dir=self.log_dir,
-                                        histogram_freq=1, write_graph=True, write_images=False)
+                                        histogram_freq=1, write_graph=True, write_images=True)
             # ,keras.callbacks.TensorBoard(log_dir=self.log_dir,
             #                             histogram_freq=1, write_graph=True, write_images=False)
             # asher todo: add hyper parameter to controll save_weights_only
