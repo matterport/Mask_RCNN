@@ -2378,7 +2378,7 @@ class MaskRCNN():
                                     'with the TensorFlow backend.')
                 self.log_dir = log_dir
                 self.histogram_freq = histogram_freq
-                self.merged = None
+                self.mergedTensorboardSumm = None
                 self.write_graph = write_graph
                 self.write_grads = write_grads
                 self.write_images = write_images
@@ -2388,7 +2388,7 @@ class MaskRCNN():
                 self.model = model
                 self.sess = K.get_session()
                 with tf.name_scope('performance'):
-                    if self.histogram_freq and self.merged is None:
+                    if self.histogram_freq and self.mergedTensorboardSumm is None:
                         for layer in self.model.layers:
 
                             for weight in layer.weights:
@@ -2443,48 +2443,57 @@ class MaskRCNN():
                             #         continue
                             #     tf.summary.histogram('{}_out'.format(layer.name),
                             #                         layer.output)
-                    self.merged = tf.summary.merge_all()
+                    self.mergedTensorboardSumm = tf.summary.merge_all()
 
                     if self.write_graph:
                         self.writer = tf.summary.FileWriter(self.log_dir,
                                                             self.sess.graph)
                     else:
                         self.writer = tf.summary.FileWriter(self.log_dir)
+            def on_batch_end(self, batch, logs=None):
+
+                self.validation_data = logs
+                del self.validation_data["batch"]
+                del self.validation_data["size"]
+                result = self.sess.run([self.mergedTensorboardSumm])
+                summary_str = result[0]
+                self.writer.add_summary(summary_str, batch)
+                
 
             def on_epoch_end(self, epoch, logs=None):
                 logs = logs or {}
 
-                if not self.validation_data and self.histogram_freq:
-                    raise ValueError('If printing histograms, validation_data must be '
-                                    'provided, and cannot be a generator.')
-                if self.validation_data and self.histogram_freq:
-                    if epoch % self.histogram_freq == 0:
+                # if not self.validation_data and self.histogram_freq:
+                #     raise ValueError('If printing histograms, validation_data must be '
+                #                     'provided, and cannot be a generator.')
+                # if self.validation_data and self.histogram_freq:
+                #     if epoch % self.histogram_freq == 0:
 
-                        val_data = self.validation_data
-                        tensors = (self.model.inputs +
-                                self.model.targets +
-                                self.model.sample_weights)
+                #         val_data = self.validation_data
+                #         tensors = (self.model.inputs +
+                #                 self.model.targets +
+                #                 self.model.sample_weights)
 
-                        if self.model.uses_learning_phase:
-                            tensors += [K.learning_phase()]
+                #         if self.model.uses_learning_phase:
+                #             tensors += [K.learning_phase()]
 
-                        assert len(val_data) == len(tensors)
-                        val_size = val_data[0].shape[0]
-                        i = 0
-                        while i < val_size:
-                            step = min(self.batch_size, val_size - i)
-                            if self.model.uses_learning_phase:
-                                # do not slice the learning phase
-                                batch_val = [x[i:i + step] for x in val_data[:-1]]
-                                batch_val.append(val_data[-1])
-                            else:
-                                batch_val = [x[i:i + step] for x in val_data]
-                            assert len(batch_val) == len(tensors)
-                            feed_dict = dict(zip(tensors, batch_val))
-                            result = self.sess.run([self.merged], feed_dict=feed_dict)
-                            summary_str = result[0]
-                            self.writer.add_summary(summary_str, epoch)
-                            i += self.batch_size
+                #         assert len(val_data) == len(tensors)
+                #         val_size = val_data[0].shape[0]
+                #         i = 0
+                #         while i < val_size:
+                #             step = min(self.batch_size, val_size - i)
+                #             if self.model.uses_learning_phase:
+                #                 # do not slice the learning phase
+                #                 batch_val = [x[i:i + step] for x in val_data[:-1]]
+                #                 batch_val.append(val_data[-1])
+                #             else:
+                #                 batch_val = [x[i:i + step] for x in val_data]
+                #             assert len(batch_val) == len(tensors)
+                #             feed_dict = dict(zip(tensors, batch_val))
+                #             result = self.sess.run([self.mergedTensorboardSumm], feed_dict=feed_dict)
+                #             summary_str = result[0]
+                #             self.writer.add_summary(summary_str, epoch)
+                #             i += self.batch_size
                 for name, value in logs.items():
                     if name in ['batch', 'size']:
                         continue
