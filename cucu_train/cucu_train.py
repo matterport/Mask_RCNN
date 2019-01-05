@@ -84,7 +84,7 @@ dataset_train = genDataset( ROOT_DIR + '/cucu_train/train_data/cucumbers_objects
                             ROOT_DIR + '/cucu_train/train_data/leaves_objects',
                             ROOT_DIR + '/cucu_train/train_data/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_train.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 # dataset_train = realDataset()
 # dataset_train.load_image(ROOT_DIR + '/cucu_train/real_annotations/segmentation_results.json',ROOT_DIR + "/cucu_train/real_images_and_annotations")
 dataset_train.prepare()
@@ -94,7 +94,7 @@ dataset_val = genDataset( ROOT_DIR +   '/cucu_train/train_data/cucumbers_objects
                             ROOT_DIR + '/cucu_train/valid_data/leaves_objects',
                             ROOT_DIR + '/cucu_train/valid_data/flower_objects',
                         ROOT_DIR + '/cucu_train/background_folder/1024', config)
-dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(1, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -150,9 +150,9 @@ model.load_weights(COCO_MODEL_PATH, by_name=True,
 
 
 #asher todo: make for loop on generated and real data set
-for _ in range(100):
+for _ in range(1):
 
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5, layers="heads",verbose=0)
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=1, layers="heads",verbose=0)
 
     # Save weights
     now = datetime.datetime.now()

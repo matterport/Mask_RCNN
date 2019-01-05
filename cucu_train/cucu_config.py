@@ -34,9 +34,9 @@ class cucumberConfig(Config):
     # ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1
 
-    VALIDATION_STEPS = 10
+    VALIDATION_STEPS = 1
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
