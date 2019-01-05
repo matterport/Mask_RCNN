@@ -41,4 +41,5 @@ class cucumberConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0.9
 
     MAX_SAVED_TRAINED_MODELS = 10
-    
+    LEARNING_RATE = 0.0001
+    LEARNING_MOMENTUM = 0.5

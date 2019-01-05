@@ -2356,16 +2356,18 @@ class MaskRCNN():
                                          augmentation=augmentation,
                                          batch_size=self.config.BATCH_SIZE,
                                          no_augmentation_sources=no_augmentation_sources)
-        val_generator = data_generator(val_dataset, self.config, shuffle=True,
+        self.val_generator = data_generator(val_dataset, self.config, shuffle=True,
                                        batch_size=self.config.BATCH_SIZE)
+
+
         # Create log_dir if it does not exist
         if not os.path.exists(self.log_dir):
             os.makedirs(self.log_dir)
         
         # Callbacks
         callbacks = [
-            # keras.callbacks.TensorBoard(log_dir=self.log_dir,
-            #                             histogram_freq=1, write_graph=True, write_images=False)
+            keras.callbacks.TensorBoard(log_dir=self.log_dir,
+                                        histogram_freq=0, write_graph=True, write_images=False)
             # ,keras.callbacks.ModelCheckpoint(self.checkpoint_path,
             #                                 verbose=0, save_weights_only=True),
         ]
@@ -2394,7 +2396,7 @@ class MaskRCNN():
             epochs=epochs,
             steps_per_epoch=self.config.STEPS_PER_EPOCH,
             callbacks=callbacks,
-            validation_data=val_generator,
+            validation_data=self.val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=10,
             workers=1,

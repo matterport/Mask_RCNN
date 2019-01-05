@@ -33,7 +33,7 @@ from mrcnn import utils
 ############################################################
 
 def display_images(images, titles=None, cols=4, cmap=None, norm=None,
-                   interpolation=None):
+                   interpolation=None, savePath = None):
     """Display the given set of images, optionally with titles.
     images: list or array of image tensors in HWC format.
     titles: optional. A list of titles to display with each image.
@@ -56,7 +56,8 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         plt.imshow(image.astype(np.uint8), cmap=cmap,
                    norm=norm, interpolation=interpolation)
         i += 1
-    plt.show()
+    plt.savefig(savePath)
+    # plt.show()
 
 
 def random_colors(N, bright=True):
@@ -284,7 +285,7 @@ def draw_box(image, box, color):
     return image
 
 
-def display_top_masks(image, mask, class_ids, class_names, limit=4):
+def display_top_masks(image, mask, class_ids, class_names,savePath, limit=4):
     """Display the given image and the top few class masks."""
     to_display = []
     titles = []
@@ -304,7 +305,7 @@ def display_top_masks(image, mask, class_ids, class_names, limit=4):
         m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
         to_display.append(m)
         titles.append(class_names[class_id] if class_id != -1 else "-")
-    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r", interpolation="bilinear")
+    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r", interpolation="bilinear", savePath=savePath)
     return to_display
 
 def plot_precision_recall(AP, precisions, recalls):

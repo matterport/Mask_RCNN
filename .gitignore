@@ -5,7 +5,7 @@ results/
 temp/
 test/
 *.h5
-
+*events.out.tfevents*
 # ASHER ignore:
 samples/coco/annotations
 samples/coco/images
