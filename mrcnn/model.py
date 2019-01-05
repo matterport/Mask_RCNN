@@ -2376,9 +2376,6 @@ class MaskRCNN():
                 if K.backend() != 'tensorflow':
                     raise RuntimeError('TensorBoard callback only works '
                                     'with the TensorFlow backend.')
-                global tf, projector
-                import tensorflow as tf
-                from tensorflow.contrib.tensorboard.plugins import projector
                 self.log_dir = log_dir
                 self.histogram_freq = histogram_freq
                 self.merged = None
@@ -2440,9 +2437,11 @@ class MaskRCNN():
                                 assert len(shape) == 4 and shape[-1] in [1, 3, 4]
                                 tf.summary.image(mapped_weight_name, w_img)
 
-                        if hasattr(layer, 'output'):
-                            tf.summary.histogram('{}_out'.format(layer.name),
-                                                layer.output)
+                        # if hasattr(layer, 'output'):
+                        #     if(layer.output.dtype == bool):
+                        #         continue
+                        #     tf.summary.histogram('{}_out'.format(layer.name),
+                        #                         layer.output)
                 self.merged = tf.summary.merge_all()
 
                 if self.write_graph:
@@ -2500,9 +2499,12 @@ class MaskRCNN():
 
 
         # Callbacks
+        #asher todo: create cucu_callbacks list
         callbacks = [
-            keras.callbacks.TensorBoard(log_dir=self.log_dir,
+            cucu_summaryCallback(log_dir=self.log_dir,
                                         histogram_freq=1, write_graph=True, write_images=False)
+            # ,keras.callbacks.TensorBoard(log_dir=self.log_dir,
+            #                             histogram_freq=1, write_graph=True, write_images=False)
             # asher todo: add hyper parameter to controll save_weights_only
             # ,keras.callbacks.ModelCheckpoint(self.checkpoint_path,
             #                                 verbose=0, save_weights_only=True),
