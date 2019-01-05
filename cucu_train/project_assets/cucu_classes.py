@@ -13,8 +13,8 @@ from PIL import Image
 from project_assets.cucu_utils import *
 
 #asher todo: change this variable name - to bum_of_object
-minimum_number_of_cucumbers = 50
-maximum_number_of_cucumbers = 70
+minimum_number_of_cucumbers = 5
+maximum_number_of_cucumbers = 20
 #number_of_cucumbers = 4
 min_scale = 0.5
 max_scale = 0.8
@@ -465,7 +465,7 @@ class realDataset(utils.Dataset):
 
 
 class project_paths(object):
-    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer):
+    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer):
         self.projectRootDir=projectRootDir
         self.TensorboardDir=TensorboardDir
         self.trainedModelsDir=trainedModelsDir
@@ -474,3 +474,4 @@ class project_paths(object):
         self.valDatasetDir=valDatasetDir
         self.testDatasetDir=testDatasetDir
         self.trainResultContainer=trainResultContainer
+        self.visualizeEvaluationsDir=visualizeEvaluationsDir

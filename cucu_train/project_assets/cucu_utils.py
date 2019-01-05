@@ -3,13 +3,24 @@ import math
 import numpy as np
 import cv2
 
-
+import matplotlib.pyplot as plt
 from PIL import Image
 
 
 # In[18]:
 
 
+
+def get_ax(rows=1, cols=1, size=8):
+    """Return a Matplotlib Axes array to be used in
+    all visualizations in the notebook. Provide a
+    central point to control graph sizes.
+    
+    Change the default size attribute to control the size
+    of rendered images
+    """
+    _, ax = plt.subplots(rows, cols, figsize=(size*cols, size*rows))
+    return ax
 
 
 def rotate_bound(image, angle):

@@ -88,7 +88,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
-                      colors=None, captions=None):
+                      colors=None, captions=None,savePath=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -168,8 +168,10 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    if auto_show:
-        plt.show()
+    if savePath != None:
+        plt.savefig(savePath)
+    # if auto_show:
+    #     plt.show()
     return masked_image.astype(np.uint8)
 
 
@@ -308,7 +310,7 @@ def display_top_masks(image, mask, class_ids, class_names,savePath, limit=4):
     display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r", interpolation="bilinear", savePath=savePath)
     return to_display
 
-def plot_precision_recall(AP, precisions, recalls):
+def plot_precision_recall(AP, precisions, recalls, savePath):
     """Draw the precision-recall curve.
 
     AP: Average precision at IoU >= 0.5
@@ -321,10 +323,11 @@ def plot_precision_recall(AP, precisions, recalls):
     ax.set_ylim(0, 1.1)
     ax.set_xlim(0, 1.1)
     _ = ax.plot(recalls, precisions)
+    plt.savefig(savePath)
 
 
 def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
-                  overlaps, class_names, threshold=0.5):
+                  overlaps, class_names,savePath, threshold=0.5):
     """Draw a grid showing how ground truth objects are classified.
     gt_class_ids: [N] int. Ground truth class IDs
     pred_class_id: [N] int. Predicted class IDs
@@ -360,7 +363,7 @@ def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
     plt.tight_layout()
     plt.xlabel("Ground Truth")
     plt.ylabel("Predictions")
-
+    plt.savefig(savePath)
 
 def draw_boxes(image, boxes=None, refined_boxes=None,
                masks=None, captions=None, visibilities=None,
