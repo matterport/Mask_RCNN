@@ -25,7 +25,11 @@ class cucumberConfig(Config):
     
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
-       
+    
+    # Ratios of anchors at each cell (width/height)
+    # A value of 1 represents a square anchor, and 0.5 is a wide anchor
+    RPN_ANCHOR_RATIOS = [0.5, 1, 2]
+
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
     TRAIN_ROIS_PER_IMAGE = 32
@@ -34,12 +38,16 @@ class cucumberConfig(Config):
     # ROI_POSITIVE_RATIO = 66  
     
     #asher todo: enlarge to 100 when real training occures
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
 
-    VALIDATION_STEPS = 10
+    VALIDATION_STEPS = 50
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
     MAX_SAVED_TRAINED_MODELS = 10
     LEARNING_RATE = 0.0001
     LEARNING_MOMENTUM = 0.5
+    # each EPOCHS times we save the weights of the net
+    EPOCHS = 50
+    # EPOCHS_ROUNDS determines how many weighst of the net we will save
+    EPOCHS_ROUNDS = 3

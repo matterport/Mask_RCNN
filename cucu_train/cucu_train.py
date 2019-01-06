@@ -32,8 +32,12 @@ from PIL import Image
 # from cucu_realDatasetClass import *
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 
+#TODO or!
+
+
+
 # create a container for training result per exexution of cucu_train.py
-CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainer/"
+CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
 now = datetime.datetime.now()
 CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now)
 os.chmod(ROOT_DIR, mode=0o777)
@@ -80,7 +84,7 @@ print(sys.version)
 
 #create configurations for model instentiating
 config = cucumberConfig()
-# config.display()
+config.display()
 
 
 
@@ -111,34 +115,6 @@ dataset_val.prepare()
 
 
 
-# # asher todo: change code to fit new load_image method of coco
-# #show n random image&mask train examples
-# n = 3
-# image_ids = np.random.choice(dataset_train.image_ids, n)
-# for image_id in image_ids:
-#     image = dataset_train.load_image(image_id)
-#     mask, class_ids = dataset_train.load_mask(image_id)
-#     print(image.shape)
-#     # images = visualize.display_top_masks(image, mask, class_ids, dataset_train.class_names, 3)
-
-    # save images for presentations
-    # cm = plt.get_cmap('gist_earth', lut=50)
-
-    # img = Image.fromarray(images[0])
-    # img.save(str(image_id) + "_pic" + ".png", "PNG")
-
-    # apply color map to masks
-    # img = (cm(images[1])[:, :, :3] * 255).astype(np.uint8)
-    # img = Image.fromarray(img)
-    # img.save(str(image_id) + "_mask_leaf" + ".png", "PNG")
-
-    # img = (cm(images[2])[:, :, :3] * 255).astype(np.uint8)
-    # img = Image.fromarray(img)
-    # img.save(str(image_id) + "_mask_fruit" + ".png", "PNG")
-
-    # img = (cm(images[3])[:, :, :3] * 255).astype(np.uint8)
-    # img = Image.fromarray(img)
-    # img.save(str(image_id) + "_mask_flower" + ".png", "PNG")
 
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
@@ -151,21 +127,21 @@ custom_callbacks=[]
 # seleect your weapon of choice
 # list_of_trained_models = glob.glob(ROOT_DIR + "/trained_models" +'/*')
 # latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
-# model.load_weights(ROOT_DIR + "/cucu_train/trained_models/"+"cucuWheights_2019-01-05 19:39:10.350050.h5", by_name=True)
+model.load_weights(ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-05 23:32:40.518988/trained_models/cucuWheights_2019-01-06 01:04:18.564691.h5", by_name=True)
 
 
-model.load_weights(cucuPaths.cocoModelPath, by_name=True,
-                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
-                                "mrcnn_bbox", "mrcnn_mask"])
+# model.load_weights(cucuPaths.cocoModelPath, by_name=True,
+#                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
+#                                 "mrcnn_bbox", "mrcnn_mask"])
 
 # In[ ]:
 
 
 #asher todo: make for loop on generated and real data set
-for _ in range(10):
+for _ in range(config.EPOCHS_ROUNDS):
 
-    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=5,\
-                            custom_callbacks=custom_callbacks, layers="heads",verbose=0)
+    model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=config.EPOCHS,\
+                            custom_callbacks=custom_callbacks, layers="heads",verbose=1)
 
     # Save weights
     now = datetime.datetime.now()
@@ -239,7 +215,7 @@ os.mkdir(cucuPaths.visualizeEvaluationsDir + "/activationsImages")
 # in future we want to generate from dataset_test!
 dataset = dataset_val
 
-image_ids = np.random.choice(dataset.image_ids, 2)
+image_ids = np.random.choice(dataset.image_ids, 20)
 for image_id in image_ids:
     image, image_meta, gt_class_id, gt_bbox, gt_mask =\
         modellib.load_image_gt(dataset, config, image_id, use_mini_mask=False)
@@ -315,30 +291,30 @@ for image_id in image_ids:
 
 
     # asher todo: this module stilll doesn't work
-    # # Run RPN sub-graph
-    # pillar = model.keras_model.get_layer("RPN").output  # node to start searching from
+    # Run RPN sub-graph
+    pillar = model.keras_model.get_layer("mrcnn_bbox").output  # node to start searching from
 
-    # # TF 1.4 and 1.9 introduce new versions of NMS. Search for all names to support TF 1.3~1.10
-    # nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression:0")
-    # if nms_node is None:
-    #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV2:0")
-    # # if nms_node is None: #TF 1.9-1.10
-    # #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV3:0")
+    # TF 1.4 and 1.9 introduce new versions of NMS. Search for all names to support TF 1.3~1.10
+    nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression:0")
+    if nms_node is None:
+        nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression/NonMaxSuppressionV2:0")
+    # if nms_node is None: #TF 1.9-1.10
+    #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV3:0")
 
-    # rpn = model.run_graph([image], [
-    #     ("rpn_class", model.keras_model.get_layer("rpn_class").output),
-    #     ("pre_nms_anchors", model.ancestor(pillar, "ROI/pre_nms_anchors:0")),
-    #     ("refined_anchors", model.ancestor(pillar, "ROI/refined_anchors:0")),
-    #     ("refined_anchors_clipped", model.ancestor(pillar, "ROI/refined_anchors_clipped:0")),
-    #     ("post_nms_anchor_ix", nms_node),
-    #     ("proposals", model.keras_model.get_layer("ROI").output),
-    # ])
-    # # Show top anchors by score (before refinement)
-    # limit = 100
-    # sorted_anchor_ids = np.argsort(rpn['rpn_class'][:,:,1].flatten())[::-1]
-    # visualize.draw_boxes(image, boxes=model.anchors[sorted_anchor_ids[:limit]], ax=get_ax(),savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsNotRefined_" + "image_" + str(image_id) +".png")
+    rpn = model.run_graph([image], [
+        ("mrcnn_bbox", model.keras_model.get_layer("mrcnn_bbox").output),
+        # ("pre_nms_anchors", model.ancestor(pillar, "ROI/pre_nms_anchors:0")),
+        # ("refined_anchors", model.ancestor(pillar, "mrcnn_bbox_fc")),
+        # ("refined_anchors_clipped", model.ancestor(pillar, "RPN/ROI/refined_anchors_clipped:0"))
+        # ,("post_nms_anchor_ix", nms_node)
+        # ,("rois", model.keras_model.get_layer("TrainGroundTruths/proposal_targets/rois").output),
+    ])
+    # Show top anchors by score (before refinement)
+    limit = 100
+    sorted_anchor_ids = np.argsort(rpn['mrcnn_bbox'][:,:,1].flatten())[::-1]
+    visualize.draw_boxes(image, boxes=model.anchors[sorted_anchor_ids[:limit]], ax=get_ax(),savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsNotRefined_" + "image_" + str(image_id) +".png")
 
-    # # Show top anchors with refinement. Then with clipping to image boundaries
+    # Show top anchors with refinement. Then with clipping to image boundaries
     # limit = 50
     # ax = get_ax(1, 2)
     # pre_nms_anchors = utils.denorm_boxes(rpn["pre_nms_anchors"][0], image.shape[:2])
@@ -370,17 +346,29 @@ for image_id in image_ids:
     visualize.display_images(det_masks[:4] * 255, cmap="Blues", interpolation="none", savePath=cucuPaths.visualizeEvaluationsDir + "/masks_detections/" + "masks_detections_" + "image_" + str(image_id) +".png" )
 
     # Get activations of a few sample layers
-    # activations = model.run_graph([image], [
-    #     ("input_image",        model.keras_model.get_layer("input_image").output),
-    #     ("res5a_out",          model.keras_model.get_layer("BackBone/res5a_out/Relu").output),  # for resnet100
-    #     ("rpn_bbox",           model.keras_model.get_layer("RPN/rpn_bbox_pred").output),
-    #     ("roi",                model.keras_model.get_layer("ROI").output),
-    # ])
-    # # Input image (normalized)
-    # _ = plt.imshow(modellib.unmold_image(activations["input_image"][0],config))
-    # plt.savefig(cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "normInputImage" + "image_" + str(image_id) +".png")
-    # # Backbone feature map
-    # visualize.display_images(np.transpose(activations["res4w_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationImage" + "image_" + str(image_id) +".png")
+    activations = model.run_graph([image], [
+        ("input_image",        model.keras_model.get_layer("input_image").output),
+        ("res2a_out",          model.keras_model.get_layer("res2a_out").output)  # for resnet100
+        # ,("rpn_bbox",           model.keras_model.get_layer("rpn_bbox").output),
+        # ("roi",                model.keras_model.get_layer("ROI").output),
+    ])
+    # Input image (normalized)
+    _ = plt.imshow(modellib.unmold_image(activations["input_image"][0],config))
+    plt.savefig(cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "normInputImage" + "image_" + str(image_id) +".png")
+    # Backbone feature map
+    visualize.display_images(np.transpose(activations["res2a_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationRes2aImage" + "image_" + str(image_id) +".png")
+    # Get activations of a few sample layers
+    activations = model.run_graph([image], [
+        ("input_image",        model.keras_model.get_layer("input_image").output),
+        ("res3a_out",          model.keras_model.get_layer("res3a_out").output)  # for resnet100
+        # ,("rpn_bbox",           model.keras_model.get_layer("rpn_bbox").output),
+        # ("roi",                model.keras_model.get_layer("ROI").output),
+    ])
+    # Input image (normalized)
+    _ = plt.imshow(modellib.unmold_image(activations["input_image"][0],config))
+    plt.savefig(cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "normInputImage" + "image_" + str(image_id) +".png")
+    # Backbone feature map
+    visualize.display_images(np.transpose(activations["res3a_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationRes3aImage" + "image_" + str(image_id) +".png")
 # In[ ]:
 
 
