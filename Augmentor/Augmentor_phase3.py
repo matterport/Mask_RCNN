@@ -3,7 +3,8 @@ import numpy as np                                 # (pip install numpy)
 from skimage import measure                        # (pip install scikit-image)
 from shapely.geometry import Polygon, MultiPolygon # (pip install Shapely)
 import json
-import cv2
+import os
+# import cv2
 
 def create_sub_masks(mask_image):
     width, height = mask_image.size
@@ -81,14 +82,30 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
 
     return annotation
 
-path = "/Users/orshemesh/Desktop/Project/Leaves_augmentor/leaves_after_phase2/leaves_after_phase1/"
-# img1 = Image.open(path+'leaves_after_phase1_original_IMG_9205.png').convert("RGBA")
-# img2 = Image.open(path+'leaves_after_phase1_original_IMG_9166.png').convert("RGBA")
-img1 = Image.open('/Users/orshemesh/Desktop/Project/leaves_after_phase1/IMG_9097.png')
-img2 = Image.open('/Users/orshemesh/Desktop/Project/leaves_after_phase1/IMG_9159.png')
+def get_image_json_doc(orig_json, image_name, new_id):
+    for image in orig_json['images']:
+        if image_name.find(image['file_name'].split('.')[0]) != -1:
+            result = image
+            result['id'] = new_id
+            orig_file_name = image['file_name']
+            for new_image_path in augmented_image_names:
+                if new_image_path.find(orig_file_name) != -1:
+                    result['path'] = new_image_path
+                    return result
+    return []
 
 
-imgs = [img1, img2]
+dir_path = '/Users/orshemesh/Desktop/Project/Leaves_augmentor/leaves_images/output/'
+files_in_dir = os.listdir(dir_path)
+ground_truth_images = [Image.open(dir_path+file) for file in files_in_dir if file.find('groundtruth') != -1]
+augmented_image_names = [file for file in files_in_dir if file.find('original_IMG') != -1]
+
+orig_json_path = '/Users/orshemesh/Desktop/Project/Leaves_augmentor/leaves_images/segmentation_results.json'
+with open(orig_json_path) as f:
+    orig_json = json.load(f)
+
+# new_image_jason = get_image_json_doc(orig_json, img1.filename.split('/')[-1].split('.')[0], 17)
+# new_image_jason2 = get_image_json_doc(orig_json, img2.filename.split('/')[-1], 18)
 
 # Define which colors match which categories in the images
 # houseplant_id, book_id, bottle_id, lamp_id = [1, 2, 3, 4]
@@ -112,14 +129,32 @@ image_id = 1
 
 # Create the annotations
 annotations = []
-for mask_image in imgs:
+images = []
+for mask_image in ground_truth_images:
+    new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
+    if new_image_json_doc == []:
+        print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
+        continue
+    images.append(new_image_json_doc)
     sub_masks = create_sub_masks(mask_image)
     for color, sub_mask in sub_masks.items():
         # category_id = category_ids[image_id][color]
-        category_id = 2
+        category_id = 1
         annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
         annotations.append(annotation)
         annotation_id += 1
+    print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
     image_id += 1
 
-print(json.dumps(annotations))
+info = orig_json['info']
+categories = orig_json['categories']
+
+output = {
+    'categories': categories,
+    'images': images,
+    'annotations': annotations,
+    'info': info
+}
+print(json.dumps(output))
+with open(dir_path+'new_annotations.json', 'w') as outfile:
+    json.dump(output, outfile)
