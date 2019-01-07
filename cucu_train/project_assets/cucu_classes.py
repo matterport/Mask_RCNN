@@ -12,7 +12,8 @@ from mrcnn import utils
 from PIL import Image
 from project_assets.cucu_utils import *
 
-#asher todo: change this variable name - to bum_of_object
+#asher todo:    move inside cucumberConfig
+# asher todo: add maximal different maximal value for each object
 minimum_number_of_cucumbers = 5
 maximum_number_of_cucumbers = 20
 #number_of_cucumbers = 4
@@ -20,7 +21,8 @@ min_scale = 0.5
 max_scale = 0.8
 
 
-
+from cucu_config import *
+cucuConf = cucumberConfig()
 
 class genDataset(utils.Dataset):
     def __init__(self, folder_objects_cucumber,folder_objects_leaf,folder_objects_flower, folder_bgs,config):
@@ -190,17 +192,21 @@ class genDataset(utils.Dataset):
         """Generates specifications of a random shape that lies within
         the given height and width boundaries.
         Returns a tuple of three valus:
-        * The shape name (square, circle, ...)
-        * Shape color: a tuple of 3 values, RGB.
+        * The shape name (cucumber, leaf, ...)
         * Shape dimensions: A tuple of values that define the shape size
                             and location. Differs per shape type.
+        *returns top left coordinate of image.
+        *returns scaling factor of object.
+        *returns index in loaded dataset to pick original object from
         """
         # Shape
         shape = choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"])
-        # Color
+        
+        # this hyper param varifies object is not generated outside the picture
+        boundingDelta = cucuConf.BOUNDING_DELTA
         # TopLeft x, y
-        x_location = randint(0, height)
-        y_location = randint(0, width)
+        x_location = randint(0, height - boundingDelta*height)
+        y_location = randint(0, width - boundingDelta*width)
         # Scale x, y
         x_scale = uniform(min_scale, max_scale)
         y_scale = uniform(min_scale, max_scale)
@@ -474,3 +480,5 @@ class project_paths(object):
         self.trainResultContainer=trainResultContainer
         self.visualizeEvaluationsDir=visualizeEvaluationsDir
         self.trainOutputLog=trainOutputLog
+
+

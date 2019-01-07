@@ -7,6 +7,8 @@ class cucumberConfig(Config):
     Derives from the base Config class and overrides values specific
     to the toy shapes dataset.
     """
+
+    """MODEL HYPER PARAMETERS"""
     # Give the configuration a recognizable name
     NAME = "cucumbers"
 
@@ -18,11 +20,6 @@ class cucumberConfig(Config):
     # Number of classes (including background)
     NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
 
-    # Use small images for faster training. Set the limits of the small side
-    # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM = 1024
-    
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
     
@@ -51,3 +48,14 @@ class cucumberConfig(Config):
     EPOCHS = 50
     # EPOCHS_ROUNDS determines how many weighst of the net we will save
     EPOCHS_ROUNDS = 3
+
+
+    """ DATA GENERATION HYPER PARAMETERS """
+    # Use small images for faster training. Set the limits of the small side
+    # the large side, and that determines the image shape.
+    #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
+    IMAGE_MIN_DIM = 1024
+    IMAGE_MAX_DIM = 1024
+    
+    # this hyper parameter varifies that object is not generated outside boundries of image being generated
+    BOUNDING_DELTA = 0.2
