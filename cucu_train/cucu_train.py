@@ -123,6 +123,7 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.Te
 
 # In[ ]:
 # add custom callbacks if needed
+from keras.callbacks import *
 custom_callbacks=[]
 
 # seleect your weapon of choice
