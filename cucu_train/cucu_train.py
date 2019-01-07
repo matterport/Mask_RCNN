@@ -64,8 +64,9 @@ try:
 finally:
     os.umask(original_umask)
 
-logger =open(cucuPaths.trainOutputLog + "/sessionLogger.txt", 'w+')
-sys.stdout = logger
+sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
+# logger =open(cucuPaths.trainOutputLog + "/sessionLogger.txt", 'w+')
+# sys.stdout = logger
 
 
 import json
@@ -127,12 +128,12 @@ custom_callbacks=[]
 # seleect your weapon of choice
 # list_of_trained_models = glob.glob(ROOT_DIR + "/trained_models" +'/*')
 # latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
-model.load_weights(ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-05 23:32:40.518988/trained_models/cucuWheights_2019-01-06 01:04:18.564691.h5", by_name=True)
+# model.load_weights(ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-05 23:32:40.518988/trained_models/cucuWheights_2019-01-06 01:04:18.564691.h5", by_name=True)
 
 
-# model.load_weights(cucuPaths.cocoModelPath, by_name=True,
-#                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
-#                                 "mrcnn_bbox", "mrcnn_mask"])
+model.load_weights(cucuPaths.cocoModelPath, by_name=True,
+                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                                 "mrcnn_bbox", "mrcnn_mask"])
 
 # In[ ]:
 
@@ -398,9 +399,6 @@ for image_id in image_ids:
 # print("mAP @ IoU=50: ", np.mean(APs))
 
 
-
-
-logger.close()
 
 # In[ ]:
 
