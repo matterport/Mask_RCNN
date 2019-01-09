@@ -2709,7 +2709,7 @@ class MaskRCNN():
             model_in = inputs
         elif self.mode=="inference":
             if len(inputs)==1:
-                [images] = inputs
+                images = inputs
                 molded_images, image_metas, _ = self.mold_inputs(images)
             elif len(inputs)==2:
                 [molded_images, image_metas] = inputs
