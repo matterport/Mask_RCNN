@@ -15,7 +15,7 @@ class cucumberConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 8
     
     # Number of classes (including background)
     NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
@@ -34,36 +34,35 @@ class cucumberConfig(Config):
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
     
-    STEPS_PER_EPOCH = 0
 
-    VALIDATION_STEPS = 50
+    VALIDATION_STEPS = 100
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
     MAX_SAVED_TRAINED_MODELS = 10
-    LEARNING_RATE = 0.0001
+    LEARNING_RATE = 0.001
     LEARNING_MOMENTUM = 0.5
     # each EPOCHS times we save the weights of the net
-    EPOCHS = 1
+    EPOCHS = 12
     # EPOCHS_ROUNDS determines how many weighst of the net we will save
-    EPOCHS_ROUNDS = 5
+    EPOCHS_ROUNDS = 1
 
 
     """ DATA GENERATION HYPER PARAMETERS """
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
-    IMAGE_MIN_DIM = 1024
-    IMAGE_MAX_DIM = 1024
+    IMAGE_MIN_DIM = 512
+    IMAGE_MAX_DIM = 512
     
     #SCALES OF GENERATED OBJECTS
-    MIN_SCALE_OBJ = 0.5
-    MAX_SCALE_OBJ = 0.8
+    MIN_SCALE_OBJ = 0.3
+    MAX_SCALE_OBJ = 0.5
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 200
-    VALID_SET_SIZE = 50
+    TRAIN_SET_SIZE = 10000
+    VALID_SET_SIZE = 1000
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 5

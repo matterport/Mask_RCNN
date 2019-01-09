@@ -94,11 +94,11 @@ class genDataset(utils.Dataset):
         self.add_class("shapes", 2, "leaf")
         self.add_class("shapes", 3, "flower")
 
-        # decide wich background:
-        bgIndex = randint(0, self.number_of_bgs-1) 
+        
         # Add images
         for i in range(count):
-            # print('Image', i, end='\r')
+            # decide wich background:
+            bgIndex = randint(0, self.number_of_bgs-1) 
             bg_color, shapes = self.random_image(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes, bgIndex=bgIndex)
     
@@ -118,8 +118,8 @@ class genDataset(utils.Dataset):
         y_max, x_max ,_ = np.asarray(self.bg[info['bgIndex']]).shape
 
         # pick random up-right corner
-        x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//4 , x_max)
-        y_topRight = randint(y_max - self.config.IMAGE_MAX_DIM//4 , y_max)
+        x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//2 , x_max)
+        y_topRight = randint(y_max - self.config.IMAGE_MAX_DIM//2 , y_max)
         # print("y_topRight:" , y_topRight , "index:", index) #asher todo: delete this
         # pick bottom-left corner for cropping the bg to fir image size which is (self.config.IMAGE_MAX_DIM)^2
         # x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
@@ -130,7 +130,10 @@ class genDataset(utils.Dataset):
 
         # temporary values (left, upper, right, lower)-tuple
         # simon todo: restore generic vars
-        area = (0, 0, 1024, 1024)
+        if self.config.IMAGE_MAX_DIM == 1024:
+            area = (0, 0, 1024, 1024)
+        else:
+            area = (x_bottomLeft,y_bottomLeft,x_topRight,y_topRight)
         image = self.bg[info['bgIndex']].crop(area)
 
         for shape, location, scale, angle, index in info['shapes']:

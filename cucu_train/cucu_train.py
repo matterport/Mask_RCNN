@@ -90,6 +90,7 @@ config.display()
 from randomColorObjects import randomColorObject, toGray
 from shutil import copyfile, copytree
 
+#RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
 copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
 randIndex = 0
 for _ in range(2):
@@ -103,10 +104,13 @@ for _ in range(2):
     for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
         randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
         randIndex += 1
-
+        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + '_'+ str(randIndex) + '.png')
+        randIndex += 1
 
     for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects')):
         randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + 'rand_'+ str(randIndex) + '.png')
+        randIndex += 1
+        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + '_'+ str(randIndex) + '.png')
         randIndex += 1
 
 
@@ -152,7 +156,7 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.Te
 # add custom callbacks if needed
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr/(0.1*epoch+1)
+    return lr/(epoch+1)
 
 custom_callbacks=[
     EarlyStopping(monitor='val_loss', min_delta=0.1, patience=2, verbose=1, mode='auto'),
