@@ -87,7 +87,7 @@ config.display()
 
 # In[3]:
 #prepare source objects for current container
-from randomColorObjects import randomColorObject
+from randomColorObjects import randomColorObject, toGray
 from shutil import copyfile, copytree
 
 copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
@@ -96,6 +96,9 @@ for _ in range(2):
     for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
         randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
         randIndex += 1
+        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + '_'+ str(randIndex) + '.png')
+        randIndex += 1
+
 
     for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
         randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
