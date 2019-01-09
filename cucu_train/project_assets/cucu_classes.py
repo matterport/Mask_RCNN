@@ -9,20 +9,20 @@ ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)  # To find local version of the library
 
 from mrcnn import utils
-from PIL import Image
+from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
 from project_assets.cucu_utils import *
-
-#asher todo:    move inside cucumberConfig
-# asher todo: add maximal different maximal value for each object
-minimum_number_of_cucumbers = 5
-maximum_number_of_cucumbers = 20
-#number_of_cucumbers = 4
-min_scale = 0.5
-max_scale = 0.8
-
 
 from cucu_config import *
 cucuConf = cucumberConfig()
+
+import math
+minObjectsNumPerImage = math.floor(cucuConf.MIN_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND)
+maxObjectsNumPerImage = math.floor(cucuConf.MAX_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND)
+min_scale = cucuConf.MIN_SCALE_OBJ
+max_scale = cucuConf.MAX_SCALE_OBJ
+
 
 class genDataset(utils.Dataset):
     def __init__(self, folder_objects_cucumber,folder_objects_leaf,folder_objects_flower, folder_bgs,config):
@@ -59,9 +59,15 @@ class genDataset(utils.Dataset):
         
         for root, _, files in os.walk(self.folder_objects_leaf):
             for filename in files:
-                self.leafObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
+                try:
+                    img = Image.open(os.path.join(root, filename)).convert('RGBA')
+                    self.leafObj.append(img)
+                except Exception as e:
+                    print("error with image: ", filename)
+                    continue
+
         _, _, files_objects = next(os.walk(self.folder_objects_leaf))
-        self.number_of_leaves = len(files_objects)
+        self.number_of_leaves = len(self.leafObj)
         
         
                 
@@ -205,8 +211,8 @@ class genDataset(utils.Dataset):
         # this hyper param varifies object is not generated outside the picture
         boundingDelta = cucuConf.BOUNDING_DELTA
         # TopLeft x, y
-        x_location = randint(0, height - boundingDelta*height)
-        y_location = randint(0, width - boundingDelta*width)
+        x_location = randint(0, height - int(boundingDelta*height))
+        y_location = randint(0, width - int(boundingDelta*width))
         # Scale x, y
         x_scale = uniform(min_scale, max_scale)
         y_scale = uniform(min_scale, max_scale)
@@ -235,7 +241,7 @@ class genDataset(utils.Dataset):
         shapes = []
         boxes = []
         indexes  = []
-        N = randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
+        N = randint(minObjectsNumPerImage, maxObjectsNumPerImage)
         
         image = np.ones([height, width, 3], dtype=np.uint8)
         
@@ -271,7 +277,7 @@ class genDataset(utils.Dataset):
         shapes = []
         boxes = []
         indexes  = []
-        N = randint(minimum_number_of_cucumbers, maximum_number_of_cucumbers)
+        N = randint(minObjectsNumPerImage, maxObjectsNumPerImage)
             
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)

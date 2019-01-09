@@ -32,13 +32,11 @@ from PIL import Image
 # from cucu_realDatasetClass import *
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 
-#TODO or!
-
-
-
 # create a container for training result per exexution of cucu_train.py
 CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
 now = datetime.datetime.now()
+
+#
 CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now)
 os.chmod(ROOT_DIR, mode=0o777)
 # create centralized class for used paths during training
@@ -48,7 +46,7 @@ cucuPaths = project_paths(
     trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
     visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
     cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       os.path.join(ROOT_DIR, "cucu_train/project_dataset/train_data"),
+    trainDatasetDir=       "/home/simon/Documents/cucu_dataset",
     valDatasetDir=         os.path.join(ROOT_DIR, "cucu_train/project_dataset/valid_data"),
     testDatasetDir=        os.path.join(ROOT_DIR, "cucu_train/project_dataset/test_data"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
@@ -65,9 +63,6 @@ finally:
     os.umask(original_umask)
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
-# logger =open(cucuPaths.trainOutputLog + "/sessionLogger.txt", 'w+')
-# sys.stdout = logger
-
 
 import json
 print(cucuPaths.projectRootDir)
@@ -93,23 +88,26 @@ config.display()
 
 # In[3]:
 
+from randomColorObjects import randomColorObject
+
 
 
 # Training dataset
 # asher todo: add a choice from which dataset to generate
-dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
-                            cucuPaths.trainDatasetDir + '/leaves_objects',
-                            cucuPaths.trainDatasetDir + '/flower_objects',
-                            cucuPaths.trainDatasetDir + '/background_folder/1024', config)
-dataset_train.load_shapes(3000, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_train = genDataset( cucuPaths.trainDatasetDir + '/fruits/train/cucumbers_objects', 
+                            cucuPaths.trainDatasetDir + '/leaves/train/leaves_objects',
+                            cucuPaths.trainDatasetDir + '/flowers/train/flowers_objects',
+                            cucuPaths.trainDatasetDir + '/bgs/1024', config)
+dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
+
 
 # Validation dataset
 dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
                             cucuPaths.valDatasetDir + '/leaves_objects',
                             cucuPaths.valDatasetDir + '/flower_objects',
                             cucuPaths.valDatasetDir + '/background_folder/1024', config)
-dataset_val.load_shapes(300, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_val.prepare()
 
 # In[ ]:
@@ -124,18 +122,26 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.Te
 # In[ ]:
 # add custom callbacks if needed
 from keras.callbacks import *
-custom_callbacks=[]
+def scheduleLearningRate(epoch, lr):
+    return lr/(0.1*epoch+1)
+
+custom_callbacks=[
+    EarlyStopping(monitor='val_loss', min_delta=0.1, patience=2, verbose=1, mode='auto'),
+    LearningRateScheduler(scheduleLearningRate, verbose=1)
+    
+]
 
 # seleect your weapon of choice
 # list_of_trained_models = glob.glob(ROOT_DIR + "/trained_models" +'/*')
 # latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
-# model.load_weights(ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-05 23:32:40.518988/trained_models/cucuWheights_2019-01-06 01:04:18.564691.h5", by_name=True)
 
-
+# weightPath = cucuPaths.cocoModelPath
+# weightPath = ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-06 13:07:54.558547/trained_models/cucuWheights_2019-01-07 05:27:48.113139.h5"
+# model.load_weights(weightPath, by_name=True)
 model.load_weights(cucuPaths.cocoModelPath, by_name=True,
-                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-                                 "mrcnn_bbox", "mrcnn_mask"])
-
+                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                               "mrcnn_bbox", "mrcnn_mask"])
+# print(weightPath)
 # In[ ]:
 
 

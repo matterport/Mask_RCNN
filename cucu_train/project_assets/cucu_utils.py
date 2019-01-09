@@ -173,5 +173,8 @@ class CucuLogger(object):
         self.logger_file.write(str)
         self.orig_out.write(str)
 
+    def flush(self):
+        pass
+
     def __del__(self):
         self.logger_file.close()

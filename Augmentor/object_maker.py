@@ -3,16 +3,16 @@ from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
 
-dataDir = '/Users/orshemesh/Desktop/Project/Photos/2018_05_31_09_02_segmentation_task_8_leaf_cucumber_KIM/'
-annFile = '/Users/orshemesh/Desktop/Project/Photos/2018_05_31_09_02_segmentation_task_8_leaf_cucumber_KIM/segmentation_results.json'
+dataDir = '/home/simon/Documents/cucu_dataset/leaves/train/output/'
+annFile = '/home/simon/Documents/cucu_dataset/leaves/train/output/annotations.json'
 coco = COCO(annFile)
 
 cucumbers = coco.loadCats(coco.getCatIds())
 categories_names = [cucumber['name'] for cucumber in cucumbers]
 print('COCO categories: \n{}\n'.format(' '.join(categories_names)))
 
-supercategories_names = set([cucumber['supercategory'] for cucumber in cucumbers])
-print('COCO supercategories: \n{}'.format(' '.join(supercategories_names)))
+# supercategories_names = set([cucumber['supercategory'] for cucumber in cucumbers])
+# print('COCO supercategories: \n{}'.format(' '.join(supercategories_names)))
 
 cucumbers_Ids = coco.getCatIds(catNms=categories_names[0]);
 images_Ids = coco.getImgIds(catIds=cucumbers_Ids );
@@ -24,6 +24,9 @@ for img in imgs:
     for i in range(len(annotation_Ids)):
         annotation = coco.loadAnns(annotation_Ids[i])
         polygon = []
+        
+        if len(annotation[0]['segmentation']) != 1:
+            continue
 
         for j in range(len(annotation[0]['segmentation'][0]) // 2):
             polygon.append((annotation[0]['segmentation'][0][2*j], annotation[0]['segmentation'][0][2*j+1]))
@@ -31,7 +34,10 @@ for img in imgs:
         # read image as RGB and add alpha (transparency)
         images_dir_path = dataDir
         image_name = img['file_name']
-        im = Image.open(images_dir_path+image_name).convert("RGBA")
+        try:
+            im = Image.open(images_dir_path+image_name).convert("RGBA")
+        except Exception as e:
+            print("error: {} skipped.".format(image_name))
 
         # convert to numpy (for convenience)
         imArray = numpy.asarray(im)
@@ -68,7 +74,7 @@ for img in imgs:
         # newIm = Image.fromarray(objectImArray, "RGBA")
         try:
             newIm = Image.fromarray(newImArray, "RGBA")
-            newIm.save("/Users/orshemesh/Desktop/Project/leaf_objects/"+image_name.split('.')[0]+"_"+str(i)+".png")
+            newIm.save("/home/simon/Documents/cucu_dataset/leaves/train/output/leaf_object/"+image_name.split('.')[0]+"_"+str(i)+".png")
         except:
             print("Unexpected error: image {} annotation id {}".format(image_name.split('.')[0]+"_"+str(i)+".png", annotation[0]['id']))
 
