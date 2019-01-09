@@ -2697,12 +2697,12 @@ class MaskRCNN():
         # TODO: Current kf only works when batch size=1
         kf = K.function(model_inputs, list(outputs.values()))
 
-	assert (self.mode=="training" and len(inputs)==7) or \
+        assert (self.mode=="training" and len(inputs)==7) or \
             (self.mode=="inference" and len(inputs) in [1,2]), \
             "argument 'inputs' should have length 7 in training mode, \
             or have length 1 or 2 in inference mode"
         
-	# Prepare inputs
+        # Prepare inputs
         if self.mode=="training":
             # inputs: [molded_images, image_metas, rpn_match, rpn_bbox,
             #              gt_class_ids, gt_boxes, gt_masks]
