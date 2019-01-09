@@ -1,7 +1,7 @@
 
 
 from mrcnn.config import Config
-
+import numpy as np
 class cucumberConfig(Config):
     """Configuration for training on the toy shapes dataset.
     Derives from the base Config class and overrides values specific
@@ -62,8 +62,8 @@ class cucumberConfig(Config):
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 10000
-    VALID_SET_SIZE = 500
+    TRAIN_SET_SIZE = 200
+    VALID_SET_SIZE = 50
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 5

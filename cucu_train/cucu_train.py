@@ -46,9 +46,9 @@ cucuPaths = project_paths(
     trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
     visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
     cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       "/home/simon/Documents/cucu_dataset",
-    valDatasetDir=         os.path.join(ROOT_DIR, "cucu_train/project_dataset/valid_data"),
-    testDatasetDir=        os.path.join(ROOT_DIR, "cucu_train/project_dataset/test_data"),
+    trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/train_data"),
+    valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/valid_data"),
+    testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
     trainOutputLog      =  CURRENT_CONTAINER_DIR
 
@@ -59,13 +59,12 @@ try:
     os.makedirs(cucuPaths.trainedModelsDir, mode=0o777)
     os.makedirs(cucuPaths.visualizeEvaluationsDir, mode=0o777)
 
+
 finally:
     os.umask(original_umask)
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
-
 import json
-print(cucuPaths.projectRootDir)
 # Import Mask RCNN
 sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
 from mrcnn import utils
@@ -87,17 +86,35 @@ config.display()
 
 
 # In[3]:
-
+#prepare source objects for current container
 from randomColorObjects import randomColorObject
+from shutil import copyfile, copytree
+
+copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
+randIndex = 0
+for _ in range(2):
+    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
+        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
+        randIndex += 1
+
+    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
+        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
+        randIndex += 1
+
+
+    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects')):
+        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + 'rand_'+ str(randIndex) + '.png')
+        randIndex += 1
+
 
 
 
 # Training dataset
 # asher todo: add a choice from which dataset to generate
-dataset_train = genDataset( cucuPaths.trainDatasetDir + '/fruits/train/cucumbers_objects', 
-                            cucuPaths.trainDatasetDir + '/leaves/train/leaves_objects',
-                            cucuPaths.trainDatasetDir + '/flowers/train/flowers_objects',
-                            cucuPaths.trainDatasetDir + '/bgs/1024', config)
+dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
+                            cucuPaths.trainDatasetDir + '/leaves_objects',
+                            cucuPaths.trainDatasetDir + '/flower_objects',
+                            cucuPaths.trainDatasetDir + '/background_folder/1024', config)
 dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
 dataset_train.prepare()
 
@@ -112,6 +129,15 @@ dataset_val.prepare()
 
 # In[ ]:
 
+
+#show n random image&mask train examples
+n = 5
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks( image, mask, class_ids, dataset_train.class_names,None, 4)
 
 
 
