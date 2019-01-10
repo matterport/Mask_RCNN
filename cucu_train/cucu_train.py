@@ -27,7 +27,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from project_assets.cucu_classes import *
-from cucu_config import cucumberConfig
+from cucu_config import cucuConf as config
 from PIL import Image
 # from cucu_realDatasetClass import *
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
@@ -78,8 +78,7 @@ import sys
 print(sys.version)
 
 #create configurations for model instentiating
-config = cucumberConfig()
-config.display()
+cucuConf.display()
 
 
 
@@ -156,7 +155,7 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.Te
 # add custom callbacks if needed
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr/(epoch+1)
+    return lr*0.8
 
 custom_callbacks=[
     EarlyStopping(monitor='val_loss', min_delta=0.1, patience=2, verbose=1, mode='auto'),

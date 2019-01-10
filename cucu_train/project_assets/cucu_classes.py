@@ -15,14 +15,9 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 from project_assets.cucu_utils import *
 
 from cucu_config import *
-cucuConf = cucumberConfig()
+
 
 import math
-minObjectsNumPerImage = math.floor(cucuConf.MIN_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND)
-maxObjectsNumPerImage = math.floor(cucuConf.MAX_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND)
-min_scale = cucuConf.MIN_SCALE_OBJ
-max_scale = cucuConf.MAX_SCALE_OBJ
-
 
 class genDataset(utils.Dataset):
     def __init__(self, folder_objects_cucumber,folder_objects_leaf,folder_objects_flower, folder_bgs,config):
@@ -217,8 +212,8 @@ class genDataset(utils.Dataset):
         x_location = randint(0, height - int(boundingDelta*height))
         y_location = randint(0, width - int(boundingDelta*width))
         # Scale x, y
-        x_scale = uniform(min_scale, max_scale)
-        y_scale = uniform(min_scale, max_scale)
+        x_scale = uniform(cucuConf.MIN_SCALE_OBJ, cucuConf.MAX_SCALE_OBJ)
+        y_scale = uniform(cucuConf.MIN_SCALE_OBJ, cucuConf.MAX_SCALE_OBJ)
         # Angle
         angle = randint(-10,10)
         # Image index
@@ -244,7 +239,7 @@ class genDataset(utils.Dataset):
         shapes = []
         boxes = []
         indexes  = []
-        N = randint(minObjectsNumPerImage, maxObjectsNumPerImage)
+        N = randint(math.floor(cucuConf.MIN_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND),  math.floor(cucuConf.MAX_GENERATED_OBJECTS * cucuConf.SCALE_OBJECTS_IOU_THRESHOLD))
         
         image = np.ones([height, width, 3], dtype=np.uint8)
         
@@ -263,7 +258,7 @@ class genDataset(utils.Dataset):
             
         # Apply non-max suppression wit 0.3 threshold to avoid
         # shapes covering each other
-        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.4)
+        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), cucuConf.OBJECTS_IOU_THRESHOLD*cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND)
         shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
         return bg_color, shapes
     
@@ -280,7 +275,7 @@ class genDataset(utils.Dataset):
         shapes = []
         boxes = []
         indexes  = []
-        N = randint(minObjectsNumPerImage, maxObjectsNumPerImage)
+        N = randint(math.floor(cucuConf.MIN_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND),  math.floor(cucuConf.MAX_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND))
             
         for _ in range(N):
             shape, location, scale, angle, index = self.random_shape(height, width)
