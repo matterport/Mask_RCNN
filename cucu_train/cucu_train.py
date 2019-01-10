@@ -64,6 +64,18 @@ finally:
     os.umask(original_umask)
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
+########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
+print("####################################### PREFACE HEADER #######################################")
+print("In this session we try a new approach - taking advantage of our infinite ability to generate data,\n\
+        we try not to fix to a fixed size training data size - but each few epochs generate new data set,\n\
+        which will be generated slightly differently [different non_max_suppression threshholds, num of objects etc].\n\
+        this way we hope to overcome the plateau situation which we are always get stuck upon till now. \n\
+        we proceed with generating gray-scale and random colored objects since this brought us to 0.2 less\n\
+        loss than previous (1.7 --> 1.5) ")
+
+
+
+
 import json
 # Import Mask RCNN
 sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
@@ -113,72 +125,64 @@ for _ in range(2):
         randIndex += 1
 
 
-
-
-# Training dataset
-# asher todo: add a choice from which dataset to generate
-dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
-                            cucuPaths.trainDatasetDir + '/leaves_objects',
-                            cucuPaths.trainDatasetDir + '/flower_objects',
-                            cucuPaths.trainDatasetDir + '/background_folder/1024', config)
-dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_train.prepare()
-
-
-# Validation dataset
-dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
-                            cucuPaths.valDatasetDir + '/leaves_objects',
-                            cucuPaths.valDatasetDir + '/flower_objects',
-                            cucuPaths.valDatasetDir + '/background_folder/1024', config)
-dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-dataset_val.prepare()
-
 # In[ ]:
-
-
-#show n random image&mask train examples
-n = 5
-image_ids = np.random.choice(dataset_train.image_ids, n)
-for image_id in image_ids:
-    image = dataset_train.load_image(image_id)
-    mask, class_ids = dataset_train.load_mask(image_id)
-    print(image.shape)
-    visualize.display_top_masks( image, mask, class_ids, dataset_train.class_names,None, 4)
-
-
-
-# Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
-
-
-# In[ ]:
-# add custom callbacks if needed
+# add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
     return lr*0.8
 
 custom_callbacks=[
-    EarlyStopping(monitor='val_loss', min_delta=0.1, patience=2, verbose=1, mode='auto'),
+    EarlyStopping(monitor='val_loss', min_delta=0.05, patience=20, verbose=1, mode='auto'),
     LearningRateScheduler(scheduleLearningRate, verbose=1)
     
 ]
 
-# seleect your weapon of choice
-# list_of_trained_models = glob.glob(ROOT_DIR + "/trained_models" +'/*')
-# latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
 
-# weightPath = cucuPaths.cocoModelPath
-# weightPath = ROOT_DIR + "/cucu_train/trainResultContainers/"+"train_results_2019-01-06 13:07:54.558547/trained_models/cucuWheights_2019-01-07 05:27:48.113139.h5"
-# model.load_weights(weightPath, by_name=True)
+# Create model in training mode
+model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
+
+# load initial weights
 model.load_weights(cucuPaths.cocoModelPath, by_name=True,
                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
                                "mrcnn_bbox", "mrcnn_mask"])
-# print(weightPath)
-# In[ ]:
 
+#create directory to hold inside samples of images we pass to model during training
+os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
-#asher todo: make for loop on generated and real data set
+import math
+# start training loop
 for _ in range(config.EPOCHS_ROUNDS):
+    # Training dataset
+    # asher todo: add a choice from which dataset to generate
+    dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
+                                cucuPaths.trainDatasetDir + '/leaves_objects',
+                                cucuPaths.trainDatasetDir + '/flower_objects',
+                                cucuPaths.trainDatasetDir + '/background_folder/1024', config)
+    dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+    dataset_train.prepare()
+
+
+    # Validation dataset
+    dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
+                                cucuPaths.valDatasetDir + '/leaves_objects',
+                                cucuPaths.valDatasetDir + '/flower_objects',
+                                cucuPaths.valDatasetDir + '/background_folder/1024', config)
+    dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+    dataset_val.prepare()
+
+    # In[ ]:
+
+
+    #show n random image&mask train examples
+    n = 10
+    image_ids = np.random.choice(dataset_train.image_ids, n)
+    for image_id in image_ids:
+        image = dataset_train.load_image(image_id)
+        mask, class_ids = dataset_train.load_mask(image_id)
+        print(image.shape)
+        visualize.display_top_masks( image, mask, class_ids, \
+        dataset_train.class_names,cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset/" + "image_" + str(image_id) +".png", 4)
+
 
     model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=config.EPOCHS,\
                             custom_callbacks=custom_callbacks, layers="heads",verbose=1)
@@ -195,7 +199,14 @@ for _ in range(config.EPOCHS_ROUNDS):
     oldest_trained_model = min(list_of_trained_models, key=os.path.getctime)
     if len(list_of_trained_models) > config.MAX_SAVED_TRAINED_MODELS:
         os.remove(oldest_trained_model)
-        
+
+    # PREPARE NEW CONFIG FOR NEXT ROUND:
+    config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*1.5, 0.5)
+    config.MIN_GENERATED_OBJECTS = math.ceil(config.MIN_GENERATED_OBJECTS*1.5)
+    config.MAX_GENERATED_OBJECTS = math.ceil(config.MAX_GENERATED_OBJECTS*1.5)
+    config.LEARNING_RATE = config.LEARNING_RATE*0.9
+
+
 
 
 

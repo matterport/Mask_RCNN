@@ -39,13 +39,14 @@ class cucumberConfig(Config):
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
-    MAX_SAVED_TRAINED_MODELS = 10
-    LEARNING_RATE = 0.001
+    MAX_SAVED_TRAINED_MODELS = 30
+
+    LEARNING_RATE = 0.1
     LEARNING_MOMENTUM = 0.5
     # each EPOCHS times we save the weights of the net
-    EPOCHS = 12
+    EPOCHS = 30
     # EPOCHS_ROUNDS determines how many weighst of the net we will save
-    EPOCHS_ROUNDS = 1
+    EPOCHS_ROUNDS = 10
 
 
     """ DATA GENERATION HYPER PARAMETERS """
@@ -61,19 +62,19 @@ class cucumberConfig(Config):
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 10000
-    VALID_SET_SIZE = 1000
+    TRAIN_SET_SIZE = 1000
+    VALID_SET_SIZE = 100
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 5
     MAX_GENERATED_OBJECTS = 25
 
-    #in case we want to generate new dataset each iteratation in EPOCH_ROUNDS
-    SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND = 1
-
     # this threshold determines how much objects will cover each other
     OBJECTS_IOU_THRESHOLD = 0.05
 
+    # asher todo: decide what todo with those parameters
+    #in case we want to generate new dataset each iteratation in EPOCH_ROUNDS
+    SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND = 1
     #this is an optional scaler when starting new epochs run
     SCALE_OBJECTS_IOU_THRESHOLD = 1
 
