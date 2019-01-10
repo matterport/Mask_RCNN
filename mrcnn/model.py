@@ -1025,7 +1025,7 @@ def rpn_class_loss_graph(rpn_match, rpn_class_logits):
 
     rpn_match: [batch, anchors, 1]. Anchor match type. 1=positive,
                -1=negative, 0=neutral anchor.
-    rpn_class_logits: [batch, anchors, 2]. RPN classifier logits for FG/BG.
+    rpn_class_logits: [batch, anchors, 2]. RPN classifier logits for BG/FG.
     """
     # Squeeze last dim to simplify
     rpn_match = tf.squeeze(rpn_match, -1)
