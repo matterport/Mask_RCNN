@@ -2,9 +2,11 @@ import numpy
 from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
 
+size_threshold = 15 #in percent of picture
+ratio_threshold = 0.5 
+dataDir = '/home/simon/Documents/cucumber/dataset/fruits/train/'
+annFile = '/home/simon/Documents/cucumber/dataset/fruits/train/annotations.json'
 
-dataDir = '/home/simon/Documents/cucu_dataset/leaves/train/output/'
-annFile = '/home/simon/Documents/cucu_dataset/leaves/train/output/annotations.json'
 coco = COCO(annFile)
 
 cucumbers = coco.loadCats(coco.getCatIds())
@@ -28,7 +30,27 @@ for img in imgs:
         if len(annotation[0]['segmentation']) != 1:
             continue
 
+        if len(annotation[0]['segmentation']) > 1 or len(annotation[0]['segmentation']) == 0:
+            print("abnormal length: ", len(annotation[0]['segmentation']))
+            continue
+
+        try:
+            if (annotation[0]['bbox'][-1] / img['height']) * 100 < size_threshold:
+                print("to small cucumber: ", annotation[0]['bbox'])
+                continue
+        except Exception as e:
+            print("img: ",img)
+            print("annotation: ", annotation)
+            continue
+
+        if annotation[0]['bbox'][-2] / annotation[0]['bbox'][-1] > ratio_threshold:
+            print("bad cucumber ratio: ", annotation[0]['bbox'])
+            continue
+
         for j in range(len(annotation[0]['segmentation'][0]) // 2):
+            # print(annotation[0]['segmentation'][0])
+            # print("length: ", len(annotation[0]['segmentation'][0]))
+            # exit()
             polygon.append((annotation[0]['segmentation'][0][2*j], annotation[0]['segmentation'][0][2*j+1]))
 
         # read image as RGB and add alpha (transparency)
@@ -74,8 +96,10 @@ for img in imgs:
         # newIm = Image.fromarray(objectImArray, "RGBA")
         try:
             newIm = Image.fromarray(newImArray, "RGBA")
-            newIm.save("/home/simon/Documents/cucu_dataset/leaves/train/output/leaf_object/"+image_name.split('.')[0]+"_"+str(i)+".png")
-        except:
+            newIm.save("/home/simon/Documents/cucumber/dataset/fruits/train/fruit_objects/"+image_name.split('.')[0]+"_"+str(i)+".png")
+        except Exception as e:
             print("Unexpected error: image {} annotation id {}".format(image_name.split('.')[0]+"_"+str(i)+".png", annotation[0]['id']))
+            print(e)
+
 
 
