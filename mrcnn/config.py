@@ -226,6 +226,14 @@ class Config(object):
         # Image meta data length
         # See compose_image_meta() for details
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+        
+        # Number of Conv2DTranspose layers in build_fpn_mask_graph
+        assert self.MASK_SHAPE[0] == self.MASK_SHAPE[1], "Only support square mask currently!"
+        num_deconv_layers = np.log2(self.MASK_SHAPE[0] / self.MASK_POOL_SIZE)
+        # make sure num_deconv_layers is a positive integer
+        assert num_deconv_layers == int(num_deconv_layers) and num_deconv_layers >= 1, \
+            "MASK_SHAPE[0] should be MASK_POOL_SIZE*(2**n), where n>=1"
+        self.NUM_DECONV_LAYERS = int(num_deconv_layers)
 
     def display(self):
         """Display Configuration values."""
