@@ -67,7 +67,7 @@ sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.t
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
 print("20 EPOCHS, 4 ROUNDS, TOLERANCE 5,\n\
-        DECAYING LEARNING RATE: NO, \n\
+        DECAYING LEARNING RATE: YES, \n\
         MULTICOLOR OBJECTS: YES,\n\
         ENHANCED BLENDING: YES,\n\
         GROWING NUMBER OF OBJECTS: 1.5,\n\
@@ -129,10 +129,10 @@ for _ in range(2):
 # add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr#*0.8
+    return lr*0.8
 
 custom_callbacks=[
-    EarlyStopping(monitor='val_loss', min_delta=0.05, patience=20, verbose=1, mode='auto'),
+    EarlyStopping(monitor='val_loss', min_delta=0.05, patience=5, verbose=1, mode='auto'),
     LearningRateScheduler(scheduleLearningRate, verbose=1)
     
 ]
@@ -204,7 +204,7 @@ for _ in range(config.EPOCHS_ROUNDS):
     config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*1.5, 0.5)
     config.MIN_GENERATED_OBJECTS = math.ceil(config.MIN_GENERATED_OBJECTS*1.5)
     config.MAX_GENERATED_OBJECTS = math.ceil(config.MAX_GENERATED_OBJECTS*1.5)
-    config.LEARNING_RATE = config.LEARNING_RATE*0.9
+    config.LEARNING_RATE = config.LEARNING_RATE
 
 
 
@@ -422,28 +422,28 @@ for image_id in image_ids:
 
 
 
-# # Compute VOC-style Average Precision
-# def compute_batch_ap(image_ids):
-#     APs = []
-#     for image_id in image_ids:
-#         # Load image
-#         image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-#             modellib.load_image_gt(dataset_val, config,
-#                                    image_id, use_mini_mask=False)
-#         # Run object detection
-#         results = model.detect([image], verbose=0)
-#         # Compute AP
-#         r = results[0]
-#         AP, precisions, recalls, overlaps =\
-#             utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-#                               r['rois'], r['class_ids'], r['scores'], r['masks'])
-#         APs.append(AP)
-#     return APs
+# Compute VOC-style Average Precision
+def compute_batch_ap(image_ids):
+    APs = []
+    for image_id in image_ids:
+        # Load image
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset_val, config,
+                                   image_id, use_mini_mask=False)
+        # Run object detection
+        results = model.detect([image], verbose=0)
+        # Compute AP
+        r = results[0]
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+        APs.append(AP)
+    return APs
 
-# # Pick a set of random images
-# image_ids = np.random.choice(dataset_val.image_ids, 10)
-# APs = compute_batch_ap(image_ids)
-# print("mAP @ IoU=50: ", np.mean(APs))
+# Pick a set of random images
+image_ids = np.random.choice(dataset_val.image_ids, 10)
+APs = compute_batch_ap(image_ids)
+print("mAP @ IoU=50: ", np.mean(APs))
 
 
 
