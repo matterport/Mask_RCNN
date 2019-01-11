@@ -1868,14 +1868,19 @@ class MaskRCNN():
 
         # Inputs
         with tf.variable_scope("Inputs"):
+            # input of image as we know it
             input_image = KL.Input(
                 shape=[None, None, config.IMAGE_SHAPE[2]], name="input_image")
+            # original image size, which objects might apear in it, image id
             input_image_meta = KL.Input(shape=[config.IMAGE_META_SIZE],
                                         name="input_image_meta")
             if mode == "training":
                 # RPN GT
+                # instnatizted placeholder for binary (object/no object) classifications
                 input_rpn_match = KL.Input(
                     shape=[None, 1], name="input_rpn_match", dtype=tf.int32)
+                # a gt for rpn: sort of x1,y1,x2,y2 coordinates, just of correspondinf ratio feature-maps
+                # which are the "gt" image input into RPN 
                 input_rpn_bbox = KL.Input(
                     shape=[None, 4], name="input_rpn_bbox", dtype=tf.float32)
 
@@ -1885,6 +1890,7 @@ class MaskRCNN():
                     shape=[None], name="input_gt_class_ids", dtype=tf.int32)
                 # 2. GT Boxes in pixels (zero padded)
                 # [batch, MAX_GT_INSTANCES, (y1, x1, y2, x2)] in image coordinates
+                # "instanciated placeholder" for (x1,y1,x2,y2) coordinates of gt
                 input_gt_boxes = KL.Input(
                     shape=[None, 4], name="input_gt_boxes", dtype=tf.float32)
                 # Normalize coordinates
@@ -1974,7 +1980,8 @@ class MaskRCNN():
 
             rpn_class_logits, rpn_class, rpn_bbox = outputs
 
-            # Generate proposals
+        # Generate proposals
+        with tf.variable_scope("RPN_ROI_PROPOSALS"):
             # Proposals are [batch, N, (y1, x1, y2, x2)] in normalized coordinates
             # and zero padded.
             proposal_count = config.POST_NMS_ROIS_TRAINING if mode == "training"\
@@ -1986,34 +1993,34 @@ class MaskRCNN():
                 config=config)([rpn_class, rpn_bbox, anchors])
 
         if mode == "training":
-            # Class ID mask to mark class IDs supported by the dataset the image
-            # came from.
-            active_class_ids = KL.Lambda(
-                lambda x: parse_image_meta_graph(x)["active_class_ids"]
-                )(input_image_meta)
+            with tf.variable_scope("RPN_ROI_PROPOSALS"):
+                # Class ID mask to mark class IDs supported by the dataset the image
+                # came from.
+                active_class_ids = KL.Lambda(
+                    lambda x: parse_image_meta_graph(x)["active_class_ids"]
+                    )(input_image_meta)
 
-            if not config.USE_RPN_ROIS:
-                # Ignore predicted ROIs and use ROIs provided as an input.
-                input_rois = KL.Input(shape=[config.POST_NMS_ROIS_TRAINING, 4],
-                                    name="input_roi", dtype=np.int32)
-                # Normalize coordinates
-                target_rois = KL.Lambda(lambda x: norm_boxes_graph(
-                    x, K.shape(input_image)[1:3]))(input_rois)
-            else:
-                target_rois = rpn_rois
+                if not config.USE_RPN_ROIS:
+                    # Ignore predicted ROIs and use ROIs provided as an input.
+                    input_rois = KL.Input(shape=[config.POST_NMS_ROIS_TRAINING, 4],
+                                        name="input_roi", dtype=np.int32)
+                    # Normalize coordinates
+                    target_rois = KL.Lambda(lambda x: norm_boxes_graph(
+                        x, K.shape(input_image)[1:3]))(input_rois)
+                else:
+                    target_rois = rpn_rois
 
             # Generate detection targets
             # Subsamples proposals and generates target outputs for training
             # Note that proposal class IDs, gt_boxes, and gt_masks are zero
             # padded. Equally, returned rois and targets are zero padded.
-            with tf.variable_scope("TrainGroundTruths"):
+            with tf.variable_scope("ROI_CLASSES_BBOX_REGRESSOR"):
                 rois, target_class_ids, target_bbox, target_mask =\
                     DetectionTargetLayer(config, name="proposal_targets")([
                         target_rois, input_gt_class_ids, gt_boxes, input_gt_masks])
 
-            # Network Heads
-            # TODO: verify that this handles zero padded ROIs
-            with tf.variable_scope("ClassifiersAndRegressors"):
+                # Network Heads
+                # TODO: verify that this handles zero padded ROIs
                 mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                     fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                         config.POOL_SIZE, config.NUM_CLASSES,
@@ -2028,19 +2035,23 @@ class MaskRCNN():
                                             train_bn=config.TRAIN_BN)
 
             # TODO: clean up (use tf.identify if necessary)
-            #asher todo: which naming scope?
-            output_rois = KL.Lambda(lambda x: x * 1, name="output_rois")(rois)
+            with tf.variable_scope("ROI_CLASSES_BBOX_REGRESSOR"):
+                output_rois = KL.Lambda(lambda x: x * 1, name="output_rois")(rois)
 
             # Losses
-            with tf.variable_scope("Losses"):
+            with tf.variable_scope("rpnAnchorClassifier_LOSS"):
                 rpn_class_loss = KL.Lambda(lambda x: rpn_class_loss_graph(*x), name="rpn_class_loss")(
                     [input_rpn_match, rpn_class_logits])
+            with tf.variable_scope("rpnBBoxAnchor_LOSS"):
                 rpn_bbox_loss = KL.Lambda(lambda x: rpn_bbox_loss_graph(config, *x), name="rpn_bbox_loss")(
                     [input_rpn_bbox, input_rpn_match, rpn_bbox])
+            with tf.variable_scope("mrcnnClassifier_LOSS"):               
                 class_loss = KL.Lambda(lambda x: mrcnn_class_loss_graph(*x), name="mrcnn_class_loss")(
                     [target_class_ids, mrcnn_class_logits, active_class_ids])
+            with tf.variable_scope("mrcnnBboxRefinement_LOSS"):                   
                 bbox_loss = KL.Lambda(lambda x: mrcnn_bbox_loss_graph(*x), name="mrcnn_bbox_loss")(
                     [target_bbox, target_class_ids, mrcnn_bbox])
+            with tf.variable_scope("mrcnnMask_LOSS"): 
                 mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
                     [target_mask, target_class_ids, mrcnn_mask])
 

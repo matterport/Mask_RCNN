@@ -1138,7 +1138,7 @@ typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_complex_t;
 
-/* "pycocotools/_mask.pyx":60
+/* "pycocotools/_mask.pyx":56
  * # python class to wrap RLE array in C
  * # the class handles the memory allocation and deallocation
  * cdef class RLEs:             # <<<<<<<<<<<<<<
@@ -1152,7 +1152,7 @@ struct __pyx_obj_11pycocotools_5_mask_RLEs {
 };
 
 
-/* "pycocotools/_mask.pyx":81
+/* "pycocotools/_mask.pyx":77
  * # python class to wrap Mask array in C
  * # the class handles the memory allocation and deallocation
  * cdef class Masks:             # <<<<<<<<<<<<<<
@@ -2194,7 +2194,7 @@ static PyObject *__pyx_codeobj__49;
 static PyObject *__pyx_codeobj__51;
 /* Late includes */
 
-/* "pycocotools/_mask.pyx":64
+/* "pycocotools/_mask.pyx":60
  *     cdef siz _n
  * 
  *     def __cinit__(self, siz n =0):             # <<<<<<<<<<<<<<
@@ -2230,7 +2230,7 @@ static int __pyx_pw_11pycocotools_5_mask_4RLEs_1__cinit__(PyObject *__pyx_v_self
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 64, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 60, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2241,14 +2241,14 @@ static int __pyx_pw_11pycocotools_5_mask_4RLEs_1__cinit__(PyObject *__pyx_v_self
       }
     }
     if (values[0]) {
-      __pyx_v_n = __Pyx_PyInt_As_siz(values[0]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L3_error)
+      __pyx_v_n = __Pyx_PyInt_As_siz(values[0]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 60, __pyx_L3_error)
     } else {
       __pyx_v_n = ((siz)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 64, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 60, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.RLEs.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2266,7 +2266,7 @@ static int __pyx_pf_11pycocotools_5_mask_4RLEs___cinit__(struct __pyx_obj_11pyco
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "pycocotools/_mask.pyx":65
+  /* "pycocotools/_mask.pyx":61
  * 
  *     def __cinit__(self, siz n =0):
  *         rlesInit(&self._R, n)             # <<<<<<<<<<<<<<
@@ -2275,7 +2275,7 @@ static int __pyx_pf_11pycocotools_5_mask_4RLEs___cinit__(struct __pyx_obj_11pyco
  */
   rlesInit((&__pyx_v_self->_R), __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":66
+  /* "pycocotools/_mask.pyx":62
  *     def __cinit__(self, siz n =0):
  *         rlesInit(&self._R, n)
  *         self._n = n             # <<<<<<<<<<<<<<
@@ -2284,7 +2284,7 @@ static int __pyx_pf_11pycocotools_5_mask_4RLEs___cinit__(struct __pyx_obj_11pyco
  */
   __pyx_v_self->_n = __pyx_v_n;
 
-  /* "pycocotools/_mask.pyx":64
+  /* "pycocotools/_mask.pyx":60
  *     cdef siz _n
  * 
  *     def __cinit__(self, siz n =0):             # <<<<<<<<<<<<<<
@@ -2298,7 +2298,7 @@ static int __pyx_pf_11pycocotools_5_mask_4RLEs___cinit__(struct __pyx_obj_11pyco
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":69
+/* "pycocotools/_mask.pyx":65
  * 
  *     # free the RLE array here
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2326,7 +2326,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
   siz __pyx_t_4;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pycocotools/_mask.pyx":70
+  /* "pycocotools/_mask.pyx":66
  *     # free the RLE array here
  *     def __dealloc__(self):
  *         if self._R is not NULL:             # <<<<<<<<<<<<<<
@@ -2336,7 +2336,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
   __pyx_t_1 = ((__pyx_v_self->_R != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pycocotools/_mask.pyx":71
+    /* "pycocotools/_mask.pyx":67
  *     def __dealloc__(self):
  *         if self._R is not NULL:
  *             for i in range(self._n):             # <<<<<<<<<<<<<<
@@ -2348,7 +2348,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
     for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
       __pyx_v_i = __pyx_t_4;
 
-      /* "pycocotools/_mask.pyx":72
+      /* "pycocotools/_mask.pyx":68
  *         if self._R is not NULL:
  *             for i in range(self._n):
  *                 free(self._R[i].cnts)             # <<<<<<<<<<<<<<
@@ -2358,7 +2358,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
       free((__pyx_v_self->_R[__pyx_v_i]).cnts);
     }
 
-    /* "pycocotools/_mask.pyx":73
+    /* "pycocotools/_mask.pyx":69
  *             for i in range(self._n):
  *                 free(self._R[i].cnts)
  *             free(self._R)             # <<<<<<<<<<<<<<
@@ -2367,7 +2367,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
  */
     free(__pyx_v_self->_R);
 
-    /* "pycocotools/_mask.pyx":70
+    /* "pycocotools/_mask.pyx":66
  *     # free the RLE array here
  *     def __dealloc__(self):
  *         if self._R is not NULL:             # <<<<<<<<<<<<<<
@@ -2376,7 +2376,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
  */
   }
 
-  /* "pycocotools/_mask.pyx":69
+  /* "pycocotools/_mask.pyx":65
  * 
  *     # free the RLE array here
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2388,7 +2388,7 @@ static void __pyx_pf_11pycocotools_5_mask_4RLEs_2__dealloc__(struct __pyx_obj_11
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pycocotools/_mask.pyx":74
+/* "pycocotools/_mask.pyx":70
  *                 free(self._R[i].cnts)
  *             free(self._R)
  *     def __getattr__(self, key):             # <<<<<<<<<<<<<<
@@ -2416,17 +2416,17 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4RLEs_4__getattr__(struct __pyx_o
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__getattr__", 0);
 
-  /* "pycocotools/_mask.pyx":75
+  /* "pycocotools/_mask.pyx":71
  *             free(self._R)
  *     def __getattr__(self, key):
  *         if key == 'n':             # <<<<<<<<<<<<<<
  *             return self._n
  *         raise AttributeError(key)
  */
-  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_key, __pyx_n_s_n, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 75, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_v_key, __pyx_n_s_n, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 71, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pycocotools/_mask.pyx":76
+    /* "pycocotools/_mask.pyx":72
  *     def __getattr__(self, key):
  *         if key == 'n':
  *             return self._n             # <<<<<<<<<<<<<<
@@ -2434,13 +2434,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4RLEs_4__getattr__(struct __pyx_o
  * 
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_self->_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_self->_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "pycocotools/_mask.pyx":75
+    /* "pycocotools/_mask.pyx":71
  *             free(self._R)
  *     def __getattr__(self, key):
  *         if key == 'n':             # <<<<<<<<<<<<<<
@@ -2449,20 +2449,20 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4RLEs_4__getattr__(struct __pyx_o
  */
   }
 
-  /* "pycocotools/_mask.pyx":77
+  /* "pycocotools/_mask.pyx":73
  *         if key == 'n':
  *             return self._n
  *         raise AttributeError(key)             # <<<<<<<<<<<<<<
  * 
  * # python class to wrap Mask array in C
  */
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_AttributeError, __pyx_v_key); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_AttributeError, __pyx_v_key); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_Raise(__pyx_t_2, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __PYX_ERR(0, 77, __pyx_L1_error)
+  __PYX_ERR(0, 73, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":74
+  /* "pycocotools/_mask.pyx":70
  *                 free(self._R[i].cnts)
  *             free(self._R)
  *     def __getattr__(self, key):             # <<<<<<<<<<<<<<
@@ -2588,7 +2588,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4RLEs_8__setstate_cython__(CYTHON
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":87
+/* "pycocotools/_mask.pyx":83
  *     cdef siz _n
  * 
  *     def __cinit__(self, h, w, n):             # <<<<<<<<<<<<<<
@@ -2630,17 +2630,17 @@ static int __pyx_pw_11pycocotools_5_mask_5Masks_1__cinit__(PyObject *__pyx_v_sel
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, 1); __PYX_ERR(0, 87, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, 1); __PYX_ERR(0, 83, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_n)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, 2); __PYX_ERR(0, 87, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, 2); __PYX_ERR(0, 83, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 87, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 83, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2655,7 +2655,7 @@ static int __pyx_pw_11pycocotools_5_mask_5Masks_1__cinit__(PyObject *__pyx_v_sel
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 87, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 83, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.Masks.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2678,59 +2678,59 @@ static int __pyx_pf_11pycocotools_5_mask_5Masks___cinit__(struct __pyx_obj_11pyc
   siz __pyx_t_5;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "pycocotools/_mask.pyx":88
+  /* "pycocotools/_mask.pyx":84
  * 
  *     def __cinit__(self, h, w, n):
  *         self._mask = <byte*> malloc(h*w*n* sizeof(byte))             # <<<<<<<<<<<<<<
  *         self._h = h
  *         self._w = w
  */
-  __pyx_t_1 = PyNumber_Multiply(__pyx_v_h, __pyx_v_w); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_h, __pyx_v_w); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_1, __pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t((sizeof(byte))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t((sizeof(byte))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_t_3); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_t_3); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 84, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_self->_mask = ((byte *)malloc(__pyx_t_4));
 
-  /* "pycocotools/_mask.pyx":89
+  /* "pycocotools/_mask.pyx":85
  *     def __cinit__(self, h, w, n):
  *         self._mask = <byte*> malloc(h*w*n* sizeof(byte))
  *         self._h = h             # <<<<<<<<<<<<<<
  *         self._w = w
  *         self._n = n
  */
-  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_h); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_h); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 85, __pyx_L1_error)
   __pyx_v_self->_h = __pyx_t_5;
 
-  /* "pycocotools/_mask.pyx":90
+  /* "pycocotools/_mask.pyx":86
  *         self._mask = <byte*> malloc(h*w*n* sizeof(byte))
  *         self._h = h
  *         self._w = w             # <<<<<<<<<<<<<<
  *         self._n = n
  *     # def __dealloc__(self):
  */
-  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_w); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_w); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 86, __pyx_L1_error)
   __pyx_v_self->_w = __pyx_t_5;
 
-  /* "pycocotools/_mask.pyx":91
+  /* "pycocotools/_mask.pyx":87
  *         self._h = h
  *         self._w = w
  *         self._n = n             # <<<<<<<<<<<<<<
  *     # def __dealloc__(self):
  *         # the memory management of _mask has been passed to np.ndarray
  */
-  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_n); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_siz(__pyx_v_n); if (unlikely((__pyx_t_5 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 87, __pyx_L1_error)
   __pyx_v_self->_n = __pyx_t_5;
 
-  /* "pycocotools/_mask.pyx":87
+  /* "pycocotools/_mask.pyx":83
  *     cdef siz _n
  * 
  *     def __cinit__(self, h, w, n):             # <<<<<<<<<<<<<<
@@ -2752,7 +2752,7 @@ static int __pyx_pf_11pycocotools_5_mask_5Masks___cinit__(struct __pyx_obj_11pyc
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":97
+/* "pycocotools/_mask.pyx":93
  * 
  *     # called when passing into np.array() and return an np.ndarray in column-major order
  *     def __array__(self):             # <<<<<<<<<<<<<<
@@ -2785,7 +2785,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_2__array__(struct __pyx_ob
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("__array__", 0);
 
-  /* "pycocotools/_mask.pyx":99
+  /* "pycocotools/_mask.pyx":95
  *     def __array__(self):
  *         cdef np.npy_intp shape[1]
  *         shape[0] = <np.npy_intp> self._h*self._w*self._n             # <<<<<<<<<<<<<<
@@ -2794,25 +2794,25 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_2__array__(struct __pyx_ob
  */
   (__pyx_v_shape[0]) = ((((npy_intp)__pyx_v_self->_h) * __pyx_v_self->_w) * __pyx_v_self->_n);
 
-  /* "pycocotools/_mask.pyx":101
+  /* "pycocotools/_mask.pyx":97
  *         shape[0] = <np.npy_intp> self._h*self._w*self._n
  *         # Create a 1D array, and reshape it to fortran/Matlab column-major array
  *         ndarray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT8, self._mask).reshape((self._h, self._w, self._n), order='F')             # <<<<<<<<<<<<<<
  *         # The _mask allocated by Masks is now handled by ndarray
  *         PyArray_ENABLEFLAGS(ndarray, np.NPY_OWNDATA)
  */
-  __pyx_t_1 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_UINT8, __pyx_v_self->_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_1 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_UINT8, __pyx_v_self->_mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_reshape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_reshape); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_self->_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_self->_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_self->_w); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_self->_w); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_siz(__pyx_v_self->_n); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_siz(__pyx_v_self->_n); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -2823,15 +2823,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_2__array__(struct __pyx_ob
   __pyx_t_1 = 0;
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -2839,17 +2839,17 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_2__array__(struct __pyx_ob
   __pyx_v_ndarray = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":103
+  /* "pycocotools/_mask.pyx":99
  *         ndarray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT8, self._mask).reshape((self._h, self._w, self._n), order='F')
  *         # The _mask allocated by Masks is now handled by ndarray
  *         PyArray_ENABLEFLAGS(ndarray, np.NPY_OWNDATA)             # <<<<<<<<<<<<<<
  *         return ndarray
  * 
  */
-  if (!(likely(((__pyx_v_ndarray) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_ndarray, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 103, __pyx_L1_error)
+  if (!(likely(((__pyx_v_ndarray) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_ndarray, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 99, __pyx_L1_error)
   PyArray_ENABLEFLAGS(((PyArrayObject *)__pyx_v_ndarray), NPY_OWNDATA);
 
-  /* "pycocotools/_mask.pyx":104
+  /* "pycocotools/_mask.pyx":100
  *         # The _mask allocated by Masks is now handled by ndarray
  *         PyArray_ENABLEFLAGS(ndarray, np.NPY_OWNDATA)
  *         return ndarray             # <<<<<<<<<<<<<<
@@ -2861,7 +2861,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_2__array__(struct __pyx_ob
   __pyx_r = __pyx_v_ndarray;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":97
+  /* "pycocotools/_mask.pyx":93
  * 
  *     # called when passing into np.array() and return an np.ndarray in column-major order
  *     def __array__(self):             # <<<<<<<<<<<<<<
@@ -2992,7 +2992,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_5Masks_6__setstate_cython__(CYTHO
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":107
+/* "pycocotools/_mask.pyx":103
  * 
  * # internal conversion from Python RLEs object to compressed RLE format
  * def _toString(RLEs Rs):             # <<<<<<<<<<<<<<
@@ -3007,7 +3007,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_1_toString(PyObject *__pyx_self, 
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_toString (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Rs), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "Rs", 0))) __PYX_ERR(0, 107, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_Rs), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "Rs", 0))) __PYX_ERR(0, 103, __pyx_L1_error)
   __pyx_r = __pyx_pf_11pycocotools_5_mask__toString(__pyx_self, ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_v_Rs));
 
   /* function exit code */
@@ -3037,32 +3037,32 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("_toString", 0);
 
-  /* "pycocotools/_mask.pyx":108
+  /* "pycocotools/_mask.pyx":104
  * # internal conversion from Python RLEs object to compressed RLE format
  * def _toString(RLEs Rs):
  *     cdef siz n = Rs.n             # <<<<<<<<<<<<<<
  *     cdef bytes py_string
  *     cdef char* c_string
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_Rs), __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_Rs), __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_2 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_2 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n = __pyx_t_2;
 
-  /* "pycocotools/_mask.pyx":111
+  /* "pycocotools/_mask.pyx":107
  *     cdef bytes py_string
  *     cdef char* c_string
  *     objs = []             # <<<<<<<<<<<<<<
  *     for i in range(n):
  *         c_string = rleToString( <RLE*> &Rs._R[i] )
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_objs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":112
+  /* "pycocotools/_mask.pyx":108
  *     cdef char* c_string
  *     objs = []
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -3074,7 +3074,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "pycocotools/_mask.pyx":113
+    /* "pycocotools/_mask.pyx":109
  *     objs = []
  *     for i in range(n):
  *         c_string = rleToString( <RLE*> &Rs._R[i] )             # <<<<<<<<<<<<<<
@@ -3083,32 +3083,32 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
  */
     __pyx_v_c_string = rleToString(((RLE *)(&(__pyx_v_Rs->_R[__pyx_v_i]))));
 
-    /* "pycocotools/_mask.pyx":114
+    /* "pycocotools/_mask.pyx":110
  *     for i in range(n):
  *         c_string = rleToString( <RLE*> &Rs._R[i] )
  *         py_string = c_string             # <<<<<<<<<<<<<<
  *         objs.append({
  *             'size': [Rs._R[i].h, Rs._R[i].w],
  */
-    __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_c_string); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyBytes_FromString(__pyx_v_c_string); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_XDECREF_SET(__pyx_v_py_string, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "pycocotools/_mask.pyx":116
+    /* "pycocotools/_mask.pyx":112
  *         py_string = c_string
  *         objs.append({
  *             'size': [Rs._R[i].h, Rs._R[i].w],             # <<<<<<<<<<<<<<
  *             'counts': py_string
  *         })
  */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyInt_From_siz((__pyx_v_Rs->_R[__pyx_v_i]).h); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_siz((__pyx_v_Rs->_R[__pyx_v_i]).h); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_From_siz((__pyx_v_Rs->_R[__pyx_v_i]).w); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_siz((__pyx_v_Rs->_R[__pyx_v_i]).w); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_5);
     PyList_SET_ITEM(__pyx_t_7, 0, __pyx_t_5);
@@ -3116,29 +3116,29 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
     PyList_SET_ITEM(__pyx_t_7, 1, __pyx_t_6);
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_size, __pyx_t_7) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_size, __pyx_t_7) < 0) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "pycocotools/_mask.pyx":117
+    /* "pycocotools/_mask.pyx":113
  *         objs.append({
  *             'size': [Rs._R[i].h, Rs._R[i].w],
  *             'counts': py_string             # <<<<<<<<<<<<<<
  *         })
  *         free(c_string)
  */
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_counts, __pyx_v_py_string) < 0) __PYX_ERR(0, 116, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_counts, __pyx_v_py_string) < 0) __PYX_ERR(0, 112, __pyx_L1_error)
 
-    /* "pycocotools/_mask.pyx":115
+    /* "pycocotools/_mask.pyx":111
  *         c_string = rleToString( <RLE*> &Rs._R[i] )
  *         py_string = c_string
  *         objs.append({             # <<<<<<<<<<<<<<
  *             'size': [Rs._R[i].h, Rs._R[i].w],
  *             'counts': py_string
  */
-    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_objs, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_objs, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "pycocotools/_mask.pyx":119
+    /* "pycocotools/_mask.pyx":115
  *             'counts': py_string
  *         })
  *         free(c_string)             # <<<<<<<<<<<<<<
@@ -3148,7 +3148,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
     free(__pyx_v_c_string);
   }
 
-  /* "pycocotools/_mask.pyx":120
+  /* "pycocotools/_mask.pyx":116
  *         })
  *         free(c_string)
  *     return objs             # <<<<<<<<<<<<<<
@@ -3160,7 +3160,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":107
+  /* "pycocotools/_mask.pyx":103
  * 
  * # internal conversion from Python RLEs object to compressed RLE format
  * def _toString(RLEs Rs):             # <<<<<<<<<<<<<<
@@ -3184,7 +3184,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask__toString(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":123
+/* "pycocotools/_mask.pyx":119
  * 
  * # internal conversion from compressed RLE format to Python RLEs object
  * def _frString(rleObjs):             # <<<<<<<<<<<<<<
@@ -3231,32 +3231,32 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
   siz __pyx_t_14;
   __Pyx_RefNannySetupContext("_frString", 0);
 
-  /* "pycocotools/_mask.pyx":124
+  /* "pycocotools/_mask.pyx":120
  * # internal conversion from compressed RLE format to Python RLEs object
  * def _frString(rleObjs):
  *     cdef siz n = len(rleObjs)             # <<<<<<<<<<<<<<
  *     Rs = RLEs(n)
  *     cdef bytes py_string
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_rleObjs); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_rleObjs); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 120, __pyx_L1_error)
   __pyx_v_n = __pyx_t_1;
 
-  /* "pycocotools/_mask.pyx":125
+  /* "pycocotools/_mask.pyx":121
  * def _frString(rleObjs):
  *     cdef siz n = len(rleObjs)
  *     Rs = RLEs(n)             # <<<<<<<<<<<<<<
  *     cdef bytes py_string
  *     cdef char* c_string
  */
-  __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":128
+  /* "pycocotools/_mask.pyx":124
  *     cdef bytes py_string
  *     cdef char* c_string
  *     for i, obj in enumerate(rleObjs):             # <<<<<<<<<<<<<<
@@ -3269,26 +3269,26 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
     __pyx_t_2 = __pyx_v_rleObjs; __Pyx_INCREF(__pyx_t_2); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_rleObjs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_1 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_rleObjs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 128, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 128, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 128, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 128, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -3298,7 +3298,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 128, __pyx_L1_error)
+          else __PYX_ERR(0, 124, __pyx_L1_error)
         }
         break;
       }
@@ -3308,41 +3308,41 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
     __pyx_t_5 = 0;
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_3);
-    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 128, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3);
     __pyx_t_3 = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "pycocotools/_mask.pyx":129
+    /* "pycocotools/_mask.pyx":125
  *     cdef char* c_string
  *     for i, obj in enumerate(rleObjs):
  *         if PYTHON_VERSION == 2:             # <<<<<<<<<<<<<<
  *             py_string = str(obj['counts']).encode('utf8')
  *         elif PYTHON_VERSION == 3:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PYTHON_VERSION); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PYTHON_VERSION); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_5, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_t_5, __pyx_int_2, 2, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     if (__pyx_t_7) {
 
-      /* "pycocotools/_mask.pyx":130
+      /* "pycocotools/_mask.pyx":126
  *     for i, obj in enumerate(rleObjs):
  *         if PYTHON_VERSION == 2:
  *             py_string = str(obj['counts']).encode('utf8')             # <<<<<<<<<<<<<<
  *         elif PYTHON_VERSION == 3:
  *             py_string = str.encode(obj['counts']) if type(obj['counts']) == str else obj['counts']
  */
-      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 130, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyString_Type)), __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_8 = NULL;
@@ -3357,14 +3357,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
       }
       __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_n_s_utf8) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_n_s_utf8);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 130, __pyx_L1_error)
+      if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_XDECREF_SET(__pyx_v_py_string, ((PyObject*)__pyx_t_6));
       __pyx_t_6 = 0;
 
-      /* "pycocotools/_mask.pyx":129
+      /* "pycocotools/_mask.pyx":125
  *     cdef char* c_string
  *     for i, obj in enumerate(rleObjs):
  *         if PYTHON_VERSION == 2:             # <<<<<<<<<<<<<<
@@ -3374,39 +3374,39 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
       goto __pyx_L5;
     }
 
-    /* "pycocotools/_mask.pyx":131
+    /* "pycocotools/_mask.pyx":127
  *         if PYTHON_VERSION == 2:
  *             py_string = str(obj['counts']).encode('utf8')
  *         elif PYTHON_VERSION == 3:             # <<<<<<<<<<<<<<
  *             py_string = str.encode(obj['counts']) if type(obj['counts']) == str else obj['counts']
  *         else:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_PYTHON_VERSION); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_PYTHON_VERSION); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_6, __pyx_int_3, 3, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (likely(__pyx_t_7)) {
 
-      /* "pycocotools/_mask.pyx":132
+      /* "pycocotools/_mask.pyx":128
  *             py_string = str(obj['counts']).encode('utf8')
  *         elif PYTHON_VERSION == 3:
  *             py_string = str.encode(obj['counts']) if type(obj['counts']) == str else obj['counts']             # <<<<<<<<<<<<<<
  *         else:
  *             raise Exception('Python version must be 2 or 3')
  */
-      __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 128, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_t_6)), ((PyObject *)(&PyString_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __pyx_t_8 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_t_6)), ((PyObject *)(&PyString_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 128, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 132, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 128, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       if (__pyx_t_7) {
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)(&PyString_Type)), __pyx_n_s_encode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)(&PyString_Type)), __pyx_n_s_encode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_9 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 132, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_10 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -3421,23 +3421,23 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
         __pyx_t_8 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_10, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_9);
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 132, __pyx_L1_error)
+        if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 128, __pyx_L1_error)
         __pyx_t_5 = __pyx_t_8;
         __pyx_t_8 = 0;
       } else {
-        __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 132, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_counts); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 132, __pyx_L1_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 128, __pyx_L1_error)
         __pyx_t_5 = __pyx_t_8;
         __pyx_t_8 = 0;
       }
       __Pyx_XDECREF_SET(__pyx_v_py_string, ((PyObject*)__pyx_t_5));
       __pyx_t_5 = 0;
 
-      /* "pycocotools/_mask.pyx":131
+      /* "pycocotools/_mask.pyx":127
  *         if PYTHON_VERSION == 2:
  *             py_string = str(obj['counts']).encode('utf8')
  *         elif PYTHON_VERSION == 3:             # <<<<<<<<<<<<<<
@@ -3447,7 +3447,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
       goto __pyx_L5;
     }
 
-    /* "pycocotools/_mask.pyx":134
+    /* "pycocotools/_mask.pyx":130
  *             py_string = str.encode(obj['counts']) if type(obj['counts']) == str else obj['counts']
  *         else:
  *             raise Exception('Python version must be 2 or 3')             # <<<<<<<<<<<<<<
@@ -3455,15 +3455,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
  *         rleFrString( <RLE*> &Rs._R[i], <char*> c_string, obj['size'][0], obj['size'][1] )
  */
     /*else*/ {
-      __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_Raise(__pyx_t_5, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __PYX_ERR(0, 134, __pyx_L1_error)
+      __PYX_ERR(0, 130, __pyx_L1_error)
     }
     __pyx_L5:;
 
-    /* "pycocotools/_mask.pyx":135
+    /* "pycocotools/_mask.pyx":131
  *         else:
  *             raise Exception('Python version must be 2 or 3')
  *         c_string = py_string             # <<<<<<<<<<<<<<
@@ -3472,36 +3472,36 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
  */
     if (unlikely(__pyx_v_py_string == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-      __PYX_ERR(0, 135, __pyx_L1_error)
+      __PYX_ERR(0, 131, __pyx_L1_error)
     }
-    __pyx_t_11 = __Pyx_PyBytes_AsWritableString(__pyx_v_py_string); if (unlikely((!__pyx_t_11) && PyErr_Occurred())) __PYX_ERR(0, 135, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyBytes_AsWritableString(__pyx_v_py_string); if (unlikely((!__pyx_t_11) && PyErr_Occurred())) __PYX_ERR(0, 131, __pyx_L1_error)
     __pyx_v_c_string = __pyx_t_11;
 
-    /* "pycocotools/_mask.pyx":136
+    /* "pycocotools/_mask.pyx":132
  *             raise Exception('Python version must be 2 or 3')
  *         c_string = py_string
  *         rleFrString( <RLE*> &Rs._R[i], <char*> c_string, obj['size'][0], obj['size'][1] )             # <<<<<<<<<<<<<<
  *     return Rs
  * 
  */
-    __pyx_t_12 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_12 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L1_error)
-    __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_12 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 132, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_13 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_13 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_13 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_size); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_obj, __pyx_n_s_size); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_8, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_8, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_14 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_14 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_14 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     rleFrString(((RLE *)(&(__pyx_v_Rs->_R[__pyx_t_12]))), ((char *)__pyx_v_c_string), __pyx_t_13, __pyx_t_14);
 
-    /* "pycocotools/_mask.pyx":128
+    /* "pycocotools/_mask.pyx":124
  *     cdef bytes py_string
  *     cdef char* c_string
  *     for i, obj in enumerate(rleObjs):             # <<<<<<<<<<<<<<
@@ -3512,7 +3512,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":137
+  /* "pycocotools/_mask.pyx":133
  *         c_string = py_string
  *         rleFrString( <RLE*> &Rs._R[i], <char*> c_string, obj['size'][0], obj['size'][1] )
  *     return Rs             # <<<<<<<<<<<<<<
@@ -3524,7 +3524,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
   __pyx_r = ((PyObject *)__pyx_v_Rs);
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":123
+  /* "pycocotools/_mask.pyx":119
  * 
  * # internal conversion from compressed RLE format to Python RLEs object
  * def _frString(rleObjs):             # <<<<<<<<<<<<<<
@@ -3553,7 +3553,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_2_frString(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":141
+/* "pycocotools/_mask.pyx":137
  * # encode mask to RLEs objects
  * # list of RLE string can be generated by RLEs member function
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):             # <<<<<<<<<<<<<<
@@ -3568,7 +3568,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_5encode(PyObject *__pyx_self, PyO
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("encode (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_mask), __pyx_ptype_5numpy_ndarray, 1, "mask", 0))) __PYX_ERR(0, 141, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_mask), __pyx_ptype_5numpy_ndarray, 1, "mask", 0))) __PYX_ERR(0, 137, __pyx_L1_error)
   __pyx_r = __pyx_pf_11pycocotools_5_mask_4encode(__pyx_self, ((PyArrayObject *)__pyx_v_mask));
 
   /* function exit code */
@@ -3603,11 +3603,11 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
   __pyx_pybuffernd_mask.rcbuffer = &__pyx_pybuffer_mask;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_mask.rcbuffer->pybuffer, (PyObject*)__pyx_v_mask, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 3, 0, __pyx_stack) == -1)) __PYX_ERR(0, 141, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_mask.rcbuffer->pybuffer, (PyObject*)__pyx_v_mask, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_F_CONTIGUOUS, 3, 0, __pyx_stack) == -1)) __PYX_ERR(0, 137, __pyx_L1_error)
   }
   __pyx_pybuffernd_mask.diminfo[0].strides = __pyx_pybuffernd_mask.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_mask.diminfo[0].shape = __pyx_pybuffernd_mask.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_mask.diminfo[1].strides = __pyx_pybuffernd_mask.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_mask.diminfo[1].shape = __pyx_pybuffernd_mask.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_mask.diminfo[2].strides = __pyx_pybuffernd_mask.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_mask.diminfo[2].shape = __pyx_pybuffernd_mask.rcbuffer->pybuffer.shape[2];
 
-  /* "pycocotools/_mask.pyx":142
+  /* "pycocotools/_mask.pyx":138
  * # list of RLE string can be generated by RLEs member function
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):
  *     h, w, n = mask.shape[0], mask.shape[1], mask.shape[2]             # <<<<<<<<<<<<<<
@@ -3621,22 +3621,22 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
   __pyx_v_w = __pyx_t_2;
   __pyx_v_n = __pyx_t_3;
 
-  /* "pycocotools/_mask.pyx":143
+  /* "pycocotools/_mask.pyx":139
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):
  *     h, w, n = mask.shape[0], mask.shape[1], mask.shape[2]
  *     cdef RLEs Rs = RLEs(n)             # <<<<<<<<<<<<<<
  *     rleEncode(Rs._R,<byte*>mask.data,h,w,n)
  *     objs = _toString(Rs)
  */
-  __pyx_t_4 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_n); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_Py_intptr_t(__pyx_v_n); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":144
+  /* "pycocotools/_mask.pyx":140
  *     h, w, n = mask.shape[0], mask.shape[1], mask.shape[2]
  *     cdef RLEs Rs = RLEs(n)
  *     rleEncode(Rs._R,<byte*>mask.data,h,w,n)             # <<<<<<<<<<<<<<
@@ -3645,14 +3645,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
  */
   rleEncode(__pyx_v_Rs->_R, ((byte *)__pyx_v_mask->data), __pyx_v_h, __pyx_v_w, __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":145
+  /* "pycocotools/_mask.pyx":141
  *     cdef RLEs Rs = RLEs(n)
  *     rleEncode(Rs._R,<byte*>mask.data,h,w,n)
  *     objs = _toString(Rs)             # <<<<<<<<<<<<<<
  *     return objs
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_toString); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_toString); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -3666,13 +3666,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
   }
   __pyx_t_5 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_6, ((PyObject *)__pyx_v_Rs)) : __Pyx_PyObject_CallOneArg(__pyx_t_4, ((PyObject *)__pyx_v_Rs));
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_objs = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":146
+  /* "pycocotools/_mask.pyx":142
  *     rleEncode(Rs._R,<byte*>mask.data,h,w,n)
  *     objs = _toString(Rs)
  *     return objs             # <<<<<<<<<<<<<<
@@ -3684,7 +3684,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":141
+  /* "pycocotools/_mask.pyx":137
  * # encode mask to RLEs objects
  * # list of RLE string can be generated by RLEs member function
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):             # <<<<<<<<<<<<<<
@@ -3716,7 +3716,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_4encode(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":149
+/* "pycocotools/_mask.pyx":145
  * 
  * # decode mask from compressed list of RLE string or RLEs object
  * def decode(rleObjs):             # <<<<<<<<<<<<<<
@@ -3755,14 +3755,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("decode", 0);
 
-  /* "pycocotools/_mask.pyx":150
+  /* "pycocotools/_mask.pyx":146
  * # decode mask from compressed list of RLE string or RLEs object
  * def decode(rleObjs):
  *     cdef RLEs Rs = _frString(rleObjs)             # <<<<<<<<<<<<<<
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n
  *     masks = Masks(h, w, n)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -3776,14 +3776,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rleObjs) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rleObjs);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 146, __pyx_L1_error)
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":151
+  /* "pycocotools/_mask.pyx":147
  * def decode(rleObjs):
  *     cdef RLEs Rs = _frString(rleObjs)
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n             # <<<<<<<<<<<<<<
@@ -3797,20 +3797,20 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   __pyx_v_w = __pyx_t_5;
   __pyx_v_n = __pyx_t_6;
 
-  /* "pycocotools/_mask.pyx":152
+  /* "pycocotools/_mask.pyx":148
  *     cdef RLEs Rs = _frString(rleObjs)
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n
  *     masks = Masks(h, w, n)             # <<<<<<<<<<<<<<
  *     rleDecode(<RLE*>Rs._R, masks._mask, n);
  *     return np.array(masks)
  */
-  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_w); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_siz(__pyx_v_w); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
@@ -3821,13 +3821,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_Masks), __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_Masks), __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_masks = ((struct __pyx_obj_11pycocotools_5_mask_Masks *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":153
+  /* "pycocotools/_mask.pyx":149
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n
  *     masks = Masks(h, w, n)
  *     rleDecode(<RLE*>Rs._R, masks._mask, n);             # <<<<<<<<<<<<<<
@@ -3836,7 +3836,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
  */
   rleDecode(((RLE *)__pyx_v_Rs->_R), __pyx_v_masks->_mask, __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":154
+  /* "pycocotools/_mask.pyx":150
  *     masks = Masks(h, w, n)
  *     rleDecode(<RLE*>Rs._R, masks._mask, n);
  *     return np.array(masks)             # <<<<<<<<<<<<<<
@@ -3844,9 +3844,9 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
  * def merge(rleObjs, intersect=0):
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_t_7 = NULL;
@@ -3861,14 +3861,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   }
   __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, ((PyObject *)__pyx_v_masks)) : __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_masks));
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":149
+  /* "pycocotools/_mask.pyx":145
  * 
  * # decode mask from compressed list of RLE string or RLEs object
  * def decode(rleObjs):             # <<<<<<<<<<<<<<
@@ -3892,7 +3892,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_6decode(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":156
+/* "pycocotools/_mask.pyx":152
  *     return np.array(masks)
  * 
  * def merge(rleObjs, intersect=0):             # <<<<<<<<<<<<<<
@@ -3937,7 +3937,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_9merge(PyObject *__pyx_self, PyOb
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "merge") < 0)) __PYX_ERR(0, 156, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "merge") < 0)) __PYX_ERR(0, 152, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3953,7 +3953,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_9merge(PyObject *__pyx_self, PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("merge", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 156, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("merge", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 152, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.merge", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3978,14 +3978,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_8merge(CYTHON_UNUSED PyObject *__
   int __pyx_t_4;
   __Pyx_RefNannySetupContext("merge", 0);
 
-  /* "pycocotools/_mask.pyx":157
+  /* "pycocotools/_mask.pyx":153
  * 
  * def merge(rleObjs, intersect=0):
  *     cdef RLEs Rs = _frString(rleObjs)             # <<<<<<<<<<<<<<
  *     cdef RLEs R = RLEs(1)
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -3999,43 +3999,43 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_8merge(CYTHON_UNUSED PyObject *__
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rleObjs) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rleObjs);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 157, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 153, __pyx_L1_error)
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":158
+  /* "pycocotools/_mask.pyx":154
  * def merge(rleObjs, intersect=0):
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef RLEs R = RLEs(1)             # <<<<<<<<<<<<<<
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)
  *     obj = _toString(R)[0]
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_R = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":159
+  /* "pycocotools/_mask.pyx":155
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef RLEs R = RLEs(1)
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)             # <<<<<<<<<<<<<<
  *     obj = _toString(R)[0]
  *     return obj
  */
-  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_intersect); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_intersect); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 155, __pyx_L1_error)
   rleMerge(((RLE *)__pyx_v_Rs->_R), ((RLE *)__pyx_v_R->_R), ((siz)__pyx_v_Rs->_n), __pyx_t_4);
 
-  /* "pycocotools/_mask.pyx":160
+  /* "pycocotools/_mask.pyx":156
  *     cdef RLEs R = RLEs(1)
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)
  *     obj = _toString(R)[0]             # <<<<<<<<<<<<<<
  *     return obj
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_toString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_toString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -4049,16 +4049,16 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_8merge(CYTHON_UNUSED PyObject *__
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, ((PyObject *)__pyx_v_R)) : __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_R));
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 160, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_obj = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pycocotools/_mask.pyx":161
+  /* "pycocotools/_mask.pyx":157
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)
  *     obj = _toString(R)[0]
  *     return obj             # <<<<<<<<<<<<<<
@@ -4070,7 +4070,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_8merge(CYTHON_UNUSED PyObject *__
   __pyx_r = __pyx_v_obj;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":156
+  /* "pycocotools/_mask.pyx":152
  *     return np.array(masks)
  * 
  * def merge(rleObjs, intersect=0):             # <<<<<<<<<<<<<<
@@ -4094,7 +4094,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_8merge(CYTHON_UNUSED PyObject *__
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":163
+/* "pycocotools/_mask.pyx":159
  *     return obj
  * 
  * def area(rleObjs):             # <<<<<<<<<<<<<<
@@ -4130,14 +4130,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("area", 0);
 
-  /* "pycocotools/_mask.pyx":164
+  /* "pycocotools/_mask.pyx":160
  * 
  * def area(rleObjs):
  *     cdef RLEs Rs = _frString(rleObjs)             # <<<<<<<<<<<<<<
  *     cdef uint* _a = <uint*> malloc(Rs._n* sizeof(uint))
  *     rleArea(Rs._R, Rs._n, _a)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -4151,14 +4151,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rleObjs) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rleObjs);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 160, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 164, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 160, __pyx_L1_error)
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":165
+  /* "pycocotools/_mask.pyx":161
  * def area(rleObjs):
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef uint* _a = <uint*> malloc(Rs._n* sizeof(uint))             # <<<<<<<<<<<<<<
@@ -4167,7 +4167,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
  */
   __pyx_v__a = ((uint *)malloc((__pyx_v_Rs->_n * (sizeof(unsigned int)))));
 
-  /* "pycocotools/_mask.pyx":166
+  /* "pycocotools/_mask.pyx":162
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef uint* _a = <uint*> malloc(Rs._n* sizeof(uint))
  *     rleArea(Rs._R, Rs._n, _a)             # <<<<<<<<<<<<<<
@@ -4176,7 +4176,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
  */
   rleArea(__pyx_v_Rs->_R, __pyx_v_Rs->_n, __pyx_v__a);
 
-  /* "pycocotools/_mask.pyx":168
+  /* "pycocotools/_mask.pyx":164
  *     rleArea(Rs._R, Rs._n, _a)
  *     cdef np.npy_intp shape[1]
  *     shape[0] = <np.npy_intp> Rs._n             # <<<<<<<<<<<<<<
@@ -4185,40 +4185,40 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
  */
   (__pyx_v_shape[0]) = ((npy_intp)__pyx_v_Rs->_n);
 
-  /* "pycocotools/_mask.pyx":169
+  /* "pycocotools/_mask.pyx":165
  *     cdef np.npy_intp shape[1]
  *     shape[0] = <np.npy_intp> Rs._n
  *     a = np.array((Rs._n, ), dtype=np.uint8)             # <<<<<<<<<<<<<<
  *     a = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT32, _a)
  *     PyArray_ENABLEFLAGS(a, np.NPY_OWNDATA)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_Rs->_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_Rs->_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_uint8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_uint8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 169, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 165, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4226,29 +4226,29 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
   __pyx_v_a = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":170
+  /* "pycocotools/_mask.pyx":166
  *     shape[0] = <np.npy_intp> Rs._n
  *     a = np.array((Rs._n, ), dtype=np.uint8)
  *     a = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT32, _a)             # <<<<<<<<<<<<<<
  *     PyArray_ENABLEFLAGS(a, np.NPY_OWNDATA)
  *     return a
  */
-  __pyx_t_5 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_UINT32, __pyx_v__a); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_5 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_UINT32, __pyx_v__a); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF_SET(__pyx_v_a, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":171
+  /* "pycocotools/_mask.pyx":167
  *     a = np.array((Rs._n, ), dtype=np.uint8)
  *     a = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT32, _a)
  *     PyArray_ENABLEFLAGS(a, np.NPY_OWNDATA)             # <<<<<<<<<<<<<<
  *     return a
  * 
  */
-  if (!(likely(((__pyx_v_a) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_a, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 171, __pyx_L1_error)
+  if (!(likely(((__pyx_v_a) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_a, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 167, __pyx_L1_error)
   PyArray_ENABLEFLAGS(((PyArrayObject *)__pyx_v_a), NPY_OWNDATA);
 
-  /* "pycocotools/_mask.pyx":172
+  /* "pycocotools/_mask.pyx":168
  *     a = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT32, _a)
  *     PyArray_ENABLEFLAGS(a, np.NPY_OWNDATA)
  *     return a             # <<<<<<<<<<<<<<
@@ -4260,7 +4260,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
   __pyx_r = __pyx_v_a;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":163
+  /* "pycocotools/_mask.pyx":159
  *     return obj
  * 
  * def area(rleObjs):             # <<<<<<<<<<<<<<
@@ -4285,7 +4285,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_10area(CYTHON_UNUSED PyObject *__
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":175
+/* "pycocotools/_mask.pyx":171
  * 
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):             # <<<<<<<<<<<<<<
@@ -4328,17 +4328,17 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_13iou(PyObject *__pyx_self, PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_gt)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, 1); __PYX_ERR(0, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, 1); __PYX_ERR(0, 171, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_pyiscrowd)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, 2); __PYX_ERR(0, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, 2); __PYX_ERR(0, 171, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iou") < 0)) __PYX_ERR(0, 175, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "iou") < 0)) __PYX_ERR(0, 171, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -4353,7 +4353,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_13iou(PyObject *__pyx_self, PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 175, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("iou", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 171, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.iou", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4366,7 +4366,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_13iou(PyObject *__pyx_self, PyObj
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":176
+/* "pycocotools/_mask.pyx":172
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):             # <<<<<<<<<<<<<<
@@ -4411,18 +4411,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
   __Pyx_RefNannySetupContext("_preproc", 0);
   __Pyx_INCREF(__pyx_v_objs);
 
-  /* "pycocotools/_mask.pyx":177
+  /* "pycocotools/_mask.pyx":173
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):
  *         if len(objs) == 0:             # <<<<<<<<<<<<<<
  *             return objs
  *         if type(objs) == np.ndarray:
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_objs); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 177, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_objs); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 173, __pyx_L1_error)
   __pyx_t_2 = ((__pyx_t_1 == 0) != 0);
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":178
+    /* "pycocotools/_mask.pyx":174
  *     def _preproc(objs):
  *         if len(objs) == 0:
  *             return objs             # <<<<<<<<<<<<<<
@@ -4434,7 +4434,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_r = __pyx_v_objs;
     goto __pyx_L0;
 
-    /* "pycocotools/_mask.pyx":177
+    /* "pycocotools/_mask.pyx":173
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):
  *         if len(objs) == 0:             # <<<<<<<<<<<<<<
@@ -4443,44 +4443,44 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  */
   }
 
-  /* "pycocotools/_mask.pyx":179
+  /* "pycocotools/_mask.pyx":175
  *         if len(objs) == 0:
  *             return objs
  *         if type(objs) == np.ndarray:             # <<<<<<<<<<<<<<
  *             if len(objs.shape) == 1:
  *                 objs = objs.reshape((objs[0], 1))
  */
-  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_objs)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_objs)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 175, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":180
+    /* "pycocotools/_mask.pyx":176
  *             return objs
  *         if type(objs) == np.ndarray:
  *             if len(objs.shape) == 1:             # <<<<<<<<<<<<<<
  *                 objs = objs.reshape((objs[0], 1))
  *             # check if it's Nx4 bbox
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_1 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_2 = ((__pyx_t_1 == 1) != 0);
     if (__pyx_t_2) {
 
-      /* "pycocotools/_mask.pyx":181
+      /* "pycocotools/_mask.pyx":177
  *         if type(objs) == np.ndarray:
  *             if len(objs.shape) == 1:
  *                 objs = objs.reshape((objs[0], 1))             # <<<<<<<<<<<<<<
  *             # check if it's Nx4 bbox
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_reshape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_reshape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_objs, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 181, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_objs, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 181, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5);
@@ -4501,13 +4501,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_6);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF_SET(__pyx_v_objs, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "pycocotools/_mask.pyx":180
+      /* "pycocotools/_mask.pyx":176
  *             return objs
  *         if type(objs) == np.ndarray:
  *             if len(objs.shape) == 1:             # <<<<<<<<<<<<<<
@@ -4516,16 +4516,16 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  */
     }
 
-    /* "pycocotools/_mask.pyx":183
+    /* "pycocotools/_mask.pyx":179
  *                 objs = objs.reshape((objs[0], 1))
  *             # check if it's Nx4 bbox
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:             # <<<<<<<<<<<<<<
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')
  *             objs = objs.astype(np.double)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_1 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_7 = ((!((__pyx_t_1 == 2) != 0)) != 0);
     if (!__pyx_t_7) {
@@ -4533,35 +4533,35 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       __pyx_t_2 = __pyx_t_7;
       goto __pyx_L7_bool_binop_done;
     }
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_4, 4, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_EqObjC(__pyx_t_4, __pyx_int_4, 4, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 179, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_8 = ((!__pyx_t_7) != 0);
     __pyx_t_2 = __pyx_t_8;
     __pyx_L7_bool_binop_done:;
     if (unlikely(__pyx_t_2)) {
 
-      /* "pycocotools/_mask.pyx":184
+      /* "pycocotools/_mask.pyx":180
  *             # check if it's Nx4 bbox
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')             # <<<<<<<<<<<<<<
  *             objs = objs.astype(np.double)
  *         elif type(objs) == list:
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __PYX_ERR(0, 184, __pyx_L1_error)
+      __PYX_ERR(0, 180, __pyx_L1_error)
 
-      /* "pycocotools/_mask.pyx":183
+      /* "pycocotools/_mask.pyx":179
  *                 objs = objs.reshape((objs[0], 1))
  *             # check if it's Nx4 bbox
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:             # <<<<<<<<<<<<<<
@@ -4570,18 +4570,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  */
     }
 
-    /* "pycocotools/_mask.pyx":185
+    /* "pycocotools/_mask.pyx":181
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')
  *             objs = objs.astype(np.double)             # <<<<<<<<<<<<<<
  *         elif type(objs) == list:
  *             # check if list is in box format and convert it to np.ndarray
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_astype); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_astype); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -4597,13 +4597,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF_SET(__pyx_v_objs, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "pycocotools/_mask.pyx":179
+    /* "pycocotools/_mask.pyx":175
  *         if len(objs) == 0:
  *             return objs
  *         if type(objs) == np.ndarray:             # <<<<<<<<<<<<<<
@@ -4613,61 +4613,61 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     goto __pyx_L4;
   }
 
-  /* "pycocotools/_mask.pyx":186
+  /* "pycocotools/_mask.pyx":182
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')
  *             objs = objs.astype(np.double)
  *         elif type(objs) == list:             # <<<<<<<<<<<<<<
  *             # check if list is in box format and convert it to np.ndarray
  *             isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
  */
-  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_objs)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 186, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 186, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_objs)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 182, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (likely(__pyx_t_2)) {
 
-    /* "pycocotools/_mask.pyx":188
+    /* "pycocotools/_mask.pyx":184
  *         elif type(objs) == list:
  *             # check if list is in box format and convert it to np.ndarray
  *             isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))             # <<<<<<<<<<<<<<
  *             isrle = np.all(np.array([type(obj) == dict for obj in objs]))
  *             if isbox:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_all); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_all); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 188, __pyx_L1_error)
+    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (likely(PyList_CheckExact(__pyx_v_objs)) || PyTuple_CheckExact(__pyx_v_objs)) {
       __pyx_t_10 = __pyx_v_objs; __Pyx_INCREF(__pyx_t_10); __pyx_t_1 = 0;
       __pyx_t_11 = NULL;
     } else {
-      __pyx_t_1 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_objs); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_1 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_objs); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 184, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 184, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_11)) {
         if (likely(PyList_CheckExact(__pyx_t_10))) {
           if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_10)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_12 = PyList_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
+          __pyx_t_12 = PyList_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 184, __pyx_L1_error)
           #else
-          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 188, __pyx_L1_error)
+          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 184, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           #endif
         } else {
           if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_10)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
+          __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 184, __pyx_L1_error)
           #else
-          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 188, __pyx_L1_error)
+          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 184, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           #endif
         }
@@ -4677,7 +4677,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 188, __pyx_L1_error)
+            else __PYX_ERR(0, 184, __pyx_L1_error)
           }
           break;
         }
@@ -4685,18 +4685,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       }
       __Pyx_XDECREF_SET(__pyx_v_obj, __pyx_t_12);
       __pyx_t_12 = 0;
-      __pyx_t_13 = PyObject_Length(__pyx_v_obj); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_13 = PyObject_Length(__pyx_v_obj); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 184, __pyx_L1_error)
       __pyx_t_2 = (__pyx_t_13 == 4);
       if (__pyx_t_2) {
       } else {
-        __pyx_t_14 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 188, __pyx_L1_error)
+        __pyx_t_14 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 184, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_14);
         __pyx_t_12 = __pyx_t_14;
         __pyx_t_14 = 0;
         goto __pyx_L11_bool_binop_done;
       }
-      __pyx_t_14 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 188, __pyx_L1_error)
-      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_14); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_14 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 184, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_14); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 184, __pyx_L1_error)
       if (!__pyx_t_2) {
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       } else {
@@ -4705,12 +4705,12 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
         goto __pyx_L11_bool_binop_done;
       }
-      __pyx_t_14 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_14 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 184, __pyx_L1_error)
       __Pyx_INCREF(__pyx_t_14);
       __pyx_t_12 = __pyx_t_14;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       __pyx_L11_bool_binop_done:;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 188, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 184, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -4727,7 +4727,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_10, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_9 = NULL;
@@ -4743,55 +4743,55 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_t_3 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_9, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 188, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_isbox = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "pycocotools/_mask.pyx":189
+    /* "pycocotools/_mask.pyx":185
  *             # check if list is in box format and convert it to np.ndarray
  *             isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
  *             isrle = np.all(np.array([type(obj) == dict for obj in objs]))             # <<<<<<<<<<<<<<
  *             if isbox:
  *                 objs = np.array(objs, dtype=np.double)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_all); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_all); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 189, __pyx_L1_error)
+    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (likely(PyList_CheckExact(__pyx_v_objs)) || PyTuple_CheckExact(__pyx_v_objs)) {
       __pyx_t_10 = __pyx_v_objs; __Pyx_INCREF(__pyx_t_10); __pyx_t_1 = 0;
       __pyx_t_11 = NULL;
     } else {
-      __pyx_t_1 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_objs); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_1 = -1; __pyx_t_10 = PyObject_GetIter(__pyx_v_objs); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 185, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_11)) {
         if (likely(PyList_CheckExact(__pyx_t_10))) {
           if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_10)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_12 = PyList_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __pyx_t_12 = PyList_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
           #else
-          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 185, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           #endif
         } else {
           if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_10)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_10, __pyx_t_1); __Pyx_INCREF(__pyx_t_12); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
           #else
-          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __pyx_t_12 = PySequence_ITEM(__pyx_t_10, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 185, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           #endif
         }
@@ -4801,7 +4801,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 189, __pyx_L1_error)
+            else __PYX_ERR(0, 185, __pyx_L1_error)
           }
           break;
         }
@@ -4809,8 +4809,8 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       }
       __Pyx_XDECREF_SET(__pyx_v_obj, __pyx_t_12);
       __pyx_t_12 = 0;
-      __pyx_t_12 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 189, __pyx_L1_error)
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_9, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_12 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 185, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_9, (PyObject*)__pyx_t_12))) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -4827,7 +4827,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_t_5 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_10, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_9);
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
@@ -4843,49 +4843,49 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     __pyx_t_3 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_isrle = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "pycocotools/_mask.pyx":190
+    /* "pycocotools/_mask.pyx":186
  *             isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
  *             isrle = np.all(np.array([type(obj) == dict for obj in objs]))
  *             if isbox:             # <<<<<<<<<<<<<<
  *                 objs = np.array(objs, dtype=np.double)
  *                 if len(objs.shape) == 1:
  */
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_isbox); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_isbox); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 186, __pyx_L1_error)
     if (__pyx_t_2) {
 
-      /* "pycocotools/_mask.pyx":191
+      /* "pycocotools/_mask.pyx":187
  *             isrle = np.all(np.array([type(obj) == dict for obj in objs]))
  *             if isbox:
  *                 objs = np.array(objs, dtype=np.double)             # <<<<<<<<<<<<<<
  *                 if len(objs.shape) == 1:
  *                     objs = objs.reshape((1,objs.shape[0]))
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_v_objs);
       __Pyx_GIVEREF(__pyx_v_objs);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_objs);
-      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 191, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4893,35 +4893,35 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       __Pyx_DECREF_SET(__pyx_v_objs, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "pycocotools/_mask.pyx":192
+      /* "pycocotools/_mask.pyx":188
  *             if isbox:
  *                 objs = np.array(objs, dtype=np.double)
  *                 if len(objs.shape) == 1:             # <<<<<<<<<<<<<<
  *                     objs = objs.reshape((1,objs.shape[0]))
  *             elif isrle:
  */
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 188, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_1 = PyObject_Length(__pyx_t_9); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_1 = PyObject_Length(__pyx_t_9); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 188, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_2 = ((__pyx_t_1 == 1) != 0);
       if (__pyx_t_2) {
 
-        /* "pycocotools/_mask.pyx":193
+        /* "pycocotools/_mask.pyx":189
  *                 objs = np.array(objs, dtype=np.double)
  *                 if len(objs.shape) == 1:
  *                     objs = objs.reshape((1,objs.shape[0]))             # <<<<<<<<<<<<<<
  *             elif isrle:
  *                 objs = _frString(objs)
  */
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_reshape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 193, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_reshape); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 189, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_objs, __pyx_n_s_shape); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 193, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_int_1);
         __Pyx_GIVEREF(__pyx_int_1);
@@ -4942,13 +4942,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
         __pyx_t_9 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 193, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 189, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF_SET(__pyx_v_objs, __pyx_t_9);
         __pyx_t_9 = 0;
 
-        /* "pycocotools/_mask.pyx":192
+        /* "pycocotools/_mask.pyx":188
  *             if isbox:
  *                 objs = np.array(objs, dtype=np.double)
  *                 if len(objs.shape) == 1:             # <<<<<<<<<<<<<<
@@ -4957,7 +4957,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  */
       }
 
-      /* "pycocotools/_mask.pyx":190
+      /* "pycocotools/_mask.pyx":186
  *             isbox = np.all(np.array([(len(obj)==4) and ((type(obj)==list) or (type(obj)==np.ndarray)) for obj in objs]))
  *             isrle = np.all(np.array([type(obj) == dict for obj in objs]))
  *             if isbox:             # <<<<<<<<<<<<<<
@@ -4967,24 +4967,24 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       goto __pyx_L16;
     }
 
-    /* "pycocotools/_mask.pyx":194
+    /* "pycocotools/_mask.pyx":190
  *                 if len(objs.shape) == 1:
  *                     objs = objs.reshape((1,objs.shape[0]))
  *             elif isrle:             # <<<<<<<<<<<<<<
  *                 objs = _frString(objs)
  *             else:
  */
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_isrle); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 194, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_isrle); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
     if (likely(__pyx_t_2)) {
 
-      /* "pycocotools/_mask.pyx":195
+      /* "pycocotools/_mask.pyx":191
  *                     objs = objs.reshape((1,objs.shape[0]))
  *             elif isrle:
  *                 objs = _frString(objs)             # <<<<<<<<<<<<<<
  *             else:
  *                 raise Exception('list input can be bounding box (Nx4) or RLEs ([RLE])')
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_frString); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 195, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_frString); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 191, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_3 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -4998,13 +4998,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       }
       __pyx_t_9 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_v_objs) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_objs);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 195, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 191, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF_SET(__pyx_v_objs, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "pycocotools/_mask.pyx":194
+      /* "pycocotools/_mask.pyx":190
  *                 if len(objs.shape) == 1:
  *                     objs = objs.reshape((1,objs.shape[0]))
  *             elif isrle:             # <<<<<<<<<<<<<<
@@ -5014,7 +5014,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
       goto __pyx_L16;
     }
 
-    /* "pycocotools/_mask.pyx":197
+    /* "pycocotools/_mask.pyx":193
  *                 objs = _frString(objs)
  *             else:
  *                 raise Exception('list input can be bounding box (Nx4) or RLEs ([RLE])')             # <<<<<<<<<<<<<<
@@ -5022,15 +5022,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  */
     /*else*/ {
-      __pyx_t_9 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 193, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_Raise(__pyx_t_9, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __PYX_ERR(0, 197, __pyx_L1_error)
+      __PYX_ERR(0, 193, __pyx_L1_error)
     }
     __pyx_L16:;
 
-    /* "pycocotools/_mask.pyx":186
+    /* "pycocotools/_mask.pyx":182
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')
  *             objs = objs.astype(np.double)
  *         elif type(objs) == list:             # <<<<<<<<<<<<<<
@@ -5040,7 +5040,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
     goto __pyx_L4;
   }
 
-  /* "pycocotools/_mask.pyx":199
+  /* "pycocotools/_mask.pyx":195
  *                 raise Exception('list input can be bounding box (Nx4) or RLEs ([RLE])')
  *         else:
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')             # <<<<<<<<<<<<<<
@@ -5048,15 +5048,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  */
   /*else*/ {
-    __pyx_t_9 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 199, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_Raise(__pyx_t_9, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __PYX_ERR(0, 199, __pyx_L1_error)
+    __PYX_ERR(0, 195, __pyx_L1_error)
   }
   __pyx_L4:;
 
-  /* "pycocotools/_mask.pyx":200
+  /* "pycocotools/_mask.pyx":196
  *         else:
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  *         return objs             # <<<<<<<<<<<<<<
@@ -5068,7 +5068,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":176
+  /* "pycocotools/_mask.pyx":172
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):             # <<<<<<<<<<<<<<
@@ -5098,7 +5098,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou__preproc(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":201
+/* "pycocotools/_mask.pyx":197
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):             # <<<<<<<<<<<<<<
@@ -5150,35 +5150,35 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_3iou_3_rleIou(PyObject *__pyx_sel
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_gt)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 1); __PYX_ERR(0, 201, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 1); __PYX_ERR(0, 197, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_iscrowd)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 2); __PYX_ERR(0, 201, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 2); __PYX_ERR(0, 197, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_m)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 3); __PYX_ERR(0, 201, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 3); __PYX_ERR(0, 197, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_n)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 4); __PYX_ERR(0, 201, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 4); __PYX_ERR(0, 197, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_iou)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 5); __PYX_ERR(0, 201, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, 5); __PYX_ERR(0, 197, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_rleIou") < 0)) __PYX_ERR(0, 201, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_rleIou") < 0)) __PYX_ERR(0, 197, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -5193,22 +5193,22 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_3iou_3_rleIou(PyObject *__pyx_sel
     __pyx_v_dt = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)values[0]);
     __pyx_v_gt = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)values[1]);
     __pyx_v_iscrowd = ((PyArrayObject *)values[2]);
-    __pyx_v_m = __Pyx_PyInt_As_siz(values[3]); if (unlikely((__pyx_v_m == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L3_error)
-    __pyx_v_n = __Pyx_PyInt_As_siz(values[4]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L3_error)
+    __pyx_v_m = __Pyx_PyInt_As_siz(values[3]); if (unlikely((__pyx_v_m == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 197, __pyx_L3_error)
+    __pyx_v_n = __Pyx_PyInt_As_siz(values[4]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 197, __pyx_L3_error)
     __pyx_v__iou = ((PyArrayObject *)values[5]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 201, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_rleIou", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 197, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.iou._rleIou", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dt), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "dt", 0))) __PYX_ERR(0, 201, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_gt), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "gt", 0))) __PYX_ERR(0, 201, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_iscrowd), __pyx_ptype_5numpy_ndarray, 1, "iscrowd", 0))) __PYX_ERR(0, 201, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v__iou), __pyx_ptype_5numpy_ndarray, 1, "_iou", 0))) __PYX_ERR(0, 201, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dt), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "dt", 0))) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_gt), __pyx_ptype_11pycocotools_5_mask_RLEs, 1, "gt", 0))) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_iscrowd), __pyx_ptype_5numpy_ndarray, 1, "iscrowd", 0))) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v__iou), __pyx_ptype_5numpy_ndarray, 1, "_iou", 0))) __PYX_ERR(0, 197, __pyx_L1_error)
   __pyx_r = __pyx_pf_11pycocotools_5_mask_3iou_2_rleIou(__pyx_self, __pyx_v_dt, __pyx_v_gt, __pyx_v_iscrowd, __pyx_v_m, __pyx_v_n, __pyx_v__iou);
 
   /* function exit code */
@@ -5238,16 +5238,16 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_2_rleIou(CYTHON_UNUSED PyObj
   __pyx_pybuffernd__iou.rcbuffer = &__pyx_pybuffer__iou;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_iscrowd.rcbuffer->pybuffer, (PyObject*)__pyx_v_iscrowd, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 201, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_iscrowd.rcbuffer->pybuffer, (PyObject*)__pyx_v_iscrowd, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 197, __pyx_L1_error)
   }
   __pyx_pybuffernd_iscrowd.diminfo[0].strides = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_iscrowd.diminfo[0].shape = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd__iou.rcbuffer->pybuffer, (PyObject*)__pyx_v__iou, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 201, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd__iou.rcbuffer->pybuffer, (PyObject*)__pyx_v__iou, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 197, __pyx_L1_error)
   }
   __pyx_pybuffernd__iou.diminfo[0].strides = __pyx_pybuffernd__iou.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd__iou.diminfo[0].shape = __pyx_pybuffernd__iou.rcbuffer->pybuffer.shape[0];
 
-  /* "pycocotools/_mask.pyx":202
+  /* "pycocotools/_mask.pyx":198
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )             # <<<<<<<<<<<<<<
@@ -5256,7 +5256,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_2_rleIou(CYTHON_UNUSED PyObj
  */
   rleIou(((RLE *)__pyx_v_dt->_R), ((RLE *)__pyx_v_gt->_R), __pyx_v_m, __pyx_v_n, ((byte *)__pyx_v_iscrowd->data), ((double *)__pyx_v__iou->data));
 
-  /* "pycocotools/_mask.pyx":201
+  /* "pycocotools/_mask.pyx":197
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):             # <<<<<<<<<<<<<<
@@ -5287,7 +5287,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_2_rleIou(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":203
+/* "pycocotools/_mask.pyx":199
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):             # <<<<<<<<<<<<<<
@@ -5339,35 +5339,35 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_3iou_5_bbIou(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_gt)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 1); __PYX_ERR(0, 203, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 1); __PYX_ERR(0, 199, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_iscrowd)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 2); __PYX_ERR(0, 203, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 2); __PYX_ERR(0, 199, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_m)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 3); __PYX_ERR(0, 203, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 3); __PYX_ERR(0, 199, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_n)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 4); __PYX_ERR(0, 203, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 4); __PYX_ERR(0, 199, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_iou)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 5); __PYX_ERR(0, 203, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, 5); __PYX_ERR(0, 199, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_bbIou") < 0)) __PYX_ERR(0, 203, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_bbIou") < 0)) __PYX_ERR(0, 199, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -5382,22 +5382,22 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_3iou_5_bbIou(PyObject *__pyx_self
     __pyx_v_dt = ((PyArrayObject *)values[0]);
     __pyx_v_gt = ((PyArrayObject *)values[1]);
     __pyx_v_iscrowd = ((PyArrayObject *)values[2]);
-    __pyx_v_m = __Pyx_PyInt_As_siz(values[3]); if (unlikely((__pyx_v_m == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 203, __pyx_L3_error)
-    __pyx_v_n = __Pyx_PyInt_As_siz(values[4]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 203, __pyx_L3_error)
+    __pyx_v_m = __Pyx_PyInt_As_siz(values[3]); if (unlikely((__pyx_v_m == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 199, __pyx_L3_error)
+    __pyx_v_n = __Pyx_PyInt_As_siz(values[4]); if (unlikely((__pyx_v_n == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 199, __pyx_L3_error)
     __pyx_v__iou = ((PyArrayObject *)values[5]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 203, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_bbIou", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 199, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.iou._bbIou", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dt), __pyx_ptype_5numpy_ndarray, 1, "dt", 0))) __PYX_ERR(0, 203, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_gt), __pyx_ptype_5numpy_ndarray, 1, "gt", 0))) __PYX_ERR(0, 203, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_iscrowd), __pyx_ptype_5numpy_ndarray, 1, "iscrowd", 0))) __PYX_ERR(0, 203, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v__iou), __pyx_ptype_5numpy_ndarray, 1, "_iou", 0))) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dt), __pyx_ptype_5numpy_ndarray, 1, "dt", 0))) __PYX_ERR(0, 199, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_gt), __pyx_ptype_5numpy_ndarray, 1, "gt", 0))) __PYX_ERR(0, 199, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_iscrowd), __pyx_ptype_5numpy_ndarray, 1, "iscrowd", 0))) __PYX_ERR(0, 199, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v__iou), __pyx_ptype_5numpy_ndarray, 1, "_iou", 0))) __PYX_ERR(0, 199, __pyx_L1_error)
   __pyx_r = __pyx_pf_11pycocotools_5_mask_3iou_4_bbIou(__pyx_self, __pyx_v_dt, __pyx_v_gt, __pyx_v_iscrowd, __pyx_v_m, __pyx_v_n, __pyx_v__iou);
 
   /* function exit code */
@@ -5439,26 +5439,26 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_4_bbIou(CYTHON_UNUSED PyObje
   __pyx_pybuffernd__iou.rcbuffer = &__pyx_pybuffer__iou;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_dt.rcbuffer->pybuffer, (PyObject*)__pyx_v_dt, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_dt.rcbuffer->pybuffer, (PyObject*)__pyx_v_dt, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 199, __pyx_L1_error)
   }
   __pyx_pybuffernd_dt.diminfo[0].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dt.diminfo[0].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dt.diminfo[1].strides = __pyx_pybuffernd_dt.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dt.diminfo[1].shape = __pyx_pybuffernd_dt.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_gt.rcbuffer->pybuffer, (PyObject*)__pyx_v_gt, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_gt.rcbuffer->pybuffer, (PyObject*)__pyx_v_gt, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 199, __pyx_L1_error)
   }
   __pyx_pybuffernd_gt.diminfo[0].strides = __pyx_pybuffernd_gt.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_gt.diminfo[0].shape = __pyx_pybuffernd_gt.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_gt.diminfo[1].strides = __pyx_pybuffernd_gt.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_gt.diminfo[1].shape = __pyx_pybuffernd_gt.rcbuffer->pybuffer.shape[1];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_iscrowd.rcbuffer->pybuffer, (PyObject*)__pyx_v_iscrowd, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_iscrowd.rcbuffer->pybuffer, (PyObject*)__pyx_v_iscrowd, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 199, __pyx_L1_error)
   }
   __pyx_pybuffernd_iscrowd.diminfo[0].strides = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_iscrowd.diminfo[0].shape = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.shape[0];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd__iou.rcbuffer->pybuffer, (PyObject*)__pyx_v__iou, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd__iou.rcbuffer->pybuffer, (PyObject*)__pyx_v__iou, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) __PYX_ERR(0, 199, __pyx_L1_error)
   }
   __pyx_pybuffernd__iou.diminfo[0].strides = __pyx_pybuffernd__iou.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd__iou.diminfo[0].shape = __pyx_pybuffernd__iou.rcbuffer->pybuffer.shape[0];
 
-  /* "pycocotools/_mask.pyx":204
+  /* "pycocotools/_mask.pyx":200
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )             # <<<<<<<<<<<<<<
@@ -5467,7 +5467,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_4_bbIou(CYTHON_UNUSED PyObje
  */
   bbIou(((BB)__pyx_v_dt->data), ((BB)__pyx_v_gt->data), __pyx_v_m, __pyx_v_n, ((byte *)__pyx_v_iscrowd->data), ((double *)__pyx_v__iou->data));
 
-  /* "pycocotools/_mask.pyx":203
+  /* "pycocotools/_mask.pyx":199
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):             # <<<<<<<<<<<<<<
@@ -5502,7 +5502,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_4_bbIou(CYTHON_UNUSED PyObje
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":205
+/* "pycocotools/_mask.pyx":201
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):             # <<<<<<<<<<<<<<
@@ -5535,7 +5535,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("_len", 0);
 
-  /* "pycocotools/_mask.pyx":206
+  /* "pycocotools/_mask.pyx":202
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):
  *         cdef siz N = 0             # <<<<<<<<<<<<<<
@@ -5544,32 +5544,32 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
  */
   __pyx_v_N = 0;
 
-  /* "pycocotools/_mask.pyx":207
+  /* "pycocotools/_mask.pyx":203
  *     def _len(obj):
  *         cdef siz N = 0
  *         if type(obj) == RLEs:             # <<<<<<<<<<<<<<
  *             N = obj.n
  *         elif len(obj)==0:
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":208
+    /* "pycocotools/_mask.pyx":204
  *         cdef siz N = 0
  *         if type(obj) == RLEs:
  *             N = obj.n             # <<<<<<<<<<<<<<
  *         elif len(obj)==0:
  *             pass
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_obj, __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_obj, __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_3 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_3 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 204, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_N = __pyx_t_3;
 
-    /* "pycocotools/_mask.pyx":207
+    /* "pycocotools/_mask.pyx":203
  *     def _len(obj):
  *         cdef siz N = 0
  *         if type(obj) == RLEs:             # <<<<<<<<<<<<<<
@@ -5579,48 +5579,48 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":209
+  /* "pycocotools/_mask.pyx":205
  *         if type(obj) == RLEs:
  *             N = obj.n
  *         elif len(obj)==0:             # <<<<<<<<<<<<<<
  *             pass
  *         elif type(obj) == np.ndarray:
  */
-  __pyx_t_4 = PyObject_Length(__pyx_v_obj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_4 = PyObject_Length(__pyx_v_obj); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 205, __pyx_L1_error)
   __pyx_t_2 = ((__pyx_t_4 == 0) != 0);
   if (__pyx_t_2) {
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":211
+  /* "pycocotools/_mask.pyx":207
  *         elif len(obj)==0:
  *             pass
  *         elif type(obj) == np.ndarray:             # <<<<<<<<<<<<<<
  *             N = obj.shape[0]
  *         return N
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_obj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":212
+    /* "pycocotools/_mask.pyx":208
  *             pass
  *         elif type(obj) == np.ndarray:
  *             N = obj.shape[0]             # <<<<<<<<<<<<<<
  *         return N
  *     # convert iscrowd to numpy array
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_obj, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_obj, __pyx_n_s_shape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 212, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_3 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 212, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_3 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_N = __pyx_t_3;
 
-    /* "pycocotools/_mask.pyx":211
+    /* "pycocotools/_mask.pyx":207
  *         elif len(obj)==0:
  *             pass
  *         elif type(obj) == np.ndarray:             # <<<<<<<<<<<<<<
@@ -5630,7 +5630,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
   }
   __pyx_L3:;
 
-  /* "pycocotools/_mask.pyx":213
+  /* "pycocotools/_mask.pyx":209
  *         elif type(obj) == np.ndarray:
  *             N = obj.shape[0]
  *         return N             # <<<<<<<<<<<<<<
@@ -5638,13 +5638,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
  *     cdef np.ndarray[np.uint8_t, ndim=1] iscrowd = np.array(pyiscrowd, dtype=np.uint8)
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __Pyx_PyInt_From_siz(__pyx_v_N); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_siz(__pyx_v_N); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":205
+  /* "pycocotools/_mask.pyx":201
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):             # <<<<<<<<<<<<<<
@@ -5664,7 +5664,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_3iou_6_len(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":175
+/* "pycocotools/_mask.pyx":171
  * 
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):             # <<<<<<<<<<<<<<
@@ -5707,92 +5707,92 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   __pyx_pybuffernd_iscrowd.data = NULL;
   __pyx_pybuffernd_iscrowd.rcbuffer = &__pyx_pybuffer_iscrowd;
 
-  /* "pycocotools/_mask.pyx":176
+  /* "pycocotools/_mask.pyx":172
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):             # <<<<<<<<<<<<<<
  *         if len(objs) == 0:
  *             return objs
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_1_preproc, 0, __pyx_n_s_iou_locals__preproc, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_1_preproc, 0, __pyx_n_s_iou_locals__preproc, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__11)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__preproc = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":201
+  /* "pycocotools/_mask.pyx":197
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):             # <<<<<<<<<<<<<<
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_3_rleIou, 0, __pyx_n_s_iou_locals__rleIou, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_3_rleIou, 0, __pyx_n_s_iou_locals__rleIou, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__rleIou = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":203
+  /* "pycocotools/_mask.pyx":199
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):             # <<<<<<<<<<<<<<
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_5_bbIou, 0, __pyx_n_s_iou_locals__bbIou, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_5_bbIou, 0, __pyx_n_s_iou_locals__bbIou, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__15)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__bbIou = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":205
+  /* "pycocotools/_mask.pyx":201
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):             # <<<<<<<<<<<<<<
  *         cdef siz N = 0
  *         if type(obj) == RLEs:
  */
-  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_7_len, 0, __pyx_n_s_iou_locals__len, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3iou_7_len, 0, __pyx_n_s_iou_locals__len, NULL, __pyx_n_s_pycocotools__mask, __pyx_d, ((PyObject *)__pyx_codeobj__17)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__len = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":215
+  /* "pycocotools/_mask.pyx":211
  *         return N
  *     # convert iscrowd to numpy array
  *     cdef np.ndarray[np.uint8_t, ndim=1] iscrowd = np.array(pyiscrowd, dtype=np.uint8)             # <<<<<<<<<<<<<<
  *     # simple type checking
  *     cdef siz m, n
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_pyiscrowd);
   __Pyx_GIVEREF(__pyx_v_pyiscrowd);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_pyiscrowd);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_uint8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_uint8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 211, __pyx_L1_error)
   __pyx_t_6 = ((PyArrayObject *)__pyx_t_5);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_iscrowd.rcbuffer->pybuffer, (PyObject*)__pyx_t_6, &__Pyx_TypeInfo_nn___pyx_t_5numpy_uint8_t, PyBUF_FORMAT| PyBUF_STRIDES, 1, 0, __pyx_stack) == -1)) {
       __pyx_v_iscrowd = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.buf = NULL;
-      __PYX_ERR(0, 215, __pyx_L1_error)
+      __PYX_ERR(0, 211, __pyx_L1_error)
     } else {__pyx_pybuffernd_iscrowd.diminfo[0].strides = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_iscrowd.diminfo[0].shape = __pyx_pybuffernd_iscrowd.rcbuffer->pybuffer.shape[0];
     }
   }
@@ -5800,57 +5800,57 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   __pyx_v_iscrowd = ((PyArrayObject *)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":218
+  /* "pycocotools/_mask.pyx":214
  *     # simple type checking
  *     cdef siz m, n
  *     dt = _preproc(dt)             # <<<<<<<<<<<<<<
  *     gt = _preproc(gt)
  *     m = _len(dt)
  */
-  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou__preproc(__pyx_v__preproc, __pyx_v_dt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou__preproc(__pyx_v__preproc, __pyx_v_dt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF_SET(__pyx_v_dt, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":219
+  /* "pycocotools/_mask.pyx":215
  *     cdef siz m, n
  *     dt = _preproc(dt)
  *     gt = _preproc(gt)             # <<<<<<<<<<<<<<
  *     m = _len(dt)
  *     n = _len(gt)
  */
-  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou__preproc(__pyx_v__preproc, __pyx_v_gt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou__preproc(__pyx_v__preproc, __pyx_v_gt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF_SET(__pyx_v_gt, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "pycocotools/_mask.pyx":220
+  /* "pycocotools/_mask.pyx":216
  *     dt = _preproc(dt)
  *     gt = _preproc(gt)
  *     m = _len(dt)             # <<<<<<<<<<<<<<
  *     n = _len(gt)
  *     if m == 0 or n == 0:
  */
-  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou_6_len(__pyx_v__len, __pyx_v_dt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou_6_len(__pyx_v__len, __pyx_v_dt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_7 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_7 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_m = __pyx_t_7;
 
-  /* "pycocotools/_mask.pyx":221
+  /* "pycocotools/_mask.pyx":217
  *     gt = _preproc(gt)
  *     m = _len(dt)
  *     n = _len(gt)             # <<<<<<<<<<<<<<
  *     if m == 0 or n == 0:
  *         return []
  */
-  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou_6_len(__pyx_v__len, __pyx_v_gt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 221, __pyx_L1_error)
+  __pyx_t_5 = __pyx_pf_11pycocotools_5_mask_3iou_6_len(__pyx_v__len, __pyx_v_gt); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_7 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 221, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_siz(__pyx_t_5); if (unlikely((__pyx_t_7 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 217, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_n = __pyx_t_7;
 
-  /* "pycocotools/_mask.pyx":222
+  /* "pycocotools/_mask.pyx":218
  *     m = _len(dt)
  *     n = _len(gt)
  *     if m == 0 or n == 0:             # <<<<<<<<<<<<<<
@@ -5868,7 +5868,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_8) {
 
-    /* "pycocotools/_mask.pyx":223
+    /* "pycocotools/_mask.pyx":219
  *     n = _len(gt)
  *     if m == 0 or n == 0:
  *         return []             # <<<<<<<<<<<<<<
@@ -5876,13 +5876,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  *         raise Exception('The dt and gt should have the same data type, either RLEs, list or np.ndarray')
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_r = __pyx_t_5;
     __pyx_t_5 = 0;
     goto __pyx_L0;
 
-    /* "pycocotools/_mask.pyx":222
+    /* "pycocotools/_mask.pyx":218
  *     m = _len(dt)
  *     n = _len(gt)
  *     if m == 0 or n == 0:             # <<<<<<<<<<<<<<
@@ -5891,33 +5891,33 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  */
   }
 
-  /* "pycocotools/_mask.pyx":224
+  /* "pycocotools/_mask.pyx":220
  *     if m == 0 or n == 0:
  *         return []
  *     if not type(dt) == type(gt):             # <<<<<<<<<<<<<<
  *         raise Exception('The dt and gt should have the same data type, either RLEs, list or np.ndarray')
  * 
  */
-  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)Py_TYPE(__pyx_v_gt)), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)Py_TYPE(__pyx_v_gt)), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_9 = ((!__pyx_t_8) != 0);
   if (unlikely(__pyx_t_9)) {
 
-    /* "pycocotools/_mask.pyx":225
+    /* "pycocotools/_mask.pyx":221
  *         return []
  *     if not type(dt) == type(gt):
  *         raise Exception('The dt and gt should have the same data type, either RLEs, list or np.ndarray')             # <<<<<<<<<<<<<<
  * 
  *     # define local variables
  */
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 221, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(0, 225, __pyx_L1_error)
+    __PYX_ERR(0, 221, __pyx_L1_error)
 
-    /* "pycocotools/_mask.pyx":224
+    /* "pycocotools/_mask.pyx":220
  *     if m == 0 or n == 0:
  *         return []
  *     if not type(dt) == type(gt):             # <<<<<<<<<<<<<<
@@ -5926,7 +5926,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  */
   }
 
-  /* "pycocotools/_mask.pyx":228
+  /* "pycocotools/_mask.pyx":224
  * 
  *     # define local variables
  *     cdef double* _iou = <double*> 0             # <<<<<<<<<<<<<<
@@ -5935,19 +5935,19 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  */
   __pyx_v__iou = ((double *)0);
 
-  /* "pycocotools/_mask.pyx":231
+  /* "pycocotools/_mask.pyx":227
  *     cdef np.npy_intp shape[1]
  *     # check type and assign iou function
  *     if type(dt) == RLEs:             # <<<<<<<<<<<<<<
  *         _iouFun = _rleIou
  *     elif type(dt) == np.ndarray:
  */
-  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 231, __pyx_L1_error)
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 227, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_9) {
 
-    /* "pycocotools/_mask.pyx":232
+    /* "pycocotools/_mask.pyx":228
  *     # check type and assign iou function
  *     if type(dt) == RLEs:
  *         _iouFun = _rleIou             # <<<<<<<<<<<<<<
@@ -5957,7 +5957,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
     __Pyx_INCREF(__pyx_v__rleIou);
     __pyx_v__iouFun = __pyx_v__rleIou;
 
-    /* "pycocotools/_mask.pyx":231
+    /* "pycocotools/_mask.pyx":227
  *     cdef np.npy_intp shape[1]
  *     # check type and assign iou function
  *     if type(dt) == RLEs:             # <<<<<<<<<<<<<<
@@ -5967,19 +5967,19 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
     goto __pyx_L7;
   }
 
-  /* "pycocotools/_mask.pyx":233
+  /* "pycocotools/_mask.pyx":229
  *     if type(dt) == RLEs:
  *         _iouFun = _rleIou
  *     elif type(dt) == np.ndarray:             # <<<<<<<<<<<<<<
  *         _iouFun = _bbIou
  *     else:
  */
-  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
-  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_5 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_dt)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (likely(__pyx_t_9)) {
 
-    /* "pycocotools/_mask.pyx":234
+    /* "pycocotools/_mask.pyx":230
  *         _iouFun = _rleIou
  *     elif type(dt) == np.ndarray:
  *         _iouFun = _bbIou             # <<<<<<<<<<<<<<
@@ -5989,7 +5989,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
     __Pyx_INCREF(__pyx_v__bbIou);
     __pyx_v__iouFun = __pyx_v__bbIou;
 
-    /* "pycocotools/_mask.pyx":233
+    /* "pycocotools/_mask.pyx":229
  *     if type(dt) == RLEs:
  *         _iouFun = _rleIou
  *     elif type(dt) == np.ndarray:             # <<<<<<<<<<<<<<
@@ -5999,7 +5999,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
     goto __pyx_L7;
   }
 
-  /* "pycocotools/_mask.pyx":236
+  /* "pycocotools/_mask.pyx":232
  *         _iouFun = _bbIou
  *     else:
  *         raise Exception('input data type not allowed.')             # <<<<<<<<<<<<<<
@@ -6007,15 +6007,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  *     iou = np.zeros((m*n, ), dtype=np.double)
  */
   /*else*/ {
-    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 236, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 232, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(0, 236, __pyx_L1_error)
+    __PYX_ERR(0, 232, __pyx_L1_error)
   }
   __pyx_L7:;
 
-  /* "pycocotools/_mask.pyx":237
+  /* "pycocotools/_mask.pyx":233
  *     else:
  *         raise Exception('input data type not allowed.')
  *     _iou = <double*> malloc(m*n* sizeof(double))             # <<<<<<<<<<<<<<
@@ -6024,40 +6024,40 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  */
   __pyx_v__iou = ((double *)malloc(((__pyx_v_m * __pyx_v_n) * (sizeof(double)))));
 
-  /* "pycocotools/_mask.pyx":238
+  /* "pycocotools/_mask.pyx":234
  *         raise Exception('input data type not allowed.')
  *     _iou = <double*> malloc(m*n* sizeof(double))
  *     iou = np.zeros((m*n, ), dtype=np.double)             # <<<<<<<<<<<<<<
  *     shape[0] = <np.npy_intp> m*n
  *     iou = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _iou)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyInt_From_siz((__pyx_v_m * __pyx_v_n)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_siz((__pyx_v_m * __pyx_v_n)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_double); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_double); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 238, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_t_4) < 0) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -6065,7 +6065,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   __pyx_v_iou = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pycocotools/_mask.pyx":239
+  /* "pycocotools/_mask.pyx":235
  *     _iou = <double*> malloc(m*n* sizeof(double))
  *     iou = np.zeros((m*n, ), dtype=np.double)
  *     shape[0] = <np.npy_intp> m*n             # <<<<<<<<<<<<<<
@@ -6074,38 +6074,38 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  */
   (__pyx_v_shape[0]) = (((npy_intp)__pyx_v_m) * __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":240
+  /* "pycocotools/_mask.pyx":236
  *     iou = np.zeros((m*n, ), dtype=np.double)
  *     shape[0] = <np.npy_intp> m*n
  *     iou = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _iou)             # <<<<<<<<<<<<<<
  *     PyArray_ENABLEFLAGS(iou, np.NPY_OWNDATA)
  *     _iouFun(dt, gt, iscrowd, m, n, iou)
  */
-  __pyx_t_4 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v__iou); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_4 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v__iou); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF_SET(__pyx_v_iou, __pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "pycocotools/_mask.pyx":241
+  /* "pycocotools/_mask.pyx":237
  *     shape[0] = <np.npy_intp> m*n
  *     iou = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _iou)
  *     PyArray_ENABLEFLAGS(iou, np.NPY_OWNDATA)             # <<<<<<<<<<<<<<
  *     _iouFun(dt, gt, iscrowd, m, n, iou)
  *     return iou.reshape((m,n), order='F')
  */
-  if (!(likely(((__pyx_v_iou) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_iou, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 241, __pyx_L1_error)
+  if (!(likely(((__pyx_v_iou) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_iou, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 237, __pyx_L1_error)
   PyArray_ENABLEFLAGS(((PyArrayObject *)__pyx_v_iou), NPY_OWNDATA);
 
-  /* "pycocotools/_mask.pyx":242
+  /* "pycocotools/_mask.pyx":238
  *     iou = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _iou)
  *     PyArray_ENABLEFLAGS(iou, np.NPY_OWNDATA)
  *     _iouFun(dt, gt, iscrowd, m, n, iou)             # <<<<<<<<<<<<<<
  *     return iou.reshape((m,n), order='F')
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_m); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_m); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v__iouFun);
   __pyx_t_3 = __pyx_v__iouFun; __pyx_t_2 = NULL;
@@ -6123,7 +6123,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[7] = {__pyx_t_2, __pyx_v_dt, __pyx_v_gt, ((PyObject *)__pyx_v_iscrowd), __pyx_t_1, __pyx_t_5, __pyx_v_iou};
-    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6133,7 +6133,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[7] = {__pyx_t_2, __pyx_v_dt, __pyx_v_gt, ((PyObject *)__pyx_v_iscrowd), __pyx_t_1, __pyx_t_5, __pyx_v_iou};
-    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 6+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6141,7 +6141,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   } else
   #endif
   {
-    __pyx_t_11 = PyTuple_New(6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(6+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -6164,14 +6164,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
     PyTuple_SET_ITEM(__pyx_t_11, 5+__pyx_t_10, __pyx_v_iou);
     __pyx_t_1 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 242, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pycocotools/_mask.pyx":243
+  /* "pycocotools/_mask.pyx":239
  *     PyArray_ENABLEFLAGS(iou, np.NPY_OWNDATA)
  *     _iouFun(dt, gt, iscrowd, m, n, iou)
  *     return iou.reshape((m,n), order='F')             # <<<<<<<<<<<<<<
@@ -6179,13 +6179,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
  * def toBbox( rleObjs ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_iou, __pyx_n_s_reshape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_iou, __pyx_n_s_reshape); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_m); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_m); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_11 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
@@ -6193,15 +6193,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_11);
   __pyx_t_3 = 0;
   __pyx_t_11 = 0;
-  __pyx_t_11 = PyTuple_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_11 = PyTuple_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 243, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_11, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 243, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_11, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -6210,7 +6210,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":175
+  /* "pycocotools/_mask.pyx":171
  * 
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):             # <<<<<<<<<<<<<<
@@ -6252,7 +6252,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_12iou(CYTHON_UNUSED PyObject *__p
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":245
+/* "pycocotools/_mask.pyx":241
  *     return iou.reshape((m,n), order='F')
  * 
  * def toBbox( rleObjs ):             # <<<<<<<<<<<<<<
@@ -6290,14 +6290,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("toBbox", 0);
 
-  /* "pycocotools/_mask.pyx":246
+  /* "pycocotools/_mask.pyx":242
  * 
  * def toBbox( rleObjs ):
  *     cdef RLEs Rs = _frString(rleObjs)             # <<<<<<<<<<<<<<
  *     cdef siz n = Rs.n
  *     cdef BB _bb = <BB> malloc(4*n* sizeof(double))
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_frString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -6311,27 +6311,27 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_rleObjs) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rleObjs);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 246, __pyx_L1_error)
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_11pycocotools_5_mask_RLEs))))) __PYX_ERR(0, 242, __pyx_L1_error)
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":247
+  /* "pycocotools/_mask.pyx":243
  * def toBbox( rleObjs ):
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef siz n = Rs.n             # <<<<<<<<<<<<<<
  *     cdef BB _bb = <BB> malloc(4*n* sizeof(double))
  *     rleToBbox( <const RLE*> Rs._R, _bb, n )
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_Rs), __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_Rs), __pyx_n_s_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_4 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_siz(__pyx_t_1); if (unlikely((__pyx_t_4 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_n = __pyx_t_4;
 
-  /* "pycocotools/_mask.pyx":248
+  /* "pycocotools/_mask.pyx":244
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef siz n = Rs.n
  *     cdef BB _bb = <BB> malloc(4*n* sizeof(double))             # <<<<<<<<<<<<<<
@@ -6340,7 +6340,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
  */
   __pyx_v__bb = ((BB)malloc(((4 * __pyx_v_n) * (sizeof(double)))));
 
-  /* "pycocotools/_mask.pyx":249
+  /* "pycocotools/_mask.pyx":245
  *     cdef siz n = Rs.n
  *     cdef BB _bb = <BB> malloc(4*n* sizeof(double))
  *     rleToBbox( <const RLE*> Rs._R, _bb, n )             # <<<<<<<<<<<<<<
@@ -6349,7 +6349,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
  */
   rleToBbox(((RLE const *)__pyx_v_Rs->_R), __pyx_v__bb, __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":251
+  /* "pycocotools/_mask.pyx":247
  *     rleToBbox( <const RLE*> Rs._R, _bb, n )
  *     cdef np.npy_intp shape[1]
  *     shape[0] = <np.npy_intp> 4*n             # <<<<<<<<<<<<<<
@@ -6358,21 +6358,21 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
  */
   (__pyx_v_shape[0]) = (((npy_intp)4) * __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":252
+  /* "pycocotools/_mask.pyx":248
  *     cdef np.npy_intp shape[1]
  *     shape[0] = <np.npy_intp> 4*n
  *     bb = np.array((1,4*n), dtype=np.double)             # <<<<<<<<<<<<<<
  *     bb = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _bb).reshape((n, 4))
  *     PyArray_ENABLEFLAGS(bb, np.NPY_OWNDATA)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_siz((4 * __pyx_v_n)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz((4 * __pyx_v_n)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_1);
   __Pyx_GIVEREF(__pyx_int_1);
@@ -6380,21 +6380,21 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_double); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_double); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 252, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_t_6) < 0) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6402,21 +6402,21 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   __pyx_v_bb = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "pycocotools/_mask.pyx":253
+  /* "pycocotools/_mask.pyx":249
  *     shape[0] = <np.npy_intp> 4*n
  *     bb = np.array((1,4*n), dtype=np.double)
  *     bb = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _bb).reshape((n, 4))             # <<<<<<<<<<<<<<
  *     PyArray_ENABLEFLAGS(bb, np.NPY_OWNDATA)
  *     return bb
  */
-  __pyx_t_3 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v__bb); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_3 = PyArray_SimpleNewFromData(1, __pyx_v_shape, NPY_DOUBLE, __pyx_v__bb); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_reshape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_reshape); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
@@ -6437,23 +6437,23 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   __pyx_t_6 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF_SET(__pyx_v_bb, __pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "pycocotools/_mask.pyx":254
+  /* "pycocotools/_mask.pyx":250
  *     bb = np.array((1,4*n), dtype=np.double)
  *     bb = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _bb).reshape((n, 4))
  *     PyArray_ENABLEFLAGS(bb, np.NPY_OWNDATA)             # <<<<<<<<<<<<<<
  *     return bb
  * 
  */
-  if (!(likely(((__pyx_v_bb) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_bb, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 254, __pyx_L1_error)
+  if (!(likely(((__pyx_v_bb) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_bb, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 250, __pyx_L1_error)
   PyArray_ENABLEFLAGS(((PyArrayObject *)__pyx_v_bb), NPY_OWNDATA);
 
-  /* "pycocotools/_mask.pyx":255
+  /* "pycocotools/_mask.pyx":251
  *     bb = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, _bb).reshape((n, 4))
  *     PyArray_ENABLEFLAGS(bb, np.NPY_OWNDATA)
  *     return bb             # <<<<<<<<<<<<<<
@@ -6465,7 +6465,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_bb;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":245
+  /* "pycocotools/_mask.pyx":241
  *     return iou.reshape((m,n), order='F')
  * 
  * def toBbox( rleObjs ):             # <<<<<<<<<<<<<<
@@ -6490,7 +6490,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_14toBbox(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":257
+/* "pycocotools/_mask.pyx":253
  *     return bb
  * 
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):             # <<<<<<<<<<<<<<
@@ -6533,17 +6533,17 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_17frBbox(PyObject *__pyx_self, Py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, 1); __PYX_ERR(0, 257, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, 1); __PYX_ERR(0, 253, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, 2); __PYX_ERR(0, 257, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, 2); __PYX_ERR(0, 253, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frBbox") < 0)) __PYX_ERR(0, 257, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frBbox") < 0)) __PYX_ERR(0, 253, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6553,18 +6553,18 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_17frBbox(PyObject *__pyx_self, Py
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_bb = ((PyArrayObject *)values[0]);
-    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L3_error)
-    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L3_error)
+    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 253, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 253, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 257, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("frBbox", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 253, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.frBbox", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_bb), __pyx_ptype_5numpy_ndarray, 1, "bb", 0))) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_bb), __pyx_ptype_5numpy_ndarray, 1, "bb", 0))) __PYX_ERR(0, 253, __pyx_L1_error)
   __pyx_r = __pyx_pf_11pycocotools_5_mask_16frBbox(__pyx_self, __pyx_v_bb, __pyx_v_h, __pyx_v_w);
 
   /* function exit code */
@@ -6594,11 +6594,11 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
   __pyx_pybuffernd_bb.rcbuffer = &__pyx_pybuffer_bb;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_bb.rcbuffer->pybuffer, (PyObject*)__pyx_v_bb, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 257, __pyx_L1_error)
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_bb.rcbuffer->pybuffer, (PyObject*)__pyx_v_bb, &__Pyx_TypeInfo_nn___pyx_t_5numpy_double_t, PyBUF_FORMAT| PyBUF_STRIDES, 2, 0, __pyx_stack) == -1)) __PYX_ERR(0, 253, __pyx_L1_error)
   }
   __pyx_pybuffernd_bb.diminfo[0].strides = __pyx_pybuffernd_bb.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_bb.diminfo[0].shape = __pyx_pybuffernd_bb.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_bb.diminfo[1].strides = __pyx_pybuffernd_bb.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_bb.diminfo[1].shape = __pyx_pybuffernd_bb.rcbuffer->pybuffer.shape[1];
 
-  /* "pycocotools/_mask.pyx":258
+  /* "pycocotools/_mask.pyx":254
  * 
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):
  *     cdef siz n = bb.shape[0]             # <<<<<<<<<<<<<<
@@ -6607,22 +6607,22 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
  */
   __pyx_v_n = (__pyx_v_bb->dimensions[0]);
 
-  /* "pycocotools/_mask.pyx":259
+  /* "pycocotools/_mask.pyx":255
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):
  *     cdef siz n = bb.shape[0]
  *     Rs = RLEs(n)             # <<<<<<<<<<<<<<
  *     rleFrBbox( <RLE*> Rs._R, <const BB> bb.data, h, w, n )
  *     objs = _toString(Rs)
  */
-  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_siz(__pyx_v_n); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pycocotools/_mask.pyx":260
+  /* "pycocotools/_mask.pyx":256
  *     cdef siz n = bb.shape[0]
  *     Rs = RLEs(n)
  *     rleFrBbox( <RLE*> Rs._R, <const BB> bb.data, h, w, n )             # <<<<<<<<<<<<<<
@@ -6631,14 +6631,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
  */
   rleFrBbox(((RLE *)__pyx_v_Rs->_R), ((BB const )__pyx_v_bb->data), __pyx_v_h, __pyx_v_w, __pyx_v_n);
 
-  /* "pycocotools/_mask.pyx":261
+  /* "pycocotools/_mask.pyx":257
  *     Rs = RLEs(n)
  *     rleFrBbox( <RLE*> Rs._R, <const BB> bb.data, h, w, n )
  *     objs = _toString(Rs)             # <<<<<<<<<<<<<<
  *     return objs
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_toString); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_toString); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -6652,13 +6652,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
   }
   __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_3, ((PyObject *)__pyx_v_Rs)) : __Pyx_PyObject_CallOneArg(__pyx_t_1, ((PyObject *)__pyx_v_Rs));
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_objs = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pycocotools/_mask.pyx":262
+  /* "pycocotools/_mask.pyx":258
  *     rleFrBbox( <RLE*> Rs._R, <const BB> bb.data, h, w, n )
  *     objs = _toString(Rs)
  *     return objs             # <<<<<<<<<<<<<<
@@ -6670,7 +6670,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":257
+  /* "pycocotools/_mask.pyx":253
  *     return bb
  * 
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):             # <<<<<<<<<<<<<<
@@ -6702,7 +6702,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_16frBbox(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":264
+/* "pycocotools/_mask.pyx":260
  *     return objs
  * 
  * def frPoly( poly, siz h, siz w ):             # <<<<<<<<<<<<<<
@@ -6745,17 +6745,17 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_19frPoly(PyObject *__pyx_self, Py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, 1); __PYX_ERR(0, 264, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, 1); __PYX_ERR(0, 260, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, 2); __PYX_ERR(0, 264, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, 2); __PYX_ERR(0, 260, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frPoly") < 0)) __PYX_ERR(0, 264, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frPoly") < 0)) __PYX_ERR(0, 260, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -6765,12 +6765,12 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_19frPoly(PyObject *__pyx_self, Py
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_poly = values[0];
-    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 264, __pyx_L3_error)
-    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 264, __pyx_L3_error)
+    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 260, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 260, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 264, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("frPoly", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 260, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.frPoly", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6816,32 +6816,32 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
   __pyx_pybuffernd_np_poly.data = NULL;
   __pyx_pybuffernd_np_poly.rcbuffer = &__pyx_pybuffer_np_poly;
 
-  /* "pycocotools/_mask.pyx":266
+  /* "pycocotools/_mask.pyx":262
  * def frPoly( poly, siz h, siz w ):
  *     cdef np.ndarray[np.double_t, ndim=1] np_poly
  *     n = len(poly)             # <<<<<<<<<<<<<<
  *     Rs = RLEs(n)
  *     for i, p in enumerate(poly):
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_poly); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 266, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_poly); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 262, __pyx_L1_error)
   __pyx_v_n = __pyx_t_1;
 
-  /* "pycocotools/_mask.pyx":267
+  /* "pycocotools/_mask.pyx":263
  *     cdef np.ndarray[np.double_t, ndim=1] np_poly
  *     n = len(poly)
  *     Rs = RLEs(n)             # <<<<<<<<<<<<<<
  *     for i, p in enumerate(poly):
  *         np_poly = np.array(p, dtype=np.double, order='F')
  */
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_n); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_Rs = ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":268
+  /* "pycocotools/_mask.pyx":264
  *     n = len(poly)
  *     Rs = RLEs(n)
  *     for i, p in enumerate(poly):             # <<<<<<<<<<<<<<
@@ -6854,26 +6854,26 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
     __pyx_t_2 = __pyx_v_poly; __Pyx_INCREF(__pyx_t_2); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_poly); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_1 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_poly); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 264, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -6883,7 +6883,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 268, __pyx_L1_error)
+          else __PYX_ERR(0, 264, __pyx_L1_error)
         }
         break;
       }
@@ -6893,45 +6893,45 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
     __pyx_t_5 = 0;
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_3);
-    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3);
     __pyx_t_3 = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "pycocotools/_mask.pyx":269
+    /* "pycocotools/_mask.pyx":265
  *     Rs = RLEs(n)
  *     for i, p in enumerate(poly):
  *         np_poly = np.array(p, dtype=np.double, order='F')             # <<<<<<<<<<<<<<
  *         rleFrPoly( <RLE*>&Rs._R[i], <const double*> np_poly.data, int(len(p)/2), h, w )
  *     objs = _toString(Rs)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_v_p);
     __Pyx_GIVEREF(__pyx_v_p);
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_p);
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_np); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_np); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 269, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_double); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_dtype, __pyx_t_9) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 269, __pyx_L1_error)
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_order, __pyx_n_s_F) < 0) __PYX_ERR(0, 265, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 265, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 269, __pyx_L1_error)
+    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 265, __pyx_L1_error)
     __pyx_t_10 = ((PyArrayObject *)__pyx_t_9);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -6948,24 +6948,24 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
         __pyx_t_12 = __pyx_t_13 = __pyx_t_14 = 0;
       }
       __pyx_pybuffernd_np_poly.diminfo[0].strides = __pyx_pybuffernd_np_poly.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_np_poly.diminfo[0].shape = __pyx_pybuffernd_np_poly.rcbuffer->pybuffer.shape[0];
-      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 269, __pyx_L1_error)
+      if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 265, __pyx_L1_error)
     }
     __pyx_t_10 = 0;
     __Pyx_XDECREF_SET(__pyx_v_np_poly, ((PyArrayObject *)__pyx_t_9));
     __pyx_t_9 = 0;
 
-    /* "pycocotools/_mask.pyx":270
+    /* "pycocotools/_mask.pyx":266
  *     for i, p in enumerate(poly):
  *         np_poly = np.array(p, dtype=np.double, order='F')
  *         rleFrPoly( <RLE*>&Rs._R[i], <const double*> np_poly.data, int(len(p)/2), h, w )             # <<<<<<<<<<<<<<
  *     objs = _toString(Rs)
  *     return objs
  */
-    __pyx_t_15 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_15 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 270, __pyx_L1_error)
-    __pyx_t_16 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_16 == ((Py_ssize_t)-1))) __PYX_ERR(0, 270, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_15 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 266, __pyx_L1_error)
+    __pyx_t_16 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_16 == ((Py_ssize_t)-1))) __PYX_ERR(0, 266, __pyx_L1_error)
     rleFrPoly(((RLE *)(&(__pyx_v_Rs->_R[__pyx_t_15]))), ((double const *)__pyx_v_np_poly->data), ((siz)__Pyx_div_Py_ssize_t(__pyx_t_16, 2)), __pyx_v_h, __pyx_v_w);
 
-    /* "pycocotools/_mask.pyx":268
+    /* "pycocotools/_mask.pyx":264
  *     n = len(poly)
  *     Rs = RLEs(n)
  *     for i, p in enumerate(poly):             # <<<<<<<<<<<<<<
@@ -6976,14 +6976,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":271
+  /* "pycocotools/_mask.pyx":267
  *         np_poly = np.array(p, dtype=np.double, order='F')
  *         rleFrPoly( <RLE*>&Rs._R[i], <const double*> np_poly.data, int(len(p)/2), h, w )
  *     objs = _toString(Rs)             # <<<<<<<<<<<<<<
  *     return objs
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_toString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_toString); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_9 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -6997,13 +6997,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
   }
   __pyx_t_3 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_9, ((PyObject *)__pyx_v_Rs)) : __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_Rs));
   __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_objs = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pycocotools/_mask.pyx":272
+  /* "pycocotools/_mask.pyx":268
  *         rleFrPoly( <RLE*>&Rs._R[i], <const double*> np_poly.data, int(len(p)/2), h, w )
  *     objs = _toString(Rs)
  *     return objs             # <<<<<<<<<<<<<<
@@ -7015,7 +7015,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":264
+  /* "pycocotools/_mask.pyx":260
  *     return objs
  * 
  * def frPoly( poly, siz h, siz w ):             # <<<<<<<<<<<<<<
@@ -7054,7 +7054,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_18frPoly(CYTHON_UNUSED PyObject *
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":274
+/* "pycocotools/_mask.pyx":270
  *     return objs
  * 
  * def frUncompressedRLE(ucRles, siz h, siz w):             # <<<<<<<<<<<<<<
@@ -7097,17 +7097,17 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_21frUncompressedRLE(PyObject *__p
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, 1); __PYX_ERR(0, 274, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, 1); __PYX_ERR(0, 270, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, 2); __PYX_ERR(0, 274, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, 2); __PYX_ERR(0, 270, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frUncompressedRLE") < 0)) __PYX_ERR(0, 274, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frUncompressedRLE") < 0)) __PYX_ERR(0, 270, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -7117,12 +7117,12 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_21frUncompressedRLE(PyObject *__p
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
     __pyx_v_ucRles = values[0];
-    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 274, __pyx_L3_error)
-    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 274, __pyx_L3_error)
+    __pyx_v_h = __Pyx_PyInt_As_siz(values[1]); if (unlikely((__pyx_v_h == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 270, __pyx_L3_error)
+    __pyx_v_w = __Pyx_PyInt_As_siz(values[2]); if (unlikely((__pyx_v_w == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 270, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 274, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("frUncompressedRLE", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 270, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.frUncompressedRLE", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7174,29 +7174,29 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
   __pyx_pybuffernd_cnts.data = NULL;
   __pyx_pybuffernd_cnts.rcbuffer = &__pyx_pybuffer_cnts;
 
-  /* "pycocotools/_mask.pyx":278
+  /* "pycocotools/_mask.pyx":274
  *     cdef RLE R
  *     cdef uint *data
  *     n = len(ucRles)             # <<<<<<<<<<<<<<
  *     objs = []
  *     for i in range(n):
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_ucRles); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 278, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_ucRles); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 274, __pyx_L1_error)
   __pyx_v_n = __pyx_t_1;
 
-  /* "pycocotools/_mask.pyx":279
+  /* "pycocotools/_mask.pyx":275
  *     cdef uint *data
  *     n = len(ucRles)
  *     objs = []             # <<<<<<<<<<<<<<
  *     for i in range(n):
  *         Rs = RLEs(1)
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_objs = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pycocotools/_mask.pyx":280
+  /* "pycocotools/_mask.pyx":276
  *     n = len(ucRles)
  *     objs = []
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -7208,55 +7208,55 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "pycocotools/_mask.pyx":281
+    /* "pycocotools/_mask.pyx":277
  *     objs = []
  *     for i in range(n):
  *         Rs = RLEs(1)             # <<<<<<<<<<<<<<
  *         cnts = np.array(ucRles[i]['counts'], dtype=np.uint32)
  *         # time for malloc can be saved here but it's fine
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_11pycocotools_5_mask_RLEs), __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_Rs, ((struct __pyx_obj_11pycocotools_5_mask_RLEs *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "pycocotools/_mask.pyx":282
+    /* "pycocotools/_mask.pyx":278
  *     for i in range(n):
  *         Rs = RLEs(1)
  *         cnts = np.array(ucRles[i]['counts'], dtype=np.uint32)             # <<<<<<<<<<<<<<
  *         # time for malloc can be saved here but it's fine
  *         data = <uint*> malloc(len(cnts)* sizeof(uint))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_counts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_counts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_6);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_6);
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_uint32); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_uint32); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_8) < 0) __PYX_ERR(0, 282, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_t_8) < 0) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 282, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 282, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 278, __pyx_L1_error)
     __pyx_t_9 = ((PyArrayObject *)__pyx_t_8);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -7273,35 +7273,35 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
         __pyx_t_11 = __pyx_t_12 = __pyx_t_13 = 0;
       }
       __pyx_pybuffernd_cnts.diminfo[0].strides = __pyx_pybuffernd_cnts.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_cnts.diminfo[0].shape = __pyx_pybuffernd_cnts.rcbuffer->pybuffer.shape[0];
-      if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
+      if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 278, __pyx_L1_error)
     }
     __pyx_t_9 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cnts, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "pycocotools/_mask.pyx":284
+    /* "pycocotools/_mask.pyx":280
  *         cnts = np.array(ucRles[i]['counts'], dtype=np.uint32)
  *         # time for malloc can be saved here but it's fine
  *         data = <uint*> malloc(len(cnts)* sizeof(uint))             # <<<<<<<<<<<<<<
  *         for j in range(len(cnts)):
  *             data[j] = <uint> cnts[j]
  */
-    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 284, __pyx_L1_error)
+    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 280, __pyx_L1_error)
     __pyx_v_data = ((uint *)malloc((__pyx_t_14 * (sizeof(unsigned int)))));
 
-    /* "pycocotools/_mask.pyx":285
+    /* "pycocotools/_mask.pyx":281
  *         # time for malloc can be saved here but it's fine
  *         data = <uint*> malloc(len(cnts)* sizeof(uint))
  *         for j in range(len(cnts)):             # <<<<<<<<<<<<<<
  *             data[j] = <uint> cnts[j]
  *         R = RLE(ucRles[i]['size'][0], ucRles[i]['size'][1], len(cnts), <uint*> data)
  */
-    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 281, __pyx_L1_error)
     __pyx_t_15 = __pyx_t_14;
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_j = __pyx_t_16;
 
-      /* "pycocotools/_mask.pyx":286
+      /* "pycocotools/_mask.pyx":282
  *         data = <uint*> malloc(len(cnts)* sizeof(uint))
  *         for j in range(len(cnts)):
  *             data[j] = <uint> cnts[j]             # <<<<<<<<<<<<<<
@@ -7316,46 +7316,46 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
       } else if (unlikely(__pyx_t_17 >= __pyx_pybuffernd_cnts.diminfo[0].shape)) __pyx_t_10 = 0;
       if (unlikely(__pyx_t_10 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_10);
-        __PYX_ERR(0, 286, __pyx_L1_error)
+        __PYX_ERR(0, 282, __pyx_L1_error)
       }
       (__pyx_v_data[__pyx_v_j]) = ((uint)(*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_uint32_t *, __pyx_pybuffernd_cnts.rcbuffer->pybuffer.buf, __pyx_t_17, __pyx_pybuffernd_cnts.diminfo[0].strides)));
     }
 
-    /* "pycocotools/_mask.pyx":287
+    /* "pycocotools/_mask.pyx":283
  *         for j in range(len(cnts)):
  *             data[j] = <uint> cnts[j]
  *         R = RLE(ucRles[i]['size'][0], ucRles[i]['size'][1], len(cnts), <uint*> data)             # <<<<<<<<<<<<<<
  *         Rs._R[0] = R
  *         objs.append(_toString(Rs)[0])
  */
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_19 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_19 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_19 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_19 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_18.h = __pyx_t_19;
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_ucRles, __pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_s_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_19 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_19 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_19 = __Pyx_PyInt_As_siz(__pyx_t_8); if (unlikely((__pyx_t_19 == ((siz)-1)) && PyErr_Occurred())) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_18.w = __pyx_t_19;
-    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_14 = PyObject_Length(((PyObject *)__pyx_v_cnts)); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 283, __pyx_L1_error)
     __pyx_t_18.m = __pyx_t_14;
     __pyx_t_18.cnts = ((uint *)__pyx_v_data);
     __pyx_v_R = __pyx_t_18;
 
-    /* "pycocotools/_mask.pyx":288
+    /* "pycocotools/_mask.pyx":284
  *             data[j] = <uint> cnts[j]
  *         R = RLE(ucRles[i]['size'][0], ucRles[i]['size'][1], len(cnts), <uint*> data)
  *         Rs._R[0] = R             # <<<<<<<<<<<<<<
@@ -7364,14 +7364,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
  */
     (__pyx_v_Rs->_R[0]) = __pyx_v_R;
 
-    /* "pycocotools/_mask.pyx":289
+    /* "pycocotools/_mask.pyx":285
  *         R = RLE(ucRles[i]['size'][0], ucRles[i]['size'][1], len(cnts), <uint*> data)
  *         Rs._R[0] = R
  *         objs.append(_toString(Rs)[0])             # <<<<<<<<<<<<<<
  *     return objs
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_toString); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 289, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_toString); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
@@ -7385,17 +7385,17 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
     }
     __pyx_t_8 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_2, ((PyObject *)__pyx_v_Rs)) : __Pyx_PyObject_CallOneArg(__pyx_t_6, ((PyObject *)__pyx_v_Rs));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 289, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 289, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_20 = __Pyx_PyList_Append(__pyx_v_objs, __pyx_t_6); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 289, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyList_Append(__pyx_v_objs, __pyx_t_6); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
 
-  /* "pycocotools/_mask.pyx":290
+  /* "pycocotools/_mask.pyx":286
  *         Rs._R[0] = R
  *         objs.append(_toString(Rs)[0])
  *     return objs             # <<<<<<<<<<<<<<
@@ -7407,7 +7407,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":274
+  /* "pycocotools/_mask.pyx":270
  *     return objs
  * 
  * def frUncompressedRLE(ucRles, siz h, siz w):             # <<<<<<<<<<<<<<
@@ -7442,7 +7442,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_20frUncompressedRLE(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "pycocotools/_mask.pyx":292
+/* "pycocotools/_mask.pyx":288
  *     return objs
  * 
  * def frPyObjects(pyobj, h, w):             # <<<<<<<<<<<<<<
@@ -7485,17 +7485,17 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_23frPyObjects(PyObject *__pyx_sel
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, 1); __PYX_ERR(0, 292, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, 1); __PYX_ERR(0, 288, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_w)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, 2); __PYX_ERR(0, 292, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, 2); __PYX_ERR(0, 288, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frPyObjects") < 0)) __PYX_ERR(0, 292, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "frPyObjects") < 0)) __PYX_ERR(0, 288, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -7510,7 +7510,7 @@ static PyObject *__pyx_pw_11pycocotools_5_mask_23frPyObjects(PyObject *__pyx_sel
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 292, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("frPyObjects", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 288, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pycocotools._mask.frPyObjects", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -7539,26 +7539,214 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("frPyObjects", 0);
 
-  /* "pycocotools/_mask.pyx":294
+  /* "pycocotools/_mask.pyx":290
  * def frPyObjects(pyobj, h, w):
  *     # encode rle from a list of python objects
  *     if type(pyobj) == np.ndarray:             # <<<<<<<<<<<<<<
  *         objs = frBbox(pyobj, h, w)
  *     elif type(pyobj) == list and len(pyobj[0]) == 4:
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)__pyx_ptype_5numpy_ndarray), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":295
+    /* "pycocotools/_mask.pyx":291
  *     # encode rle from a list of python objects
  *     if type(pyobj) == np.ndarray:
  *         objs = frBbox(pyobj, h, w)             # <<<<<<<<<<<<<<
  *     elif type(pyobj) == list and len(pyobj[0]) == 4:
  *         objs = frBbox(pyobj, h, w)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 295, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_4)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    {
+      __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      if (__pyx_t_4) {
+        __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
+      }
+      __Pyx_INCREF(__pyx_v_pyobj);
+      __Pyx_GIVEREF(__pyx_v_pyobj);
+      PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, __pyx_v_pyobj);
+      __Pyx_INCREF(__pyx_v_h);
+      __Pyx_GIVEREF(__pyx_v_h);
+      PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_h);
+      __Pyx_INCREF(__pyx_v_w);
+      __Pyx_GIVEREF(__pyx_v_w);
+      PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_v_w);
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_v_objs = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "pycocotools/_mask.pyx":290
+ * def frPyObjects(pyobj, h, w):
+ *     # encode rle from a list of python objects
+ *     if type(pyobj) == np.ndarray:             # <<<<<<<<<<<<<<
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) == 4:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "pycocotools/_mask.pyx":292
+ *     if type(pyobj) == np.ndarray:
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) == 4:             # <<<<<<<<<<<<<<
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:
+ */
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_7) {
+  } else {
+    __pyx_t_2 = __pyx_t_7;
+    goto __pyx_L4_bool_binop_done;
+  }
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_8 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 292, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_7 = ((__pyx_t_8 == 4) != 0);
+  __pyx_t_2 = __pyx_t_7;
+  __pyx_L4_bool_binop_done:;
+  if (__pyx_t_2) {
+
+    /* "pycocotools/_mask.pyx":293
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) == 4:
+ *         objs = frBbox(pyobj, h, w)             # <<<<<<<<<<<<<<
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:
+ *         objs = frPoly(pyobj, h, w)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 293, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_6 = NULL;
+    __pyx_t_5 = 0;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_6)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_6);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+        __pyx_t_5 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __Pyx_GOTREF(__pyx_t_1);
+    } else
+    #endif
+    {
+      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 293, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      if (__pyx_t_6) {
+        __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6); __pyx_t_6 = NULL;
+      }
+      __Pyx_INCREF(__pyx_v_pyobj);
+      __Pyx_GIVEREF(__pyx_v_pyobj);
+      PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_5, __pyx_v_pyobj);
+      __Pyx_INCREF(__pyx_v_h);
+      __Pyx_GIVEREF(__pyx_v_h);
+      PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_5, __pyx_v_h);
+      __Pyx_INCREF(__pyx_v_w);
+      __Pyx_GIVEREF(__pyx_v_w);
+      PyTuple_SET_ITEM(__pyx_t_4, 2+__pyx_t_5, __pyx_v_w);
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_v_objs = __pyx_t_1;
+    __pyx_t_1 = 0;
+
+    /* "pycocotools/_mask.pyx":292
+ *     if type(pyobj) == np.ndarray:
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) == 4:             # <<<<<<<<<<<<<<
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "pycocotools/_mask.pyx":294
+ *     elif type(pyobj) == list and len(pyobj[0]) == 4:
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:             # <<<<<<<<<<<<<<
+ *         objs = frPoly(pyobj, h, w)
+ *     elif type(pyobj) == list and type(pyobj[0]) == dict \
+ */
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_7) {
+  } else {
+    __pyx_t_2 = __pyx_t_7;
+    goto __pyx_L6_bool_binop_done;
+  }
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_8 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 294, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_7 = ((__pyx_t_8 > 4) != 0);
+  __pyx_t_2 = __pyx_t_7;
+  __pyx_L6_bool_binop_done:;
+  if (__pyx_t_2) {
+
+    /* "pycocotools/_mask.pyx":295
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:
+ *         objs = frPoly(pyobj, h, w)             # <<<<<<<<<<<<<<
+ *     elif type(pyobj) == list and type(pyobj[0]) == dict \
+ *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frPoly); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     __pyx_t_5 = 0;
@@ -7612,21 +7800,21 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     __pyx_t_1 = 0;
 
     /* "pycocotools/_mask.pyx":294
- * def frPyObjects(pyobj, h, w):
- *     # encode rle from a list of python objects
- *     if type(pyobj) == np.ndarray:             # <<<<<<<<<<<<<<
- *         objs = frBbox(pyobj, h, w)
  *     elif type(pyobj) == list and len(pyobj[0]) == 4:
+ *         objs = frBbox(pyobj, h, w)
+ *     elif type(pyobj) == list and len(pyobj[0]) > 4:             # <<<<<<<<<<<<<<
+ *         objs = frPoly(pyobj, h, w)
+ *     elif type(pyobj) == list and type(pyobj[0]) == dict \
  */
     goto __pyx_L3;
   }
 
   /* "pycocotools/_mask.pyx":296
- *     if type(pyobj) == np.ndarray:
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) == 4:             # <<<<<<<<<<<<<<
- *         objs = frBbox(pyobj, h, w)
  *     elif type(pyobj) == list and len(pyobj[0]) > 4:
+ *         objs = frPoly(pyobj, h, w)
+ *     elif type(pyobj) == list and type(pyobj[0]) == dict \             # <<<<<<<<<<<<<<
+ *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
+ *         objs = frUncompressedRLE(pyobj, h, w)
  */
   __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 296, __pyx_L1_error)
@@ -7634,217 +7822,29 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
   if (__pyx_t_7) {
   } else {
     __pyx_t_2 = __pyx_t_7;
-    goto __pyx_L4_bool_binop_done;
-  }
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 296, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = ((__pyx_t_8 == 4) != 0);
-  __pyx_t_2 = __pyx_t_7;
-  __pyx_L4_bool_binop_done:;
-  if (__pyx_t_2) {
-
-    /* "pycocotools/_mask.pyx":297
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) == 4:
- *         objs = frBbox(pyobj, h, w)             # <<<<<<<<<<<<<<
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:
- *         objs = frPoly(pyobj, h, w)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = NULL;
-    __pyx_t_5 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_6)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_6);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-        __pyx_t_5 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-    } else
-    #endif
-    {
-      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 297, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      if (__pyx_t_6) {
-        __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6); __pyx_t_6 = NULL;
-      }
-      __Pyx_INCREF(__pyx_v_pyobj);
-      __Pyx_GIVEREF(__pyx_v_pyobj);
-      PyTuple_SET_ITEM(__pyx_t_4, 0+__pyx_t_5, __pyx_v_pyobj);
-      __Pyx_INCREF(__pyx_v_h);
-      __Pyx_GIVEREF(__pyx_v_h);
-      PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_5, __pyx_v_h);
-      __Pyx_INCREF(__pyx_v_w);
-      __Pyx_GIVEREF(__pyx_v_w);
-      PyTuple_SET_ITEM(__pyx_t_4, 2+__pyx_t_5, __pyx_v_w);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_objs = __pyx_t_1;
-    __pyx_t_1 = 0;
-
-    /* "pycocotools/_mask.pyx":296
- *     if type(pyobj) == np.ndarray:
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) == 4:             # <<<<<<<<<<<<<<
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:
- */
-    goto __pyx_L3;
-  }
-
-  /* "pycocotools/_mask.pyx":298
- *     elif type(pyobj) == list and len(pyobj[0]) == 4:
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:             # <<<<<<<<<<<<<<
- *         objs = frPoly(pyobj, h, w)
- *     elif type(pyobj) == list and type(pyobj[0]) == dict \
- */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 298, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_t_7) {
-  } else {
-    __pyx_t_2 = __pyx_t_7;
-    goto __pyx_L6_bool_binop_done;
-  }
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = PyObject_Length(__pyx_t_1); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 298, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = ((__pyx_t_8 > 4) != 0);
-  __pyx_t_2 = __pyx_t_7;
-  __pyx_L6_bool_binop_done:;
-  if (__pyx_t_2) {
-
-    /* "pycocotools/_mask.pyx":299
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:
- *         objs = frPoly(pyobj, h, w)             # <<<<<<<<<<<<<<
- *     elif type(pyobj) == list and type(pyobj[0]) == dict \
- *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frPoly); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    __pyx_t_5 = 0;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-        __pyx_t_5 = 1;
-      }
-    }
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-    } else
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
-      PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_GOTREF(__pyx_t_1);
-    } else
-    #endif
-    {
-      __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 299, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      if (__pyx_t_4) {
-        __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
-      }
-      __Pyx_INCREF(__pyx_v_pyobj);
-      __Pyx_GIVEREF(__pyx_v_pyobj);
-      PyTuple_SET_ITEM(__pyx_t_6, 0+__pyx_t_5, __pyx_v_pyobj);
-      __Pyx_INCREF(__pyx_v_h);
-      __Pyx_GIVEREF(__pyx_v_h);
-      PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_5, __pyx_v_h);
-      __Pyx_INCREF(__pyx_v_w);
-      __Pyx_GIVEREF(__pyx_v_w);
-      PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_v_w);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_objs = __pyx_t_1;
-    __pyx_t_1 = 0;
-
-    /* "pycocotools/_mask.pyx":298
- *     elif type(pyobj) == list and len(pyobj[0]) == 4:
- *         objs = frBbox(pyobj, h, w)
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:             # <<<<<<<<<<<<<<
- *         objs = frPoly(pyobj, h, w)
- *     elif type(pyobj) == list and type(pyobj[0]) == dict \
- */
-    goto __pyx_L3;
-  }
-
-  /* "pycocotools/_mask.pyx":300
- *     elif type(pyobj) == list and len(pyobj[0]) > 4:
- *         objs = frPoly(pyobj, h, w)
- *     elif type(pyobj) == list and type(pyobj[0]) == dict \             # <<<<<<<<<<<<<<
- *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
- *         objs = frUncompressedRLE(pyobj, h, w)
- */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (__pyx_t_7) {
-  } else {
-    __pyx_t_2 = __pyx_t_7;
     goto __pyx_L8_bool_binop_done;
   }
 
-  /* "pycocotools/_mask.pyx":301
+  /* "pycocotools/_mask.pyx":297
  *         objs = frPoly(pyobj, h, w)
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \
  *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:             # <<<<<<<<<<<<<<
  *         objs = frUncompressedRLE(pyobj, h, w)
  *     # encode rle from single python object
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "pycocotools/_mask.pyx":300
+  /* "pycocotools/_mask.pyx":296
  *     elif type(pyobj) == list and len(pyobj[0]) > 4:
  *         objs = frPoly(pyobj, h, w)
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \             # <<<<<<<<<<<<<<
  *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
  *         objs = frUncompressedRLE(pyobj, h, w)
  */
-  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_t_1)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_t_1)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_7) {
   } else {
@@ -7852,16 +7852,16 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     goto __pyx_L8_bool_binop_done;
   }
 
-  /* "pycocotools/_mask.pyx":301
+  /* "pycocotools/_mask.pyx":297
  *         objs = frPoly(pyobj, h, w)
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \
  *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:             # <<<<<<<<<<<<<<
  *         objs = frUncompressedRLE(pyobj, h, w)
  *     # encode rle from single python object
  */
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_counts, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_counts, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_9 = (__pyx_t_7 != 0);
   if (__pyx_t_9) {
@@ -7869,15 +7869,15 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     __pyx_t_2 = __pyx_t_9;
     goto __pyx_L8_bool_binop_done;
   }
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_pyobj, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_size, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 301, __pyx_L1_error)
+  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_size, __pyx_t_3, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_7 = (__pyx_t_9 != 0);
   __pyx_t_2 = __pyx_t_7;
   __pyx_L8_bool_binop_done:;
 
-  /* "pycocotools/_mask.pyx":300
+  /* "pycocotools/_mask.pyx":296
  *     elif type(pyobj) == list and len(pyobj[0]) > 4:
  *         objs = frPoly(pyobj, h, w)
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \             # <<<<<<<<<<<<<<
@@ -7886,14 +7886,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
  */
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":302
+    /* "pycocotools/_mask.pyx":298
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \
  *         and 'counts' in pyobj[0] and 'size' in pyobj[0]:
  *         objs = frUncompressedRLE(pyobj, h, w)             # <<<<<<<<<<<<<<
  *     # encode rle from single python object
  *     elif type(pyobj) == list and len(pyobj) == 4:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frUncompressedRLE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frUncompressedRLE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_6 = NULL;
     __pyx_t_5 = 0;
@@ -7910,7 +7910,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 298, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
@@ -7918,13 +7918,13 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_v_pyobj, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 298, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 302, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 298, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -7938,7 +7938,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
       __Pyx_INCREF(__pyx_v_w);
       __Pyx_GIVEREF(__pyx_v_w);
       PyTuple_SET_ITEM(__pyx_t_4, 2+__pyx_t_5, __pyx_v_w);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 302, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 298, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -7946,7 +7946,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     __pyx_v_objs = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "pycocotools/_mask.pyx":300
+    /* "pycocotools/_mask.pyx":296
  *     elif type(pyobj) == list and len(pyobj[0]) > 4:
  *         objs = frPoly(pyobj, h, w)
  *     elif type(pyobj) == list and type(pyobj[0]) == dict \             # <<<<<<<<<<<<<<
@@ -7956,37 +7956,37 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":304
+  /* "pycocotools/_mask.pyx":300
  *         objs = frUncompressedRLE(pyobj, h, w)
  *     # encode rle from single python object
  *     elif type(pyobj) == list and len(pyobj) == 4:             # <<<<<<<<<<<<<<
  *         objs = frBbox([pyobj], h, w)[0]
  *     elif type(pyobj) == list and len(pyobj) > 4:
  */
-  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 304, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 300, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_7) {
   } else {
     __pyx_t_2 = __pyx_t_7;
     goto __pyx_L12_bool_binop_done;
   }
-  __pyx_t_8 = PyObject_Length(__pyx_v_pyobj); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_8 = PyObject_Length(__pyx_v_pyobj); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 300, __pyx_L1_error)
   __pyx_t_7 = ((__pyx_t_8 == 4) != 0);
   __pyx_t_2 = __pyx_t_7;
   __pyx_L12_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":305
+    /* "pycocotools/_mask.pyx":301
  *     # encode rle from single python object
  *     elif type(pyobj) == list and len(pyobj) == 4:
  *         objs = frBbox([pyobj], h, w)[0]             # <<<<<<<<<<<<<<
  *     elif type(pyobj) == list and len(pyobj) > 4:
  *         objs = frPoly([pyobj], h, w)[0]
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frBbox); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 305, __pyx_L1_error)
+    __pyx_t_4 = PyList_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 301, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_pyobj);
     __Pyx_GIVEREF(__pyx_v_pyobj);
@@ -8006,7 +8006,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_4, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -8015,14 +8015,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_4, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_10 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 305, __pyx_L1_error)
+      __pyx_t_10 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -8036,18 +8036,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
       __Pyx_GIVEREF(__pyx_v_w);
       PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_5, __pyx_v_w);
       __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_objs = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "pycocotools/_mask.pyx":304
+    /* "pycocotools/_mask.pyx":300
  *         objs = frUncompressedRLE(pyobj, h, w)
  *     # encode rle from single python object
  *     elif type(pyobj) == list and len(pyobj) == 4:             # <<<<<<<<<<<<<<
@@ -8057,37 +8057,37 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":306
+  /* "pycocotools/_mask.pyx":302
  *     elif type(pyobj) == list and len(pyobj) == 4:
  *         objs = frBbox([pyobj], h, w)[0]
  *     elif type(pyobj) == list and len(pyobj) > 4:             # <<<<<<<<<<<<<<
  *         objs = frPoly([pyobj], h, w)[0]
  *     elif type(pyobj) == dict and 'counts' in pyobj and 'size' in pyobj:
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 306, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyList_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_7) {
   } else {
     __pyx_t_2 = __pyx_t_7;
     goto __pyx_L14_bool_binop_done;
   }
-  __pyx_t_8 = PyObject_Length(__pyx_v_pyobj); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 306, __pyx_L1_error)
+  __pyx_t_8 = PyObject_Length(__pyx_v_pyobj); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 302, __pyx_L1_error)
   __pyx_t_7 = ((__pyx_t_8 > 4) != 0);
   __pyx_t_2 = __pyx_t_7;
   __pyx_L14_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pycocotools/_mask.pyx":307
+    /* "pycocotools/_mask.pyx":303
  *         objs = frBbox([pyobj], h, w)[0]
  *     elif type(pyobj) == list and len(pyobj) > 4:
  *         objs = frPoly([pyobj], h, w)[0]             # <<<<<<<<<<<<<<
  *     elif type(pyobj) == dict and 'counts' in pyobj and 'size' in pyobj:
  *         objs = frUncompressedRLE([pyobj], h, w)[0]
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frPoly); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_frPoly); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 303, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 303, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(__pyx_v_pyobj);
     __Pyx_GIVEREF(__pyx_v_pyobj);
@@ -8107,7 +8107,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_10, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -8116,14 +8116,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_10, __pyx_v_h, __pyx_v_w};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 307, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 303, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       if (__pyx_t_4) {
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -8137,18 +8137,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
       __Pyx_GIVEREF(__pyx_v_w);
       PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_v_w);
       __pyx_t_10 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 307, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 303, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_objs = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "pycocotools/_mask.pyx":306
+    /* "pycocotools/_mask.pyx":302
  *     elif type(pyobj) == list and len(pyobj) == 4:
  *         objs = frBbox([pyobj], h, w)[0]
  *     elif type(pyobj) == list and len(pyobj) > 4:             # <<<<<<<<<<<<<<
@@ -8158,44 +8158,44 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":308
+  /* "pycocotools/_mask.pyx":304
  *     elif type(pyobj) == list and len(pyobj) > 4:
  *         objs = frPoly([pyobj], h, w)[0]
  *     elif type(pyobj) == dict and 'counts' in pyobj and 'size' in pyobj:             # <<<<<<<<<<<<<<
  *         objs = frUncompressedRLE([pyobj], h, w)[0]
  *     else:
  */
-  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 308, __pyx_L1_error)
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_pyobj)), ((PyObject *)(&PyDict_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 304, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_7) {
   } else {
     __pyx_t_2 = __pyx_t_7;
     goto __pyx_L16_bool_binop_done;
   }
-  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_counts, __pyx_v_pyobj, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_counts, __pyx_v_pyobj, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   __pyx_t_9 = (__pyx_t_7 != 0);
   if (__pyx_t_9) {
   } else {
     __pyx_t_2 = __pyx_t_9;
     goto __pyx_L16_bool_binop_done;
   }
-  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_size, __pyx_v_pyobj, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
+  __pyx_t_9 = (__Pyx_PySequence_ContainsTF(__pyx_n_s_size, __pyx_v_pyobj, Py_EQ)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   __pyx_t_7 = (__pyx_t_9 != 0);
   __pyx_t_2 = __pyx_t_7;
   __pyx_L16_bool_binop_done:;
   if (likely(__pyx_t_2)) {
 
-    /* "pycocotools/_mask.pyx":309
+    /* "pycocotools/_mask.pyx":305
  *         objs = frPoly([pyobj], h, w)[0]
  *     elif type(pyobj) == dict and 'counts' in pyobj and 'size' in pyobj:
  *         objs = frUncompressedRLE([pyobj], h, w)[0]             # <<<<<<<<<<<<<<
  *     else:
  *         raise Exception('input type is not supported.')
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frUncompressedRLE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_frUncompressedRLE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 309, __pyx_L1_error)
+    __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_INCREF(__pyx_v_pyobj);
     __Pyx_GIVEREF(__pyx_v_pyobj);
@@ -8215,7 +8215,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_t_6, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -8224,14 +8224,14 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[4] = {__pyx_t_10, __pyx_t_6, __pyx_v_h, __pyx_v_w};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 309, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 305, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_10) {
         __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -8245,18 +8245,18 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
       __Pyx_GIVEREF(__pyx_v_w);
       PyTuple_SET_ITEM(__pyx_t_4, 2+__pyx_t_5, __pyx_v_w);
       __pyx_t_6 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 309, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 305, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_objs = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "pycocotools/_mask.pyx":308
+    /* "pycocotools/_mask.pyx":304
  *     elif type(pyobj) == list and len(pyobj) > 4:
  *         objs = frPoly([pyobj], h, w)[0]
  *     elif type(pyobj) == dict and 'counts' in pyobj and 'size' in pyobj:             # <<<<<<<<<<<<<<
@@ -8266,22 +8266,22 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
     goto __pyx_L3;
   }
 
-  /* "pycocotools/_mask.pyx":311
+  /* "pycocotools/_mask.pyx":307
  *         objs = frUncompressedRLE([pyobj], h, w)[0]
  *     else:
  *         raise Exception('input type is not supported.')             # <<<<<<<<<<<<<<
  *     return objs
  */
   /*else*/ {
-    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 311, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 307, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 311, __pyx_L1_error)
+    __PYX_ERR(0, 307, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "pycocotools/_mask.pyx":312
+  /* "pycocotools/_mask.pyx":308
  *     else:
  *         raise Exception('input type is not supported.')
  *     return objs             # <<<<<<<<<<<<<<
@@ -8291,7 +8291,7 @@ static PyObject *__pyx_pf_11pycocotools_5_mask_22frPyObjects(CYTHON_UNUSED PyObj
   __pyx_r = __pyx_v_objs;
   goto __pyx_L0;
 
-  /* "pycocotools/_mask.pyx":292
+  /* "pycocotools/_mask.pyx":288
  *     return objs
  * 
  * def frPyObjects(pyobj, h, w):             # <<<<<<<<<<<<<<
@@ -11093,10 +11093,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 71, __pyx_L1_error)
-  __pyx_builtin_AttributeError = __Pyx_GetBuiltinName(__pyx_n_s_AttributeError); if (!__pyx_builtin_AttributeError) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_builtin_AttributeError = __Pyx_GetBuiltinName(__pyx_n_s_AttributeError); if (!__pyx_builtin_AttributeError) __PYX_ERR(0, 73, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 128, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 124, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(2, 272, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(2, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(2, 1038, __pyx_L1_error)
@@ -11147,138 +11147,138 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "pycocotools/_mask.pyx":134
+  /* "pycocotools/_mask.pyx":130
  *             py_string = str.encode(obj['counts']) if type(obj['counts']) == str else obj['counts']
  *         else:
  *             raise Exception('Python version must be 2 or 3')             # <<<<<<<<<<<<<<
  *         c_string = py_string
  *         rleFrString( <RLE*> &Rs._R[i], <char*> c_string, obj['size'][0], obj['size'][1] )
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Python_version_must_be_2_or_3); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_Python_version_must_be_2_or_3); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "pycocotools/_mask.pyx":158
+  /* "pycocotools/_mask.pyx":154
  * def merge(rleObjs, intersect=0):
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef RLEs R = RLEs(1)             # <<<<<<<<<<<<<<
  *     rleMerge(<RLE*>Rs._R, <RLE*> R._R, <siz> Rs._n, intersect)
  *     obj = _toString(R)[0]
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_int_1); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_int_1); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "pycocotools/_mask.pyx":184
+  /* "pycocotools/_mask.pyx":180
  *             # check if it's Nx4 bbox
  *             if not len(objs.shape) == 2 or not objs.shape[1] == 4:
  *                 raise Exception('numpy ndarray input is only for *bounding boxes* and should have Nx4 dimension')             # <<<<<<<<<<<<<<
  *             objs = objs.astype(np.double)
  *         elif type(objs) == list:
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_numpy_ndarray_input_is_only_for); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 184, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_numpy_ndarray_input_is_only_for); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "pycocotools/_mask.pyx":197
+  /* "pycocotools/_mask.pyx":193
  *                 objs = _frString(objs)
  *             else:
  *                 raise Exception('list input can be bounding box (Nx4) or RLEs ([RLE])')             # <<<<<<<<<<<<<<
  *         else:
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_list_input_can_be_bounding_box_N); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_list_input_can_be_bounding_box_N); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "pycocotools/_mask.pyx":199
+  /* "pycocotools/_mask.pyx":195
  *                 raise Exception('list input can be bounding box (Nx4) or RLEs ([RLE])')
  *         else:
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')             # <<<<<<<<<<<<<<
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_unrecognized_type_The_following); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_unrecognized_type_The_following); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 195, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "pycocotools/_mask.pyx":176
+  /* "pycocotools/_mask.pyx":172
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):
  *     def _preproc(objs):             # <<<<<<<<<<<<<<
  *         if len(objs) == 0:
  *             return objs
  */
-  __pyx_tuple__10 = PyTuple_Pack(4, __pyx_n_s_objs, __pyx_n_s_isbox, __pyx_n_s_isrle, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(4, __pyx_n_s_objs, __pyx_n_s_isbox, __pyx_n_s_isrle, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_preproc, 176, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 176, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(1, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_preproc, 172, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 172, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":201
+  /* "pycocotools/_mask.pyx":197
  *             raise Exception('unrecognized type.  The following type: RLEs (rle), np.ndarray (box), and list (box) are supported.')
  *         return objs
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):             # <<<<<<<<<<<<<<
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  */
-  __pyx_tuple__12 = PyTuple_Pack(6, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(6, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_rleIou, 201, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__12, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_rleIou, 197, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 197, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":203
+  /* "pycocotools/_mask.pyx":199
  *     def _rleIou(RLEs dt, RLEs gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t,  ndim=1] _iou):
  *         rleIou( <RLE*> dt._R, <RLE*> gt._R, m, n, <byte*> iscrowd.data, <double*> _iou.data )
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):             # <<<<<<<<<<<<<<
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):
  */
-  __pyx_tuple__14 = PyTuple_Pack(6, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(6, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_bbIou, 203, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(6, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_bbIou, 199, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 199, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":205
+  /* "pycocotools/_mask.pyx":201
  *     def _bbIou(np.ndarray[np.double_t, ndim=2] dt, np.ndarray[np.double_t, ndim=2] gt, np.ndarray[np.uint8_t, ndim=1] iscrowd, siz m, siz n, np.ndarray[np.double_t, ndim=1] _iou):
  *         bbIou( <BB> dt.data, <BB> gt.data, m, n, <byte*> iscrowd.data, <double*>_iou.data )
  *     def _len(obj):             # <<<<<<<<<<<<<<
  *         cdef siz N = 0
  *         if type(obj) == RLEs:
  */
-  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_n_s_obj, __pyx_n_s_N); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_n_s_obj, __pyx_n_s_N); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
-  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_len, 205, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_codeobj__17 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__16, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_len, 201, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__17)) __PYX_ERR(0, 201, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":225
+  /* "pycocotools/_mask.pyx":221
  *         return []
  *     if not type(dt) == type(gt):
  *         raise Exception('The dt and gt should have the same data type, either RLEs, list or np.ndarray')             # <<<<<<<<<<<<<<
  * 
  *     # define local variables
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_The_dt_and_gt_should_have_the_sa); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_The_dt_and_gt_should_have_the_sa); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 221, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "pycocotools/_mask.pyx":236
+  /* "pycocotools/_mask.pyx":232
  *         _iouFun = _bbIou
  *     else:
  *         raise Exception('input data type not allowed.')             # <<<<<<<<<<<<<<
  *     _iou = <double*> malloc(m*n* sizeof(double))
  *     iou = np.zeros((m*n, ), dtype=np.double)
  */
-  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_input_data_type_not_allowed); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 236, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_input_data_type_not_allowed); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "pycocotools/_mask.pyx":311
+  /* "pycocotools/_mask.pyx":307
  *         objs = frUncompressedRLE([pyobj], h, w)[0]
  *     else:
  *         raise Exception('input type is not supported.')             # <<<<<<<<<<<<<<
  *     return objs
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_input_type_is_not_supported); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_input_type_is_not_supported); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
@@ -11359,149 +11359,149 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
-  /* "pycocotools/_mask.pyx":107
+  /* "pycocotools/_mask.pyx":103
  * 
  * # internal conversion from Python RLEs object to compressed RLE format
  * def _toString(RLEs Rs):             # <<<<<<<<<<<<<<
  *     cdef siz n = Rs.n
  *     cdef bytes py_string
  */
-  __pyx_tuple__28 = PyTuple_Pack(6, __pyx_n_s_Rs, __pyx_n_s_n, __pyx_n_s_py_string, __pyx_n_s_c_string, __pyx_n_s_objs, __pyx_n_s_i); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_tuple__28 = PyTuple_Pack(6, __pyx_n_s_Rs, __pyx_n_s_n, __pyx_n_s_py_string, __pyx_n_s_c_string, __pyx_n_s_objs, __pyx_n_s_i); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_toString, 107, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_toString, 103, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 103, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":123
+  /* "pycocotools/_mask.pyx":119
  * 
  * # internal conversion from compressed RLE format to Python RLEs object
  * def _frString(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef siz n = len(rleObjs)
  *     Rs = RLEs(n)
  */
-  __pyx_tuple__30 = PyTuple_Pack(7, __pyx_n_s_rleObjs, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_py_string, __pyx_n_s_c_string, __pyx_n_s_i, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_tuple__30 = PyTuple_Pack(7, __pyx_n_s_rleObjs, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_py_string, __pyx_n_s_c_string, __pyx_n_s_i, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(1, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frString, 123, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(1, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frString, 119, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) __PYX_ERR(0, 119, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":141
+  /* "pycocotools/_mask.pyx":137
  * # encode mask to RLEs objects
  * # list of RLE string can be generated by RLEs member function
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):             # <<<<<<<<<<<<<<
  *     h, w, n = mask.shape[0], mask.shape[1], mask.shape[2]
  *     cdef RLEs Rs = RLEs(n)
  */
-  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_mask, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(6, __pyx_n_s_mask, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__32);
   __Pyx_GIVEREF(__pyx_tuple__32);
-  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_encode, 141, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_encode, 137, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 137, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":149
+  /* "pycocotools/_mask.pyx":145
  * 
  * # decode mask from compressed list of RLE string or RLEs object
  * def decode(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n
  */
-  __pyx_tuple__34 = PyTuple_Pack(6, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_masks); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_tuple__34 = PyTuple_Pack(6, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_masks); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__34);
   __Pyx_GIVEREF(__pyx_tuple__34);
-  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_decode, 149, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_decode, 145, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 145, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":156
+  /* "pycocotools/_mask.pyx":152
  *     return np.array(masks)
  * 
  * def merge(rleObjs, intersect=0):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef RLEs R = RLEs(1)
  */
-  __pyx_tuple__36 = PyTuple_Pack(5, __pyx_n_s_rleObjs, __pyx_n_s_intersect, __pyx_n_s_Rs, __pyx_n_s_R, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_tuple__36 = PyTuple_Pack(5, __pyx_n_s_rleObjs, __pyx_n_s_intersect, __pyx_n_s_Rs, __pyx_n_s_R, __pyx_n_s_obj); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__36);
   __Pyx_GIVEREF(__pyx_tuple__36);
-  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_merge, 156, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_merge, 152, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 152, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":163
+  /* "pycocotools/_mask.pyx":159
  *     return obj
  * 
  * def area(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef uint* _a = <uint*> malloc(Rs._n* sizeof(uint))
  */
-  __pyx_tuple__38 = PyTuple_Pack(5, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_a, __pyx_n_s_shape, __pyx_n_s_a_2); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_tuple__38 = PyTuple_Pack(5, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_a, __pyx_n_s_shape, __pyx_n_s_a_2); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__38);
   __Pyx_GIVEREF(__pyx_tuple__38);
-  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_area, 163, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(1, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_area, 159, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 159, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":175
+  /* "pycocotools/_mask.pyx":171
  * 
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):             # <<<<<<<<<<<<<<
  *     def _preproc(objs):
  *         if len(objs) == 0:
  */
-  __pyx_tuple__40 = PyTuple_Pack(18, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_pyiscrowd, __pyx_n_s_preproc, __pyx_n_s_preproc, __pyx_n_s_rleIou, __pyx_n_s_rleIou, __pyx_n_s_bbIou, __pyx_n_s_bbIou, __pyx_n_s_len, __pyx_n_s_len, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou, __pyx_n_s_shape, __pyx_n_s_iouFun, __pyx_n_s_iou_2); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_tuple__40 = PyTuple_Pack(18, __pyx_n_s_dt, __pyx_n_s_gt, __pyx_n_s_pyiscrowd, __pyx_n_s_preproc, __pyx_n_s_preproc, __pyx_n_s_rleIou, __pyx_n_s_rleIou, __pyx_n_s_bbIou, __pyx_n_s_bbIou, __pyx_n_s_len, __pyx_n_s_len, __pyx_n_s_iscrowd, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_iou, __pyx_n_s_shape, __pyx_n_s_iouFun, __pyx_n_s_iou_2); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__40);
   __Pyx_GIVEREF(__pyx_tuple__40);
-  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(3, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_iou_2, 175, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(3, 0, 18, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_iou_2, 171, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 171, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":245
+  /* "pycocotools/_mask.pyx":241
  *     return iou.reshape((m,n), order='F')
  * 
  * def toBbox( rleObjs ):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef siz n = Rs.n
  */
-  __pyx_tuple__42 = PyTuple_Pack(6, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_n, __pyx_n_s_bb_2, __pyx_n_s_shape, __pyx_n_s_bb); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_tuple__42 = PyTuple_Pack(6, __pyx_n_s_rleObjs, __pyx_n_s_Rs, __pyx_n_s_n, __pyx_n_s_bb_2, __pyx_n_s_shape, __pyx_n_s_bb); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__42);
   __Pyx_GIVEREF(__pyx_tuple__42);
-  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_toBbox, 245, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_toBbox, 241, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 241, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":257
+  /* "pycocotools/_mask.pyx":253
  *     return bb
  * 
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):             # <<<<<<<<<<<<<<
  *     cdef siz n = bb.shape[0]
  *     Rs = RLEs(n)
  */
-  __pyx_tuple__44 = PyTuple_Pack(6, __pyx_n_s_bb, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_tuple__44 = PyTuple_Pack(6, __pyx_n_s_bb, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__44);
   __Pyx_GIVEREF(__pyx_tuple__44);
-  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frBbox, 257, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_codeobj__45 = (PyObject*)__Pyx_PyCode_New(3, 0, 6, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__44, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frBbox, 253, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__45)) __PYX_ERR(0, 253, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":264
+  /* "pycocotools/_mask.pyx":260
  *     return objs
  * 
  * def frPoly( poly, siz h, siz w ):             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.double_t, ndim=1] np_poly
  *     n = len(poly)
  */
-  __pyx_tuple__46 = PyTuple_Pack(9, __pyx_n_s_poly, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_np_poly, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_i, __pyx_n_s_p, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_tuple__46 = PyTuple_Pack(9, __pyx_n_s_poly, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_np_poly, __pyx_n_s_n, __pyx_n_s_Rs, __pyx_n_s_i, __pyx_n_s_p, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__46);
   __Pyx_GIVEREF(__pyx_tuple__46);
-  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frPoly, 264, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_codeobj__47 = (PyObject*)__Pyx_PyCode_New(3, 0, 9, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__46, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frPoly, 260, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__47)) __PYX_ERR(0, 260, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":274
+  /* "pycocotools/_mask.pyx":270
  *     return objs
  * 
  * def frUncompressedRLE(ucRles, siz h, siz w):             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.uint32_t, ndim=1] cnts
  *     cdef RLE R
  */
-  __pyx_tuple__48 = PyTuple_Pack(11, __pyx_n_s_ucRles, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_cnts, __pyx_n_s_R, __pyx_n_s_data, __pyx_n_s_n, __pyx_n_s_objs, __pyx_n_s_i, __pyx_n_s_Rs, __pyx_n_s_j); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_tuple__48 = PyTuple_Pack(11, __pyx_n_s_ucRles, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_cnts, __pyx_n_s_R, __pyx_n_s_data, __pyx_n_s_n, __pyx_n_s_objs, __pyx_n_s_i, __pyx_n_s_Rs, __pyx_n_s_j); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__48);
   __Pyx_GIVEREF(__pyx_tuple__48);
-  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(3, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frUncompressedRLE, 274, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_codeobj__49 = (PyObject*)__Pyx_PyCode_New(3, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__48, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frUncompressedRLE, 270, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__49)) __PYX_ERR(0, 270, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":292
+  /* "pycocotools/_mask.pyx":288
  *     return objs
  * 
  * def frPyObjects(pyobj, h, w):             # <<<<<<<<<<<<<<
  *     # encode rle from a list of python objects
  *     if type(pyobj) == np.ndarray:
  */
-  __pyx_tuple__50 = PyTuple_Pack(4, __pyx_n_s_pyobj, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_tuple__50 = PyTuple_Pack(4, __pyx_n_s_pyobj, __pyx_n_s_h, __pyx_n_s_w, __pyx_n_s_objs); if (unlikely(!__pyx_tuple__50)) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__50);
   __Pyx_GIVEREF(__pyx_tuple__50);
-  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frPyObjects, 292, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_codeobj__51 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__50, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pycocotools__mask_pyx, __pyx_n_s_frPyObjects, 288, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__51)) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -11557,18 +11557,18 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   __pyx_type_11pycocotools_5_mask_RLEs.tp_print = 0;
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RLEs, (PyObject *)&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 60, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_RLEs, (PyObject *)&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_11pycocotools_5_mask_RLEs) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   __pyx_ptype_11pycocotools_5_mask_RLEs = &__pyx_type_11pycocotools_5_mask_RLEs;
-  if (PyType_Ready(&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 81, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
   __pyx_type_11pycocotools_5_mask_Masks.tp_print = 0;
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_11pycocotools_5_mask_Masks.tp_dictoffset && __pyx_type_11pycocotools_5_mask_Masks.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_11pycocotools_5_mask_Masks.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Masks, (PyObject *)&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 81, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 81, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Masks, (PyObject *)&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_11pycocotools_5_mask_Masks) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
   __pyx_ptype_11pycocotools_5_mask_Masks = &__pyx_type_11pycocotools_5_mask_Masks;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -11873,165 +11873,165 @@ if (!__Pyx_RefNanny) {
  * # import both Python-level and C-level symbols of Numpy
  * # the API uses Numpy to interface C and Python
  * import numpy as np             # <<<<<<<<<<<<<<
- * # asher note: I already compiled the module so converting back to
- * # cimport numpy as np
+ * cimport numpy as np
+ * from libc.stdlib cimport malloc, free
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":27
+  /* "pycocotools/_mask.pyx":23
  * 
  * # intialized Numpy. must do.
  * np.import_array()             # <<<<<<<<<<<<<<
  * 
  * # import numpy C function
  */
-  __pyx_t_3 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_5numpy_import_array(); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 23, __pyx_L1_error)
 
-  /* "pycocotools/_mask.pyx":107
+  /* "pycocotools/_mask.pyx":103
  * 
  * # internal conversion from Python RLEs object to compressed RLE format
  * def _toString(RLEs Rs):             # <<<<<<<<<<<<<<
  *     cdef siz n = Rs.n
  *     cdef bytes py_string
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_1_toString, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_1_toString, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_toString, __pyx_t_1) < 0) __PYX_ERR(0, 107, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_toString, __pyx_t_1) < 0) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":123
+  /* "pycocotools/_mask.pyx":119
  * 
  * # internal conversion from compressed RLE format to Python RLEs object
  * def _frString(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef siz n = len(rleObjs)
  *     Rs = RLEs(n)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3_frString, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_3_frString, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frString, __pyx_t_1) < 0) __PYX_ERR(0, 123, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frString, __pyx_t_1) < 0) __PYX_ERR(0, 119, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":141
+  /* "pycocotools/_mask.pyx":137
  * # encode mask to RLEs objects
  * # list of RLE string can be generated by RLEs member function
  * def encode(np.ndarray[np.uint8_t, ndim=3, mode='fortran'] mask):             # <<<<<<<<<<<<<<
  *     h, w, n = mask.shape[0], mask.shape[1], mask.shape[2]
  *     cdef RLEs Rs = RLEs(n)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_5encode, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_5encode, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_encode, __pyx_t_1) < 0) __PYX_ERR(0, 141, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_encode, __pyx_t_1) < 0) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":149
+  /* "pycocotools/_mask.pyx":145
  * 
  * # decode mask from compressed list of RLE string or RLEs object
  * def decode(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     h, w, n = Rs._R[0].h, Rs._R[0].w, Rs._n
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_7decode, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_7decode, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_decode, __pyx_t_1) < 0) __PYX_ERR(0, 149, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_decode, __pyx_t_1) < 0) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":156
+  /* "pycocotools/_mask.pyx":152
  *     return np.array(masks)
  * 
  * def merge(rleObjs, intersect=0):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef RLEs R = RLEs(1)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_9merge, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_9merge, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_merge, __pyx_t_1) < 0) __PYX_ERR(0, 156, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_merge, __pyx_t_1) < 0) __PYX_ERR(0, 152, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":163
+  /* "pycocotools/_mask.pyx":159
  *     return obj
  * 
  * def area(rleObjs):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef uint* _a = <uint*> malloc(Rs._n* sizeof(uint))
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_11area, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_11area, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_area, __pyx_t_1) < 0) __PYX_ERR(0, 163, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_area, __pyx_t_1) < 0) __PYX_ERR(0, 159, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":175
+  /* "pycocotools/_mask.pyx":171
  * 
  * # iou computation. support function overload (RLEs-RLEs and bbox-bbox).
  * def iou( dt, gt, pyiscrowd ):             # <<<<<<<<<<<<<<
  *     def _preproc(objs):
  *         if len(objs) == 0:
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_13iou, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_13iou, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iou_2, __pyx_t_1) < 0) __PYX_ERR(0, 175, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_iou_2, __pyx_t_1) < 0) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":245
+  /* "pycocotools/_mask.pyx":241
  *     return iou.reshape((m,n), order='F')
  * 
  * def toBbox( rleObjs ):             # <<<<<<<<<<<<<<
  *     cdef RLEs Rs = _frString(rleObjs)
  *     cdef siz n = Rs.n
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_15toBbox, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_15toBbox, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_toBbox, __pyx_t_1) < 0) __PYX_ERR(0, 245, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_toBbox, __pyx_t_1) < 0) __PYX_ERR(0, 241, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":257
+  /* "pycocotools/_mask.pyx":253
  *     return bb
  * 
  * def frBbox(np.ndarray[np.double_t, ndim=2] bb, siz h, siz w ):             # <<<<<<<<<<<<<<
  *     cdef siz n = bb.shape[0]
  *     Rs = RLEs(n)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_17frBbox, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_17frBbox, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frBbox, __pyx_t_1) < 0) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frBbox, __pyx_t_1) < 0) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":264
+  /* "pycocotools/_mask.pyx":260
  *     return objs
  * 
  * def frPoly( poly, siz h, siz w ):             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.double_t, ndim=1] np_poly
  *     n = len(poly)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_19frPoly, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_19frPoly, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frPoly, __pyx_t_1) < 0) __PYX_ERR(0, 264, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frPoly, __pyx_t_1) < 0) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":274
+  /* "pycocotools/_mask.pyx":270
  *     return objs
  * 
  * def frUncompressedRLE(ucRles, siz h, siz w):             # <<<<<<<<<<<<<<
  *     cdef np.ndarray[np.uint32_t, ndim=1] cnts
  *     cdef RLE R
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_21frUncompressedRLE, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_21frUncompressedRLE, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frUncompressedRLE, __pyx_t_1) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frUncompressedRLE, __pyx_t_1) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pycocotools/_mask.pyx":292
+  /* "pycocotools/_mask.pyx":288
  *     return objs
  * 
  * def frPyObjects(pyobj, h, w):             # <<<<<<<<<<<<<<
  *     # encode rle from a list of python objects
  *     if type(pyobj) == np.ndarray:
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_23frPyObjects, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_11pycocotools_5_mask_23frPyObjects, NULL, __pyx_n_s_pycocotools__mask); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frPyObjects, __pyx_t_1) < 0) __PYX_ERR(0, 292, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_frPyObjects, __pyx_t_1) < 0) __PYX_ERR(0, 288, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "pycocotools/_mask.pyx":1
