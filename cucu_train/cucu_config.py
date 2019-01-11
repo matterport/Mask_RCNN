@@ -35,7 +35,7 @@ class cucumberConfig(Config):
     # ROI_POSITIVE_RATIO = 66  
     
 
-    VALIDATION_STEPS = 100
+    VALIDATION_STEPS = 4
      # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
 
@@ -44,9 +44,9 @@ class cucumberConfig(Config):
     LEARNING_RATE = 0.1
     LEARNING_MOMENTUM = 0.5
     # each EPOCHS times we save the weights of the net
-    EPOCHS = 30
-    # EPOCHS_ROUNDS determines how many weighst of the net we will save
-    EPOCHS_ROUNDS = 10
+    EPOCHS = 20
+    # EPOCHS_ROUNDS determines how many weights of the net we will save
+    EPOCHS_ROUNDS = 4
 
 
     """ DATA GENERATION HYPER PARAMETERS """

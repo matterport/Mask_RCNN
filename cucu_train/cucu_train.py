@@ -66,13 +66,12 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print("In this session we try a new approach - taking advantage of our infinite ability to generate data,\n\
-        we try not to fix to a fixed size training data size - but each few epochs generate new data set,\n\
-        which will be generated slightly differently [different non_max_suppression threshholds, num of objects etc].\n\
-        this way we hope to overcome the plateau situation which we are always get stuck upon till now. \n\
-        we proceed with generating gray-scale and random colored objects since this brought us to 0.2 less\n\
-        loss than previous (1.7 --> 1.5) ")
-
+print("20 EPOCHS, 4 ROUNDS, TOLERANCE 5,\n\
+        DECAYING LEARNING RATE: NO, \n\
+        MULTICOLOR OBJECTS: YES,\n\
+        ENHANCED BLENDING: YES,\n\
+        GROWING NUMBER OF OBJECTS: 1.5,\n\
+        MISC: new leaves added \n")
 
 
 
@@ -101,6 +100,7 @@ cucuConf.display()
 from randomColorObjects import randomColorObject, toGray
 from shutil import copyfile, copytree
 
+# Create a training set for this Experiment and store it in the container
 #RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
 copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
 randIndex = 0
@@ -129,7 +129,7 @@ for _ in range(2):
 # add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr*0.8
+    return lr#*0.8
 
 custom_callbacks=[
     EarlyStopping(monitor='val_loss', min_delta=0.05, patience=20, verbose=1, mode='auto'),
@@ -205,9 +205,6 @@ for _ in range(config.EPOCHS_ROUNDS):
     config.MIN_GENERATED_OBJECTS = math.ceil(config.MIN_GENERATED_OBJECTS*1.5)
     config.MAX_GENERATED_OBJECTS = math.ceil(config.MAX_GENERATED_OBJECTS*1.5)
     config.LEARNING_RATE = config.LEARNING_RATE*0.9
-
-
-
 
 
 
