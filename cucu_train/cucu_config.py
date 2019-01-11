@@ -41,7 +41,7 @@ class cucumberConfig(Config):
 
     MAX_SAVED_TRAINED_MODELS = 30
 
-    LEARNING_RATE = 0.1
+    LEARNING_RATE = 1
     LEARNING_MOMENTUM = 0.5
     # each EPOCHS times we save the weights of the net
     EPOCHS = 20
@@ -57,7 +57,7 @@ class cucumberConfig(Config):
     IMAGE_MAX_DIM = 512
     
     #SCALES OF GENERATED OBJECTS
-    MIN_SCALE_OBJ = 0.3
+    MIN_SCALE_OBJ = 0.1
     MAX_SCALE_OBJ = 0.5
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
@@ -66,11 +66,11 @@ class cucumberConfig(Config):
     VALID_SET_SIZE = 100
 
     #in case images are synthesized
-    MIN_GENERATED_OBJECTS = 5
-    MAX_GENERATED_OBJECTS = 25
+    MIN_GENERATED_OBJECTS = 20
+    MAX_GENERATED_OBJECTS = 45
 
     # this threshold determines how much objects will cover each other
-    OBJECTS_IOU_THRESHOLD = 0.05
+    OBJECTS_IOU_THRESHOLD = 0.2
 
     # asher todo: decide what todo with those parameters
     #in case we want to generate new dataset each iteratation in EPOCH_ROUNDS

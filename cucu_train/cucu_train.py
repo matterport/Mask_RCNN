@@ -71,7 +71,9 @@ print("20 EPOCHS, 4 ROUNDS, TOLERANCE 5,\n\
         MULTICOLOR OBJECTS: YES,\n\
         ENHANCED BLENDING: YES,\n\
         GROWING NUMBER OF OBJECTS: 1.5,\n\
-        MISC: new leaves added \n")
+        MISC: proceeding training from last model-weights produced in container: train_results_2019-01-11 11:52:01.987896 \n\
+        in aditiion, initial ammount of objects generated is big--> in range [20,45] and growing each epochs-round.\n\
+        mAp calculation is added on a random test_data set.")
 
 
 
@@ -142,9 +144,13 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-model.load_weights(cucuPaths.cocoModelPath, by_name=True,
-                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-                               "mrcnn_bbox", "mrcnn_mask"])
+# weightPath=cucuPaths.cocoModelPath
+# model.load_weights(weightPath, by_name=True,
+#                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+#                                "mrcnn_bbox", "mrcnn_mask"])
+weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-11 11:52:01.987896/trained_models/cucuWheights_2019-01-11 18:28:10.152402.h5"
+model.load_weights(weightPath, by_name=True)
+print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
