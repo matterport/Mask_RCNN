@@ -10,7 +10,6 @@ def create_sub_masks(mask_image):
     width, height = mask_image.size
     # Initialize a dictionary of sub-masks indexed by RGB colors
     sub_masks = {}
-    pixel = mask_image.getpixel((87, 58))
     for x in range(width):
         for y in range(height):
             # Get the RGB values of the pixel
@@ -60,10 +59,15 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
             segmentation = np.array(poly.exterior.coords).ravel().tolist()
             segmentations.append(segmentation)
         except:
-            print(poly)
+            pass
 
     # Combine the polygons to calculate the bounding box and area
     multi_poly = MultiPolygon(polygons)
+
+    if multi_poly.area < 400:
+        return []
+
+    print(multi_poly.area)
     x, y, max_x, max_y = multi_poly.bounds
     width = max_x - x
     height = max_y - y
@@ -83,24 +87,29 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
     return annotation
 
 def get_image_json_doc(orig_json, image_name, new_id):
+    orig_image_name = image_name.split('_')[2] + '_' +image_name.split('_')[3]
+    image_name_no_prefix = image_name[13:]
     for image in orig_json['images']:
-        if image_name.find(image['file_name'].split('.')[0]) != -1:
+        if image['file_name'].split('.')[0].find(orig_image_name) != -1:
             result = image
             result['id'] = new_id
-            orig_file_name = image['file_name']
-            for new_image_path in augmented_image_names:
-                if new_image_path.find(orig_file_name) != -1:
-                    result['path'] = new_image_path
-                    return result
+            list = [f for f in augmented_image_names if f == image_name_no_prefix]
+            if len(list) == 1:
+                result['path'] = list[0]
+                result['file_name'] = list[0]
+                return result
+    print('error {} {} {}'.format(image_name, orig_image_name, image_name_no_prefix))
     return []
 
 
-dir_path = '/Users/orshemesh/Desktop/Project/Leaves_augmentor/leaves_images/output/'
-files_in_dir = os.listdir(dir_path)
-ground_truth_images = [Image.open(dir_path+file) for file in files_in_dir if file.find('groundtruth') != -1]
-augmented_image_names = [file for file in files_in_dir if file.find('original_IMG') != -1]
+dir_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/output_phase2/'
 
-orig_json_path = '/Users/orshemesh/Desktop/Project/Leaves_augmentor/leaves_images/segmentation_results.json'
+files_in_dir = os.listdir(dir_path)
+ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
+augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
+
+
+orig_json_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/out.json'
 with open(orig_json_path) as f:
     orig_json = json.load(f)
 
@@ -126,35 +135,44 @@ is_crowd = 0
 # These ids will be automatically increased as we go
 annotation_id = 1
 image_id = 1
+info = orig_json['info']
+categories = orig_json['categories']
+
+output = {
+    'categories': categories,
+    'images': [],
+    'annotations': [],
+    'info': info
+}
 
 # Create the annotations
 annotations = []
 images = []
-for mask_image in ground_truth_images:
+error_num = 0
+for file in ground_truth_images:
+    mask_image = Image.open(dir_path+file)
     new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
     if new_image_json_doc == []:
         print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
         continue
     images.append(new_image_json_doc)
     sub_masks = create_sub_masks(mask_image)
+    mask_image.close()
     for color, sub_mask in sub_masks.items():
         # category_id = category_ids[image_id][color]
         category_id = 1
         annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
-        annotations.append(annotation)
-        annotation_id += 1
+        if annotation != []:
+            annotations.append(annotation)
+            annotation_id += 1
     print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
     image_id += 1
+    output['images'] = images
+    output['annotations'] = annotations
 
-info = orig_json['info']
-categories = orig_json['categories']
+    with open(dir_path+'new_annotations_' + str(image_id) + '.json', 'w') as outfile:
+        json.dump(output, outfile)
 
-output = {
-    'categories': categories,
-    'images': images,
-    'annotations': annotations,
-    'info': info
-}
 print(json.dumps(output))
 with open(dir_path+'new_annotations.json', 'w') as outfile:
     json.dump(output, outfile)

@@ -1,10 +1,11 @@
 import numpy
 from PIL import Image, ImageDraw
-from pycocotools.coco import COCO
+from coco.PythonAPI.pycocotools.coco import COCO
 
+dataDir = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/'
+annFile = dataDir + 'out.json'
+output_dir = dataDir + 'output_phase1/'
 
-dataDir = '/Users/orshemesh/Desktop/Project/Photos/2018_05_31_09_02_segmentation_task_8_leaf_cucumber_KIM/'
-annFile = '/Users/orshemesh/Desktop/Project/Photos/2018_05_31_09_02_segmentation_task_8_leaf_cucumber_KIM/segmentation_results.json'
 coco = COCO(annFile)
 
 cucumbers = coco.loadCats(coco.getCatIds())
@@ -18,6 +19,7 @@ cucumbers_Ids = coco.getCatIds(catNms=categories_names[0]);
 images_Ids = coco.getImgIds(catIds=cucumbers_Ids );
 
 imgs = coco.loadImgs(images_Ids)
+image_num = 0
 
 for img in imgs:
     annotation_Ids = coco.getAnnIds(imgIds=img['id'], catIds=cucumbers_Ids, iscrowd=None)
@@ -46,12 +48,19 @@ for img in imgs:
     # newImArray[:, :, :3] = imArray[y1:y2, x1:x2, :3]
     mask_colors = []
     for annotation in annotations:
+
+        # choose a color
         color = numpy.random.choice(range(256), size=3)
         color = numpy.append(color, [255])
-        # while color in mask_colors:
-        #     color = numpy.random.choice(range(256), size=3)
-        #     color = numpy.append(color, [255])
+
+        # while color exist choose another one
+        while len([c for c in mask_colors if c[0]==color[0] and c[1]==color[1] and c[2]==color[2]]) != 0:
+            color = numpy.random.choice(range(256), size=3)
+            color = numpy.append(color, [255])
+
+        # add to colors that already used
         mask_colors.append(color)
+
         polygon = []
         for j in range(len(annotation['segmentation'][0]) // 2):
             polygon.append((annotation['segmentation'][0][2*j], annotation['segmentation'][0][2*j+1]))
@@ -73,14 +82,12 @@ for img in imgs:
             newImArray[x, y] = color
 
 
-    # objectImArray = numpy.empty((dy, dx, 4), dtype='uint8')
-    # objectImArray[:, :, :] = newImArray[y1:y2, x1:x2, :]
-    # back to Image from numpy
-    # newIm = Image.fromarray(objectImArray, "RGBA")
     try:
         newIm = Image.fromarray(newImArray, "RGBA")
         # newIm.show()
-        newIm.save("/Users/orshemesh/Desktop/Project/leaves_after_phase1/"+image_name.split('.')[0]+".png")
+        newIm.save(output_dir+image_name.split('.')[0]+".png")
+        image_num = image_num + 1
+        print('{} out of {}'.format(image_num, len(imgs)))
     except:
         print("Unexpected error: image {}".format(image_name.split('.')[0]+".png"))
 
