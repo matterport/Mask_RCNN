@@ -4,7 +4,7 @@ from skimage import measure                        # (pip install scikit-image)
 from shapely.geometry import Polygon, MultiPolygon # (pip install Shapely)
 import json
 import os
-# import cv2
+import datetime
 
 def create_sub_masks(mask_image):
     width, height = mask_image.size
@@ -87,20 +87,20 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
     return annotation
 
 def get_image_json_doc(orig_json, image_name, new_id):
-    orig_image_name = image_name.split('_')[2] + '_' +image_name.split('_')[3]
-    image_name_no_prefix = image_name[13:]
-    for image in orig_json['images']:
-        if image['file_name'].split('.')[0].find(orig_image_name) != -1:
-            result = image
-            result['id'] = new_id
-            list = [f for f in augmented_image_names if f == image_name_no_prefix]
-            if len(list) == 1:
-                result['path'] = list[0]
-                result['file_name'] = list[0]
-                return result
-    print('error {} {} {}'.format(image_name, orig_image_name, image_name_no_prefix))
+    image_orig_name = 'IMG_' + image_name.split('_')[3] + '.JPG'
+    for img in orig_json['images']:
+        if img['file_name'] == image_orig_name:
+            result = {
+                'date': str(datetime.datetime.now()),
+                'file_name': image_name[13:],
+                'height': img['height'],
+                'id': new_id,
+                'path': image_name[13:],
+                'url': img['url'],
+                'width': img['width']
+            }
+            return result
     return []
-
 
 dir_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/output_phase2/'
 
@@ -133,8 +133,8 @@ with open(orig_json_path) as f:
 is_crowd = 0
 
 # These ids will be automatically increased as we go
-annotation_id = 1
-image_id = 1
+annotation_id = 0
+image_id = 0
 info = orig_json['info']
 categories = orig_json['categories']
 
@@ -170,9 +170,10 @@ for file in ground_truth_images:
     output['images'] = images
     output['annotations'] = annotations
 
-    with open(dir_path+'new_annotations_' + str(image_id) + '.json', 'w') as outfile:
-        json.dump(output, outfile)
+    if image_id % 10 == 0:
+        with open(dir_path+'new_annotations2_' + str(image_id) + '.json', 'w') as outfile:
+            json.dump(output, outfile)
 
 print(json.dumps(output))
-with open(dir_path+'new_annotations.json', 'w') as outfile:
+with open(dir_path+'new_annotations2.json', 'w') as outfile:
     json.dump(output, outfile)
