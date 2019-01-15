@@ -669,7 +669,7 @@ def compute_matches(gt_boxes, gt_class_ids, gt_masks,
                   predicted box.
         pred_match: 1-D array. For each predicted box, it has the index of
                     the matched ground truth box.
-        overlaps: [pred_boxes, gt_boxes] IoU overlaps.
+        overlaps: [pred_masks, gt_masks] IoU overlaps.
     """
     # Trim zero padding
     # TODO: cleaner to do zero unpadding upstream

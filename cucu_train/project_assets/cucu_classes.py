@@ -91,7 +91,7 @@ class genDataset(utils.Dataset):
 
         
         # Add images
-        for i in range(count):
+        for i in range(count):  
             # decide wich background:
             bgIndex = randint(0, self.number_of_bgs-1) 
             bg_color, shapes = self.random_image(height, width)
@@ -213,7 +213,7 @@ class genDataset(utils.Dataset):
         y_location = randint(0, width - int(boundingDelta*width))
         # Scale x, y
         x_scale = uniform(cucuConf.MIN_SCALE_OBJ, cucuConf.MAX_SCALE_OBJ)
-        y_scale = uniform(cucuConf.MIN_SCALE_OBJ, cucuConf.MAX_SCALE_OBJ)
+        y_scale = x_scale
         # Angle
         angle = randint(-10,10)
         # Image index
@@ -354,9 +354,6 @@ class realDataset(utils.Dataset):
         auto_download: Automatically download and unzip MS-COCO images and annotations
         """
 
-        # if auto_download is True:
-        #     self.auto_download(dataset_dir, subset, year)
-
         coco = COCO(annotations_path)
         image_dir = "{}".format(dataset_dir)
 
@@ -473,7 +470,7 @@ class realDataset(utils.Dataset):
 
 
 class project_paths(object):
-    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer):
+    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
         self.projectRootDir=projectRootDir
         self.TensorboardDir=TensorboardDir
         self.trainedModelsDir=trainedModelsDir
@@ -481,6 +478,7 @@ class project_paths(object):
         self.trainDatasetDir=trainDatasetDir
         self.valDatasetDir=valDatasetDir
         self.testDatasetDir=testDatasetDir
+        self.testAnnotationsDir=testAnnotationsDir
         self.trainResultContainer=trainResultContainer
         self.visualizeEvaluationsDir=visualizeEvaluationsDir
         self.trainOutputLog=trainOutputLog

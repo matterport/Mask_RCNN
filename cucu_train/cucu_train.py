@@ -66,14 +66,16 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print("20 EPOCHS, 4 ROUNDS, TOLERANCE 5,\n\
+print("5 EPOCHS, 30 ROUNDS, TOLERANCE 5,\n\
         DECAYING LEARNING RATE: YES, \n\
         MULTICOLOR OBJECTS: YES,\n\
         ENHANCED BLENDING: YES,\n\
-        GROWING NUMBER OF OBJECTS: 1.5,\n\
-        MISC: proceeding training from last model-weights produced in container: train_results_2019-01-11 11:52:01.987896 \n\
-        in aditiion, initial ammount of objects generated is big--> in range [20,45] and growing each epochs-round.\n\
-        mAp calculation is added on a random test_data set.")
+        GROWING NUMBER OF OBJECTS: + 5,\n\
+        MISC: train from clean coco-weights, \n\
+        in aditiion, initial ammount of objects generated is --> in range [5,15] and growing each epochs-round.\n\
+        mAp calculation is added on a random test_data set.\
+        The main attempt here is to train net on wide range of scaled objects. performing small amount of epochs trying to overcome an overfit which we suspicious about.\n\
+        ")
 
 
 
@@ -106,35 +108,35 @@ from shutil import copyfile, copytree
 #RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
 copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
 randIndex = 0
-for _ in range(2):
-    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
-        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
-        randIndex += 1
-        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + '_'+ str(randIndex) + '.png')
-        randIndex += 1
+#for _ in range(1):
+#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
+#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
+#        randIndex += 1
+#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + '_'+ str(randIndex) + '.png')
+#        randIndex += 1
 
 
-    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
-        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
-        randIndex += 1
-        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + '_'+ str(randIndex) + '.png')
-        randIndex += 1
+#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
+#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
+#        randIndex += 1
+#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + '_'+ str(randIndex) + '.png')
+#        randIndex += 1
 
-    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects')):
-        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + 'rand_'+ str(randIndex) + '.png')
-        randIndex += 1
-        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + '_'+ str(randIndex) + '.png')
-        randIndex += 1
+#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects')):
+#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + 'rand_'+ str(randIndex) + '.png')
+#        randIndex += 1
+#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + '_'+ str(randIndex) + '.png')
+#        randIndex += 1
 
 
 # In[ ]:
 # add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr*0.8
+    return lr*0.9
 
 custom_callbacks=[
-    EarlyStopping(monitor='val_loss', min_delta=0.05, patience=5, verbose=1, mode='auto'),
+    EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
     LearningRateScheduler(scheduleLearningRate, verbose=1)
     
 ]
@@ -144,12 +146,12 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-# weightPath=cucuPaths.cocoModelPath
-# model.load_weights(weightPath, by_name=True,
-#                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-#                                "mrcnn_bbox", "mrcnn_mask"])
-weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-11 11:52:01.987896/trained_models/cucuWheights_2019-01-11 18:28:10.152402.h5"
-model.load_weights(weightPath, by_name=True)
+weightPath=cucuPaths.cocoModelPath
+model.load_weights(weightPath, by_name=True,
+                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                               "mrcnn_bbox", "mrcnn_mask"])
+# weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-11 20:50:45.733775/trained_models/cucuWheights_2019-01-12 00:52:13.086031.h5"
+# model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
@@ -207,10 +209,10 @@ for _ in range(config.EPOCHS_ROUNDS):
         os.remove(oldest_trained_model)
 
     # PREPARE NEW CONFIG FOR NEXT ROUND:
-    config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*1.5, 0.5)
-    config.MIN_GENERATED_OBJECTS = math.ceil(config.MIN_GENERATED_OBJECTS*1.5)
-    config.MAX_GENERATED_OBJECTS = math.ceil(config.MAX_GENERATED_OBJECTS*1.5)
-    config.LEARNING_RATE = config.LEARNING_RATE
+    config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*3, 0.5)
+    config.MIN_GENERATED_OBJECTS = min(math.ceil(config.MIN_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
+    config.MAX_GENERATED_OBJECTS = min(math.ceil(config.MAX_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
+    config.LEARNING_RATE = 0.01
 
 
 
