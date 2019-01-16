@@ -2,8 +2,8 @@ import numpy
 from PIL import Image, ImageDraw
 from coco.PythonAPI.pycocotools.coco import COCO
 
-dataDir = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/'
-annFile = dataDir + 'out.json'
+dataDir = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/'
+annFile = dataDir + 'fruits.json'
 output_dir = dataDir + 'output_phase1/'
 
 coco = COCO(annFile)
@@ -12,11 +12,8 @@ cucumbers = coco.loadCats(coco.getCatIds())
 categories_names = [cucumber['name'] for cucumber in cucumbers]
 print('COCO categories: \n{}\n'.format(' '.join(categories_names)))
 
-supercategories_names = set([cucumber['supercategory'] for cucumber in cucumbers])
-print('COCO supercategories: \n{}'.format(' '.join(supercategories_names)))
-
-cucumbers_Ids = coco.getCatIds(catNms=categories_names[0]);
-images_Ids = coco.getImgIds(catIds=cucumbers_Ids );
+cucumbers_Ids = coco.getCatIds(catNms=categories_names[0])
+images_Ids = coco.getImgIds(catIds=cucumbers_Ids )
 
 imgs = coco.loadImgs(images_Ids)
 image_num = 0
@@ -61,25 +58,27 @@ for img in imgs:
         # add to colors that already used
         mask_colors.append(color)
 
-        polygon = []
-        for j in range(len(annotation['segmentation'][0]) // 2):
-            polygon.append((annotation['segmentation'][0][2*j], annotation['segmentation'][0][2*j+1]))
+        for segmentation in annotation['segmentation']:
 
-        # create mask
-        maskIm = Image.new('L', (imArray.shape[1], imArray.shape[0]), 0)
-        ImageDraw.Draw(maskIm).polygon(polygon, fill=1, outline=0)
-        mask = numpy.array(maskIm)
-        # transparency (4th column)
-        # newImArray[:, :, 3] = mask * 255
-        # numpy.arange()
+            polygon = []
+            for j in range(len(segmentation) // 2):
+                polygon.append((segmentation[2*j], segmentation[2*j+1]))
 
-        # for (x, y), _ in numpy.ndenumerate(mask):
-        #     if mask[x][y] != 0:
-        #         new_mask[x][y] = color
+            # create mask
+            maskIm = Image.new('L', (imArray.shape[1], imArray.shape[0]), 0)
+            ImageDraw.Draw(maskIm).polygon(polygon, fill=1, outline=0)
+            mask = numpy.array(maskIm)
+            # transparency (4th column)
+            # newImArray[:, :, 3] = mask * 255
+            # numpy.arange()
 
-        rows = numpy.where(mask[:,:] != 0)
-        for x, y in zip(rows[0], rows[1]):
-            newImArray[x, y] = color
+            # for (x, y), _ in numpy.ndenumerate(mask):
+            #     if mask[x][y] != 0:
+            #         new_mask[x][y] = color
+
+            rows = numpy.where(mask[:,:] != 0)
+            for x, y in zip(rows[0], rows[1]):
+                newImArray[x, y] = color
 
 
     try:

@@ -64,7 +64,7 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
     # Combine the polygons to calculate the bounding box and area
     multi_poly = MultiPolygon(polygons)
 
-    if multi_poly.area < 400:
+    if multi_poly.area < 150:
         return []
 
     print(multi_poly.area)
@@ -90,26 +90,45 @@ def get_image_json_doc(orig_json, image_name, new_id):
     image_orig_name = 'IMG_' + image_name.split('_')[3] + '.JPG'
     for img in orig_json['images']:
         if img['file_name'] == image_orig_name:
+
+            if 'annotated' in img:
+                annotated = img['annotated']
+            else:
+                annotated = False
+
+            if 'metadata' in img:
+                metadata = img['metadata']
+            else:
+                metadata = False
+
+            if 'url' in img:
+                url = img['url']
+            else:
+                url = ''
+
             result = {
                 'date': str(datetime.datetime.now()),
                 'file_name': image_name[13:],
                 'height': img['height'],
                 'id': new_id,
                 'path': image_name[13:],
-                'url': img['url'],
-                'width': img['width']
+                'url': url,
+                'width': img['width'],
+                'dataset_id':dataset_id,
+                'annotated': annotated,
+                'metadata': metadata
             }
             return result
     return []
 
-dir_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/output_phase2/'
+dir_path = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/output_phase2/'
 
 files_in_dir = os.listdir(dir_path)
 ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
 augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
 
 
-orig_json_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/out.json'
+orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/fruits.json'
 with open(orig_json_path) as f:
     orig_json = json.load(f)
 
@@ -135,7 +154,12 @@ is_crowd = 0
 # These ids will be automatically increased as we go
 annotation_id = 0
 image_id = 0
-info = orig_json['info']
+dataset_id = 2
+
+if 'info' in orig_json:
+    info = orig_json['info']
+else:
+    info = 'GeverNet project 2019!'
 categories = orig_json['categories']
 
 output = {
@@ -170,7 +194,7 @@ for file in ground_truth_images:
     output['images'] = images
     output['annotations'] = annotations
 
-    if image_id % 10 == 0:
+    if image_id % 100 == 0:
         with open(dir_path+'new_annotations2_' + str(image_id) + '.json', 'w') as outfile:
             json.dump(output, outfile)
 

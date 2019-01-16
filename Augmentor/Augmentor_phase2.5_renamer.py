@@ -1,5 +1,5 @@
 import os
-dir_path = '/Users/orshemesh/Desktop/Project/DATA/2018_05_09_11_58_segmentation_task_22_fruit_cucumber_BH/output_phase2/'
+dir_path = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/output_phase2/'
 
 files_in_dir = os.listdir(dir_path)
 augmented_image_names = [file for file in files_in_dir if file.find('original_IMG') != -1]
