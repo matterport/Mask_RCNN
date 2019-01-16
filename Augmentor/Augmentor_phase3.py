@@ -64,7 +64,7 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
     # Combine the polygons to calculate the bounding box and area
     multi_poly = MultiPolygon(polygons)
 
-    if multi_poly.area < 150:
+    if multi_poly.area < 150 or len(segmentations) == 0:
         return []
 
     print(multi_poly.area)
@@ -121,14 +121,14 @@ def get_image_json_doc(orig_json, image_name, new_id):
             return result
     return []
 
-dir_path = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/output_phase2/'
+dir_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/output_phase2/'
 
 files_in_dir = os.listdir(dir_path)
 ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
 augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
 
 
-orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/fruits.json'
+orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/leaves.json'
 with open(orig_json_path) as f:
     orig_json = json.load(f)
 
@@ -169,6 +169,8 @@ output = {
     'info': info
 }
 
+category_id = categories[0]['id']
+
 # Create the annotations
 annotations = []
 images = []
@@ -179,17 +181,24 @@ for file in ground_truth_images:
     if new_image_json_doc == []:
         print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
         continue
-    images.append(new_image_json_doc)
     sub_masks = create_sub_masks(mask_image)
     mask_image.close()
+    has_annotation = False
     for color, sub_mask in sub_masks.items():
         # category_id = category_ids[image_id][color]
-        category_id = 1
         annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
         if annotation != []:
             annotations.append(annotation)
             annotation_id += 1
-    print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
+            has_annotation = True
+
+    if has_annotation:
+        images.append(new_image_json_doc)
+        print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
+    else:
+        print('no annotation for {} {}'.format(mask_image.filename, image_id))
+        continue
+
     image_id += 1
     output['images'] = images
     output['annotations'] = annotations

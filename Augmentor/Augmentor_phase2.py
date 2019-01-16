@@ -5,7 +5,7 @@ sys.path.append("/Users/orshemesh/Desktop/project repo/alteredAugmentor")  # To 
 import Augmentor
 
 # this dir must to contains input_dir (the name does not mather) + ground_truth dir
-path = "/Users/orshemesh/Desktop/Project/augmented_cucumbers/"
+path = "/Users/orshemesh/Desktop/Project/augmented_leaves/"
 
 # output dir will be in <path>/output
 p = Augmentor.Pipeline(path+'origin/', output_directory="output_phase2/", save_format="PNG")
@@ -18,8 +18,8 @@ p.rotate(probability=1.0, max_left_rotation=25, max_right_rotation=25)
 p.random_color(probability=1.0, min_factor=0.5, max_factor=1.7)
 p.random_contrast(probability=1.0, min_factor=0.7, max_factor=1.7)
 p.random_brightness(probability=1.0, min_factor=0.7, max_factor=1.5)
-p.skew(probability=0.8, magnitude=0.8)
-p.shear(probability=0.6, max_shear_left=15, max_shear_right=15)
+p.skew(probability=0.8, magnitude=0.3)
+p.shear(probability=0.6, max_shear_left=7, max_shear_right=7)
 p.resize(probability=1.0, width=1024, height=1024)
 
 # p.gaussian_distortion(probability=1.0, grid_width = 700, grid_height=700, magnitude= 8, corner= "ul", method="in") very easy with big grid!!!!

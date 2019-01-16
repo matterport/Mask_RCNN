@@ -2,8 +2,8 @@ import numpy
 from PIL import Image, ImageDraw
 from coco.PythonAPI.pycocotools.coco import COCO
 
-dataDir = '/Users/orshemesh/Desktop/Project/augmented_cucumbers/origin/'
-annFile = dataDir + 'fruits.json'
+dataDir = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/'
+annFile = dataDir + 'leaves.json'
 output_dir = dataDir + 'output_phase1/'
 
 coco = COCO(annFile)
@@ -87,7 +87,8 @@ for img in imgs:
         newIm.save(output_dir+image_name.split('.')[0]+".png")
         image_num = image_num + 1
         print('{} out of {}'.format(image_num, len(imgs)))
-    except:
+    except Exception as e:
+        print(e)
         print("Unexpected error: image {}".format(image_name.split('.')[0]+".png"))
 
 
