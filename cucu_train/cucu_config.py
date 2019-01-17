@@ -15,7 +15,7 @@ class cucumberConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 16
+    IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
     NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
@@ -29,26 +29,47 @@ class cucumberConfig(Config):
 
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 32
+    TRAIN_ROIS_PER_IMAGE = 200
     
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
     
 
+    # Maximum number of ground truth instances to use in one image
+    MAX_GT_INSTANCES = 300
+
+
     VALIDATION_STEPS = 4
-     # Skip detections with < 70% confidence
-     # asher todo: try 0.5
-    DETECTION_MIN_CONFIDENCE = 0.7
+
 
     MAX_SAVED_TRAINED_MODELS = 30
 
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.0001
     LEARNING_MOMENTUM = 0.9
     # each EPOCHS times we save the weights of the net
     EPOCHS = 30
-    # EPOCHS_ROUNDS determines how many weights of the net we will save
+    # EPOCHS_ROUNDS is the number of times we generate new training data with different stats.
     EPOCHS_ROUNDS = 5
+    POST_NMS_ROIS_TRAINING = 2000
 
+    # If enabled, resizes instance masks to a smaller size to reduce
+    # memory load. Recommended when using high-resolution images.
+    USE_MINI_MASK = False
+    ''' DETECTION '''
+    # Max number of final detections
+    DETECTION_MAX_INSTANCES = 300
+
+    # ROIs kept after non-maximum suppression (training and inference)
+    POST_NMS_ROIS_INFERENCE = 2000
+    # Minimum probability value to accept a detected instance
+    # ROIs below this threshold are skipped
+    DETECTION_MIN_CONFIDENCE = 0.5
+
+    # Non-maximum suppression threshold for detection
+    DETECTION_NMS_THRESHOLD = 0.5
+    
+    # Skip detections with < 50% confidence
+    DETECTION_MIN_CONFIDENCE = 0.7
 
     """ DATA GENERATION HYPER PARAMETERS """
     # Use small images for faster training. Set the limits of the small side
@@ -58,13 +79,13 @@ class cucumberConfig(Config):
     IMAGE_MAX_DIM = 512
     
     #SCALES OF GENERATED OBJECTS
-    MIN_SCALE_OBJ = 0.15
-    MAX_SCALE_OBJ = 0.7
+    MIN_SCALE_OBJ = 0.1
+    MAX_SCALE_OBJ = 0.3
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 3000
-    VALID_SET_SIZE = 100
+    TRAIN_SET_SIZE = 6000
+    VALID_SET_SIZE = 200
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 5

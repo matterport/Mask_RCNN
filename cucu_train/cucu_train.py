@@ -66,15 +66,12 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print("5 EPOCHS, 30 ROUNDS, TOLERANCE 5,\n\
+print("5 EPOCHS, 30 ROUNDS, TOLERANCE 3 ON DELTA 0.05,\n\
         DECAYING LEARNING RATE: YES, \n\
         MULTICOLOR OBJECTS: YES,\n\
         ENHANCED BLENDING: YES,\n\
         GROWING NUMBER OF OBJECTS: + 5,\n\
-        MISC: train from clean coco-weights, \n\
-        in aditiion, initial ammount of objects generated is --> in range [5,15] and growing each epochs-round.\n\
-        mAp calculation is added on a random test_data set.\
-        The main attempt here is to train net on wide range of scaled objects. performing small amount of epochs trying to overcome an overfit which we suspicious about.\n\
+        MISC:training is based on last training weights - scales are small and LR is very small - trying to fine-tune \n\
         ")
 
 
@@ -146,12 +143,12 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-weightPath=cucuPaths.cocoModelPath
-model.load_weights(weightPath, by_name=True,
-                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-                               "mrcnn_bbox", "mrcnn_mask"])
-# weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-11 20:50:45.733775/trained_models/cucuWheights_2019-01-12 00:52:13.086031.h5"
-# model.load_weights(weightPath, by_name=True)
+# weightPath=cucuPaths.cocoModelPath
+#model.load_weights(weightPath, by_name=True,
+#                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+#                               "mrcnn_bbox", "mrcnn_mask"])
+weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
+model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
@@ -212,7 +209,7 @@ for _ in range(config.EPOCHS_ROUNDS):
     config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*3, 0.5)
     config.MIN_GENERATED_OBJECTS = min(math.ceil(config.MIN_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
     config.MAX_GENERATED_OBJECTS = min(math.ceil(config.MAX_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
-    config.LEARNING_RATE = 0.01
+    # config.LEARNING_RATE = 0.01
 
 
 
