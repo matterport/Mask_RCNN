@@ -15,10 +15,10 @@ class cucumberConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 4
+    IMAGES_PER_GPU = 16
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
+    NUM_CLASSES = 1 + 1 # background + fruit
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -29,7 +29,7 @@ class cucumberConfig(Config):
 
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 200
+    TRAIN_ROIS_PER_IMAGE = 100
     
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
@@ -44,7 +44,7 @@ class cucumberConfig(Config):
 
     MAX_SAVED_TRAINED_MODELS = 30
 
-    LEARNING_RATE = 0.0001
+    LEARNING_RATE = 0.01
     LEARNING_MOMENTUM = 0.9
     # each EPOCHS times we save the weights of the net
     EPOCHS = 30

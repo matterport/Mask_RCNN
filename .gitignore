@@ -4,6 +4,7 @@ logs/
 results/
 temp/
 test/
+cucu_train/project_dataset/
 *.h5
 *events.out.tfevents*
 # ASHER ignore:
