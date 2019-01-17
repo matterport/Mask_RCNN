@@ -127,10 +127,19 @@ class TabletopDataset(utils.Dataset):
         # MaskID = correspondences between mask colors and class label
 
         # Add classes (except __background__, that is added by default)
-        for class_name, id in dataset_dict['Classes'].items():
-            if class_name=='__background__':
+        # We need to make sure that the classes are added according to the order of their IDs in the dataset
+        # Or the names will be screwed up
+        class_entries_sorted_by_id = sorted(dataset_dict['Classes'].items(), key=lambda kv: kv[1])
+
+        # for class_name, id in dataset_dict['Classes'].items():
+        #     if class_name=='__background__':
+        #         continue
+        #     self.add_class("tabletop", id, class_name)
+
+        for label, id in class_entries_sorted_by_id:
+            if label == '__background__':
                 continue
-            self.add_class("tabletop", id, class_name)
+            self.add_class('tabletop', id, label)
 
         # Iterate over images in the dataset to add them
         for path, info in dataset_dict['Images'].items():
