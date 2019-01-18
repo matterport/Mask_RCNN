@@ -66,7 +66,7 @@ class TabletopConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # Background + balloon
+    NUM_CLASSES = 1 + 2  # Background + balloon
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
