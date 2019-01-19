@@ -1,6 +1,7 @@
 import numpy
 from PIL import Image, ImageDraw
 from pycocotools.coco import COCO
+import os.path
 
 # dataDir = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/'
 # annFile = dataDir + 'leaves.json'
@@ -31,7 +32,7 @@ def augment_create_mask_files(dataset_dir_path, dataset_annotation_file_path, ou
         # read image as RGB and add alpha (transparency)
         images_dir_path = dataDir
         image_name = img['file_name']
-        im = Image.open(images_dir_path+image_name).convert("RGBA")
+        im = Image.open(os.path.join(images_dir_path, image_name)).convert("RGBA")
         # im.show()
 
         # convert to numpy (for convenience)
@@ -90,7 +91,7 @@ def augment_create_mask_files(dataset_dir_path, dataset_annotation_file_path, ou
         try:
             newIm = Image.fromarray(newImArray, "RGBA")
             # newIm.show()
-            newIm.save(output_dir+image_name.split('.')[0]+".png")
+            newIm.save(os.path.join(output_dir, image_name).split('.')[0]+".png")
             image_num = image_num + 1
             print('{} out of {}\n path:{}'.format(image_num, len(imgs), output_dir+image_name.split('.')[0]+".png"))
         except Exception as e:

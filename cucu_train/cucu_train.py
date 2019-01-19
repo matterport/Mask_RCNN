@@ -46,9 +46,9 @@ cucuPaths = project_paths(
     trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
     visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
     cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/train_data"),
-    valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/valid_data"),
-    testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
+    trainDatasetDir=       os.path.join(ROOT_DIR, "project_dataset/real/512/augmented"),
+    valDatasetDir=         os.path.join(ROOT_DIR, "project_dataset/real/512/validation"),
+    testDatasetDir=        os.path.join(ROOT_DIR, "project_dataset/real/512/validation"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
     trainOutputLog      =  CURRENT_CONTAINER_DIR
 
@@ -66,14 +66,12 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print("5 EPOCHS, 30 ROUNDS, TOLERANCE 3 ON DELTA 0.05,\n\
+print(" REAL-DATASET\n\
+        30 EPOCHS, 5 ROUNDS,\n\
         DECAYING LEARNING RATE: YES, \n\
-        MULTICOLOR OBJECTS: YES,\n\
-        ENHANCED BLENDING: YES,\n\
-        GROWING NUMBER OF OBJECTS: + 5,\n\
-        MISC:training is based on last training weights - scales are small and LR is very small - trying to fine-tune \n\
+        AUGMENTED: YES, \n\
+        DATASET SIZE: 5000 \n\
         ")
-
 
 
 import json
@@ -92,10 +90,6 @@ print(sys.version)
 #create configurations for model instentiating
 cucuConf.display()
 
-
-
-
-
 # In[3]:
 #prepare source objects for current container
 from randomColorObjects import randomColorObject, toGray
@@ -103,8 +97,8 @@ from shutil import copyfile, copytree
 
 # Create a training set for this Experiment and store it in the container
 #RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
-copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
-randIndex = 0
+# copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
+# randIndex = 0
 #for _ in range(1):
 #    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
 #        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
@@ -130,7 +124,7 @@ randIndex = 0
 # add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr*0.9
+    return lr * 0.5
 
 custom_callbacks=[
     EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
@@ -143,11 +137,11 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-# weightPath=cucuPaths.cocoModelPath
+weightPath=cucuPaths.cocoModelPath
 #model.load_weights(weightPath, by_name=True,
 #                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
 #                               "mrcnn_bbox", "mrcnn_mask"])
-weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
+# weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
 model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
@@ -158,22 +152,12 @@ import math
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
-    # asher todo: add a choice from which dataset to generate
-    dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
-                                cucuPaths.trainDatasetDir + '/leaves_objects',
-                                cucuPaths.trainDatasetDir + '/flower_objects',
-                                cucuPaths.trainDatasetDir + '/background_folder/1024', config)
-    dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    dataset_train.prepare()
-
+    dataset_train = realDataset()
+    dataset_train.load_dataset(os.path.join(cucuPaths.trainDatasetDir, "annotations.json"), cucuPaths.trainDatasetDir)
 
     # Validation dataset
-    dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
-                                cucuPaths.valDatasetDir + '/leaves_objects',
-                                cucuPaths.valDatasetDir + '/flower_objects',
-                                cucuPaths.valDatasetDir + '/background_folder/1024', config)
-    dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    dataset_val.prepare()
+    dataset_val = realDataset()
+    dataset_val.load_dataset(os.path.join(cucuPaths.valDatasetDir, "annotations.json"), cucuPaths.valDatasetDir)
 
     # In[ ]:
 
