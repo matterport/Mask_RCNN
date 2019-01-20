@@ -6,7 +6,7 @@ import os
 def augment_batch_rename(dir_path):
 
     files_in_dir = os.listdir(dir_path)
-    augmented_image_names = [file for file in files_in_dir if file.find('original_IMG') != -1]
+    augmented_image_names = [file for file in files_in_dir if file.find('original_IMG') != -1 and file.find('groundtruth') == -1]
 
     ground_truth_images = [file for file in files_in_dir if file.find('groundtruth') != -1]
     i = 0
@@ -24,7 +24,8 @@ def augment_batch_rename(dir_path):
                 print(g_new_name)
                 os.rename(os.path.join(dir_path, g_img), os.path.join(dir_path, g_new_name))
                 os.rename(os.path.join(dir_path, a_img), os.path.join(dir_path, a_new_name))
-
                 f = False
+                break
+
         if f:
             print("doesn't find match image to: {}".format(g_img))
