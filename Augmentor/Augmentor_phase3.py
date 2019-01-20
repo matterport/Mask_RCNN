@@ -6,6 +6,7 @@ import json
 import os
 import datetime
 import os
+import glob
 
 def create_sub_masks(mask_image):
     width, height = mask_image.size
@@ -87,8 +88,26 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
 
     return annotation
 
-def get_image_json_doc(orig_json, image_name, new_id):
-    image_orig_name = 'IMG_' + image_name.split('_')[3] + '.JPG'
+def get_image_json_doc(orig_json, gt_image_path, new_id):
+    image_file_path = os.path.dirname(gt_image_path)
+    gt_image_filename = os.path.split(gt_image_path)[1]
+
+    # e.g: ground_truth_IMG_2055_22.PNG ==> IMG_2055_22
+    core_name = gt_image_filename.split("ground_truth_")[-1].split(".")[0]
+
+    # find image filename and discover its filetype
+    image_file_path = glob.glob(os.path.join(image_file_path, core_name + "*"))[0]
+    image_name = os.path.split(image_file_path)[-1]
+
+    # original name in original json
+    core_name_parts = core_name.split('_')
+    image_orig_name = core_name_parts[0] + "_" + core_name_parts[1] + '.JPG'
+
+    # get new width and height of image
+    tmp = Image.open(os.path.join(image_file_path))
+    width, height = tmp.size
+    tmp.close()
+    
     for img in orig_json['images']:
         if img['file_name'] == image_orig_name:
 
@@ -109,12 +128,12 @@ def get_image_json_doc(orig_json, image_name, new_id):
 
             result = {
                 'date': str(datetime.datetime.now()),
-                'file_name': image_name[13:],
-                'height': img['height'],
+                'file_name': image_name,
                 'id': new_id,
-                'path': image_name[13:],
+                'path': image_file_path,
                 'url': url,
-                'width': img['width'],
+                'width': width,
+                'height': height,
                 # 'dataset_id': dataset_id,
                 'annotated': annotated,
                 'metadata': metadata
@@ -173,15 +192,15 @@ def augment_reconstruct_json(dir_path, orig_json_path):
     }
 
     category_id = categories[0]['id']
-
     # Create the annotations
     annotations = []
     images = []
-    error_num = 0
+    errors = []
     for file in ground_truth_images:
         mask_image = Image.open(os.path.join(dir_path, file))
-        new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
+        new_image_json_doc = get_image_json_doc(orig_json, os.path.join(dir_path, file), image_id)
         if new_image_json_doc == []:
+            errors.append("{} file not found in original json".format(mask_image.filename.split('/')[-1]))
             print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
             continue
         sub_masks = create_sub_masks(mask_image)
@@ -196,10 +215,12 @@ def augment_reconstruct_json(dir_path, orig_json_path):
                 has_annotation = True
 
         if has_annotation:
+            # change images size in json
             images.append(new_image_json_doc)
-            print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
+            print('{} Done! {} out of {}'.format(mask_image.filename, image_id + 1, len(ground_truth_images)))
         else:
             print('no annotation for {} {}'.format(mask_image.filename, image_id))
+            errors.append('no annotation for {} {}'.format(mask_image.filename, image_id))
             continue
 
         image_id += 1
@@ -207,9 +228,11 @@ def augment_reconstruct_json(dir_path, orig_json_path):
         output['annotations'] = annotations
 
         if image_id % 100 == 0:
-            with open(os.path.join(dir_path, 'new_annotations2_' + str(image_id) + '.json'), 'w') as outfile:
+            with open(os.path.join(dir_path, 'new_annotations_' + str(image_id) + '.json'), 'w') as outfile:
                 json.dump(output, outfile, indent=4, sort_keys=True)
 
     # print(json.dumps(output))
-    with open(os.path.join(dir_path, 'new_annotations2.json'), 'w') as outfile:
-        json.dump(output, outfile)
+    with open(os.path.join(dir_path, 'annotations.json'), 'w') as outfile:
+        json.dump(output, outfile, indent=4, sort_keys=True)
+
+    print(errors)

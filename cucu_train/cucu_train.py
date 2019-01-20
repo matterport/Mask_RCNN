@@ -37,6 +37,7 @@ CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
 now = datetime.datetime.now()
 
 #
+# CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR + "train_results_2019-01-19 22:24:11.136986"
 CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now)
 os.chmod(ROOT_DIR, mode=0o777)
 # create centralized class for used paths during training
@@ -46,9 +47,9 @@ cucuPaths = project_paths(
     trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
     visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
     cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       os.path.join(ROOT_DIR, "project_dataset/real/512/augmented"),
-    valDatasetDir=         os.path.join(ROOT_DIR, "project_dataset/real/512/validation"),
-    testDatasetDir=        os.path.join(ROOT_DIR, "project_dataset/real/512/validation"),
+    trainDatasetDir=       os.path.join(ROOT_DIR, "cucu_train/project_dataset/real/512/augmented"),
+    valDatasetDir=         os.path.join(ROOT_DIR, "cucu_train/project_dataset/real/512/validation"),
+    testDatasetDir=        os.path.join(ROOT_DIR, "cucu_train/project_dataset/real/512/validation"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
     trainOutputLog      =  CURRENT_CONTAINER_DIR
 
@@ -66,7 +67,8 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print(" REAL-DATASET\n\
+print("\
+        REAL-DATASET\n\
         30 EPOCHS, 5 ROUNDS,\n\
         DECAYING LEARNING RATE: YES, \n\
         AUGMENTED: YES, \n\
@@ -137,41 +139,42 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-weightPath=cucuPaths.cocoModelPath
-#model.load_weights(weightPath, by_name=True,
-#                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-#                               "mrcnn_bbox", "mrcnn_mask"])
+weightPath = cucuPaths.cocoModelPath
+model.load_weights(weightPath, by_name=True,
+                      exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                              "mrcnn_bbox", "mrcnn_mask"])
 # weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
-model.load_weights(weightPath, by_name=True)
+# print(weightPath)
+# model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
+# # Training dataset
+dataset_train = realDataset()
+dataset_train.load_dataset(os.path.join(cucuPaths.trainDatasetDir, "annotations.json"), cucuPaths.trainDatasetDir)
+dataset_train.prepare()
+
+# # Validation dataset
+dataset_val = realDataset()
+dataset_val.load_dataset(os.path.join(cucuPaths.valDatasetDir, "annotations.json"), cucuPaths.valDatasetDir)
+dataset_val.prepare()
+
+#show n random image&mask train examples
+n = 10
+image_ids = np.random.choice(dataset_train.image_ids, n)
+for image_id in image_ids:
+    image = dataset_train.load_image(image_id)
+    mask, class_ids = dataset_train.load_mask(image_id)
+    print(image.shape)
+    visualize.display_top_masks( image, mask, class_ids, \
+    dataset_train.class_names,cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset/" + "image_" + str(image_id) +".png", 2)
+
+
 import math
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):
-    # Training dataset
-    dataset_train = realDataset()
-    dataset_train.load_dataset(os.path.join(cucuPaths.trainDatasetDir, "annotations.json"), cucuPaths.trainDatasetDir)
-
-    # Validation dataset
-    dataset_val = realDataset()
-    dataset_val.load_dataset(os.path.join(cucuPaths.valDatasetDir, "annotations.json"), cucuPaths.valDatasetDir)
-
-    # In[ ]:
-
-
-    #show n random image&mask train examples
-    n = 10
-    image_ids = np.random.choice(dataset_train.image_ids, n)
-    for image_id in image_ids:
-        image = dataset_train.load_image(image_id)
-        mask, class_ids = dataset_train.load_mask(image_id)
-        print(image.shape)
-        visualize.display_top_masks( image, mask, class_ids, \
-        dataset_train.class_names,cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset/" + "image_" + str(image_id) +".png", 4)
-
 
     model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=config.EPOCHS,\
                             custom_callbacks=custom_callbacks, layers="heads",verbose=1)
@@ -180,6 +183,7 @@ for _ in range(config.EPOCHS_ROUNDS):
     now = datetime.datetime.now()
     model_path = os.path.join(cucuPaths.trainedModelsDir, "cucuWheights_" + str(now) + ".h5")
     model.keras_model.save_weights(model_path)
+
     #load just trained weights again
     list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
     latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
@@ -225,11 +229,15 @@ model.load_weights(latest_trained_model, by_name=True)
 # DISPLAY_TOP_MASKS
 #create container directories per function calls from Visualize module
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_top_masks")
-tests_location = cucuPaths.testDatasetDir + "/1024"
+tests_location = cucuPaths.testDatasetDir
 for filename in sorted(os.listdir(tests_location)):
     
     testImage = os.path.join(tests_location,filename)
-    t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
+    try:
+        t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
+    except Exception as e:
+        print("error: {}, \n probably a non image file is in the directory".format(e))
+        continue
     results = model.detect([t], verbose=1)
     r = results[0]
     # visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())

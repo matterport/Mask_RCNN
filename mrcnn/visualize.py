@@ -289,7 +289,7 @@ def draw_box(image, box, color):
     return image
 
 
-def display_top_masks(image, mask, class_ids, class_names,savePath=None, limit=4):
+def display_top_masks(image, mask, class_ids, class_names,savePath=None, limit=2):
     """Display the given image and the top few class masks."""
     to_display = []
     titles = []

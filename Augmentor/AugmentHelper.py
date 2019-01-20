@@ -36,16 +36,15 @@ class AugmentHelper(object):
 
     def generate(self):
         # simon - todo: finish implementation
-        # augmented_output_path = "/home/simon/Mask_RCNN/cucu_train/project_dataset/output_phase2/"
-        augment_create_mask_files(self.src_dataset_path, self.annotation_file_path, self.ground_truth_path)
-        augment_perform_pipe(self.src_dataset_path, self.ground_truth_path, self.output_dataset_path)
-        augment_batch_rename(self.output_dataset_path)
+        # augment_create_mask_files(self.src_dataset_path, self.annotation_file_path, self.ground_truth_path)
+        # augment_perform_pipe(self.src_dataset_path, self.ground_truth_path, self.output_dataset_path)
+        # augment_batch_rename(self.output_dataset_path)
         augment_reconstruct_json(self.output_dataset_path, self.annotation_file_path)
-        shutil.rmtree(self.ground_truth_path)   
-        purge(self.output_dataset_path, "ground_truth")
+        # shutil.rmtree(self.ground_truth_path)   
+        # purge(self.output_dataset_path, "ground_truth")
 
-augmentor = AugmentHelper("/home/simon/Mask_RCNN/cucu_train/project_dataset/real/original/validation", 
-                            "/home/simon/Mask_RCNN/cucu_train/project_dataset/real/512/validation")
+augmentor = AugmentHelper("/home/simon/Mask_RCNN/cucu_train/project_dataset/real/original/train", 
+                            "/home/simon/Mask_RCNN/cucu_train/project_dataset/real/512/augmented")
 augmentor.generate()
 print("finish")
 
