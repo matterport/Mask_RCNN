@@ -121,8 +121,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 
     # Show area outside image boundaries.
     height, width = image.shape[:2]
-    ax.set_ylim(height + 10, -10)
-    ax.set_xlim(-10, width + 10)
+    # ax.set_ylim(height + 10, -10)
+    # ax.set_xlim(-10, width + 10)
     ax.axis('off')
     ax.set_title(title)
 
@@ -325,7 +325,8 @@ def plot_precision_recall(AP, precisions, recalls, savePath):
     ax.set_ylim(0, 1.1)
     ax.set_xlim(0, 1.1)
     _ = ax.plot(recalls, precisions)
-    plt.savefig(savePath)
+    if savePath is not None:
+        plt.savefig(savePath)
 
 
 def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
@@ -365,7 +366,8 @@ def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
     plt.tight_layout()
     plt.xlabel("Ground Truth")
     plt.ylabel("Predictions")
-    plt.savefig(savePath)
+    if savePath is not None:
+        plt.savefig(savePath)
 
 def draw_boxes(image, boxes=None, refined_boxes=None,
                masks=None, captions=None, visibilities=None,
@@ -468,7 +470,8 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
                 p = Polygon(verts, facecolor="none", edgecolor=color)
                 ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
-    plt.savefig(savePath)
+    if savePath is not None:
+        plt.savefig(savePath)
 
 
 def display_table(table):
