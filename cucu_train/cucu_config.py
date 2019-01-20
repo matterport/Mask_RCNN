@@ -34,6 +34,7 @@ class cucumberConfig(Config):
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
     
+    IMAGE_RESIZE_MODE = "crop"
 
     # Maximum number of ground truth instances to use in one image
     MAX_GT_INSTANCES = 300
