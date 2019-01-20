@@ -93,7 +93,7 @@ def augment_create_mask_files(dataset_dir_path, dataset_annotation_file_path, ou
             # newIm.show()
             newIm.save(os.path.join(output_dir, image_name).split('.')[0]+".png")
             image_num = image_num + 1
-            print('{} out of {}\n path:{}'.format(image_num, len(imgs), output_dir+image_name.split('.')[0]+".png"))
+            print('{} out of {}\n path:{}'.format(image_num, len(imgs), os.path.join(output_dir, image_name).split('.')[0]+".png"))
         except Exception as e:
             print(e)
             print("Unexpected error: image {}".format(image_name.split('.')[0]+".png"))
