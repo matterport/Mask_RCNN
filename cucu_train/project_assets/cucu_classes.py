@@ -204,8 +204,10 @@ class genDataset(utils.Dataset):
         *returns index in loaded dataset to pick original object from
         """
         # Shape
-        shape = choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"])
-        
+        #todo simon:
+        # shape = choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"])
+        shape = choice(["cucumber","cucumber"])
+
         # this hyper param varifies object is not generated outside the picture
         boundingDelta = cucuConf.BOUNDING_DELTA
         # TopLeft x, y

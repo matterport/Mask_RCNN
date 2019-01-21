@@ -130,7 +130,7 @@ randIndex = 0
 # add custom callbacks if needed as a preparation to training model
 from keras.callbacks import *
 def scheduleLearningRate(epoch, lr):
-    return lr*0.9
+    return lr*0.5
 
 custom_callbacks=[
     EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
@@ -143,12 +143,12 @@ custom_callbacks=[
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-# weightPath=cucuPaths.cocoModelPath
-#model.load_weights(weightPath, by_name=True,
-#                       exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-#                               "mrcnn_bbox", "mrcnn_mask"])
-weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
-model.load_weights(weightPath, by_name=True)
+weightPath=cucuPaths.cocoModelPath
+model.load_weights(weightPath, by_name=True,
+                      exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                              "mrcnn_bbox", "mrcnn_mask"])
+# weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
+# model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
@@ -207,8 +207,8 @@ for _ in range(config.EPOCHS_ROUNDS):
 
     # PREPARE NEW CONFIG FOR NEXT ROUND:
     config.OBJECTS_IOU_THRESHOLD = min(config.OBJECTS_IOU_THRESHOLD*3, 0.5)
-    config.MIN_GENERATED_OBJECTS = min(math.ceil(config.MIN_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
-    config.MAX_GENERATED_OBJECTS = min(math.ceil(config.MAX_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
+    # config.MIN_GENERATED_OBJECTS = min(math.ceil(config.MIN_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
+    # config.MAX_GENERATED_OBJECTS = min(math.ceil(config.MAX_GENERATED_OBJECTS + 5), config.MAX_GT_INSTANCES)
     # config.LEARNING_RATE = 0.01
 
 

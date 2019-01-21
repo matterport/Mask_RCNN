@@ -88,8 +88,8 @@ class cucumberConfig(Config):
     VALID_SET_SIZE = 200
 
     #in case images are synthesized
-    MIN_GENERATED_OBJECTS = 5
-    MAX_GENERATED_OBJECTS = 15
+    MIN_GENERATED_OBJECTS = 2
+    MAX_GENERATED_OBJECTS = 10
 
     # this threshold determines how much objects will cover each other
     OBJECTS_IOU_THRESHOLD = 0.05
