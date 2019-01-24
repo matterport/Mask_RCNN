@@ -15,10 +15,10 @@ class cucumberConfig(Config):
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 8
+    IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1 # background + fruit
+    NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -29,12 +29,11 @@ class cucumberConfig(Config):
 
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 100
+    TRAIN_ROIS_PER_IMAGE = 200
     
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
     
-    IMAGE_RESIZE_MODE = "crop"
 
     # Maximum number of ground truth instances to use in one image
     MAX_GT_INSTANCES = 300
@@ -45,7 +44,7 @@ class cucumberConfig(Config):
 
     MAX_SAVED_TRAINED_MODELS = 30
 
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.0001
     LEARNING_MOMENTUM = 0.9
     # each EPOCHS times we save the weights of the net
     EPOCHS = 30
@@ -89,8 +88,8 @@ class cucumberConfig(Config):
     VALID_SET_SIZE = 200
 
     #in case images are synthesized
-    MIN_GENERATED_OBJECTS = 5
-    MAX_GENERATED_OBJECTS = 15
+    MIN_GENERATED_OBJECTS = 2
+    MAX_GENERATED_OBJECTS = 10
 
     # this threshold determines how much objects will cover each other
     OBJECTS_IOU_THRESHOLD = 0.05
