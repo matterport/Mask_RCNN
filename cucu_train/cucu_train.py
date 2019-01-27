@@ -37,7 +37,7 @@ CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
 now = datetime.datetime.now()
 
 #
-CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now)
+CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now.month) + str(now.day) + str(now.hour)
 os.chmod(ROOT_DIR, mode=0o777)
 # create centralized class for used paths during training
 cucuPaths = project_paths(

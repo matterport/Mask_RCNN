@@ -37,7 +37,7 @@ CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
 now = datetime.datetime.now()
 
 #
-CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"test_results_" + str(now)
+CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"test_results_" + str(now.month) + str(now.day) + str(now.hour) + ".genDataOrigColor"
 os.chmod(ROOT_DIR, mode=0o777)
 # create centralized class for used paths during training
 cucuPaths = project_paths(
@@ -50,8 +50,6 @@ cucuPaths = project_paths(
     valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/valid_data"),
     testDatasetDir=        os.path.join(ROOT_DIR, "cucu_train/project_dataset/real_test_data/test_data"),
     testAnnotationsDir =    os.path.join(ROOT_DIR, "cucu_train/project_dataset/real_test_data/test_annotations/test.json"),
-    # testDatasetDir=        os.path.join(ROOT_DIR, "cucu_train/project_dataset/real_images"),
-    # testAnnotationsDir =    os.path.join(ROOT_DIR, "cucu_train/project_dataset/real_annotations/segmentation_results.json"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
     trainOutputLog      =  CURRENT_CONTAINER_DIR
 
@@ -102,7 +100,7 @@ model = modellib.MaskRCNN(mode="inference", config=inference_config, model_dir=c
 
 
 
-weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-16 23:11:42.574683/trained_models/cucuWheights_2019-01-17 09:02:13.754119.h5"
+weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/compareEqualCond_2/train_results_2019-01-15 08:41:40.genDataOrigColor/trained_models/cucuWheights_2019-01-15 15:18:33.324335.h5"
 model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
