@@ -18,7 +18,7 @@ class cucumberConfig(Config):
     IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
+    NUM_CLASSES = 1 + 1 # background + cucumber, leaf, flower
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
