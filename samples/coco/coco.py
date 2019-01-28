@@ -25,6 +25,13 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
     # Run COCO evaluatoin on the last model you trained
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
+
+    # Train a MobileNet224v1 model starting from ImageNet weights
+    python3 coco.py train --dataset=/path/to/coco/ --model=imagenet --backbone=mobilenet224v1
+
+    # Continue training the last MobileNet224v1 model you trained
+    python3 coco.py train --dataset=/path/to/coco/ --model=last --backbone=mobilenet224v1
+
 """
 
 import os
@@ -457,14 +464,10 @@ if __name__ == '__main__':
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
         config = InferenceConfig()
+
+    utils.configure_backbone(config, args.backbone)
+
     config.display()
-
-
-    # Configure backbone architecture
-    if args.backbone.lower() == "resnet50":
-        config.BACKBONE = "resnet50"
-    elif args.backbone.lower() == "mobilenet224v1":
-        config.BACKBONE = "mobilenet224v1"
 
 
     if args.train_bn:

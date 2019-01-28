@@ -210,6 +210,7 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
         C5 = None
     return [C1, C2, C3, C4, C5]
 
+
 ############################################################
 #  Mobilenet Graph
 ############################################################
@@ -2696,9 +2697,6 @@ class MaskRCNN():
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "3R+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "4R+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "5R+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # From a specific Mobilenet stage and up
             "5M+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "11M+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",

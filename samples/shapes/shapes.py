@@ -59,6 +59,9 @@ class ShapesConfig(Config):
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = 5
 
+    # Uncomment to use Mobilenet224v1 as a backbone
+    #BACKBONE = "mobilenet224v1"
+
 
 class ShapesDataset(utils.Dataset):
     """Generates the shapes synthetic dataset. The dataset consists of simple
