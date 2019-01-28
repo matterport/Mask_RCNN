@@ -2260,7 +2260,7 @@ class MaskRCNN():
                                         int(m.group(4)), int(m.group(5)))
                 # Epoch number in file is 1-based, and in Keras code it's 0-based.
                 # So, adjust for that then increment by one to start from the next epoch
-                self.epoch = int(m.group(6))
+                self.epoch = int(m.group(6)) - 1 + 1
                 print('Re-starting from epoch %d' % self.epoch)
 
         # Directory for training logs
