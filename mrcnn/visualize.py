@@ -15,6 +15,7 @@ import colorsys
 
 import numpy as np
 from skimage.measure import find_contours
+from skimage import exposure
 import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
@@ -31,6 +32,34 @@ from mrcnn import utils
 ############################################################
 #  Visualization
 ############################################################
+def normalize(arr):
+    ''' Function to normalize an input array to 0-1 '''
+    arr_max = arr.max()
+    return arr / arr_max
+
+def reorder_to_brg(image):
+    '''reorders wv2 bands ordered like RGBNRGN for off/onseason
+    to blue, red, green for imshow
+    '''
+    blue = normalize(image[:,:,2])
+    green = normalize(image[:,:,1])
+    red = normalize(image[:,:,0])
+    nir = normalize(image[:,:,3])
+    return np.stack([blue, red, green], axis=-1)
+
+def percentile_rescale(arr):
+    '''
+    Rescales and applies other exposure functions to improve image vis. 
+    http://scikit-image.org/docs/dev/api/skimage.exposure.html#skimage.exposure.rescale_intensity
+    '''
+    rescaled_arr = np.zeros_like(arr)
+    for i in range(0,arr.shape[-1]):
+        val_range = (np.percentile(arr[:,:,i], 1), np.percentile(arr[:,:,i], 99))
+        rescaled_channel = exposure.rescale_intensity(arr[:,:,i], val_range)
+        rescaled_arr[:,:,i] = rescaled_channel
+#     rescaled_arr= exposure.adjust_gamma(rescaled_arr, gamma=1) #adjust from 1 either way
+#     rescaled_arr= exposure.adjust_sigmoid(rescaled_arr, cutoff=.50) #adjust from .5 either way 
+    return rescaled_arr
 
 def display_images(images, titles=None, cols=4, cmap=None, norm=None,
                    interpolation=None):
@@ -47,12 +76,33 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
     plt.figure(figsize=(14, 14 * rows // cols))
     i = 1
     for image, title in zip(images, titles):
-        plt.subplot(rows, cols, i)
-        plt.title(title, fontsize=9)
-        plt.axis('off')
-        plt.imshow(image.astype(np.uint8), cmap=cmap,
+        if i == 1 and image.shape[-1] == 8: #added for wv2
+            brg = reorder_to_brg(image)
+            brg_adap = exposure.equalize_adapthist(brg, clip_limit=0.0055)
+            plt.figure()
+            plt.subplot(rows, cols, i)
+            plt.title(title, fontsize=9)
+            plt.axis('off')
+            plt.imshow(brg_adap, cmap='brg',
                    norm=norm, interpolation=interpolation)
-        i += 1
+            i += 1
+        elif i == 1 and image.shape[-1]==3: #added for RGB satellite imagery, tested with wv2
+            image[image < 0] = 0
+            image = percentile_rescale(image)
+            plt.figure()
+            plt.subplot(rows, cols, i)
+            plt.title(title, fontsize=9)
+            plt.axis('off')
+            plt.imshow(image, cmap='brg',
+                   norm=norm, interpolation=interpolation)
+            i += 1
+        else:
+            plt.subplot(rows, cols, i)
+            plt.title(title, fontsize=9)
+            plt.axis('off')
+            plt.imshow(image, cmap=cmap,
+                   norm=norm, interpolation=interpolation)
+            i += 1
     plt.show()
 
 
@@ -163,7 +213,14 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
-    ax.imshow(masked_image.astype(np.uint8))
+    if image.shape[-1] == 8: # added for wv2 using RGBNRGB for two seasons        
+        brg = reorder_to_brg(image)
+        brg_adap = exposure.equalize_adapthist(brg, clip_limit=0.0055)
+        ax.imshow(brg_adap) # added band reordering for wv2 and adaptive stretch
+    else:
+        image[image < 0] = 0
+        image = percentile_rescale(image)
+        ax.imshow(image, cmap='brg')
     if auto_show:
         plt.show()
 
@@ -257,8 +314,12 @@ def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10)
             m = utils.unmold_mask(mask[id], rois[id]
                                   [:4].astype(np.int32), image.shape)
             masked_image = apply_mask(masked_image, m, color)
-
-    ax.imshow(masked_image)
+    if image.shape[-1] == 8: # added for wv2
+        brg = reorder_to_brg(image)
+        brg_adap = exposure.equalize_adapthist(brg, clip_limit=0.0055)
+        ax.imshow(brg_adap)
+    else:
+        ax.imshow(masked_image)
 
     # Print stats
     print("Positive ROIs: ", class_ids[class_ids > 0].shape[0])
@@ -272,6 +333,10 @@ def draw_box(image, box, color):
     """Draw 3-pixel width bounding boxes on the given image array.
     color: list of 3 int values for RGB.
     """
+
+    if image.shape[-1] == 8: # added for 8 channel wv2
+        image = reorder_to_brg(image)
+
     y1, x1, y2, x2 = box
     image[y1:y1 + 2, x1:x2] = color
     image[y2:y2 + 2, x1:x2] = color
@@ -300,7 +365,7 @@ def display_top_masks(image, mask, class_ids, class_names, limit=4):
         m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
         to_display.append(m)
         titles.append(class_names[class_id] if class_id != -1 else "-")
-    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r")
+    display_images(to_display, titles=titles, cols=limit + 1, cmap="brg")
 
 
 def plot_precision_recall(AP, precisions, recalls):
@@ -457,8 +522,12 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
                 verts = np.fliplr(verts) - 1
                 p = Polygon(verts, facecolor="none", edgecolor=color)
                 ax.add_patch(p)
-    ax.imshow(masked_image.astype(np.uint8))
-
+    if image.shape[-1] == 8: # added for wv2
+        brg = reorder_to_brg(image)
+        brg_adap = exposure.equalize_adapthist(brg, clip_limit=0.0055)
+        ax.imshow(brg_adap)
+    else:
+        ax.imshow(masked_image.astype(np.uint8))
 
 def display_table(table):
     """Display values in a table format.

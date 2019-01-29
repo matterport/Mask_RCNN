@@ -1,0 +1,43 @@
+dirs:
+    root: /home/rave/tana-crunch/waves/cropmask/data
+    dataset: landsat-1024-cp-nobaddata # rename this based on the imagery and labels
+    reorder: reorder
+    train: train
+    test: test
+    gridded_imgs: landsat_grid_imgs
+    gridded_labels: landsat_grid_labels
+    opened: opened_labels
+    results: results
+    source_imgs: North_Platte_Western_NB_L5_2004-2006_stacked
+    source_labels: north_platte_landsat_tile_labels
+    neg_buffered_labels: neg_buffered_labels
+seasons:
+    GS: false # if GS and OS are false, seasons are disregarded
+    OS: false
+landsat_bands_to_include:
+    - blue: true
+    - green: true
+    - red: true
+    - near-IR : false
+wv2_bands_to_include:
+    - coastal: false
+    - blue: true
+    - green: true
+    - yellow: false
+    - red: true
+    - red_edge: false
+    - near_IR1: false
+    - near_IR2: false
+image_vals:
+    dataset: "landsat"
+    img_id: "LT05_L1TP_032031_20040318_20160914_01rgb.tif" #check REORDER folder for what id this should be. If False, operates on whole folder, extent of images and shape pairs must match
+    grid_size: 512 # in pixel units
+    usable_thresh: .00 #image must have no more than this percentage of values that are zero from either clouds or no_data (tile edges)
+    split: .10 # the proportion of samples that will be used for testing
+label_vals:
+    class: 3 # this is the integer associated with the particular class you would like to segment. 1: smallholder, 2: large ag, 3:center pivots for the wv2 datasets
+    neg_buffer: -30 # in meters, applied on vectors before they are rasterized to reduce spurious instance overlap
+    small_area_filter: 100 # in area meters, removes fields with area less than 100 meters from labels 
+    big_area_filter: 100000000000000 # in area meters, remove fields that are larger than this value
+    open: false # whether or not to apply opening. Necessary due to small partial fields after gridding
+    kernel: 5 # square kernel size for erosion then dilation of raterized instance labels to reduce overlap

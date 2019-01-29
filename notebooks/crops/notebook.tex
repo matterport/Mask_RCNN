@@ -1,0 +1,934 @@
+
+% Default to the notebook output style
+
+    
+
+
+% Inherit from the specified cell style.
+
+
+
+
+    
+\documentclass[11pt]{article}
+
+    
+    
+    \usepackage[T1]{fontenc}
+    % Nicer default font (+ math font) than Computer Modern for most use cases
+    \usepackage{mathpazo}
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % We will generate all images so they have a width \maxwidth. This means
+    % that they will get their normal width if they fit onto the page, but
+    % are scaled down if they would overflow the margins.
+    \makeatletter
+    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+    \else\Gin@nat@width\fi}
+    \makeatother
+    \let\Oldincludegraphics\includegraphics
+    % Set max figure width to be 80% of text width, for now hardcoded.
+    \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=.8\maxwidth]{#1}}
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionLabelFormat{nolabel}{}
+    \captionsetup{labelformat=nolabel}
+
+    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+    \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
+    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics 
+                         % to support a larger range 
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    
+
+    
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+    
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    
+    
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatability definitions
+    \def\gt{>}
+    \def\lt{<}
+    % Document parameters
+    \title{inspect\_crop\_model}
+    
+    
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\expandafter\def\csname PY@tok@w\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\expandafter\def\csname PY@tok@c\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.74,0.48,0.00}{##1}}}
+\expandafter\def\csname PY@tok@k\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\expandafter\def\csname PY@tok@o\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@ow\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@nn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@ne\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.82,0.25,0.23}{##1}}}
+\expandafter\def\csname PY@tok@nv\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@no\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ni\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,0.60}{##1}}}
+\expandafter\def\csname PY@tok@na\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.49,0.56,0.16}{##1}}}
+\expandafter\def\csname PY@tok@nt\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@nd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\expandafter\def\csname PY@tok@s\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sd\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@si\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@se\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sr\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.40,0.53}{##1}}}
+\expandafter\def\csname PY@tok@ss\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sx\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@m\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@gh\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gu\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@gd\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\expandafter\def\csname PY@tok@gr\endcsname{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}}
+\expandafter\def\csname PY@tok@ge\endcsname{\let\PY@it=\textit}
+\expandafter\def\csname PY@tok@gs\endcsname{\let\PY@bf=\textbf}
+\expandafter\def\csname PY@tok@gp\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\expandafter\def\csname PY@tok@go\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.53,0.53,0.53}{##1}}}
+\expandafter\def\csname PY@tok@gt\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\expandafter\def\csname PY@tok@err\endcsname{\def\PY@bc##1{\setlength{\fboxsep}{0pt}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}
+\expandafter\def\csname PY@tok@kc\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kd\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kn\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@kr\endcsname{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@bp\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\expandafter\def\csname PY@tok@fm\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\expandafter\def\csname PY@tok@vc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vg\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@vm\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\expandafter\def\csname PY@tok@sa\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sc\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@dl\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@s2\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@sh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@s1\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\expandafter\def\csname PY@tok@mb\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mf\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mh\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mi\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@il\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@mo\endcsname{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\expandafter\def\csname PY@tok@ch\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cm\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cpf\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@c1\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+\expandafter\def\csname PY@tok@cs\endcsname{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.25,0.50,0.50}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy 
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+    \begin{document}
+    
+    
+    \maketitle
+    
+    
+
+    
+    \section{Mask R-CNN - Inspect WV2 Trained
+Model}\label{mask-r-cnn---inspect-wv2-trained-model}
+
+Code and visualizations to test, debug, and evaluate the Mask R-CNN
+model.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{k+kn}{import} \PY{n+nn}{os}
+        \PY{k+kn}{import} \PY{n+nn}{sys}
+        \PY{k+kn}{import} \PY{n+nn}{random}
+        \PY{k+kn}{import} \PY{n+nn}{math}
+        \PY{k+kn}{import} \PY{n+nn}{re}
+        \PY{k+kn}{import} \PY{n+nn}{time}
+        \PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+        \PY{k+kn}{import} \PY{n+nn}{tensorflow} \PY{k}{as} \PY{n+nn}{tf}
+        \PY{k+kn}{import} \PY{n+nn}{matplotlib}
+        \PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+        \PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{patches} \PY{k}{as} \PY{n+nn}{patches}
+        
+        \PY{c+c1}{\PYZsh{} Root directory of the project}
+        \PY{n}{ROOT\PYZus{}DIR} \PY{o}{=} \PY{n}{os}\PY{o}{.}\PY{n}{path}\PY{o}{.}\PY{n}{abspath}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{../../}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Import Mask RCNN}
+        \PY{n}{sys}\PY{o}{.}\PY{n}{path}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{ROOT\PYZus{}DIR}\PY{p}{)}  \PY{c+c1}{\PYZsh{} To find local version of the library}
+        \PY{k+kn}{from} \PY{n+nn}{mrcnn} \PY{k}{import} \PY{n}{utils}
+        \PY{k+kn}{from} \PY{n+nn}{mrcnn} \PY{k}{import} \PY{n}{visualize}
+        \PY{k+kn}{from} \PY{n+nn}{mrcnn}\PY{n+nn}{.}\PY{n+nn}{visualize} \PY{k}{import} \PY{n}{display\PYZus{}images}
+        \PY{k+kn}{import} \PY{n+nn}{mrcnn}\PY{n+nn}{.}\PY{n+nn}{model} \PY{k}{as} \PY{n+nn}{modellib}
+        \PY{k+kn}{from} \PY{n+nn}{mrcnn}\PY{n+nn}{.}\PY{n+nn}{model} \PY{k}{import} \PY{n}{log}
+        
+        \PY{k+kn}{import} \PY{n+nn}{crop\PYZus{}mask}
+        \PY{k+kn}{import} \PY{n+nn}{model\PYZus{}configs}
+        \PY{k+kn}{import} \PY{n+nn}{datasets}
+        \PY{k+kn}{import} \PY{n+nn}{preprocess} \PY{k}{as} \PY{n+nn}{pp} \PY{c+c1}{\PYZsh{} pp.DATASET to get the dir}
+        
+        \PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline 
+        
+        \PY{c+c1}{\PYZsh{} Directory to save logs and trained model}
+        \PY{n}{LOGS\PYZus{}DIR} \PY{o}{=} \PY{n}{os}\PY{o}{.}\PY{n}{path}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{ROOT\PYZus{}DIR}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{logs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Comment out to reload imported modules if they change}
+        \PY{o}{\PYZpc{}}\PY{k}{load\PYZus{}ext} autoreload
+        \PY{o}{\PYZpc{}}\PY{k}{autoreload} 2
+\end{Verbatim}
+
+
+    \subsection{Configurations}\label{configurations}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Inference Configuration}
+        \PY{n}{config} \PY{o}{=} \PY{n}{model\PYZus{}configs}\PY{o}{.}\PY{n}{WV2InferenceConfig}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{)}
+        \PY{n}{config}\PY{o}{.}\PY{n}{display}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Notebook Preferences}\label{notebook-preferences}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Device to load the neural network on.}
+        \PY{c+c1}{\PYZsh{} Useful if you\PYZsq{}re training a model on the same }
+        \PY{c+c1}{\PYZsh{} machine, in which case use CPU and leave the}
+        \PY{c+c1}{\PYZsh{} GPU for training.}
+        \PY{c+c1}{\PYZsh{} check which gpu is being used to train another model with nvidia\PYZhy{}smi. use the other gpu for inference}
+        \PY{n}{DEVICE} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{/gpu:1}\PY{l+s+s2}{\PYZdq{}}  \PY{c+c1}{\PYZsh{} /cpu:0 or /gpu:0}
+        
+        \PY{c+c1}{\PYZsh{} Inspect the model in training or inference modes}
+        \PY{c+c1}{\PYZsh{} values: \PYZsq{}inference\PYZsq{} or \PYZsq{}training\PYZsq{}}
+        \PY{c+c1}{\PYZsh{} Only inference mode is supported right now}
+        \PY{n}{TEST\PYZus{}MODE} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{inference}\PY{l+s+s2}{\PYZdq{}}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{k}{def} \PY{n+nf}{get\PYZus{}ax}\PY{p}{(}\PY{n}{rows}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{cols}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{size}\PY{o}{=}\PY{l+m+mi}{16}\PY{p}{)}\PY{p}{:}
+            \PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}Return a Matplotlib Axes array to be used in}
+        \PY{l+s+sd}{    all visualizations in the notebook. Provide a}
+        \PY{l+s+sd}{    central point to control graph sizes.}
+        \PY{l+s+sd}{    }
+        \PY{l+s+sd}{    Adjust the size attribute to control how big to render images}
+        \PY{l+s+sd}{    \PYZdq{}\PYZdq{}\PYZdq{}}
+            \PY{n}{fig}\PY{p}{,} \PY{n}{ax} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{rows}\PY{p}{,} \PY{n}{cols}\PY{p}{,} \PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{n}{size}\PY{o}{*}\PY{n}{cols}\PY{p}{,} \PY{n}{size}\PY{o}{*}\PY{n}{rows}\PY{p}{)}\PY{p}{)}
+            \PY{n}{fig}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)}
+            \PY{k}{return} \PY{n}{ax}
+\end{Verbatim}
+
+
+    \subsection{Load Validation Dataset}\label{load-validation-dataset}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Load validation dataset}
+        \PY{n}{dataset} \PY{o}{=} \PY{n}{datasets}\PY{o}{.}\PY{n}{WV2Dataset}\PY{p}{(}\PY{p}{)}
+        \PY{n}{dataset}\PY{o}{.}\PY{n}{load\PYZus{}imagery}\PY{p}{(}\PY{n}{pp}\PY{o}{.}\PY{n}{DATASET}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{test}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{image\PYZus{}source}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{wv2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{class\PYZus{}name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{smallholder}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+        \PY{n}{dataset}\PY{o}{.}\PY{n}{prepare}\PY{p}{(}\PY{p}{)}
+        
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Images: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Classes: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}ids}\PY{p}{)}\PY{p}{,} \PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Load Model}\label{load-model}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Create model in inference mode}
+        \PY{k}{with} \PY{n}{tf}\PY{o}{.}\PY{n}{device}\PY{p}{(}\PY{n}{DEVICE}\PY{p}{)}\PY{p}{:}
+            \PY{n}{model} \PY{o}{=} \PY{n}{modellib}\PY{o}{.}\PY{n}{MaskRCNN}\PY{p}{(}\PY{n}{mode}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{inference}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+                                      \PY{n}{model\PYZus{}dir}\PY{o}{=}\PY{n}{LOGS\PYZus{}DIR}\PY{p}{,}
+                                      \PY{n}{config}\PY{o}{=}\PY{n}{config}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Path to a specific weights file}
+        \PY{n}{weights\PYZus{}path} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{/tana\PYZhy{}crunch/waves/cropmask/logs/wv2\PYZhy{}512\PYZhy{}small\PYZhy{}labels\PYZhy{}allgrowing\PYZhy{}fromcoco\PYZhy{}opening20180720T0940/mask\PYZus{}rcnn\PYZus{}wv2\PYZhy{}512\PYZhy{}small\PYZhy{}labels\PYZhy{}allgrowing\PYZhy{}fromcoco\PYZhy{}opening\PYZus{}0002.h5}\PY{l+s+s2}{\PYZdq{}}
+        \PY{c+c1}{\PYZsh{} Or, load the last model you trained}
+        \PY{c+c1}{\PYZsh{}weights\PYZus{}path = model.find\PYZus{}last()}
+        
+        \PY{c+c1}{\PYZsh{} Load weights}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Loading weights }\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{weights\PYZus{}path}\PY{p}{)}
+        \PY{n}{model}\PY{o}{.}\PY{n}{load\PYZus{}weights}\PY{p}{(}\PY{n}{weights\PYZus{}path}\PY{p}{,} \PY{n}{by\PYZus{}name}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Run Detection, this won't run detection on negative sa mples
+(those without true ground truth masks), because nucleus example didn't
+have any negative samples. Put in hacky way in else to show
+masks}\label{run-detection-this-wont-run-detection-on-negative-sa-mples-those-without-true-ground-truth-masks-because-nucleus-example-didnt-have-any-negative-samples.-put-in-hacky-way-in-else-to-show-masks}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{dataset\PYZus{}train}\PY{o}{.}\PY{n}{image\PYZus{}info}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{dataset\PYZus{}train} \PY{o}{=} \PY{n}{datasets}\PY{o}{.}\PY{n}{WV2Dataset}\PY{p}{(}\PY{p}{)}
+        \PY{n}{dataset\PYZus{}train}\PY{o}{.}\PY{n}{load\PYZus{}imagery}\PY{p}{(}\PY{n}{pp}\PY{o}{.}\PY{n}{DATASET}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{train}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{image\PYZus{}source}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{wv2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{class\PYZus{}name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{smallholder}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+        \PY{n}{dataset\PYZus{}train}\PY{o}{.}\PY{n}{prepare}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}info}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+        \PY{k+kn}{import} \PY{n+nn}{skimage}\PY{n+nn}{.}\PY{n+nn}{io} \PY{k}{as} \PY{n+nn}{skio}
+        \PY{n}{image\PYZus{}id} \PY{o}{=} \PY{n}{random}\PY{o}{.}\PY{n}{choice}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}ids}\PY{p}{)}
+        \PY{n}{image}\PY{p}{,} \PY{n}{image\PYZus{}meta}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}mask} \PY{o}{=}\PYZbs{}
+            \PY{n}{modellib}\PY{o}{.}\PY{n}{load\PYZus{}image\PYZus{}gt}\PY{p}{(}\PY{n}{dataset}\PY{p}{,} \PY{n}{config}\PY{p}{,} \PY{n}{image\PYZus{}id}\PY{p}{,} \PY{n}{use\PYZus{}mini\PYZus{}mask}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+        \PY{n}{info} \PY{o}{=} \PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}info}\PY{p}{[}\PY{n}{image\PYZus{}id}\PY{p}{]}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{image ID: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{.}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ (}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{) }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{info}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{source}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{,} \PY{n}{info}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{id}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{,} \PY{n}{image\PYZus{}id}\PY{p}{,} 
+                                               \PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}reference}\PY{p}{(}\PY{n}{image\PYZus{}id}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Original image shape: }\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{modellib}\PY{o}{.}\PY{n}{parse\PYZus{}image\PYZus{}meta}\PY{p}{(}\PY{n}{image\PYZus{}meta}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{,}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{]}\PY{p}{)}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{original\PYZus{}image\PYZus{}shape}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Run object detection}
+        \PY{n}{results} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{detect\PYZus{}molded}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{expand\PYZus{}dims}\PY{p}{(}\PY{n}{image}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{expand\PYZus{}dims}\PY{p}{(}\PY{n}{image\PYZus{}meta}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}
+        
+        \PY{k}{if} \PY{k+kc}{True} \PY{o+ow}{in} \PY{n}{gt\PYZus{}mask}\PY{p}{:}
+            
+            \PY{c+c1}{\PYZsh{} Display results}
+            \PY{n}{r} \PY{o}{=} \PY{n}{results}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+            \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{gt\PYZus{}class\PYZus{}id}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{)}
+            \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{gt\PYZus{}bbox}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{gt\PYZus{}bbox}\PY{p}{)}
+            \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{gt\PYZus{}mask}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{gt\PYZus{}mask}\PY{p}{)}
+            \PY{n+nb}{print}\PY{p}{(}\PY{n}{gt\PYZus{}mask}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+            \PY{n+nb}{print}\PY{p}{(}\PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+            \PY{c+c1}{\PYZsh{} Compute AP over range 0.5 to 0.95 and print it}
+            \PY{n}{utils}\PY{o}{.}\PY{n}{compute\PYZus{}ap\PYZus{}range}\PY{p}{(}\PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}mask}\PY{p}{,}
+                                   \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rois}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{class\PYZus{}ids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{scores}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,}
+                                   \PY{n}{verbose}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}
+        
+            \PY{n}{visualize}\PY{o}{.}\PY{n}{display\PYZus{}differences}\PY{p}{(}
+                \PY{n}{image}\PY{p}{,}
+                \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}mask}\PY{p}{,}
+                \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rois}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{class\PYZus{}ids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{scores}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,}
+                \PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{,}
+                \PY{n}{show\PYZus{}box}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,} \PY{n}{show\PYZus{}mask}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,}
+                \PY{n}{iou\PYZus{}threshold}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{,} \PY{n}{score\PYZus{}threshold}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{)}
+            
+        \PY{k}{else}\PY{p}{:}
+            \PY{n}{r} \PY{o}{=} \PY{n}{results}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Should have no predictions if model was accurate}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+            \PY{n}{i}\PY{o}{=}\PY{l+m+mi}{0}
+            \PY{n}{v\PYZus{}min} \PY{o}{=} \PY{n}{image}\PY{o}{.}\PY{n}{min}\PY{p}{(}\PY{n}{axis}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,} \PY{n}{keepdims}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+            \PY{n}{v\PYZus{}max} \PY{o}{=} \PY{n}{image}\PY{o}{.}\PY{n}{max}\PY{p}{(}\PY{n}{axis}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,} \PY{n}{keepdims}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
+            \PY{n}{image} \PY{o}{=} \PY{p}{(}\PY{n}{image} \PY{o}{\PYZhy{}} \PY{n}{v\PYZus{}min}\PY{p}{)}\PY{o}{/}\PY{p}{(}\PY{n}{v\PYZus{}max} \PY{o}{\PYZhy{}} \PY{n}{v\PYZus{}min}\PY{p}{)}
+            \PY{n}{skio}\PY{o}{.}\PY{n}{imshow}\PY{p}{(}\PY{n}{image}\PY{p}{)}
+            \PY{k}{while} \PY{n}{i} \PY{o}{\PYZlt{}} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{:}
+                \PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{p}{)}
+                \PY{n}{plt}\PY{o}{.}\PY{n}{imshow}\PY{p}{(}\PY{l+m+mi}{1}\PY{o}{*}\PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{p}{:}\PY{p}{,}\PY{n}{i}\PY{p}{]}\PY{p}{)}
+                \PY{n}{i} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Display predictions only}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{display\PYZus{}instances}\PY{p}{(}\PY{n}{image}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rois}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{class\PYZus{}ids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} 
+                                    \PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{scores}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,}
+                                    \PY{n}{show\PYZus{}bbox}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,} \PY{n}{show\PYZus{}mask}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,}
+                                    \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Predictions}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Display Ground Truth only}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{display\PYZus{}instances}\PY{p}{(}\PY{n}{image}\PY{p}{,} \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}mask}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} 
+                                    \PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,}
+                                    \PY{n}{show\PYZus{}bbox}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,} \PY{n}{show\PYZus{}mask}\PY{o}{=}\PY{k+kc}{False}\PY{p}{,}
+                                    \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Ground Truth}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsubsection{Compute AP on Batch of
+Images}\label{compute-ap-on-batch-of-images}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{k}{def} \PY{n+nf}{compute\PYZus{}batch\PYZus{}ap}\PY{p}{(}\PY{n}{dataset}\PY{p}{,} \PY{n}{image\PYZus{}ids}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{:}
+            \PY{n}{APs} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+            \PY{k}{for} \PY{n}{image\PYZus{}id} \PY{o+ow}{in} \PY{n}{image\PYZus{}ids}\PY{p}{:}
+                \PY{c+c1}{\PYZsh{} Load image}
+                \PY{n}{image}\PY{p}{,} \PY{n}{image\PYZus{}meta}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}mask} \PY{o}{=}\PYZbs{}
+                    \PY{n}{modellib}\PY{o}{.}\PY{n}{load\PYZus{}image\PYZus{}gt}\PY{p}{(}\PY{n}{dataset}\PY{p}{,} \PY{n}{config}\PY{p}{,}
+                                           \PY{n}{image\PYZus{}id}\PY{p}{,} \PY{n}{use\PYZus{}mini\PYZus{}mask}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+                \PY{c+c1}{\PYZsh{} Run object detection}
+                \PY{n}{results} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{detect\PYZus{}molded}\PY{p}{(}\PY{n}{image}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{]}\PY{p}{,} \PY{n}{image\PYZus{}meta}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{]}\PY{p}{,} \PY{n}{verbose}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+                \PY{c+c1}{\PYZsh{} Compute AP over range 0.5 to 0.95}
+                \PY{n}{r} \PY{o}{=} \PY{n}{results}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+                \PY{n}{ap} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{compute\PYZus{}ap\PYZus{}range}\PY{p}{(}
+                    \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}mask}\PY{p}{,}
+                    \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rois}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{class\PYZus{}ids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{scores}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{r}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{masks}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,}
+                    \PY{n}{verbose}\PY{o}{=}\PY{l+m+mi}{0}\PY{p}{)}
+                \PY{n}{APs}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{ap}\PY{p}{)}
+                \PY{k}{if} \PY{n}{verbose}\PY{p}{:}
+                    \PY{n}{info} \PY{o}{=} \PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}info}\PY{p}{[}\PY{n}{image\PYZus{}id}\PY{p}{]}
+                    \PY{n}{meta} \PY{o}{=} \PY{n}{modellib}\PY{o}{.}\PY{n}{parse\PYZus{}image\PYZus{}meta}\PY{p}{(}\PY{n}{image\PYZus{}meta}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{,}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{]}\PY{p}{)}
+                    \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}:3\PYZcb{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{   AP: }\PY{l+s+si}{\PYZob{}:.2f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}
+                        \PY{n}{meta}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{image\PYZus{}id}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{meta}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{original\PYZus{}image\PYZus{}shape}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{ap}\PY{p}{)}\PY{p}{)}
+            \PY{k}{return} \PY{n}{APs}
+        
+        \PY{c+c1}{\PYZsh{} Run on validation set}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{5}
+        \PY{n}{APs} \PY{o}{=} \PY{n}{compute\PYZus{}batch\PYZus{}ap}\PY{p}{(}\PY{n}{dataset}\PY{p}{,} \PY{n}{dataset}\PY{o}{.}\PY{n}{image\PYZus{}ids}\PY{p}{[}\PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Mean AP overa }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ images: }\PY{l+s+si}{\PYZob{}:.4f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{APs}\PY{p}{)}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{APs}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Step by Step Prediction}\label{step-by-step-prediction}
+
+    \subsection{Stage 1: Region Proposal
+Network}\label{stage-1-region-proposal-network}
+
+The Region Proposal Network (RPN) runs a lightweight binary classifier
+on a lot of boxes (anchors) over the image and returns object/no-object
+scores. Anchors with high \emph{objectness} score (positive anchors) are
+passed to the stage two to be classified.
+
+Often, even positive anchors don't cover objects fully. So the RPN also
+regresses a refinement (a delta in location and size) to be applied to
+the anchors to shift it and resize it a bit to the correct boundaries of
+the object.
+
+    \subsubsection{1.a RPN Targets}\label{a-rpn-targets}
+
+The RPN targets are the training values for the RPN. To generate the
+targets, we start with a grid of anchors that cover the full image at
+different scales, and then we compute the IoU of the anchors with ground
+truth object. Positive anchors are those that have an IoU
+\textgreater{}= 0.7 with any ground truth object, and negative anchors
+are those that don't cover any object by more than 0.3 IoU. Anchors in
+between (i.e. cover an object by IoU \textgreater{}= 0.3 but \textless{}
+0.7) are considered neutral and excluded from training.
+
+To train the RPN regressor, we also compute the shift and resizing
+needed to make the anchor cover the ground truth object completely.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Get anchors and convert to pixel coordinates}
+        \PY{n}{anchors} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{get\PYZus{}anchors}\PY{p}{(}\PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+        \PY{n}{anchors} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{anchors}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{anchors}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Generate RPN trainig targets}
+        \PY{c+c1}{\PYZsh{} target\PYZus{}rpn\PYZus{}match is 1 for positive anchors, \PYZhy{}1 for negative anchors}
+        \PY{c+c1}{\PYZsh{} and 0 for neutral anchors.}
+        \PY{n}{target\PYZus{}rpn\PYZus{}match}\PY{p}{,} \PY{n}{target\PYZus{}rpn\PYZus{}bbox} \PY{o}{=} \PY{n}{modellib}\PY{o}{.}\PY{n}{build\PYZus{}rpn\PYZus{}targets}\PY{p}{(}
+            \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{,} \PY{n}{anchors}\PY{p}{,} \PY{n}{gt\PYZus{}class\PYZus{}id}\PY{p}{,} \PY{n}{gt\PYZus{}bbox}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{config}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{target\PYZus{}rpn\PYZus{}match}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{target\PYZus{}rpn\PYZus{}match}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{target\PYZus{}rpn\PYZus{}bbox}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{target\PYZus{}rpn\PYZus{}bbox}\PY{p}{)}
+        
+        \PY{n}{positive\PYZus{}anchor\PYZus{}ix} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{target\PYZus{}rpn\PYZus{}match}\PY{p}{[}\PY{p}{:}\PY{p}{]} \PY{o}{==} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n}{negative\PYZus{}anchor\PYZus{}ix} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{target\PYZus{}rpn\PYZus{}match}\PY{p}{[}\PY{p}{:}\PY{p}{]} \PY{o}{==} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n}{neutral\PYZus{}anchor\PYZus{}ix} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{target\PYZus{}rpn\PYZus{}match}\PY{p}{[}\PY{p}{:}\PY{p}{]} \PY{o}{==} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n}{positive\PYZus{}anchors} \PY{o}{=} \PY{n}{anchors}\PY{p}{[}\PY{n}{positive\PYZus{}anchor\PYZus{}ix}\PY{p}{]}
+        \PY{n}{negative\PYZus{}anchors} \PY{o}{=} \PY{n}{anchors}\PY{p}{[}\PY{n}{negative\PYZus{}anchor\PYZus{}ix}\PY{p}{]}
+        \PY{n}{neutral\PYZus{}anchors} \PY{o}{=} \PY{n}{anchors}\PY{p}{[}\PY{n}{neutral\PYZus{}anchor\PYZus{}ix}\PY{p}{]}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{positive\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{positive\PYZus{}anchors}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{negative\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{negative\PYZus{}anchors}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{neutral anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{neutral\PYZus{}anchors}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Apply refinement deltas to positive anchors}
+        \PY{n}{refined\PYZus{}anchors} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{apply\PYZus{}box\PYZus{}deltas}\PY{p}{(}
+            \PY{n}{positive\PYZus{}anchors}\PY{p}{,}
+            \PY{n}{target\PYZus{}rpn\PYZus{}bbox}\PY{p}{[}\PY{p}{:}\PY{n}{positive\PYZus{}anchors}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{]} \PY{o}{*} \PY{n}{model}\PY{o}{.}\PY{n}{config}\PY{o}{.}\PY{n}{RPN\PYZus{}BBOX\PYZus{}STD\PYZus{}DEV}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{refined\PYZus{}anchors}\PY{p}{,} \PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Display positive anchors before refinement (dotted) and}
+        \PY{c+c1}{\PYZsh{} after refinement (solid).}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{,}
+            \PY{n}{boxes}\PY{o}{=}\PY{n}{positive\PYZus{}anchors}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{refined\PYZus{}anchors}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsubsection{1.b RPN Predictions}\label{b-rpn-predictions}
+
+Here we run the RPN graph and display its predictions.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Run RPN sub\PYZhy{}graph}
+        \PY{n}{pillar} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}  \PY{c+c1}{\PYZsh{} node to start searching from}
+        
+        \PY{c+c1}{\PYZsh{} TF 1.4 introduces a new version of NMS. Search for both names to support TF 1.3 and 1.4}
+        \PY{n}{nms\PYZus{}node} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{ancestor}\PY{p}{(}\PY{n}{pillar}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI/rpn\PYZus{}non\PYZus{}max\PYZus{}suppression:0}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{k}{if} \PY{n}{nms\PYZus{}node} \PY{o+ow}{is} \PY{k+kc}{None}\PY{p}{:}
+            \PY{n}{nms\PYZus{}node} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{ancestor}\PY{p}{(}\PY{n}{pillar}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI/rpn\PYZus{}non\PYZus{}max\PYZus{}suppression/NonMaxSuppressionV2:0}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        
+        \PY{n}{rpn} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{run\PYZus{}graph}\PY{p}{(}\PY{n}{image}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{]}\PY{p}{,} \PY{p}{[}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{rpn\PYZus{}class}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{rpn\PYZus{}class}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pre\PYZus{}nms\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{ancestor}\PY{p}{(}\PY{n}{pillar}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI/pre\PYZus{}nms\PYZus{}anchors:0}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{ancestor}\PY{p}{(}\PY{n}{pillar}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI/refined\PYZus{}anchors:0}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors\PYZus{}clipped}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{ancestor}\PY{p}{(}\PY{n}{pillar}\PY{p}{,} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI/refined\PYZus{}anchors\PYZus{}clipped:0}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{post\PYZus{}nms\PYZus{}anchor\PYZus{}ix}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{nms\PYZus{}node}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{proposals}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+        \PY{p}{]}\PY{p}{,} \PY{n}{image\PYZus{}metas}\PY{o}{=}\PY{n}{image\PYZus{}meta}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{newaxis}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Show top anchors by score (before refinement)}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{100}
+        \PY{n}{sorted\PYZus{}anchor\PYZus{}ids} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{argsort}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{rpn\PYZus{}class}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{p}{:}\PY{p}{,}\PY{p}{:}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{flatten}\PY{p}{(}\PY{p}{)}\PY{p}{)}\PY{p}{[}\PY{p}{:}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}\PY{n}{image}\PY{p}{,} \PY{n}{boxes}\PY{o}{=}\PY{n}{anchors}\PY{p}{[}\PY{n}{sorted\PYZus{}anchor\PYZus{}ids}\PY{p}{[}\PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{]}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Show top anchors with refinement. Then with clipping to image boundaries}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{50}
+        \PY{n}{ax} \PY{o}{=} \PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{)}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,}
+            \PY{n}{boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{pre\PYZus{}nms\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,} 
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors\PYZus{}clipped}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Show refined anchors after non\PYZhy{}max suppression}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{50}
+        \PY{n}{ixs} \PY{o}{=} \PY{n}{rpn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{post\PYZus{}nms\PYZus{}anchor\PYZus{}ix}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{p}{:}\PY{n}{limit}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}anchors\PYZus{}clipped}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Show final proposals}
+        \PY{c+c1}{\PYZsh{} These are the same as the previous step (refined anchors }
+        \PY{c+c1}{\PYZsh{} after NMS) but with coordinates normalized to [0, 1] range.}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{50}
+        \PY{c+c1}{\PYZsh{} Convert back to image coordinates for display}
+        \PY{n}{h}\PY{p}{,} \PY{n}{w} \PY{o}{=} \PY{n}{config}\PY{o}{.}\PY{n}{IMAGE\PYZus{}SHAPE}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}
+        \PY{n}{proposals} \PY{o}{=} \PY{n}{rpn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{proposals}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{h}\PY{p}{,} \PY{n}{w}\PY{p}{,} \PY{n}{h}\PY{p}{,} \PY{n}{w}\PY{p}{]}\PY{p}{)}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{rpn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{proposals}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Stage 2: Proposal
+Classification}\label{stage-2-proposal-classification}
+
+This stage takes the region proposals from the RPN and classifies them.
+
+    \subsubsection{2.a Proposal
+Classification}\label{a-proposal-classification}
+
+Run the classifier heads on proposals to generate class propbabilities
+and bounding box regressions.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Get input and output to classifier and mask heads.}
+        \PY{n}{mrcnn} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{run\PYZus{}graph}\PY{p}{(}\PY{p}{[}\PY{n}{image}\PY{p}{]}\PY{p}{,} \PY{p}{[}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{proposals}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{probs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}class}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{deltas}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}bbox}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{masks}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}mask}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{detections}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}detection}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+        \PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Get detection class IDs. Trim zero padding.}
+        \PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{detections}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{p}{,} \PY{l+m+mi}{4}\PY{p}{]}\PY{o}{.}\PY{n}{astype}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{int32}\PY{p}{)}
+        \PY{n}{det\PYZus{}count} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{==} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{det\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{p}{:}\PY{n}{det\PYZus{}count}\PY{p}{]}
+        \PY{n}{detections} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{detections}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{n}{det\PYZus{}count}\PY{p}{]}
+        
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ detections: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}
+            \PY{n}{det\PYZus{}count}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{)}\PY{p}{[}\PY{n}{det\PYZus{}class\PYZus{}ids}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+        
+        \PY{n}{captions} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}:.3f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{[}\PY{n+nb}{int}\PY{p}{(}\PY{n}{c}\PY{p}{)}\PY{p}{]}\PY{p}{,} \PY{n}{s}\PY{p}{)} \PY{k}{if} \PY{n}{c} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+                    \PY{k}{for} \PY{n}{c}\PY{p}{,} \PY{n}{s} \PY{o+ow}{in} \PY{n+nb}{zip}\PY{p}{(}\PY{n}{detections}\PY{p}{[}\PY{p}{:}\PY{p}{,} \PY{l+m+mi}{4}\PY{p}{]}\PY{p}{,} \PY{n}{detections}\PY{p}{[}\PY{p}{:}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{]}\PY{p}{)}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} 
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{detections}\PY{p}{[}\PY{p}{:}\PY{p}{,} \PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{visibilities}\PY{o}{=}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{]} \PY{o}{*} \PY{n+nb}{len}\PY{p}{(}\PY{n}{detections}\PY{p}{)}\PY{p}{,}
+            \PY{n}{captions}\PY{o}{=}\PY{n}{captions}\PY{p}{,} \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Detections}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+            \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsubsection{2.c Step by Step
+Detection}\label{c-step-by-step-detection}
+
+Here we dive deeper into the process of processing the detections.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Proposals are in normalized coordinates}
+        \PY{n}{proposals} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{proposals}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        
+        \PY{c+c1}{\PYZsh{} Class ID, score, and mask per proposal}
+        \PY{n}{roi\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{argmax}\PY{p}{(}\PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{probs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}
+        \PY{n}{roi\PYZus{}scores} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{probs}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{]}
+        \PY{n}{roi\PYZus{}class\PYZus{}names} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{)}\PY{p}{[}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{]}
+        \PY{n}{roi\PYZus{}positive\PYZus{}ixs} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        
+        \PY{c+c1}{\PYZsh{} How many ROIs vs empty rows?}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ Valid proposals out of }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{any}\PY{p}{(}\PY{n}{proposals}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{proposals}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ Positive ROIs}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Class counts}
+        \PY{n+nb}{print}\PY{p}{(}\PY{n+nb}{list}\PY{p}{(}\PY{n+nb}{zip}\PY{p}{(}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{unique}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}names}\PY{p}{,} \PY{n}{return\PYZus{}counts}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Display a random sample of proposals.}
+        \PY{c+c1}{\PYZsh{} Proposals classified as background are dotted, and}
+        \PY{c+c1}{\PYZsh{} the rest show their class and confidence score.}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{200}
+        \PY{n}{ixs} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{randint}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{n}{proposals}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{limit}\PY{p}{)}
+        \PY{n}{captions} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}:.3f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{[}\PY{n}{c}\PY{p}{]}\PY{p}{,} \PY{n}{s}\PY{p}{)} \PY{k}{if} \PY{n}{c} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+                    \PY{k}{for} \PY{n}{c}\PY{p}{,} \PY{n}{s} \PY{o+ow}{in} \PY{n+nb}{zip}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{roi\PYZus{}scores}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{)}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,}
+            \PY{n}{boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{proposals}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{visibilities}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{ixs}\PY{p}{]} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,}
+            \PY{n}{captions}\PY{o}{=}\PY{n}{captions}\PY{p}{,} \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROIs Before Refinement}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+            \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \paragraph{Apply Bounding Box
+Refinement}\label{apply-bounding-box-refinement}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Class\PYZhy{}specific bounding box shifts.}
+        \PY{n}{roi\PYZus{}bbox\PYZus{}specific} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{deltas}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n}{proposals}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{]}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{roi\PYZus{}bbox\PYZus{}specific}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{roi\PYZus{}bbox\PYZus{}specific}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Apply bounding box transformations}
+        \PY{c+c1}{\PYZsh{} Shape: [N, (y1, x1, y2, x2)]}
+        \PY{n}{refined\PYZus{}proposals} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{apply\PYZus{}box\PYZus{}deltas}\PY{p}{(}
+            \PY{n}{proposals}\PY{p}{,} \PY{n}{roi\PYZus{}bbox\PYZus{}specific} \PY{o}{*} \PY{n}{config}\PY{o}{.}\PY{n}{BBOX\PYZus{}STD\PYZus{}DEV}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{refined\PYZus{}proposals}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{refined\PYZus{}proposals}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Show positive proposals}
+        \PY{c+c1}{\PYZsh{} ids = np.arange(roi\PYZus{}boxes.shape[0])  \PYZsh{} Display all}
+        \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{5}
+        \PY{n}{ids} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{random}\PY{o}{.}\PY{n}{randint}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{n+nb}{len}\PY{p}{(}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{)}\PY{p}{,} \PY{n}{limit}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Display random sample}
+        \PY{n}{captions} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}:.3f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{[}\PY{n}{c}\PY{p}{]}\PY{p}{,} \PY{n}{s}\PY{p}{)} \PY{k}{if} \PY{n}{c} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+                    \PY{k}{for} \PY{n}{c}\PY{p}{,} \PY{n}{s} \PY{o+ow}{in} \PY{n+nb}{zip}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{]}\PY{p}{[}\PY{n}{ids}\PY{p}{]}\PY{p}{,} \PY{n}{roi\PYZus{}scores}\PY{p}{[}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{]}\PY{p}{[}\PY{n}{ids}\PY{p}{]}\PY{p}{)}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,} \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{,}
+            \PY{n}{boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{proposals}\PY{p}{[}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{]}\PY{p}{[}\PY{n}{ids}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{refined\PYZus{}proposals}\PY{p}{[}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{]}\PY{p}{[}\PY{n}{ids}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{visibilities}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{roi\PYZus{}positive\PYZus{}ixs}\PY{p}{]}\PY{p}{[}\PY{n}{ids}\PY{p}{]} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{,}
+            \PY{n}{captions}\PY{o}{=}\PY{n}{captions}\PY{p}{,} \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROIs After Refinement}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \paragraph{Filter Low Confidence
+Detections}\label{filter-low-confidence-detections}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Remove boxes classified as background}
+        \PY{n}{keep} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Keep }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ detections:}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{keep}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{keep}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Remove low confidence detections}
+        \PY{n}{keep} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{intersect1d}\PY{p}{(}\PY{n}{keep}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}scores} \PY{o}{\PYZgt{}}\PY{o}{=} \PY{n}{config}\PY{o}{.}\PY{n}{DETECTION\PYZus{}MIN\PYZus{}CONFIDENCE}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Remove boxes below }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ confidence. Keep }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{:}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}
+            \PY{n}{config}\PY{o}{.}\PY{n}{DETECTION\PYZus{}MIN\PYZus{}CONFIDENCE}\PY{p}{,} \PY{n}{keep}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{keep}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \paragraph{Per-Class Non-Max
+Suppression}\label{per-class-non-max-suppression}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Apply per\PYZhy{}class non\PYZhy{}max suppression}
+        \PY{n}{pre\PYZus{}nms\PYZus{}boxes} \PY{o}{=} \PY{n}{refined\PYZus{}proposals}\PY{p}{[}\PY{n}{keep}\PY{p}{]}
+        \PY{n}{pre\PYZus{}nms\PYZus{}scores} \PY{o}{=} \PY{n}{roi\PYZus{}scores}\PY{p}{[}\PY{n}{keep}\PY{p}{]}
+        \PY{n}{pre\PYZus{}nms\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{keep}\PY{p}{]}
+        
+        \PY{n}{nms\PYZus{}keep} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+        \PY{k}{for} \PY{n}{class\PYZus{}id} \PY{o+ow}{in} \PY{n}{np}\PY{o}{.}\PY{n}{unique}\PY{p}{(}\PY{n}{pre\PYZus{}nms\PYZus{}class\PYZus{}ids}\PY{p}{)}\PY{p}{:}
+            \PY{c+c1}{\PYZsh{} Pick detections of this class}
+            \PY{n}{ixs} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{pre\PYZus{}nms\PYZus{}class\PYZus{}ids} \PY{o}{==} \PY{n}{class\PYZus{}id}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+            \PY{c+c1}{\PYZsh{} Apply NMS}
+            \PY{n}{class\PYZus{}keep} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{non\PYZus{}max\PYZus{}suppression}\PY{p}{(}\PY{n}{pre\PYZus{}nms\PYZus{}boxes}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} 
+                                                    \PY{n}{pre\PYZus{}nms\PYZus{}scores}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,}
+                                                    \PY{n}{config}\PY{o}{.}\PY{n}{DETECTION\PYZus{}NMS\PYZus{}THRESHOLD}\PY{p}{)}
+            \PY{c+c1}{\PYZsh{} Map indicies}
+            \PY{n}{class\PYZus{}keep} \PY{o}{=} \PY{n}{keep}\PY{p}{[}\PY{n}{ixs}\PY{p}{[}\PY{n}{class\PYZus{}keep}\PY{p}{]}\PY{p}{]}
+            \PY{n}{nms\PYZus{}keep} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{union1d}\PY{p}{(}\PY{n}{nms\PYZus{}keep}\PY{p}{,} \PY{n}{class\PYZus{}keep}\PY{p}{)}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}:22\PYZcb{}}\PY{l+s+s2}{: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ \PYZhy{}\PYZgt{} }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{[}\PY{n}{class\PYZus{}id}\PY{p}{]}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{20}\PY{p}{]}\PY{p}{,} 
+                                           \PY{n}{keep}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{class\PYZus{}keep}\PY{p}{)}\PY{p}{)}
+        
+        \PY{n}{keep} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{intersect1d}\PY{p}{(}\PY{n}{keep}\PY{p}{,} \PY{n}{nms\PYZus{}keep}\PY{p}{)}\PY{o}{.}\PY{n}{astype}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{int32}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Kept after per\PYZhy{}class NMS: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{keep}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{,} \PY{n}{keep}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Show final detections}
+        \PY{n}{ixs} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n+nb}{len}\PY{p}{(}\PY{n}{keep}\PY{p}{)}\PY{p}{)}  \PY{c+c1}{\PYZsh{} Display all}
+        \PY{c+c1}{\PYZsh{} ixs = np.random.randint(0, len(keep), 10)  \PYZsh{} Display random sample}
+        \PY{n}{captions} \PY{o}{=} \PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ }\PY{l+s+si}{\PYZob{}:.3f\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{[}\PY{n}{c}\PY{p}{]}\PY{p}{,} \PY{n}{s}\PY{p}{)} \PY{k}{if} \PY{n}{c} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdq{}}
+                    \PY{k}{for} \PY{n}{c}\PY{p}{,} \PY{n}{s} \PY{o+ow}{in} \PY{n+nb}{zip}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{keep}\PY{p}{]}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{roi\PYZus{}scores}\PY{p}{[}\PY{n}{keep}\PY{p}{]}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{)}\PY{p}{]}
+        \PY{n}{visualize}\PY{o}{.}\PY{n}{draw\PYZus{}boxes}\PY{p}{(}
+            \PY{n}{image}\PY{p}{,}
+            \PY{n}{boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{proposals}\PY{p}{[}\PY{n}{keep}\PY{p}{]}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{refined\PYZus{}boxes}\PY{o}{=}\PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{refined\PYZus{}proposals}\PY{p}{[}\PY{n}{keep}\PY{p}{]}\PY{p}{[}\PY{n}{ixs}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}\PY{p}{,}
+            \PY{n}{visibilities}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{roi\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{n}{keep}\PY{p}{]}\PY{p}{[}\PY{n}{ixs}\PY{p}{]} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{,}
+            \PY{n}{captions}\PY{o}{=}\PY{n}{captions}\PY{p}{,} \PY{n}{title}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Detections after NMS}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+            \PY{n}{ax}\PY{o}{=}\PY{n}{get\PYZus{}ax}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Stage 3: Generating Masks}\label{stage-3-generating-masks}
+
+This stage takes the detections (refined bounding boxes and class IDs)
+from the previous layer and runs the mask head to generate segmentation
+masks for every instance.
+
+    \subsubsection{3.a Mask Targets}\label{a-mask-targets}
+
+These are the training targets for the mask branch
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{limit} \PY{o}{=} \PY{l+m+mi}{8}
+        \PY{n}{display\PYZus{}images}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{n}{gt\PYZus{}mask}\PY{p}{[}\PY{o}{.}\PY{o}{.}\PY{o}{.}\PY{p}{,} \PY{p}{:}\PY{n}{limit}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{cmap}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Blues}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsubsection{3.b Predicted Masks}\label{b-predicted-masks}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Get predictions of mask head}
+        \PY{n}{mrcnn} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{run\PYZus{}graph}\PY{p}{(}\PY{p}{[}\PY{n}{image}\PY{p}{]}\PY{p}{,} \PY{p}{[}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{detections}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}detection}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{masks}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{mrcnn\PYZus{}mask}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+        \PY{p}{]}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Get detection class IDs. Trim zero padding.}
+        \PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{detections}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{p}{,} \PY{l+m+mi}{4}\PY{p}{]}\PY{o}{.}\PY{n}{astype}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{int32}\PY{p}{)}
+        \PY{n}{det\PYZus{}count} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{where}\PY{p}{(}\PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{==} \PY{l+m+mi}{0}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+        \PY{n}{det\PYZus{}class\PYZus{}ids} \PY{o}{=} \PY{n}{det\PYZus{}class\PYZus{}ids}\PY{p}{[}\PY{p}{:}\PY{n}{det\PYZus{}count}\PY{p}{]}
+        
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{ detections: }\PY{l+s+si}{\PYZob{}\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{o}{.}\PY{n}{format}\PY{p}{(}
+            \PY{n}{det\PYZus{}count}\PY{p}{,} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n}{dataset}\PY{o}{.}\PY{n}{class\PYZus{}names}\PY{p}{)}\PY{p}{[}\PY{n}{det\PYZus{}class\PYZus{}ids}\PY{p}{]}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Masks}
+        \PY{n}{det\PYZus{}boxes} \PY{o}{=} \PY{n}{utils}\PY{o}{.}\PY{n}{denorm\PYZus{}boxes}\PY{p}{(}\PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{detections}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{p}{:}\PY{p}{,} \PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{)}
+        \PY{n}{det\PYZus{}mask\PYZus{}specific} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{mrcnn}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{masks}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{n}{i}\PY{p}{,} \PY{p}{:}\PY{p}{,} \PY{p}{:}\PY{p}{,} \PY{n}{c}\PY{p}{]} 
+                                      \PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{c} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{det\PYZus{}class\PYZus{}ids}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+        \PY{n}{det\PYZus{}masks} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{utils}\PY{o}{.}\PY{n}{unmold\PYZus{}mask}\PY{p}{(}\PY{n}{m}\PY{p}{,} \PY{n}{det\PYZus{}boxes}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{image}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+                              \PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{m} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{det\PYZus{}mask\PYZus{}specific}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{det\PYZus{}mask\PYZus{}specific}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{det\PYZus{}mask\PYZus{}specific}\PY{p}{)}
+        \PY{n}{log}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{det\PYZus{}masks}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{det\PYZus{}masks}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{display\PYZus{}images}\PY{p}{(}\PY{n}{det\PYZus{}mask\PYZus{}specific}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]} \PY{o}{*} \PY{l+m+mi}{255}\PY{p}{,} \PY{n}{cmap}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Blues}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{interpolation}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{none}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{n}{display\PYZus{}images}\PY{p}{(}\PY{n}{det\PYZus{}masks}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]} \PY{o}{*} \PY{l+m+mi}{255}\PY{p}{,} \PY{n}{cmap}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Blues}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{interpolation}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{none}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+
+    \subsection{Visualize Activations}\label{visualize-activations}
+
+In some cases it helps to look at the output from different layers and
+visualize them to catch issues and odd patterns.
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Get activations of a few sample layers}
+        \PY{n}{activations} \PY{o}{=} \PY{n}{model}\PY{o}{.}\PY{n}{run\PYZus{}graph}\PY{p}{(}\PY{p}{[}\PY{n}{image}\PY{p}{]}\PY{p}{,} \PY{p}{[}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{input\PYZus{}image}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}        \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{input\PYZus{}image}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{res2c\PYZus{}out}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}          \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{res2c\PYZus{}out}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{res3c\PYZus{}out}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}          \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{res3c\PYZus{}out}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{rpn\PYZus{}bbox}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}           \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{rpn\PYZus{}bbox}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+            \PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{roi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}                \PY{n}{model}\PY{o}{.}\PY{n}{keras\PYZus{}model}\PY{o}{.}\PY{n}{get\PYZus{}layer}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ROI}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{output}\PY{p}{)}\PY{p}{,}
+        \PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor} }]:} \PY{c+c1}{\PYZsh{} Backbone feature map}
+        \PY{n}{display\PYZus{}images}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{transpose}\PY{p}{(}\PY{n}{activations}\PY{p}{[}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{res2c\PYZus{}out}\PY{l+s+s2}{\PYZdq{}}\PY{p}{]}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{p}{:}\PY{p}{,}\PY{p}{:}\PY{p}{,}\PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}\PY{p}{,} \PY{n}{cols}\PY{o}{=}\PY{l+m+mi}{4}\PY{p}{)}
+\end{Verbatim}
+
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+    \end{document}

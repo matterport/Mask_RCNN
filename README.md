@@ -1,3 +1,7 @@
+CropMask is a project to train and deploy instance segmentation models for mapping center pivot agriculture from multispectral satellite imagery. It extends [matterport's Mask R-CNN implementaion](https://github.com/matterport/Mask_RCNN) to work with multispectral satellite imagery, contains infrastructure-as-code via terraform to provision a testing cluster on Azure, and will eventually contain a Leaflet or OpenLayers web app to expose maps of crop water use in drylands across the globe. 
+
+Below is an explanation of the Mask R-CNN architecture and a guide to notebook tutorials and notebooks for inspecting model inputs and outputs.
+
 # Mask R-CNN for Object Detection and Segmentation
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
@@ -12,7 +16,7 @@ The repository includes:
 * ParallelModel class for multi-GPU training
 * Evaluation on MS COCO metrics (AP)
 * Example of training on your own dataset
-
+* Cropmask library and notebooks for preprocessing satellite imagery, applying Mask R-CNN, and inspecting models 
 
 The code is documented and designed to be easy to extend. If you use it in your research, please consider citing this repository (bibtex below). If you work on 3D vision, you might find our recently released [Matterport3D](https://matterport.com/blog/2017/09/20/announcing-matterport3d-research-dataset/) dataset useful as well.
 This dataset was created from 3D-reconstructed spaces captured by our customers who agreed to make them publicly available for academic use. You can see more examples [here](https://matterport.com/gallery/).
@@ -39,7 +43,6 @@ This notebooks inspects the weights of a trained model and looks for anomalies a
 To help with debugging and understanding the model, there are 3 notebooks 
 ([inspect_data.ipynb](samples/coco/inspect_data.ipynb), [inspect_model.ipynb](samples/coco/inspect_model.ipynb),
 [inspect_weights.ipynb](samples/coco/inspect_weights.ipynb)) that provide a lot of visualizations and allow running the model step by step to inspect the output at each point. Here are a few examples:
-
 
 
 ## 1. Anchor sorting and filtering
@@ -75,7 +78,7 @@ TensorBoard is another great debugging and visualization tool. The model is conf
 ![](assets/detection_final.png)
 
 
-# Training on MS COCO
+# Training on MS COCO TODO add guide for cropmask specific training
 We're providing pre-trained weights for MS COCO to make it easier to start. You can
 use those weights as a starting point to train your own variation on the network.
 Training and evaluation code is in `samples/coco/coco.py`. You can import this
@@ -141,30 +144,8 @@ gradients (sum vs mean across batches and GPUs). Or, maybe the official model us
 clipping to avoid this issue. We do use gradient clipping, but don't set it too aggressively.
 We found that smaller learning rates converge faster anyway so we go with that.
 
-## Citation
-Use this bibtex to cite this repository:
-```
-@misc{matterport_maskrcnn_2017,
-  title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
-  author={Waleed Abdulla},
-  year={2017},
-  publisher={Github},
-  journal={GitHub repository},
-  howpublished={\url{https://github.com/matterport/Mask_RCNN}},
-}
-```
-
-## Contributing
-Contributions to this repository are welcome. Examples of things you can contribute:
-* Speed Improvements. Like re-writing some Python code in TensorFlow or Cython.
-* Training on other datasets.
-* Accuracy Improvements.
-* Visualizations and examples.
-
-You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
-
 ## Requirements
-Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.txt`.
+Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.yaml`.
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
@@ -178,15 +159,16 @@ If you use Docker, the code has been verified to work on
 [this Docker container](https://hub.docker.com/r/waleedka/modern-deep-learning/).
 
 
-## Installation
+## Local Installation, see terraform/ folder for Azure instructions
 1. Install dependencies
    ```bash
-   pip3 install -r requirements.txt
+   conda env create -f requirements.txt
    ```
 2. Clone this repository
 3. Run setup from the repository root directory
     ```bash
-    python3 setup.py install
+    source activate cropmask
+    python setup.py install
     ``` 
 3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
 4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
@@ -195,47 +177,18 @@ If you use Docker, the code has been verified to work on
     * Windows: https://github.com/philferriere/cocoapi.
     You must have the Visual C++ 2015 build tools on your path (see the repo for additional details)
 
-# Projects Using this Model
-If you extend this model to other datasets or build projects that use it, we'd love to hear from you.
+# Projects Using CropMask, see matterport/Mask_RCNN for more examples
 
-### [4K Video Demo](https://www.youtube.com/watch?v=OOT3UIXZztE) by Karol Majek.
-[![Mask RCNN on 4K Video](assets/4k_video.gif)](https://www.youtube.com/watch?v=OOT3UIXZztE)
+### [Center Pivot Crop Water Use](assets/cropmask_agu2018.pdf). Preliminary results from test on 2004 Landsat SR scene over western Nebraska.
+![Center Pivot Detections](assets/cp_detection.png)
 
-### [Images to OSM](https://github.com/jremillard/images-to-osm): Improve OpenStreetMap by adding baseball, soccer, tennis, football, and basketball fields.
+## Citation
+@misc{matterport_maskrcnn_2017,
+  title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
+  author={Waleed Abdulla},
+  year={2017},
+  publisher={Github},
+  journal={GitHub repository},
+  howpublished={\url{https://github.com/matterport/Mask_RCNN}},
+}
 
-![Identify sport fields in satellite images](assets/images_to_osm.png)
-
-### [Splash of Color](https://engineering.matterport.com/splash-of-color-instance-segmentation-with-mask-r-cnn-and-tensorflow-7c761e238b46). A blog post explaining how to train this model from scratch and use it to implement a color splash effect.
-![Balloon Color Splash](assets/balloon_color_splash.gif)
-
-
-### [Segmenting Nuclei in Microscopy Images](samples/nucleus). Built for the [2018 Data Science Bowl](https://www.kaggle.com/c/data-science-bowl-2018)
-Code is in the `samples/nucleus` directory.
-
-![Nucleus Segmentation](assets/nucleus_segmentation.png)
-
-### [Detection and Segmentation for Surgery Robots](https://github.com/SUYEgit/Surgery-Robot-Detection-Segmentation) by the NUS Control & Mechatronics Lab.
-![Surgery Robot Detection and Segmentation](https://github.com/SUYEgit/Surgery-Robot-Detection-Segmentation/raw/master/assets/video.gif)
-
-### [Reconstructing 3D buildings from aerial LiDAR](https://medium.com/geoai/reconstructing-3d-buildings-from-aerial-lidar-with-ai-details-6a81cb3079c0)
-A proof of concept project by [Esri](https://www.esri.com/), in collaboration with Nvidia and Miami-Dade County. Along with a great write up and code by Dmitry Kudinov, Daniel Hedges, and Omar Maher.
-![3D Building Reconstruction](assets/project_3dbuildings.png)
-
-### [Usiigaci: Label-free Cell Tracking in Phase Contrast Microscopy](https://github.com/oist/usiigaci)
-A project from Japan to automatically track cells in a microfluidics platform. Paper is pending, but the source code is released.
-
-![](assets/project_usiigaci1.gif) ![](assets/project_usiigaci2.gif)
-
-### [Characterization of Arctic Ice-Wedge Polygons in Very High Spatial Resolution Aerial Imagery](http://www.mdpi.com/2072-4292/10/9/1487)
-Research project to understand the complex processes between degradations in the Arctic and climate change. By Weixing Zhang, Chandi Witharana, Anna Liljedahl, and Mikhail Kanevskiy.
-![image](assets/project_ice_wedge_polygons.png)
-
-### [Mask-RCNN Shiny](https://github.com/huuuuusy/Mask-RCNN-Shiny)
-A computer vision class project by HU Shiyu to apply the color pop effect on people with beautiful results.
-![](assets/project_shiny1.jpg)
-
-### [Mapping Challenge](https://github.com/crowdAI/crowdai-mapping-challenge-mask-rcnn): Convert satellite imagery to maps for use by humanitarian organisations.
-![Mapping Challenge](assets/mapping_challenge.png)
-
-### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
-![GRASS GIS Image](assets/project_grass_gis.png)
