@@ -1,7 +1,6 @@
-name: geo-dl
+#name: geo-dl
 channels:
   - conda-forge
-  - landlab
 dependencies:
   # Core scientific python
   - numpy
@@ -20,9 +19,8 @@ dependencies:
   - scikit-image
   - tensorflow>=1.3.0
   - keras>=2.0.8
-  - opencv-python
+  - opencv
   - h5py
-  - imgaug
   - IPython[all]
 
 
@@ -45,7 +43,6 @@ dependencies:
   - kealib
   - geocoder
   - geojson
-  - landlab
 
   # Natural language processing
   - tweepy
@@ -62,3 +59,4 @@ dependencies:
       - hydrofunctions
       - lsru
       - porder
+      - imgaug # for MaskRCNN
