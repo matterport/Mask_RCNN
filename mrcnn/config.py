@@ -211,7 +211,7 @@ class Config(object):
     GRADIENT_CLIP_NORM = 5.0
 
     # # ModelCheckpoint to save the model for each epoch
-    SAVE_BEST_ONLY = False
+    save_best_only = False
 
     def __init__(self):
         """Set values of computed attributes."""
