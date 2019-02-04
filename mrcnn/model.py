@@ -526,7 +526,6 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     crowd_ix = tf.where(gt_class_ids < 0)[:, 0]
     non_crowd_ix = tf.where(gt_class_ids > 0)[:, 0]
     crowd_boxes = tf.gather(gt_boxes, crowd_ix)
-    crowd_masks = tf.gather(gt_masks, crowd_ix, axis=2)
     gt_class_ids = tf.gather(gt_class_ids, non_crowd_ix)
     gt_boxes = tf.gather(gt_boxes, non_crowd_ix)
     gt_masks = tf.gather(gt_masks, non_crowd_ix, axis=2)
@@ -1025,7 +1024,7 @@ def rpn_class_loss_graph(rpn_match, rpn_class_logits):
 
     rpn_match: [batch, anchors, 1]. Anchor match type. 1=positive,
                -1=negative, 0=neutral anchor.
-    rpn_class_logits: [batch, anchors, 2]. RPN classifier logits for FG/BG.
+    rpn_class_logits: [batch, anchors, 2]. RPN classifier logits for BG/FG.
     """
     # Squeeze last dim to simplify
     rpn_match = tf.squeeze(rpn_match, -1)
