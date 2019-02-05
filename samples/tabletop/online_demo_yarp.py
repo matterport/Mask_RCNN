@@ -200,8 +200,6 @@ class MaskRCNNWrapperModule (yarp.RFModule):
 
             frame = self._input_buf_array
 
-            #print(frame.shape)
-
             #   run detection/segmentation on frame
             #   display/return results
             results = self._model.detect([frame], verbose=1)
