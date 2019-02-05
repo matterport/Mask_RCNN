@@ -179,16 +179,7 @@ If you use Docker, the code has been verified to work on
 
 # Projects Using CropMask, see matterport/Mask_RCNN for more examples
 
-### [Center Pivot Crop Water Use](assets/cropmask_agu2018.pdf). Preliminary results from test on 2004 Landsat SR scene over western Nebraska.
+### [Center Pivot Crop Water Use](assets/cropmask_agu2018.pdf). Preliminary results from test on 2004 Landsat SR scene over western Nebraska. Detections are in Red, Targets from the Nebraska Department of Agriculture are in Green. Metrics are (probability score)/(intersection over union)
 ![Center Pivot Detections](assets/cp_detection.png)
 
-## Citation
-@misc{matterport_maskrcnn_2017,
-  title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
-  author={Waleed Abdulla},
-  year={2017},
-  publisher={Github},
-  journal={GitHub repository},
-  howpublished={\url{https://github.com/matterport/Mask_RCNN}},
-}
 
