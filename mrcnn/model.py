@@ -967,9 +967,9 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     num_classes: number of classes, which determines the depth of the results
     num_deconv_layers: The number of Conv2DTranspose layers. 
                        In the paper of Mask R-CNN(Ch. 3 - Network Architecture),
-		       it only has one deconv layer.
-		       Adding additional deconv layers increases output mask resolution,
-		       and it is an extra feature not described in the paper.
+                       it only has one deconv layer.
+                       Adding additional deconv layers increases output mask resolution,
+                       and it is an extra feature not described in the paper.
     train_bn: Boolean. Train or freeze Batch Norm layers
 
     Returns: Masks [batch, num_rois, MASK_SHAPE[0], MASK_SHAPE[1], NUM_CLASSES]
@@ -1006,7 +1006,6 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
-    
     for i in range(1, num_deconv_layers):
         x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv" + str(i+1))(x)
