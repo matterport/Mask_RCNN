@@ -17,7 +17,8 @@ import scipy
 import skimage.color
 import skimage.io
 import skimage.transform
-import urllib.request
+#import urllib.request
+from six.moves import urllib
 import shutil
 import warnings
 from distutils.version import LooseVersion
