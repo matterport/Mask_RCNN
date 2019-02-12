@@ -44,7 +44,8 @@ from pycocotools.cocoeval import COCOeval
 from pycocotools import mask as maskUtils
 
 import zipfile
-import urllib.request
+#import urllib.request
+from six.moves import urllib
 import shutil
 
 # Root directory of the project
