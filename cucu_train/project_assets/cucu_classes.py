@@ -19,8 +19,12 @@ from cucu_config import *
 
 import math
 
+# here you can add more object keys 
+objKeysList= ['cucumbers', 'flowers', 'leaves', 'stems','backgrounds']
+
+from collections import defaultdict
 class genDataset(utils.Dataset):
-    def __init__(self, folder_objects_cucumber,folder_objects_leaf,folder_objects_flower, folder_bgs,config):
+    def __init__(self,objByCategoryPaths,config):
         """
         self variables:
             folder_object - folder containing object asher todo: what is exactly an object? image +annotations?
@@ -28,53 +32,24 @@ class genDataset(utils.Dataset):
             cucumberObj - container for all images in dataSet containing objects
             bg - container for all images in dataSet containing backGrounds
         """
-        utils.Dataset.__init__(self)
-        # asher todo: get rid of this variable later, config is not really needed here
-        self.config = config
-        self.folder_objects_cucumber = folder_objects_cucumber
-        self.folder_objects_leaf = folder_objects_leaf
-        self.folder_objects_flower = folder_objects_flower
-        self.folder_bgs = folder_bgs
-        self.cucumberObj = []
-        self.leafObj = []
-        self.flowerObj = []
-        self.bg = []
-        # asher todo: beautify calls -> pass a super folder which contains sub folders per object
-        for root, _, files in os.walk(self.folder_objects_cucumber):
-            for filename in files:
-                self.cucumberObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
-        _, _, files_objects = next(os.walk(self.folder_objects_cucumber))
-        self.number_of_cucumbers = len(files_objects)
-
-        for root, _, files in os.walk(self.folder_objects_flower):
-            for filename in files:
-                self.flowerObj.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
-        _, _, files_objects = next(os.walk(self.folder_objects_flower))
-        self.number_of_flowers = len(files_objects)
-        
-        for root, _, files in os.walk(self.folder_objects_leaf):
-            for filename in files:
-                try:
-                    img = Image.open(os.path.join(root, filename)).convert('RGBA')
-                    self.leafObj.append(img)
-                except Exception as e:
-                    print("error with image: ", filename)
-                    continue
-
-        _, _, files_objects = next(os.walk(self.folder_objects_leaf))
-        self.number_of_leaves = len(self.leafObj)
-        
-        
+        def collectAndCountObjImagesByCategory():
+            self.objByCategoryPaths = objByCategoryPaths
+            self.containerOfObjForGeneratingImages={}
+            self.quantityOfObjByCategory={}
+            
+            for key in objKeysList:
+                for root, _, files in os.walk(self.objByCategoryPaths[key]):
+                    for filename in files:
+                        self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
+                _, _, files_objects = next(os.walk(self.objByCategoryPaths[key]))
                 
-        for root, _, files in os.walk(self.folder_bgs):
-            for filename in files:
-                #self.bg.append(cv2.cvtColor(cv2.imread(os.path.join(root, filename)), cv2.COLOR_BGR2RGB))
-                self.bg.append(Image.open(os.path.join(root, filename)).convert('RGBA'))
-        _, _, files_bgs = next(os.walk(self.folder_bgs))
-        self.number_of_bgs = len(files_bgs)
-        print("folder: " + folder_objects_cucumber + " inited")
-        # asher todo add prints
-        print("folder: " + folder_bgs + " inited")
+                self.quantityOfObjByCategory[key] = len(files_objects)
+        utils.Dataset.__init__(self)
+
+        collectAndCountObjImagesByCategory()
+        
+        # asher todo: what todo with that?
+        self.config = config
 
     
     def load_shapes(self, count, height, width):
