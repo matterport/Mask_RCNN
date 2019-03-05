@@ -88,6 +88,8 @@ class genDataset(utils.Dataset):
         self.add_class("shapes", 1, "cucumber")
         self.add_class("shapes", 2, "leaf")
         self.add_class("shapes", 3, "flower")
+        self.add_class("shapes", 3, "stem")
+
 
         
         # Add images
