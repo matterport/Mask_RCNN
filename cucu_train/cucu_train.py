@@ -155,7 +155,7 @@ print("loaded weights from path:", weightPath)
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
 import math
-globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+# globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
 
 #create path dictionaries
 trainCategoryPathsDict = {}

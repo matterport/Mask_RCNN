@@ -91,8 +91,8 @@ class cucumberConfig(Config):
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 6000
-    VALID_SET_SIZE = 200
+    TRAIN_SET_SIZE = 10
+    VALID_SET_SIZE = 5
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 2

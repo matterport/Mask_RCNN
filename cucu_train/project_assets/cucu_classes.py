@@ -25,16 +25,15 @@ class genDataset(utils.Dataset):
     def __init__(self,objByCategoryPaths,config):
         def collectAndCountObjImagesByCategory():
             self.objByCategoryPaths = objByCategoryPaths
-            self.containerOfObjForGeneratingImages={}
+            self.containerOfObjForGeneratingImages= defaultdict(list)
             self.quantityOfObjByCategory={}
             
             for key in globalObjectShapesList:
                 for root, _, files in os.walk(self.objByCategoryPaths[key]):
                     for filename in files:
                         self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
-                _, _, files_objects = next(os.walk(self.objByCategoryPaths[key]))
-                
-                self.quantityOfObjByCategory[key] = len(files_objects)
+                    self.quantityOfObjByCategory[key] = len(files)
+                    print("files num:" + str(self.quantityOfObjByCategory[key])+ key)
         utils.Dataset.__init__(self)
 
         collectAndCountObjImagesByCategory()
