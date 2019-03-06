@@ -16,12 +16,9 @@ from project_assets.cucu_utils import *
 
 from cucu_config import *
 from cucu_config import cucuConf
-
+from cucu_config import globalObjectShapesList
 
 import math
-
-# here you can add more object keys 
-objKeysList= ['BG', 'cucumbers', 'flowers', 'leaves', 'stems']
 
 from collections import defaultdict
 class genDataset(utils.Dataset):
@@ -31,7 +28,7 @@ class genDataset(utils.Dataset):
             self.containerOfObjForGeneratingImages={}
             self.quantityOfObjByCategory={}
             
-            for key in objKeysList:
+            for key in globalObjectShapesList:
                 for root, _, files in os.walk(self.objByCategoryPaths[key]):
                     for filename in files:
                         self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
@@ -55,7 +52,7 @@ class genDataset(utils.Dataset):
         #asher todo: move this section into init
         #Add categories
         SKIP_BACKGROUND_KEY = 1
-        for index, key in enumerate(objKeysList, SKIP_BACKGROUND_KEY):
+        for index, key in enumerate(globalObjectShapesList, SKIP_BACKGROUND_KEY):
             self.add_class("shapes", index, key)
 
         
