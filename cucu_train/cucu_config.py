@@ -2,6 +2,13 @@
 
 from mrcnn.config import Config
 import numpy as np
+
+
+
+# here you can add more object shapes 
+globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+
+
 class cucumberConfig(Config):
     """Configuration for training on the toy shapes dataset.
     Derives from the base Config class and overrides values specific

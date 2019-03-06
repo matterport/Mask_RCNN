@@ -56,7 +56,7 @@ def rotate_bound(image, angle):
     return cv2.warpAffine(image, M, (nW, nH))
 
 
-def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, erode=None, gaussian=None):
+def add_image(backGroundToPasteOn, objectShape, x_center, y_center, x_scale, y_scale, angle, erode=None, gaussian=None):
     """
     name I gave: pasteImageOnOther ruined the overriding of base class function
     pasting re-scaled image on other image (collage effect)
@@ -79,9 +79,9 @@ def add_image(img1, objectShape, x_center, y_center, x_scale, y_scale, angle, er
     x_from = x_center - math.floor(cols/2.)
     y_from = y_center - math.floor(rows/2.)
 
-    img1.paste(objectShape, (x_from, y_from), Image.fromarray(mask, 'L'))
+    generatedImageWithAdditionalObj = backGroundToPasteOn.paste(objectShape, (x_from, y_from), Image.fromarray(mask, 'L'))
 
-    return img1
+    return generatedImageWithAdditionalObj
 
 def add_imageWithoutTransparency(img1, objectShape, x_center, y_center, x_scale, y_scale, angle):
     """

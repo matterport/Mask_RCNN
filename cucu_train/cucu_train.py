@@ -66,7 +66,7 @@ finally:
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
-print("5 EPOCHS, 30 ROUNDS, TOLERANCE 3 ON DELTA 0.05,\n\
+print("first training with stems\n\
         DECAYING LEARNING RATE: YES, \n\
         MULTICOLOR OBJECTS: YES,\n\
         ENHANCED BLENDING: YES,\n\
@@ -155,23 +155,34 @@ print("loaded weights from path:", weightPath)
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
 import math
+globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+
+#create path dictionaries
+trainCategoryPathsDict = {}
+trainCategoryPathsDict['BG']         = cucuPaths.trainDatasetDir + '/background_folder/1024'
+trainCategoryPathsDict['cucumber']   = cucuPaths.trainDatasetDir + '/cucumbers_objects'
+trainCategoryPathsDict['leaf']       = cucuPaths.trainDatasetDir + '/leaves_objects'
+trainCategoryPathsDict['flower']     = cucuPaths.trainDatasetDir + '/flower_objects'
+trainCategoryPathsDict['stem']       = cucuPaths.trainDatasetDir + '/stems_objects'
+
+validCategoryPathsDict = {}
+validCategoryPathsDict['BG']         = cucuPaths.valDatasetDir + '/background_folder/1024'
+validCategoryPathsDict['cucumber']   = cucuPaths.valDatasetDir + '/cucumbers_objects'
+validCategoryPathsDict['leaf']       = cucuPaths.valDatasetDir + '/leaves_objects'
+validCategoryPathsDict['flower']     = cucuPaths.valDatasetDir + '/flower_objects'
+validCategoryPathsDict['stem']       = cucuPaths.valDatasetDir + '/stems_objects'
+
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
     # asher todo: add a choice from which dataset to generate
-    dataset_train = genDataset( cucuPaths.trainDatasetDir + '/cucumbers_objects', 
-                                cucuPaths.trainDatasetDir + '/leaves_objects',
-                                cucuPaths.trainDatasetDir + '/flower_objects',
-                                cucuPaths.trainDatasetDir + '/background_folder/1024', config)
+    dataset_train = genDataset(trainCategoryPathsDict, config)
     dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
     dataset_train.prepare()
 
 
     # Validation dataset
-    dataset_val = genDataset(   cucuPaths.valDatasetDir + '/cucumbers_objects', 
-                                cucuPaths.valDatasetDir + '/leaves_objects',
-                                cucuPaths.valDatasetDir + '/flower_objects',
-                                cucuPaths.valDatasetDir + '/background_folder/1024', config)
+    dataset_val = genDataset(validCategoryPathsDict, config)
     dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
     dataset_val.prepare()
 
