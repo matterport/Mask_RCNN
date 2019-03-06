@@ -67,45 +67,41 @@ class genDataset(utils.Dataset):
             bg_color, shapes = self.GenerateRandomSpecsForImage(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes, bgIndex=bgIndex)
     
-    def load_image(self, image_id):
+    def load_image(self, specification_id):
         """
         creates an image using spcifications choosed earlier for creating it.
+        the specifications are tracked usiing specification_id
 
         function is called by load_image_gt - it is crucial for generating on-the-fly training set 
         for NN.
-        image_id - associates with certain attributes (image_info) of this image generated 
+        specification_id - associates with certain attributes (image_info) of this image generated 
                    on constructing train_dataset and val_dataset
         """
-        info = self.image_info[image_id]
+        info = self.image_info[specification_id]
                 
         # pull some random background from loaded bg set. which are typcally big
-        y_topRight, x_topRight,channels = np.asarray(self.bg[info['bgIndex']]).shape
-        y_max, x_max ,_ = np.asarray(self.bg[info['bgIndex']]).shape
+        y_topRight, x_topRight,channels = np.asarray(self.containerOfObjForGeneratingImages['BG'][info['bgIndex']]).shape
+        y_max, x_max ,_ = np.asarray(self.containerOfObjForGeneratingImages['BG'][info['bgIndex']]).shape
 
         # pick random up-right corner
         x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//2 , x_max)
         y_topRight = randint(y_max - self.config.IMAGE_MAX_DIM//2 , y_max)
-        # print("y_topRight:" , y_topRight , "index:", index) #asher todo: delete this
-        # pick bottom-left corner for cropping the bg to fir image size which is (self.config.IMAGE_MAX_DIM)^2
-        # x_bottomLeft = randint(0, x_topRight- self.config.IMAGE_MAX_DIM)
-        # y_bottomLeft = randint(0, y_topRight- self.config.IMAGE_MAX_DIM)
         x_bottomLeft = x_topRight - self.config.IMAGE_MAX_DIM
         y_bottomLeft = y_topRight - self.config.IMAGE_MAX_DIM
         # build random area of configure IMAGE_SHAPE for net, which is IMAGE_MAX_DIM*IMAGE_MAX_DIM
 
         # temporary values (left, upper, right, lower)-tuple
-        # simon todo: restore generic vars
         if self.config.IMAGE_MAX_DIM == 1024:
             area = (0, 0, 1024, 1024)
         else:
             area = (x_bottomLeft,y_bottomLeft,x_topRight,y_topRight)
-        image = self.bg[info['bgIndex']].crop(area)
+        image = self.containerOfObjForGeneratingImages['BG'][info['bgIndex']].crop(area)
 
         for shape, location, scale, angle, index in info['shapes']:
             image = self.draw_shape(image, shape, location, scale, angle, index)
-        # asher todo: erase it later
-        npImage = np.array(image)
+        
         # remove transparency channel to fit to network data
+        npImage = np.array(image)
         ImageWithoutTransparency = npImage[:,:,:3]
         return ImageWithoutTransparency
     
@@ -123,22 +119,14 @@ class genDataset(utils.Dataset):
         Draws a shape from the given specs.
         image - is just initiated to zeroes matrix 
         """
-        if 'cucumber' == shape:
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            image = add_imageWithoutTransparency(image, np.array(self.cucumberObj[index]), topLeftX_location, topLeftY_location, x_scale, y_scale, angle)
-        if 'leaf' == shape:
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            image = add_imageWithoutTransparency(image, np.array(self.leafObj[index]), topLeftX_location, topLeftY_location, x_scale, y_scale, angle)
-        if 'flower' == shape:
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            image = add_imageWithoutTransparency(image, np.array(self.flowerObj[index]), topLeftX_location, topLeftY_location, x_scale, y_scale, angle)
+        topLeftX_location, topLeftY_location = location
+        x_scale, y_scale = scale
+        image = add_imageWithoutTransparency(image, np.array(self.containerOfObjForGeneratingImages[shape][index]), topLeftX_location, topLeftY_location, x_scale, y_scale, angle)
+        
         return image
 
 
-    def draw_shape(self, Collage, shape, location, scale, angle, index, erode_coeff=5, gaussian_coeff=3):
+    def draw_shape(self, imageToDrawShapeOn, shape, location, scale, angle, index, erode_coeff=5, gaussian_coeff=3):
         """
         Draws another cucumber on a selected background
         Get the center x, y and the size s
@@ -146,19 +134,11 @@ class genDataset(utils.Dataset):
         :param erode_coeff: size of kernel for erosion to apply on mask when blending to image
         :param gaussian_coeff: size of kernel for gaussian blur around mask when blending to image
         """
-
-        if shape == 'cucumber':
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            Collage = add_image(Collage, self.cucumberObj[index], topLeftX_location, topLeftY_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
-        if shape == 'leaf':
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            Collage = add_image(Collage, self.leafObj[index], topLeftX_location, topLeftY_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
-        if shape == 'flower':
-            topLeftX_location, topLeftY_location = location
-            x_scale, y_scale = scale
-            Collage = add_image(Collage, self.flowerObj[index], topLeftX_location, topLeftY_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
+        topLeftX_location, topLeftY_location = location
+        x_scale, y_scale = scale
+        Collage = add_image(imageToDrawShapeOn, self.containerOfObjForGeneratingImages[shape][index], topLeftX_location,\
+                             topLeftY_location, x_scale, y_scale, angle, erode_coeff, gaussian_coeff)
+        
         return Collage
     
     
