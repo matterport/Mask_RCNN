@@ -30,6 +30,7 @@ class ShapesConfig(Config):
     Derives from the base Config class and overrides values specific
     to the toy shapes dataset.
     """
+
     # Give the configuration a recognizable name
     NAME = "shapes"
 
@@ -82,9 +83,15 @@ class ShapesDataset(utils.Dataset):
         # actual images. Images are generated on the fly in load_image().
         for i in range(count):
             bg_color, shapes = self.random_image(height, width)
-            self.add_image("shapes", image_id=i, path=None,
-                           width=width, height=height,
-                           bg_color=bg_color, shapes=shapes)
+            self.add_image(
+                "shapes",
+                image_id=i,
+                path=None,
+                width=width,
+                height=height,
+                bg_color=bg_color,
+                shapes=shapes,
+            )
 
     def load_image(self, image_id):
         """Generate an image from the specs of the given image ID.
@@ -93,10 +100,10 @@ class ShapesDataset(utils.Dataset):
         specs in image_info.
         """
         info = self.image_info[image_id]
-        bg_color = np.array(info['bg_color']).reshape([1, 1, 3])
-        image = np.ones([info['height'], info['width'], 3], dtype=np.uint8)
+        bg_color = np.array(info["bg_color"]).reshape([1, 1, 3])
+        image = np.ones([info["height"], info["width"], 3], dtype=np.uint8)
         image = image * bg_color.astype(np.uint8)
-        for shape, color, dims in info['shapes']:
+        for shape, color, dims in info["shapes"]:
             image = self.draw_shape(image, shape, dims, color)
         return image
 
@@ -112,18 +119,18 @@ class ShapesDataset(utils.Dataset):
         """Generate instance masks for shapes of the given image ID.
         """
         info = self.image_info[image_id]
-        shapes = info['shapes']
+        shapes = info["shapes"]
         count = len(shapes)
-        mask = np.zeros([info['height'], info['width'], count], dtype=np.uint8)
-        for i, (shape, _, dims) in enumerate(info['shapes']):
-            mask[:, :, i:i + 1] = self.draw_shape(mask[:, :, i:i + 1].copy(),
-                                                  shape, dims, 1)
+        mask = np.zeros([info["height"], info["width"], count], dtype=np.uint8)
+        for i, (shape, _, dims) in enumerate(info["shapes"]):
+            mask[:, :, i : i + 1] = self.draw_shape(
+                mask[:, :, i : i + 1].copy(), shape, dims, 1
+            )
         # Handle occlusions
         occlusion = np.logical_not(mask[:, :, -1]).astype(np.uint8)
         for i in range(count - 2, -1, -1):
             mask[:, :, i] = mask[:, :, i] * occlusion
-            occlusion = np.logical_and(
-                occlusion, np.logical_not(mask[:, :, i]))
+            occlusion = np.logical_and(occlusion, np.logical_not(mask[:, :, i]))
         # Map class names to class IDs.
         class_ids = np.array([self.class_names.index(s[0]) for s in shapes])
         return mask, class_ids.astype(np.int32)
@@ -132,16 +139,21 @@ class ShapesDataset(utils.Dataset):
         """Draws a shape from the given specs."""
         # Get the center x, y and the size s
         x, y, s = dims
-        if shape == 'square':
-            image = cv2.rectangle(image, (x - s, y - s),
-                                  (x + s, y + s), color, -1)
+        if shape == "square":
+            image = cv2.rectangle(image, (x - s, y - s), (x + s, y + s), color, -1)
         elif shape == "circle":
             image = cv2.circle(image, (x, y), s, color, -1)
         elif shape == "triangle":
-            points = np.array([[(x, y - s),
-                                (x - s / math.sin(math.radians(60)), y + s),
-                                (x + s / math.sin(math.radians(60)), y + s),
-                                ]], dtype=np.int32)
+            points = np.array(
+                [
+                    [
+                        (x, y - s),
+                        (x - s / math.sin(math.radians(60)), y + s),
+                        (x + s / math.sin(math.radians(60)), y + s),
+                    ]
+                ],
+                dtype=np.int32,
+            )
             image = cv2.fillPoly(image, points, color)
         return image
 
@@ -185,7 +197,6 @@ class ShapesDataset(utils.Dataset):
             boxes.append([y - s, x - s, y + s, x + s])
         # Apply non-max suppression wit 0.3 threshold to avoid
         # shapes covering each other
-        keep_ixs = utils.non_max_suppression(
-            np.array(boxes), np.arange(N), 0.3)
+        keep_ixs = utils.non_max_suppression(np.array(boxes), np.arange(N), 0.3)
         shapes = [s for i, s in enumerate(shapes) if i in keep_ixs]
         return bg_color, shapes

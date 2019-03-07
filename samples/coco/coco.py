@@ -73,6 +73,7 @@ class CocoConfig(Config):
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
     """
+
     # Give the configuration a recognizable name
     NAME = "coco"
 
@@ -91,9 +92,18 @@ class CocoConfig(Config):
 #  Dataset
 ############################################################
 
+
 class CocoDataset(utils.Dataset):
-    def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_ids=None,
-                  class_map=None, return_coco=False, auto_download=False):
+    def load_coco(
+        self,
+        dataset_dir,
+        subset,
+        year=DEFAULT_DATASET_YEAR,
+        class_ids=None,
+        class_map=None,
+        return_coco=False,
+        auto_download=False,
+    ):
         """Load a subset of the COCO dataset.
         dataset_dir: The root directory of the COCO dataset.
         subset: What to load (train, val, minival, valminusminival)
@@ -108,7 +118,9 @@ class CocoDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
-        coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        coco = COCO(
+            "{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year)
+        )
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
         image_dir = "{}/{}{}".format(dataset_dir, subset, year)
@@ -136,12 +148,15 @@ class CocoDataset(utils.Dataset):
         # Add images
         for i in image_ids:
             self.add_image(
-                "coco", image_id=i,
-                path=os.path.join(image_dir, coco.imgs[i]['file_name']),
+                "coco",
+                image_id=i,
+                path=os.path.join(image_dir, coco.imgs[i]["file_name"]),
                 width=coco.imgs[i]["width"],
                 height=coco.imgs[i]["height"],
-                annotations=coco.loadAnns(coco.getAnnIds(
-                    imgIds=[i], catIds=class_ids, iscrowd=None)))
+                annotations=coco.loadAnns(
+                    coco.getAnnIds(imgIds=[i], catIds=class_ids, iscrowd=None)
+                ),
+            )
         if return_coco:
             return coco
 
@@ -159,11 +174,15 @@ class CocoDataset(utils.Dataset):
         if dataType == "minival" or dataType == "valminusminival":
             imgDir = "{}/{}{}".format(dataDir, "val", dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, "val", dataYear)
-            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format("val", dataYear)
+            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(
+                "val", dataYear
+            )
         else:
             imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
-            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
+            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(
+                dataType, dataYear
+            )
         # print("Image paths:"); print(imgDir); print(imgZipFile); print(imgURL)
 
         # Create main folder if it doesn't exist yet
@@ -174,7 +193,7 @@ class CocoDataset(utils.Dataset):
         if not os.path.exists(imgDir):
             os.makedirs(imgDir)
             print("Downloading images to " + imgZipFile + " ...")
-            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
+            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, "wb") as out:
                 shutil.copyfileobj(resp, out)
             print("... done downloading.")
             print("Unzipping " + imgZipFile)
@@ -198,7 +217,9 @@ class CocoDataset(utils.Dataset):
         else:
             annZipFile = "{}/annotations_trainval{}.zip".format(dataDir, dataYear)
             annFile = "{}/instances_{}{}.json".format(annDir, dataType, dataYear)
-            annURL = "http://images.cocodataset.org/annotations/annotations_trainval{}.zip".format(dataYear)
+            annURL = "http://images.cocodataset.org/annotations/annotations_trainval{}.zip".format(
+                dataYear
+            )
             unZipDir = dataDir
         # print("Annotations paths:"); print(annDir); print(annFile); print(annZipFile); print(annURL)
 
@@ -208,7 +229,9 @@ class CocoDataset(utils.Dataset):
         if not os.path.exists(annFile):
             if not os.path.exists(annZipFile):
                 print("Downloading zipped annotations to " + annZipFile + " ...")
-                with urllib.request.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
+                with urllib.request.urlopen(annURL) as resp, open(
+                    annZipFile, "wb"
+                ) as out:
                     shutil.copyfileobj(resp, out)
                 print("... done downloading.")
             print("Unzipping " + annZipFile)
@@ -241,22 +264,29 @@ class CocoDataset(utils.Dataset):
         # of class IDs that correspond to each channel of the mask.
         for annotation in annotations:
             class_id = self.map_source_class_id(
-                "coco.{}".format(annotation['category_id']))
+                "coco.{}".format(annotation["category_id"])
+            )
             if class_id:
-                m = self.annToMask(annotation, image_info["height"],
-                                   image_info["width"])
+                m = self.annToMask(
+                    annotation, image_info["height"], image_info["width"]
+                )
                 # Some objects are so small that they're less than 1 pixel area
                 # and end up rounded out. Skip those objects.
                 if m.max() < 1:
                     continue
                 # Is it a crowd? If so, use a negative class ID.
-                if annotation['iscrowd']:
+                if annotation["iscrowd"]:
                     # Use negative class ID for crowds
                     class_id *= -1
                     # For crowd masks, annToMask() sometimes returns a mask
                     # smaller than the given dimensions. If so, resize it.
-                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
-                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                    if (
+                        m.shape[0] != image_info["height"]
+                        or m.shape[1] != image_info["width"]
+                    ):
+                        m = np.ones(
+                            [image_info["height"], image_info["width"]], dtype=bool
+                        )
                 instance_masks.append(m)
                 class_ids.append(class_id)
 
@@ -284,18 +314,18 @@ class CocoDataset(utils.Dataset):
         Convert annotation which can be polygons, uncompressed RLE to RLE.
         :return: binary mask (numpy 2D array)
         """
-        segm = ann['segmentation']
+        segm = ann["segmentation"]
         if isinstance(segm, list):
             # polygon -- a single object might consist of multiple parts
             # we merge all parts into one mask rle code
             rles = maskUtils.frPyObjects(segm, height, width)
             rle = maskUtils.merge(rles)
-        elif isinstance(segm['counts'], list):
+        elif isinstance(segm["counts"], list):
             # uncompressed RLE
             rle = maskUtils.frPyObjects(segm, height, width)
         else:
             # rle
-            rle = ann['segmentation']
+            rle = ann["segmentation"]
         return rle
 
     def annToMask(self, ann, height, width):
@@ -311,6 +341,7 @@ class CocoDataset(utils.Dataset):
 ############################################################
 #  COCO Evaluation
 ############################################################
+
 
 def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
     """Arrange resutls to match COCO specs in http://cocodataset.org/#format
@@ -333,7 +364,7 @@ def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
                 "category_id": dataset.get_source_class_id(class_id, "coco"),
                 "bbox": [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]],
                 "score": score,
-                "segmentation": maskUtils.encode(np.asfortranarray(mask))
+                "segmentation": maskUtils.encode(np.asfortranarray(mask)),
             }
             results.append(result)
     return results
@@ -366,14 +397,18 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         # Run detection
         t = time.time()
         r = model.detect([image], verbose=0)[0]
-        t_prediction += (time.time() - t)
+        t_prediction += time.time() - t
 
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
-        image_results = build_coco_results(dataset, coco_image_ids[i:i + 1],
-                                           r["rois"], r["class_ids"],
-                                           r["scores"],
-                                           r["masks"].astype(np.uint8))
+        image_results = build_coco_results(
+            dataset,
+            coco_image_ids[i : i + 1],
+            r["rois"],
+            r["class_ids"],
+            r["scores"],
+            r["masks"].astype(np.uint8),
+        )
         results.extend(image_results)
 
     # Load results. This modifies results with additional attributes.
@@ -386,8 +421,11 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     cocoEval.accumulate()
     cocoEval.summarize()
 
-    print("Prediction time: {}. Average {}/image".format(
-        t_prediction, t_prediction / len(image_ids)))
+    print(
+        "Prediction time: {}. Average {}/image".format(
+            t_prediction, t_prediction / len(image_ids)
+        )
+    )
     print("Total time: ", time.time() - t_start)
 
 
@@ -396,38 +434,55 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
 ############################################################
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN on MS COCO.')
-    parser.add_argument("command",
-                        metavar="<command>",
-                        help="'train' or 'evaluate' on MS COCO")
-    parser.add_argument('--dataset', required=True,
-                        metavar="/path/to/coco/",
-                        help='Directory of the MS-COCO dataset')
-    parser.add_argument('--year', required=False,
-                        default=DEFAULT_DATASET_YEAR,
-                        metavar="<year>",
-                        help='Year of the MS-COCO dataset (2014 or 2017) (default=2014)')
-    parser.add_argument('--model', required=True,
-                        metavar="/path/to/weights.h5",
-                        help="Path to weights .h5 file or 'coco'")
-    parser.add_argument('--logs', required=False,
-                        default=DEFAULT_LOGS_DIR,
-                        metavar="/path/to/logs/",
-                        help='Logs and checkpoints directory (default=logs/)')
-    parser.add_argument('--limit', required=False,
-                        default=500,
-                        metavar="<image count>",
-                        help='Images to use for evaluation (default=500)')
-    parser.add_argument('--download', required=False,
-                        default=False,
-                        metavar="<True|False>",
-                        help='Automatically download and unzip MS-COCO files (default=False)',
-                        type=bool)
+    parser = argparse.ArgumentParser(description="Train Mask R-CNN on MS COCO.")
+    parser.add_argument(
+        "command", metavar="<command>", help="'train' or 'evaluate' on MS COCO"
+    )
+    parser.add_argument(
+        "--dataset",
+        required=True,
+        metavar="/path/to/coco/",
+        help="Directory of the MS-COCO dataset",
+    )
+    parser.add_argument(
+        "--year",
+        required=False,
+        default=DEFAULT_DATASET_YEAR,
+        metavar="<year>",
+        help="Year of the MS-COCO dataset (2014 or 2017) (default=2014)",
+    )
+    parser.add_argument(
+        "--model",
+        required=True,
+        metavar="/path/to/weights.h5",
+        help="Path to weights .h5 file or 'coco'",
+    )
+    parser.add_argument(
+        "--logs",
+        required=False,
+        default=DEFAULT_LOGS_DIR,
+        metavar="/path/to/logs/",
+        help="Logs and checkpoints directory (default=logs/)",
+    )
+    parser.add_argument(
+        "--limit",
+        required=False,
+        default=500,
+        metavar="<image count>",
+        help="Images to use for evaluation (default=500)",
+    )
+    parser.add_argument(
+        "--download",
+        required=False,
+        default=False,
+        metavar="<True|False>",
+        help="Automatically download and unzip MS-COCO files (default=False)",
+        type=bool,
+    )
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -440,22 +495,22 @@ if __name__ == '__main__':
     if args.command == "train":
         config = CocoConfig()
     else:
+
         class InferenceConfig(CocoConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
+
         config = InferenceConfig()
     config.display()
 
     # Create model
     if args.command == "train":
-        model = modellib.MaskRCNN(mode="training", config=config,
-                                  model_dir=args.logs)
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=args.logs)
     else:
-        model = modellib.MaskRCNN(mode="inference", config=config,
-                                  model_dir=args.logs)
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
 
     # Select weights file to load
     if args.model.lower() == "coco":
@@ -478,15 +533,24 @@ if __name__ == '__main__':
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = CocoDataset()
-        dataset_train.load_coco(args.dataset, "train", year=args.year, auto_download=args.download)
-        if args.year in '2014':
-            dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
+        dataset_train.load_coco(
+            args.dataset, "train", year=args.year, auto_download=args.download
+        )
+        if args.year in "2014":
+            dataset_train.load_coco(
+                args.dataset,
+                "valminusminival",
+                year=args.year,
+                auto_download=args.download,
+            )
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = CocoDataset()
-        val_type = "val" if args.year in '2017' else "minival"
-        dataset_val.load_coco(args.dataset, val_type, year=args.year, auto_download=args.download)
+        val_type = "val" if args.year in "2017" else "minival"
+        dataset_val.load_coco(
+            args.dataset, val_type, year=args.year, auto_download=args.download
+        )
         dataset_val.prepare()
 
         # Image Augmentation
@@ -497,38 +561,54 @@ if __name__ == '__main__':
 
         # Training - Stage 1
         print("Training network heads")
-        model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
-                    epochs=40,
-                    layers='heads',
-                    augmentation=augmentation)
+        model.train(
+            dataset_train,
+            dataset_val,
+            learning_rate=config.LEARNING_RATE,
+            epochs=40,
+            layers="heads",
+            augmentation=augmentation,
+        )
 
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune Resnet stage 4 and up")
-        model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
-                    epochs=120,
-                    layers='4+',
-                    augmentation=augmentation)
+        model.train(
+            dataset_train,
+            dataset_val,
+            learning_rate=config.LEARNING_RATE,
+            epochs=120,
+            layers="4+",
+            augmentation=augmentation,
+        )
 
         # Training - Stage 3
         # Fine tune all layers
         print("Fine tune all layers")
-        model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=160,
-                    layers='all',
-                    augmentation=augmentation)
+        model.train(
+            dataset_train,
+            dataset_val,
+            learning_rate=config.LEARNING_RATE / 10,
+            epochs=160,
+            layers="all",
+            augmentation=augmentation,
+        )
 
     elif args.command == "evaluate":
         # Validation dataset
         dataset_val = CocoDataset()
-        val_type = "val" if args.year in '2017' else "minival"
-        coco = dataset_val.load_coco(args.dataset, val_type, year=args.year, return_coco=True, auto_download=args.download)
+        val_type = "val" if args.year in "2017" else "minival"
+        coco = dataset_val.load_coco(
+            args.dataset,
+            val_type,
+            year=args.year,
+            return_coco=True,
+            auto_download=args.download,
+        )
         dataset_val.prepare()
         print("Running COCO evaluation on {} images.".format(args.limit))
         evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
     else:
-        print("'{}' is not recognized. "
-              "Use 'train' or 'evaluate'".format(args.command))
+        print(
+            "'{}' is not recognized. " "Use 'train' or 'evaluate'".format(args.command)
+        )

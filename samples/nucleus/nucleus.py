@@ -29,10 +29,11 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 # This has to be done before other importa that might
 # set it, but only if we're running in script mode
 # rather than being imported.
-if __name__ == '__main__':
+if __name__ == "__main__":
     import matplotlib
+
     # Agg backend runs without a display
-    matplotlib.use('Agg')
+    matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
 import os
@@ -99,8 +100,10 @@ VAL_IMAGE_IDS = [
 #  Configurations
 ############################################################
 
+
 class NucleusConfig(Config):
     """Configuration for training on the nucleus segmentation dataset."""
+
     # Give the configuration a recognizable name
     NAME = "nucleus"
 
@@ -180,8 +183,8 @@ class NucleusInferenceConfig(NucleusConfig):
 #  Dataset
 ############################################################
 
-class NucleusDataset(utils.Dataset):
 
+class NucleusDataset(utils.Dataset):
     def load_nucleus(self, dataset_dir, subset):
         """Load a subset of the nuclei dataset.
 
@@ -215,7 +218,10 @@ class NucleusDataset(utils.Dataset):
             self.add_image(
                 "nucleus",
                 image_id=image_id,
-                path=os.path.join(dataset_dir, image_id, "images/{}.png".format(image_id)))
+                path=os.path.join(
+                    dataset_dir, image_id, "images/{}.png".format(image_id)
+                ),
+            )
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -226,7 +232,7 @@ class NucleusDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
         # Get mask directory from image path
-        mask_dir = os.path.join(os.path.dirname(os.path.dirname(info['path'])), "masks")
+        mask_dir = os.path.join(os.path.dirname(os.path.dirname(info["path"])), "masks")
 
         # Read mask files from .png image
         mask = []
@@ -252,6 +258,7 @@ class NucleusDataset(utils.Dataset):
 #  Training
 ############################################################
 
+
 def train(model, dataset_dir, subset):
     """Train the model."""
     # Training dataset.
@@ -266,38 +273,48 @@ def train(model, dataset_dir, subset):
 
     # Image augmentation
     # http://imgaug.readthedocs.io/en/latest/source/augmenters.html
-    augmentation = iaa.SomeOf((0, 2), [
-        iaa.Fliplr(0.5),
-        iaa.Flipud(0.5),
-        iaa.OneOf([iaa.Affine(rotate=90),
-                   iaa.Affine(rotate=180),
-                   iaa.Affine(rotate=270)]),
-        iaa.Multiply((0.8, 1.5)),
-        iaa.GaussianBlur(sigma=(0.0, 5.0))
-    ])
+    augmentation = iaa.SomeOf(
+        (0, 2),
+        [
+            iaa.Fliplr(0.5),
+            iaa.Flipud(0.5),
+            iaa.OneOf(
+                [iaa.Affine(rotate=90), iaa.Affine(rotate=180), iaa.Affine(rotate=270)]
+            ),
+            iaa.Multiply((0.8, 1.5)),
+            iaa.GaussianBlur(sigma=(0.0, 5.0)),
+        ],
+    )
 
     # *** This training schedule is an example. Update to your needs ***
 
     # If starting from imagenet, train heads only for a bit
     # since they have random weights
     print("Train network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=20,
-                augmentation=augmentation,
-                layers='heads')
+    model.train(
+        dataset_train,
+        dataset_val,
+        learning_rate=config.LEARNING_RATE,
+        epochs=20,
+        augmentation=augmentation,
+        layers="heads",
+    )
 
     print("Train all layers")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=40,
-                augmentation=augmentation,
-                layers='all')
+    model.train(
+        dataset_train,
+        dataset_val,
+        learning_rate=config.LEARNING_RATE,
+        epochs=40,
+        augmentation=augmentation,
+        layers="all",
+    )
 
 
 ############################################################
 #  RLE Encoding
 ############################################################
+
 
 def rle_encode(mask):
     """Encodes a mask in Run Length Encoding (RLE).
@@ -359,6 +376,7 @@ def mask_to_rle(image_id, mask, scores):
 #  Detection
 ############################################################
 
+
 def detect(model, dataset_dir, subset):
     """Run detection on images in the given directory."""
     print("Running on {}".format(dataset_dir))
@@ -387,10 +405,16 @@ def detect(model, dataset_dir, subset):
         submission.append(rle)
         # Save image with masks
         visualize.display_instances(
-            image, r['rois'], r['masks'], r['class_ids'],
-            dataset.class_names, r['scores'],
-            show_bbox=False, show_mask=False,
-            title="Predictions")
+            image,
+            r["rois"],
+            r["masks"],
+            r["class_ids"],
+            dataset.class_names,
+            r["scores"],
+            show_bbox=False,
+            show_mask=False,
+            title="Predictions",
+        )
         plt.savefig("{}/{}.png".format(submit_dir, dataset.image_info[image_id]["id"]))
 
     # Save to csv file
@@ -405,28 +429,39 @@ def detect(model, dataset_dir, subset):
 #  Command Line
 ############################################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Mask R-CNN for nuclei counting and segmentation')
-    parser.add_argument("command",
-                        metavar="<command>",
-                        help="'train' or 'detect'")
-    parser.add_argument('--dataset', required=False,
-                        metavar="/path/to/dataset/",
-                        help='Root directory of the dataset')
-    parser.add_argument('--weights', required=True,
-                        metavar="/path/to/weights.h5",
-                        help="Path to weights .h5 file or 'coco'")
-    parser.add_argument('--logs', required=False,
-                        default=DEFAULT_LOGS_DIR,
-                        metavar="/path/to/logs/",
-                        help='Logs and checkpoints directory (default=logs/)')
-    parser.add_argument('--subset', required=False,
-                        metavar="Dataset sub-directory",
-                        help="Subset of dataset to run prediction on")
+        description="Mask R-CNN for nuclei counting and segmentation"
+    )
+    parser.add_argument("command", metavar="<command>", help="'train' or 'detect'")
+    parser.add_argument(
+        "--dataset",
+        required=False,
+        metavar="/path/to/dataset/",
+        help="Root directory of the dataset",
+    )
+    parser.add_argument(
+        "--weights",
+        required=True,
+        metavar="/path/to/weights.h5",
+        help="Path to weights .h5 file or 'coco'",
+    )
+    parser.add_argument(
+        "--logs",
+        required=False,
+        default=DEFAULT_LOGS_DIR,
+        metavar="/path/to/logs/",
+        help="Logs and checkpoints directory (default=logs/)",
+    )
+    parser.add_argument(
+        "--subset",
+        required=False,
+        metavar="Dataset sub-directory",
+        help="Subset of dataset to run prediction on",
+    )
     args = parser.parse_args()
 
     # Validate arguments
@@ -450,11 +485,9 @@ if __name__ == '__main__':
 
     # Create model
     if args.command == "train":
-        model = modellib.MaskRCNN(mode="training", config=config,
-                                  model_dir=args.logs)
+        model = modellib.MaskRCNN(mode="training", config=config, model_dir=args.logs)
     else:
-        model = modellib.MaskRCNN(mode="inference", config=config,
-                                  model_dir=args.logs)
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
 
     # Select weights file to load
     if args.weights.lower() == "coco":
@@ -476,9 +509,11 @@ if __name__ == '__main__':
     if args.weights.lower() == "coco":
         # Exclude the last layers because they require a matching
         # number of classes
-        model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
+        model.load_weights(
+            weights_path,
+            by_name=True,
+            exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"],
+        )
     else:
         model.load_weights(weights_path, by_name=True)
 
@@ -488,5 +523,4 @@ if __name__ == '__main__':
     elif args.command == "detect":
         detect(model, args.dataset, args.subset)
     else:
-        print("'{}' is not recognized. "
-              "Use 'train' or 'detect'".format(args.command))
+        print("'{}' is not recognized. " "Use 'train' or 'detect'".format(args.command))

@@ -1,57 +1,52 @@
 def parse_yaml(input_file):
     """Parse yaml file of configuration parameters."""
-    with open(input_file, 'r') as yaml_file:
+    with open(input_file, "r") as yaml_file:
         params = yaml.load(yaml_file)
     return params
 
-params = parse_yaml('preprocess_config.yaml') 
 
-ROOT = params['dirs']['root']
+params = parse_yaml("preprocess_config.yaml")
 
-DATASET = os.path.join(
-    ROOT, params['dirs']['dataset'])
+ROOT = params["dirs"]["root"]
 
-REORDER = os.path.join(
-    DATASET, params['dirs']['reorder'])
+DATASET = os.path.join(ROOT, params["dirs"]["dataset"])
 
-TRAIN = os.path.join(
-    DATASET, params['dirs']['train'])
+REORDER = os.path.join(DATASET, params["dirs"]["reorder"])
 
-TEST = os.path.join(
-    DATASET, params['dirs']['test'])
+TRAIN = os.path.join(DATASET, params["dirs"]["train"])
 
-GRIDDED_IMGS = os.path.join(
-    DATASET, params['dirs']['gridded_imgs'])
+TEST = os.path.join(DATASET, params["dirs"]["test"])
 
-GRIDDED_LABELS = os.path.join(
-    DATASET, params['dirs']['gridded_labels'])
+GRIDDED_IMGS = os.path.join(DATASET, params["dirs"]["gridded_imgs"])
 
-OPENED = os.path.join(
-    DATASET, params['dirs']['opened'])
+GRIDDED_LABELS = os.path.join(DATASET, params["dirs"]["gridded_labels"])
 
-INSTANCES = os.path.join(
-    DATASET, params['dirs']['instances'])
+OPENED = os.path.join(DATASET, params["dirs"]["opened"])
 
-RESULTS = os.path.join(ROOT,'../',params['dirs']['results'], params['dirs']['dataset'])
+INSTANCES = os.path.join(DATASET, params["dirs"]["instances"])
 
-SOURCE_IMGS = os.path.join(
-    ROOT, params['dirs']['source_imgs'])
+RESULTS = os.path.join(
+    ROOT, "../", params["dirs"]["results"], params["dirs"]["dataset"]
+)
 
-SOURCE_LABELS = os.path.join(
-    ROOT, params['dirs']['source_labels'])
+SOURCE_IMGS = os.path.join(ROOT, params["dirs"]["source_imgs"])
+
+SOURCE_LABELS = os.path.join(ROOT, params["dirs"]["source_labels"])
 
 # all files, including ones we don't care about
 file_ids_all = next(os.walk(SOURCE_IMGS))[2]
 # all multispectral on and off season tifs
-image_ids_all = [image_id for image_id in file_ids_all if 'MS' in image_id and '.aux' not in image_id]
+image_ids_all = [
+    image_id for image_id in file_ids_all if "MS" in image_id and ".aux" not in image_id
+]
 
-#check for duplicates
+# check for duplicates
 assert len(image_ids_all) == len(set(image_ids_all))
 
-image_ids_gs = [image_id for image_id in image_ids_all if 'GS' in image_id]
-image_ids_os = [image_id for image_id in image_ids_all if 'OS' in image_id]
+image_ids_gs = [image_id for image_id in image_ids_all if "GS" in image_id]
+image_ids_os = [image_id for image_id in image_ids_all if "OS" in image_id]
 
-#check for equality
+# check for equality
 assert len(image_ids_os) == len(image_ids_gs)
 
 # only select growing season images
@@ -61,4 +56,3 @@ for imid in image_ids_short:
     load_merge_wv2(imid, WV2_DIR)
 
 image_list = next(os.walk(REORDERED_DIR))[2]
-    
