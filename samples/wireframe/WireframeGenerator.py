@@ -14,6 +14,8 @@ COLOR = (255, 255, 255, 255)
 # Icon Dimensions
 ICON_W = ICON_H = 50
 
+#Specify training data or validation data
+TYPES = ["/train", "/val"]
 
 file_content = "{"
 
@@ -40,43 +42,35 @@ def add_box_json_polygon(filename, size, icons):
     return s
 
 
-def write_string_to_json(string):
-    with open(DATA_DIR + DATA_TYPE + '/via_region_data.json', 'w+') as f:
+def write_string_to_json(string, type):
+    with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
         f.write(string)
 
 
 def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
     global file_content
+    for type in TYPES:
+        file_content = "{"
+        if type == "/val":
+            NUM_IMAGES = int(5 / NUM_IMAGES)
+        print(file_content)
+        for j in range(NUM_IMAGES):
+            icon_list = []
+            NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
 
-    for j in range(NUM_IMAGES):
-        icon_list = []
-        NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
+            background = Image.new('RGBA', DIMENSIONS, COLOR)
+            for i in range(NUM_ICONS):
+                cur_icon = ICONS[random.randint(0, len(ICONS) - 1)]
+                img = Image.open('Icons/' + cur_icon, 'r').resize((ICON_W, ICON_H))
+                offset = random.randint(1, bg_w - ICON_W), random.randint(1, bg_h - ICON_H)
+                background.paste(img, offset)
+                icon_list.append((cur_icon[0:-4], offset[0], offset[1]))
 
-        background = Image.new('RGBA', DIMENSIONS, COLOR)
-        for i in range(NUM_ICONS):
-            cur_icon = ICONS[random.randint(0, len(ICONS) - 1)]
-            img = Image.open('Icons/' + cur_icon, 'r').resize((ICON_W, ICON_H))
-            offset = random.randint(1, bg_w - ICON_W), random.randint(1, bg_h - ICON_H)
-            background.paste(img, offset)
-            icon_list.append((cur_icon[0:-4], offset[0], offset[1]))
+            img_dir_name = DATA_DIR + type + '/' + str(j) + ".png"
+            background.save(img_dir_name)
+            filename = str(j) + ".png"
+            img_size = os.stat(img_dir_name).st_size
+            file_content += add_box_json_polygon(filename, img_size, icon_list)
 
-        img_dir_name = DATA_DIR + DATA_TYPE + '/' + str(j) + ".png"
-        background.save(img_dir_name)
-        filename = str(j) + ".png"
-        img_size = os.stat(img_dir_name).st_size
-        file_content += add_box_json_polygon(filename, img_size, icon_list)
-
-    file_content = file_content[0:-1] + "}"
-    write_string_to_json(file_content)
-
-
-def generate_training_data(NUM_IMAGES, ICONS_PER_IMAGE):
-    global DATA_TYPE
-    DATA_TYPE = "/train"
-    generate_data(NUM_IMAGES, ICONS_PER_IMAGE)
-
-
-def generate_training_data(NUM_IMAGES, ICONS_PER_IMAGE):
-    global DATA_TYPE
-    DATA_TYPE = "/val"
-    generate_data(NUM_IMAGES, ICONS_PER_IMAGE)
+        file_content = file_content[0:-1] + "}"
+        write_string_to_json(file_content, type)
