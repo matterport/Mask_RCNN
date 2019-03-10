@@ -14,9 +14,6 @@ COLOR = (255, 255, 255, 255)
 # Icon Dimensions
 ICON_W = ICON_H = 50
 
-#Specify training data or validation data
-DATA_TYPE = "/train"
-# DATA_TYPE = "/val"
 
 file_content = "{"
 
@@ -73,4 +70,13 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
     write_string_to_json(file_content)
 
 
-generate_data(10)
+def generate_training_data(NUM_IMAGES, ICONS_PER_IMAGE):
+    global DATA_TYPE
+    DATA_TYPE = "/train"
+    generate_data(NUM_IMAGES, ICONS_PER_IMAGE)
+
+
+def generate_training_data(NUM_IMAGES, ICONS_PER_IMAGE):
+    global DATA_TYPE
+    DATA_TYPE = "/val"
+    generate_data(NUM_IMAGES, ICONS_PER_IMAGE)
