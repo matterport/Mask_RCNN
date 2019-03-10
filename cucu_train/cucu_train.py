@@ -46,8 +46,8 @@ cucuPaths = project_paths(
     trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
     visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
     cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/train_data"),
-    valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/valid_data"),
+    trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
+    valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/valid_data"),
     testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
     trainResultContainer=  CURRENT_CONTAINER_DIR,
     trainOutputLog      =  CURRENT_CONTAINER_DIR
@@ -190,7 +190,7 @@ for _ in range(config.EPOCHS_ROUNDS):
 
 
     #show n random image&mask train examples
-    n = 10
+    n = 1
     image_ids = np.random.choice(dataset_train.image_ids, n)
     for image_id in image_ids:
         image = dataset_train.load_image(image_id)

@@ -17,7 +17,7 @@ class cucumberConfig(Config):
 
     """MODEL HYPER PARAMETERS"""
     # Give the configuration a recognizable name
-    NAME = "cucumbers"
+    NAME = "agriculture"
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
@@ -25,7 +25,7 @@ class cucumberConfig(Config):
     IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 3 # background + cucumber, leaf, flower
+    NUM_CLASSES = 1 + 5# background + cucumber, leaf, flower, stems
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -54,9 +54,9 @@ class cucumberConfig(Config):
     LEARNING_RATE = 0.0001
     LEARNING_MOMENTUM = 0.9
     # each EPOCHS times we save the weights of the net
-    EPOCHS = 30
+    EPOCHS = 1
     # EPOCHS_ROUNDS is the number of times we generate new training data with different stats.
-    EPOCHS_ROUNDS = 5
+    EPOCHS_ROUNDS = 1
     POST_NMS_ROIS_TRAINING = 2000
 
     # If enabled, resizes instance masks to a smaller size to reduce

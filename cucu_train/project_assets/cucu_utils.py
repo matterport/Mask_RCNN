@@ -78,10 +78,10 @@ def add_image(backGroundToPasteOn, objectShape, x_center, y_center, x_scale, y_s
     rows,cols,channels = np.asarray(objectShape).shape
     x_from = x_center - math.floor(cols/2.)
     y_from = y_center - math.floor(rows/2.)
+    # todo rename backGroundToPasteOn to collageImageToPasteOn
+    backGroundToPasteOn.paste(objectShape, (x_from, y_from), Image.fromarray(mask, 'L'))
 
-    generatedImageWithAdditionalObj = backGroundToPasteOn.paste(objectShape, (x_from, y_from), Image.fromarray(mask, 'L'))
-
-    return generatedImageWithAdditionalObj
+    return backGroundToPasteOn
 
 def add_imageWithoutTransparency(img1, objectShape, x_center, y_center, x_scale, y_scale, angle):
     """

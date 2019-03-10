@@ -33,13 +33,14 @@ class genDataset(utils.Dataset):
                     for filename in files:
                         self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
                     self.quantityOfObjByCategory[key] = len(files)
-                    print("files num:" + str(self.quantityOfObjByCategory[key])+ key)
-        utils.Dataset.__init__(self)
+                    print("files num:" + str(self.quantityOfObjByCategory[key]) + key)
+        def initiateConfiguration():
+            self.config = config
 
+        utils.Dataset.__init__(self)
         collectAndCountObjImagesByCategory()
-        
-        # asher todo: what todo with that?
-        self.config = config
+        initiateConfiguration()
+
 
     
     def load_shapes(self, numOfImagesToGenerate, height, width):
@@ -61,7 +62,7 @@ class genDataset(utils.Dataset):
             bgIndex = randint(0, self.quantityOfObjByCategory['BG']-1) 
             #asher todo: remove bg_color when generating
             bg_color, shapes = self.GenerateRandomSpecsForImage(height, width)
-            self.add_image("shapes", image_id=i, path=None, width=width, height=height, bg_color=bg_color, shapes=shapes, bgIndex=bgIndex)
+            self.add_image("shapes", image_id=i, path=None, width=width, height=height, shapes=shapes, bgIndex=bgIndex)
     
     def load_image(self, specification_id):
         """
@@ -75,10 +76,9 @@ class genDataset(utils.Dataset):
         """
         info = self.image_info[specification_id]
                 
-        # pull some random background from loaded bg set. which are typcally big
-        y_topRight, x_topRight,channels = np.asarray(self.containerOfObjForGeneratingImages['BG'][info['bgIndex']]).shape
+        # load shape of pre-specified background
         y_max, x_max ,_ = np.asarray(self.containerOfObjForGeneratingImages['BG'][info['bgIndex']]).shape
-
+        # todo: change y_max to imageHeight and x_max to imageWidth
         # pick random up-right corner
         x_topRight = randint(x_max - self.config.IMAGE_MAX_DIM//2 , x_max)
         y_topRight = randint(y_max - self.config.IMAGE_MAX_DIM//2 , y_max)
@@ -143,7 +143,7 @@ class genDataset(utils.Dataset):
         of generated image.
         """
         def drawObjCategoryFromDistribution():
-            return choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"])
+            return choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower","stem","stem","stem","stem"])
         # Shape
         shape = drawObjCategoryFromDistribution()
         
