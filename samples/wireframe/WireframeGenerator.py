@@ -52,8 +52,7 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
     for type in TYPES:
         file_content = "{"
         if type == "/val":
-            NUM_IMAGES = int(5 / NUM_IMAGES)
-        print(file_content)
+            NUM_IMAGES = int(NUM_IMAGES / 5)
         for j in range(NUM_IMAGES):
             icon_list = []
             NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
@@ -65,7 +64,6 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
                 offset = random.randint(1, bg_w - ICON_W), random.randint(1, bg_h - ICON_H)
                 background.paste(img, offset)
                 icon_list.append((cur_icon[0:-4], offset[0], offset[1]))
-
             img_dir_name = DATA_DIR + type + '/' + str(j) + ".png"
             background.save(img_dir_name)
             filename = str(j) + ".png"
