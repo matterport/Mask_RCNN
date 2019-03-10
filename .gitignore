@@ -1,6 +1,4 @@
 # Data files and directories common in repo root
-datasets/wireframe/train/
-datasets/wireframe/val/
 logs/
 *.h5
 results/
