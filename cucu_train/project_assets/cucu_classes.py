@@ -34,12 +34,26 @@ class genDataset(utils.Dataset):
                         self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
                     self.quantityOfObjByCategory[key] = len(files)
                     print("files num:" + str(self.quantityOfObjByCategory[key]) + key)
+        
         def initiateConfiguration():
             self.config = config
 
+        def initiateClassificationNames():
+            for index, key in enumerate(globalObjectShapesList):
+                addClassificationToNN("shapes", index, key)
+
+        def addClassificationToNN(classificationType, index, classificationName):
+            # NN's class_info attribute holds class's names and initialized with BG classification, therefore, avoid duplicate
+            def classNameIsNotBackground(classificationName):
+                return classificationName != 'BG'
+
+            if classNameIsNotBackground(classificationName):
+                self.add_class(classificationType, index, classificationName)
+        
         utils.Dataset.__init__(self)
         collectAndCountObjImagesByCategory()
         initiateConfiguration()
+        initiateClassificationNames()
 
 
     
@@ -49,13 +63,6 @@ class genDataset(utils.Dataset):
         height, width: the size of the generated images.
         """
 
-        #asher todo: move this section into init
-        #Add categories
-        SKIP_BACKGROUND_KEY = 1
-        for index, key in enumerate(globalObjectShapesList, SKIP_BACKGROUND_KEY):
-            self.add_class("shapes", index, key)
-
-        
         # Add images
         for i in range(numOfImagesToGenerate):  
             # decide wich background:

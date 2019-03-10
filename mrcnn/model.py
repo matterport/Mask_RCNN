@@ -1681,9 +1681,9 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
         is True then the outputs list contains target class_ids, bbox deltas,
         and masks.
     """
-    b = 0  # batch item index
-    image_index = -1
-    image_ids = np.copy(dataset.image_ids)
+    batchItemIndex = 0
+    cyclicImageIndexToPick = -1
+    datasetImageIdentifiersSet = np.copy(dataset.image_ids)
     error_count = 0
     no_augmentation_sources = no_augmentation_sources or []
 
@@ -1699,13 +1699,14 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
     # Keras requires a generator to run indefinitely.
     while True:
         try:
+            BEGINNING_OF_SET = 0
             # Increment index to pick next image. Shuffle if at the start of an epoch.
-            image_index = (image_index + 1) % len(image_ids)
-            if shuffle and image_index == 0:
-                np.random.shuffle(image_ids)
+            cyclicImageIndexToPick = (cyclicImageIndexToPick + 1) % len(datasetImageIdentifiersSet)
+            if shuffle and cyclicImageIndexToPick == BEGINNING_OF_SET:
+                np.random.shuffle(datasetImageIdentifiersSet)
 
             # Get GT bounding boxes and masks for image.
-            image_id = image_ids[image_index]
+            image_id = datasetImageIdentifiersSet[cyclicImageIndexToPick]
 
             # If the image source is not to be augmented pass None as augmentation
             if dataset.image_info[image_id]['source'] in no_augmentation_sources:
@@ -1743,7 +1744,7 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                             rpn_rois, gt_class_ids, gt_boxes, gt_masks, config)
 
             # Init batch arrays
-            if b == 0:
+            if batchItemIndex == 0:
                 batch_image_meta = np.zeros(
                     (batch_size,) + image_meta.shape, dtype=image_meta.dtype)
                 batch_rpn_match = np.zeros(
@@ -1781,24 +1782,24 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                 gt_masks = gt_masks[:, :, ids]
 
             # Add to batch
-            batch_image_meta[b] = image_meta
-            batch_rpn_match[b] = rpn_match[:, np.newaxis]
-            batch_rpn_bbox[b] = rpn_bbox
-            batch_images[b] = mold_image(image.astype(np.float32), config)
-            batch_gt_class_ids[b, :gt_class_ids.shape[0]] = gt_class_ids
-            batch_gt_boxes[b, :gt_boxes.shape[0]] = gt_boxes
-            batch_gt_masks[b, :, :, :gt_masks.shape[-1]] = gt_masks
+            batch_image_meta[batchItemIndex] = image_meta
+            batch_rpn_match[batchItemIndex] = rpn_match[:, np.newaxis]
+            batch_rpn_bbox[batchItemIndex] = rpn_bbox
+            batch_images[batchItemIndex] = mold_image(image.astype(np.float32), config)
+            batch_gt_class_ids[batchItemIndex, :gt_class_ids.shape[0]] = gt_class_ids
+            batch_gt_boxes[batchItemIndex, :gt_boxes.shape[0]] = gt_boxes
+            batch_gt_masks[batchItemIndex, :, :, :gt_masks.shape[-1]] = gt_masks
             if random_rois:
-                batch_rpn_rois[b] = rpn_rois
+                batch_rpn_rois[batchItemIndex] = rpn_rois
                 if detection_targets:
-                    batch_rois[b] = rois
-                    batch_mrcnn_class_ids[b] = mrcnn_class_ids
-                    batch_mrcnn_bbox[b] = mrcnn_bbox
-                    batch_mrcnn_mask[b] = mrcnn_mask
-            b += 1
+                    batch_rois[batchItemIndex] = rois
+                    batch_mrcnn_class_ids[batchItemIndex] = mrcnn_class_ids
+                    batch_mrcnn_bbox[batchItemIndex] = mrcnn_bbox
+                    batch_mrcnn_mask[batchItemIndex] = mrcnn_mask
+            batchItemIndex += 1
 
             # Batch full?
-            if b >= batch_size:
+            if batchItemIndex >= batch_size:
                 inputs = [batch_images, batch_image_meta, batch_rpn_match, batch_rpn_bbox,
                           batch_gt_class_ids, batch_gt_boxes, batch_gt_masks]
                 outputs = []
@@ -1812,11 +1813,11 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                             batch_mrcnn_class_ids, -1)
                         outputs.extend(
                             [batch_mrcnn_class_ids, batch_mrcnn_bbox, batch_mrcnn_mask])
-
+                # bug31 it appears inputs are of wrong 18 dims rather than expected 17 dims
                 yield inputs, outputs
 
                 # start a new batch
-                b = 0
+                batchItemIndex = 0
         except (GeneratorExit, KeyboardInterrupt):
             raise
         except:
@@ -2367,7 +2368,7 @@ class MaskRCNN():
                                          augmentation=augmentation,
                                          batch_size=self.config.BATCH_SIZE,
                                          no_augmentation_sources=no_augmentation_sources)
-        self.val_generator = data_generator(val_dataset, self.config, shuffle=True,
+        val_generator = data_generator(val_dataset, self.config, shuffle=True,
                                        batch_size=self.config.BATCH_SIZE)
 
 
@@ -2407,7 +2408,7 @@ class MaskRCNN():
             epochs=epochs,
             steps_per_epoch=self.config.STEPS_PER_EPOCH,
             callbacks=callbacks,
-            validation_data=self.val_generator,
+            validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=10,
             workers=1,
