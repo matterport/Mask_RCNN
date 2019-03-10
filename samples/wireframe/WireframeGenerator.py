@@ -16,7 +16,7 @@ ICON_W = ICON_H = 50
 
 #Specify training data or validation data
 DATA_TYPE = "/train"
-#DATA_TYPE = "/val"
+# DATA_TYPE = "/val"
 
 file_content = "{"
 
