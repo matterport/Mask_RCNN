@@ -293,8 +293,9 @@ class Dataset(object):
     def prepare(self, class_map=None):
         """Prepares the Dataset class for use.
 
-        TODO: class map is not supported yet. When done, it should handle mapping
-              classes from different datasets to the same class ID.
+        class map: a list with names of the classes to merge. When class_map isn't None, it handle mapping
+                   classes from different datasets to the same class ID.    
+                   Example: class_map=['person']
         """
 
         def clean_name(name):
@@ -308,12 +309,43 @@ class Dataset(object):
         self.num_images = len(self.image_info)
         self._image_ids = np.arange(self.num_images)
 
+        #Merge same classes of several sources if they are indicated in class_map list.
+        if(class_map != None):
+            
+            for class_i in class_map: 
+                
+                #Index of class_names equal to class_i
+                idx_class=list(np.where(class_i==np.array(self.class_names))[0]) 
+                
+                #If class_i only appear in one source, output a warning and exit loop
+                if(len(idx_class)<2):
+                    warnings.warn("La clase '{}' no aparece en dos sources distintos".format(class_i))
+                    break
+                
+                #Map ids of same class from several sources to a unique id
+                id_class_merged=self.class_ids[idx_class[0]]
+                
+                for i in range(1, len(idx_class)): 
+                    self.class_ids[idx_class[i]]= id_class_merged
+                    self.num_classes=self.num_classes-1
+                                        
         # Mapping from source class and image IDs to internal IDs
         self.class_from_source_map = {"{}.{}".format(info['source'], info['id']): id
                                       for info, id in zip(self.class_info, self.class_ids)}
         self.image_from_source_map = {"{}.{}".format(info['source'], info['id']): id
                                       for info, id in zip(self.image_info, self.image_ids)}
-
+        
+        #Delete class_id and class_name repeated if some class has been merged 
+        if(class_map != None):
+            
+            #Delete ids repeated:
+            class_ids=list( self.class_ids) 
+            class_ids=sorted(set(class_ids), key=class_ids.index) #key argument keeps the order of ids
+            self.class_ids=np.array(class_ids)
+            
+            #Delete names repeated:
+            self.class_names=sorted(set(self.class_names), key=self.class_names.index)   
+        
         # Map sources to class_ids they support
         self.sources = list(set([i['source'] for i in self.class_info]))
         self.source_class_ids = {}
@@ -323,8 +355,14 @@ class Dataset(object):
             # Find classes that belong to this dataset
             for i, info in enumerate(self.class_info):
                 # Include BG class in all datasets
-                if i == 0 or source == info['source']:
+                if i == 0:
                     self.source_class_ids[source].append(i)
+                    
+                elif source == info['source']:
+                    id_global=self.map_source_class_id('{}.{}'.format(info['source'], info['id']))
+                    self.source_class_ids[source].append(id_global)
+            
+            self.source_class_ids[source]=sorted(self.source_class_ids[source]) #sort source_class_ids[source]
 
     def map_source_class_id(self, source_class_id):
         """Takes a source class ID and returns the int class ID assigned to it.
