@@ -950,7 +950,14 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     s = K.int_shape(x)
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
-    return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
+    # One shot head
+    print("\nOne Shot is even more in!\n")
+    mrcnn_embedding = KL.TimeDistributed(KL.Dense(128),
+                                            name='mrcnn_embedding')(shared)
+    mrcnn_embedding_act = KL.TimeDistributed(KL.Activation("softmax"),
+                                     name="mrcnn_embedding_activation")(mrcnn_embedding)
+
+    return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding_act
 
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
@@ -1991,7 +1998,7 @@ class MaskRCNN():
 
             # Network Heads
             # TODO: verify that this handles zero padded ROIs
-            mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
+            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding_act =\
                 fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN,
@@ -2031,7 +2038,7 @@ class MaskRCNN():
         else:
             # Network Heads
             # Proposal classifier and BBox regressor heads
-            mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
+            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding_act=\
                 fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN,

@@ -8,6 +8,10 @@ from matplotlib import pyplot as plt
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
 
+import keras
+keras.layers.TimeDistributed(keras.layers.Flatten())
+
+
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
