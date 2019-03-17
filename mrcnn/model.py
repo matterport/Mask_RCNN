@@ -2525,6 +2525,11 @@ class MaskRCNN():
             log("image_metas", image_metas)
             log("anchors", anchors)
 
+        tup = \
+            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+        print("Tuple length:")
+        print(len(tup))
+        """
         in_a, in_b, in_c, in_d, in_e, in_f, in_g = \
             self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
 
@@ -2535,7 +2540,7 @@ class MaskRCNN():
         print("E: {}".format(np.shape(in_e)))
         print("F: {}".format(np.shape(in_f)))
         print("G: {}".format(np.shape(in_g)))
-
+        """
 
 
 
