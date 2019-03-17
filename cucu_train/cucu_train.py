@@ -14,6 +14,14 @@ from cucu_config import cucumberConfig
 from cucu_config import cucuConfForTrainingSession as config
 from project_assets.cucu_classes import genDataset, realDataset, CucuLogger, project_paths
 from PIL import Image
+import json
+from mrcnn import utils
+import mrcnn.model as modellib
+from mrcnn import visualize
+from mrcnn.model import log
+from shutil import copyfile, copytree
+from keras.callbacks import *
+import math
 
 def setRootPathForCurrentSession():
     return dirname(dirname(os.path.realpath(__file__)))
@@ -22,15 +30,17 @@ def constructContainerPath():
     CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
     now = datetime.datetime.now()
     return CONTAINER_ROOT_DIR + 'trainResults_{month}-{day}-{hour}'.format(month=now.month, day=now.day, hour=now.hour)
-
-def initiateAllPathsForCurrentSession(currentContainerDir):
+def cloneDataSetIntoSessionFolderTree():
+    copytree(ROOT_DIR+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
+    return
+def initiateAllPathsForCurrentSession(currentContainerDir,currentSessionInitialWeights):
     # create centralized class for used paths during current session
     cucuPaths = project_paths(
     projectRootDir=ROOT_DIR,
     TensorboardDir=        os.path.join(currentContainerDir, "TensorBoardGraphs"),
     trainedModelsDir=      os.path.join(currentContainerDir, "trained_models"),
     visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
-    cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
+    currSessionInitialModelWeights=         currentSessionInitialWeights,
     trainDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
     valDatasetDir=         os.path.join(currentContainerDir, "project_dataset/generated/valid_data"),
     testDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test_data"),
@@ -47,98 +57,43 @@ def createFoldersForModelWeightsAndVizualizations():
     finally:
         os.umask(original_umask)
     return
+def prepareCallbackForCurrentSession():
+    def scheduleLearningRate(epoch, lr):
+        return lr*0.5
+    
+    return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
+            LearningRateScheduler(scheduleLearningRate, verbose=1)]
 
 #handle paths,new folders and logger
 ROOT_DIR = setRootPathForCurrentSession()
 os.chmod(ROOT_DIR, mode=0o777)
 currentContainerDir = constructContainerPath()
-cucuPaths = initiateAllPathsForCurrentSession(currentContainerDir)
+#todo: get it inside function below
+print('Enter full path for initial model weights:')
+currentSessionInitialWeights=input()
+cucuPaths = initiateAllPathsForCurrentSession(currentContainerDir,currentSessionInitialWeights)
+sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
+
 createFoldersForModelWeightsAndVizualizations()
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 sys.stdout.getFromUserCurrentSessionSpecs()
-
-
-import json
-# Import Mask RCNN
-sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
-from mrcnn import utils
-import mrcnn.model as modellib
-from mrcnn import visualize
-from mrcnn.model import log
-
-# In[11]:
-
-import sys
-print(sys.version)
-
-#create configurations for model instentiating
+#print current session configuration to logger
 config.display()
-
-
-
-
-
-# In[3]:
-#prepare source objects for current container
-from randomColorObjects import randomColorObject, toGray
-from shutil import copyfile, copytree
-
-# Create a training set for this Experiment and store it in the container
-#RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
-copytree(ROOT_DIR+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
-randIndex = 0
-#for _ in range(1):
-#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
-#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + 'rand_'+ str(randIndex) + '.png')
-#        randIndex += 1
-#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects/' + filename, cucuPaths.trainDatasetDir + "/cucumbers_objects/" + '_'+ str(randIndex) + '.png')
-#        randIndex += 1
-
-
-#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects')):
-#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + 'rand_'+ str(randIndex) + '.png')
-#        randIndex += 1
-#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/leaves_objects/' + filename, cucuPaths.trainDatasetDir + "/leaves_objects/" + '_'+ str(randIndex) + '.png')
-#        randIndex += 1
-
-#    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects')):
-#        randomColorObject(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + 'rand_'+ str(randIndex) + '.png')
-#        randIndex += 1
-#        toGray(ROOT_DIR+ '/cucu_train/project_dataset/train_data/flower_objects/' + filename, cucuPaths.trainDatasetDir + "/flower_objects/" + '_'+ str(randIndex) + '.png')
-#        randIndex += 1
-
-
-# In[ ]:
-# add custom callbacks if needed as a preparation to training model
-from keras.callbacks import *
-def scheduleLearningRate(epoch, lr):
-    return lr*0.5
-
-custom_callbacks=[
-EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
-LearningRateScheduler(scheduleLearningRate, verbose=1)
-
-]
-
 
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
 
 # load initial weights
-weightPath=cucuPaths.cocoModelPath
+weightPath=cucuPaths.currSessionInitialModelWeights
 model.load_weights(weightPath, by_name=True,
                 exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
                         "mrcnn_bbox", "mrcnn_mask"])
-# weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
-# model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
 
 #create directory to hold inside samples of images we pass to model during training
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
-import math
-# globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
 
 #create path dictionaries
 trainCategoryPathsDict = {}
@@ -154,6 +109,10 @@ validCategoryPathsDict['cucumber']   = cucuPaths.valDatasetDir + '/cucumbers_obj
 validCategoryPathsDict['leaf']       = cucuPaths.valDatasetDir + '/leaves_objects'
 validCategoryPathsDict['flower']     = cucuPaths.valDatasetDir + '/flower_objects'
 validCategoryPathsDict['stem']       = cucuPaths.valDatasetDir + '/stems_objects'
+
+# In[ ]:
+# add custom callbacks if needed as a preparation to training model
+custom_callbacks= prepareCallbackForCurrentSession()
 
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):

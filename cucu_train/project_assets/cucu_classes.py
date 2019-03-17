@@ -374,11 +374,11 @@ class realDataset(utils.Dataset):
 
 
 class project_paths(object):
-    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, cocoModelPath,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
+    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, currSessionInitialModelWeights,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
         self.projectRootDir=projectRootDir
         self.TensorboardDir=TensorboardDir
         self.trainedModelsDir=trainedModelsDir
-        self.cocoModelPath=cocoModelPath
+        self.currSessionInitialModelWeights=currSessionInitialModelWeights
         self.trainDatasetDir=trainDatasetDir
         self.valDatasetDir=valDatasetDir
         self.testDatasetDir=testDatasetDir
@@ -404,10 +404,7 @@ class CucuLogger(object):
     def getFromUserCurrentSessionSpecs(self):
         print("####################################### PREFACE HEADER #######################################")
         print('Hello handsome, please provide spsifications for this session for easier analyzing later:')
-        input('DECAYING LEARNING RATE:')
-        # input('ENHANCED BLENDING:')
-        # input('GROWING NUMBER OF OBJECTS:')
-        # input('MAIN PURPOSE FOR THIS SESSION')
+        input()
         return 
 
     def __del__(self):
