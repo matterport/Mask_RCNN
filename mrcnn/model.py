@@ -2525,27 +2525,9 @@ class MaskRCNN():
             log("image_metas", image_metas)
             log("anchors", anchors)
 
-        tup = \
-            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
-        print("Tuple length:")
-        print(len(tup))
-        """
-        in_a, in_b, in_c, in_d, in_e, in_f, in_g = \
-            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
-
-        print("A: {}".format(np.shape(in_a)))
-        print("B: {}".format(np.shape(in_b)))
-        print("C: {}".format(np.shape(in_c)))
-        print("D: {}".format(np.shape(in_d)))
-        print("E: {}".format(np.shape(in_e)))
-        print("F: {}".format(np.shape(in_f)))
-        print("G: {}".format(np.shape(in_g)))
-        """
-
-
 
         # Run object detection
-        detections, _, _, mrcnn_mask, _, _, _ =\
+        detections, _, _, mrcnn_mask, _, _, _, embedding =\
             self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
         # Process detections
         results = []
@@ -2560,6 +2542,7 @@ class MaskRCNN():
                 "scores": final_scores,
                 "masks": final_masks,
             })
+        results.append(embedding)
         return results
 
     def detect_molded(self, molded_images, image_metas, verbose=0):
