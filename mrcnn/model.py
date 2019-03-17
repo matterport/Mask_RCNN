@@ -2526,10 +2526,21 @@ class MaskRCNN():
             log("molded_images", molded_images)
             log("image_metas", image_metas)
             log("anchors", anchors)
-        
-        print("Okay.. here it comes..\n")
-        print(self.keras_model.predict([molded_images, image_metas, anchors], verbose=0))
-        print("Done.. \n")        
+
+        in_a, in_b, in_c, in_d, in_e, in_f, in_g = \
+            self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+
+        print("A: {}".format(np.shape(in_a)))
+        print("B: {}".format(np.shape(in_b)))
+        print("C: {}".format(np.shape(in_c)))
+        print("D: {}".format(np.shape(in_d)))
+        print("E: {}".format(np.shape(in_e)))
+        print("F: {}".format(np.shape(in_f)))
+        print("G: {}".format(np.shape(in_g)))
+
+
+
+
         # Run object detection
         detections, _, _, mrcnn_mask, _, _, _ =\
             self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
