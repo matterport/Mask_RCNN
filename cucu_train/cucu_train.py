@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from cucu_config import cucumberConfig
 from cucu_config import cucuConfForTrainingSession as config
-from project_assets.cucu_classes import genDataset, realDataset, CucuLogger, project_paths
+from project_assets.cucu_classes import genDataset, CucuLogger, project_paths #, realDataset
 from PIL import Image
 import json
 from mrcnn import utils
@@ -27,16 +27,16 @@ def setRootPathForCurrentSession():
     return dirname(dirname(os.path.realpath(__file__)))
 def constructContainerPath():
     # create a container for training result per exexution of cucu_train.py
-    CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
+    CONTAINER_ROOT_DIR = rootDir + "/cucu_train/trainResultContainers/"
     now = datetime.datetime.now()
     return CONTAINER_ROOT_DIR + 'trainResults_{month}-{day}-{hour}'.format(month=now.month, day=now.day, hour=now.hour)
 def cloneDataSetIntoSessionFolderTree():
-    copytree(ROOT_DIR+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
+    copytree(rootDir+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
     return
-def initiateAllPathsForCurrentSession(currentContainerDir,currentSessionInitialWeights):
+def initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSessionInitialWeights):
     # create centralized class for used paths during current session
     cucuPaths = project_paths(
-    projectRootDir=ROOT_DIR,
+    projectRootDir=rootDir,
     TensorboardDir=        os.path.join(currentContainerDir, "TensorBoardGraphs"),
     trainedModelsDir=      os.path.join(currentContainerDir, "trained_models"),
     visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
@@ -65,16 +65,17 @@ def prepareCallbackForCurrentSession():
             LearningRateScheduler(scheduleLearningRate, verbose=1)]
 
 #handle paths,new folders and logger
-ROOT_DIR = setRootPathForCurrentSession()
-os.chmod(ROOT_DIR, mode=0o777)
+rootDir = setRootPathForCurrentSession()
+os.chmod(rootDir, mode=0o777)
 currentContainerDir = constructContainerPath()
 #todo: get it inside function below
 print('Enter full path for initial model weights:')
 currentSessionInitialWeights=input()
-cucuPaths = initiateAllPathsForCurrentSession(currentContainerDir,currentSessionInitialWeights)
+cucuPaths = initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSessionInitialWeights)
 sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
 
 createFoldersForModelWeightsAndVizualizations()
+cloneDataSetIntoSessionFolderTree()
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
 sys.stdout.getFromUserCurrentSessionSpecs()

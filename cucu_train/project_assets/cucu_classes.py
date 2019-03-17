@@ -10,8 +10,8 @@ import numpy as np
 
 #COCO image and json processing
 import json
-from project_assets.cocoapi.PythonAPI.pycocotools.coco import COCO
-from project_assets.cocoapi.PythonAPI.pycocotools import mask as maskUtils
+# from project_assets.cocoapi.PythonAPI.pycocotools.coco import COCO 
+# from project_assets.cocoapi.PythonAPI.pycocotools import mask as maskUtils
 
 #generated image processing
 import cv2
@@ -76,7 +76,7 @@ class genDataset(utils.Dataset):
 
         # Add images
         for i in range(numOfImagesToGenerate):  
-            # decide wich background:
+            # decide which background:
             bgIndex = randint(0, self.quantityOfObjByCategory['BG']-1) 
             #asher todo: remove bg_color when generating
             bg_color, shapes = self.GenerateRandomSpecsForImage(height, width)
