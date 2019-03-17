@@ -400,6 +400,15 @@ class CucuLogger(object):
 
     def flush(self):
         pass
+    #todo: make sure that user input is printed to logger, decide which fields are importent
+    def getFromUserCurrentSessionSpecs(self):
+        print("####################################### PREFACE HEADER #######################################")
+        print('Hello handsome, please provide spsifications for this session for easier analyzing later:')
+        input('DECAYING LEARNING RATE:')
+        # input('ENHANCED BLENDING:')
+        # input('GROWING NUMBER OF OBJECTS:')
+        # input('MAIN PURPOSE FOR THIS SESSION')
+        return 
 
     def __del__(self):
         self.logger_file.close()

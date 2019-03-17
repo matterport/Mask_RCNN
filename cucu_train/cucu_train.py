@@ -1,10 +1,7 @@
-import tensorflow as tf
-print(tf.__version__)
 import os
-# asher note: macOS workaround
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-import glob
 from os.path import dirname, abspath
+import tensorflow as tf
+import glob
 import sys
 import datetime
 import random
@@ -13,53 +10,53 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
+from cucu_config import cucumberConfig
 from cucu_config import cucuConfForTrainingSession as config
 from project_assets.cucu_classes import genDataset, realDataset, CucuLogger, project_paths
 from PIL import Image
-ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 
-# create a container for training result per exexution of cucu_train.py
-CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
-now = datetime.datetime.now()
+def setRootPathForCurrentSession():
+    return dirname(dirname(os.path.realpath(__file__)))
+def constructContainerPath():
+    # create a container for training result per exexution of cucu_train.py
+    CONTAINER_ROOT_DIR = ROOT_DIR + "/cucu_train/trainResultContainers/"
+    now = datetime.datetime.now()
+    return CONTAINER_ROOT_DIR + 'trainResults_{month}-{day}-{hour}'.format(month=now.month, day=now.day, hour=now.hour)
 
-#
-CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now.month) + str(now.day) + str(now.hour)
+def initiateAllPathsForCurrentSession(currentContainerDir):
+    # create centralized class for used paths during current session
+    cucuPaths = project_paths(
+    projectRootDir=ROOT_DIR,
+    TensorboardDir=        os.path.join(currentContainerDir, "TensorBoardGraphs"),
+    trainedModelsDir=      os.path.join(currentContainerDir, "trained_models"),
+    visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
+    cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
+    trainDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
+    valDatasetDir=         os.path.join(currentContainerDir, "project_dataset/generated/valid_data"),
+    testDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test_data"),
+    trainResultContainer=  currentContainerDir,
+    trainOutputLog      =  currentContainerDir)
+    return cucuPaths
+
+#todo: simplify
+def createFoldersForModelWeightsAndVizualizations():
+    try:
+        original_umask = os.umask(0)
+        os.makedirs(cucuPaths.trainedModelsDir, mode=0o777)
+        os.makedirs(cucuPaths.visualizeEvaluationsDir, mode=0o777)
+    finally:
+        os.umask(original_umask)
+    return
+
+#handle paths,new folders and logger
+ROOT_DIR = setRootPathForCurrentSession()
 os.chmod(ROOT_DIR, mode=0o777)
-# create centralized class for used paths during training
-cucuPaths = project_paths(
-projectRootDir=ROOT_DIR,
-TensorboardDir=        os.path.join(CURRENT_CONTAINER_DIR, "TensorBoardGraphs"),
-trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
-visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
-cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
-valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/valid_data"),
-testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
-trainResultContainer=  CURRENT_CONTAINER_DIR,
-trainOutputLog      =  CURRENT_CONTAINER_DIR
-
-)
-
-try:
-    original_umask = os.umask(0)
-    os.makedirs(cucuPaths.trainedModelsDir, mode=0o777)
-    os.makedirs(cucuPaths.visualizeEvaluationsDir, mode=0o777)
-
-
-finally:
-    os.umask(original_umask)
+currentContainerDir = constructContainerPath()
+cucuPaths = initiateAllPathsForCurrentSession(currentContainerDir)
+createFoldersForModelWeightsAndVizualizations()
 
 sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
-########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
-print("####################################### PREFACE HEADER #######################################")
-print("first training with stems\n\
-    DECAYING LEARNING RATE: YES, \n\
-    MULTICOLOR OBJECTS: YES,\n\
-    ENHANCED BLENDING: YES,\n\
-    GROWING NUMBER OF OBJECTS: + 5,\n\
-    MISC:training is based on last training weights - scales are small and LR is very small - trying to fine-tune \n\
-    ")
-
+sys.stdout.getFromUserCurrentSessionSpecs()
 
 
 import json
@@ -89,7 +86,7 @@ from shutil import copyfile, copytree
 
 # Create a training set for this Experiment and store it in the container
 #RANDOMIZE COLORS AND GRAY OBJECTS IN TRAIN SET ONLY
-copytree(ROOT_DIR+ '/cucu_train/project_dataset', CURRENT_CONTAINER_DIR+ '/project_dataset')
+copytree(ROOT_DIR+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
 randIndex = 0
 #for _ in range(1):
 #    for filename in sorted(os.listdir(ROOT_DIR+ '/cucu_train/project_dataset/train_data/cucumbers_objects')):
