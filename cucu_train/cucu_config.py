@@ -128,4 +128,4 @@ class cucumberConfig(Config):
 
 
 
-cucuConf = cucumberConfig()
+cucuConfForTrainingSession = cucumberConfig()

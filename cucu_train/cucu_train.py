@@ -1,16 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
-
-
-
-# In[1]:
-
-
-
 import tensorflow as tf
 print(tf.__version__)
 import os
@@ -26,10 +13,9 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
-from project_assets.cucu_classes import *
-from cucu_config import cucuConf as config
+from cucu_config import cucuConfForTrainingSession as config
+from project_assets.cucu_classes import genDataset, realDataset, CucuLogger, project_paths
 from PIL import Image
-# from cucu_realDatasetClass import *
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 
 # create a container for training result per exexution of cucu_train.py
@@ -41,16 +27,16 @@ CURRENT_CONTAINER_DIR = CONTAINER_ROOT_DIR +"train_results_" + str(now.month) + 
 os.chmod(ROOT_DIR, mode=0o777)
 # create centralized class for used paths during training
 cucuPaths = project_paths(
-    projectRootDir=ROOT_DIR,
-    TensorboardDir=        os.path.join(CURRENT_CONTAINER_DIR, "TensorBoardGraphs"),
-    trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
-    visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
-    cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
-    trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
-    valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/valid_data"),
-    testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
-    trainResultContainer=  CURRENT_CONTAINER_DIR,
-    trainOutputLog      =  CURRENT_CONTAINER_DIR
+projectRootDir=ROOT_DIR,
+TensorboardDir=        os.path.join(CURRENT_CONTAINER_DIR, "TensorBoardGraphs"),
+trainedModelsDir=      os.path.join(CURRENT_CONTAINER_DIR, "trained_models"),
+visualizeEvaluationsDir = os.path.join(CURRENT_CONTAINER_DIR, "visualizeEvaluations"),
+cocoModelPath=         os.path.join(ROOT_DIR, "mask_rcnn_coco.h5"),
+trainDatasetDir=       os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
+valDatasetDir=         os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/generated/valid_data"),
+testDatasetDir=        os.path.join(CURRENT_CONTAINER_DIR, "project_dataset/test_data"),
+trainResultContainer=  CURRENT_CONTAINER_DIR,
+trainOutputLog      =  CURRENT_CONTAINER_DIR
 
 )
 
@@ -67,12 +53,12 @@ sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.t
 ########################## HEADERING THE RUNNING SESSION WITH SOME PRIOR ASSUMPTIONS AND INTENTIONS ########################
 print("####################################### PREFACE HEADER #######################################")
 print("first training with stems\n\
-        DECAYING LEARNING RATE: YES, \n\
-        MULTICOLOR OBJECTS: YES,\n\
-        ENHANCED BLENDING: YES,\n\
-        GROWING NUMBER OF OBJECTS: + 5,\n\
-        MISC:training is based on last training weights - scales are small and LR is very small - trying to fine-tune \n\
-        ")
+    DECAYING LEARNING RATE: YES, \n\
+    MULTICOLOR OBJECTS: YES,\n\
+    ENHANCED BLENDING: YES,\n\
+    GROWING NUMBER OF OBJECTS: + 5,\n\
+    MISC:training is based on last training weights - scales are small and LR is very small - trying to fine-tune \n\
+    ")
 
 
 
@@ -90,7 +76,7 @@ import sys
 print(sys.version)
 
 #create configurations for model instentiating
-cucuConf.display()
+config.display()
 
 
 
@@ -133,9 +119,9 @@ def scheduleLearningRate(epoch, lr):
     return lr*0.5
 
 custom_callbacks=[
-    EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
-    LearningRateScheduler(scheduleLearningRate, verbose=1)
-    
+EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
+LearningRateScheduler(scheduleLearningRate, verbose=1)
+
 ]
 
 
@@ -145,8 +131,8 @@ model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.Te
 # load initial weights
 weightPath=cucuPaths.cocoModelPath
 model.load_weights(weightPath, by_name=True,
-                      exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-                              "mrcnn_bbox", "mrcnn_mask"])
+                exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                        "mrcnn_bbox", "mrcnn_mask"])
 # weightPath="/home/simon/Mask_RCNN/cucu_train/trainResultContainers/train_results_2019-01-15 22:07:14.522361/trained_models/cucuWheights_2019-01-16 16:05:30.280801.h5"
 # model.load_weights(weightPath, by_name=True)
 print("loaded weights from path:", weightPath)
@@ -254,7 +240,7 @@ model.load_weights(latest_trained_model, by_name=True)
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_top_masks")
 tests_location = cucuPaths.testDatasetDir + "/1024"
 for filename in sorted(os.listdir(tests_location)):
-    
+
     testImage = os.path.join(tests_location,filename)
     t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
     results = model.detect([t], verbose=1)
@@ -321,8 +307,8 @@ for image_id in image_ids:
     # Grid of ground truth objects and their predictions
     visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
                         overlaps, dataset.class_names,savePath=cucuPaths.visualizeEvaluationsDir + "/plot_overlaps/" + "plot_overlaps" + "image_" + str(image_id) +".png")
-    
-    
+
+
 
 
     # Generate RPN trainig targets
@@ -433,7 +419,6 @@ for image_id in image_ids:
     plt.savefig(cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "normInputImage" + "image_" + str(image_id) +".png")
     # Backbone feature map
     visualize.display_images(np.transpose(activations["res3a_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationRes3aImage" + "image_" + str(image_id) +".png")
-# In[ ]:
 
 
 
@@ -445,14 +430,14 @@ def compute_batch_ap(image_ids):
         # Load image
         image, image_meta, gt_class_id, gt_bbox, gt_mask =\
             modellib.load_image_gt(dataset_val, config,
-                                   image_id, use_mini_mask=False)
+                                image_id, use_mini_mask=False)
         # Run object detection
         results = model.detect([image], verbose=0)
         # Compute AP
         r = results[0]
         AP, precisions, recalls, overlaps =\
             utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+                            r['rois'], r['class_ids'], r['scores'], r['masks'])
         APs.append(AP)
     return APs
 

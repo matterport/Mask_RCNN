@@ -1,26 +1,37 @@
-
+#system
 import os
 from os.path import dirname, abspath
 import sys
+
+#math
+import math
 from random import randint , choice, uniform
 import numpy as np
-import cv2
-ROOT_DIR = os.path.abspath("../")
-sys.path.append(ROOT_DIR)  # To find local version of the library
 
+#COCO image and json processing
+import json
+from project_assets.cocoapi.PythonAPI.pycocotools.coco import COCO
+from project_assets.cocoapi.PythonAPI.pycocotools import mask as maskUtils
+
+#generated image processing
+import cv2
 from mrcnn import utils
 from PIL import Image, ImageFile
+from project_assets.cucu_utils import add_image, image_to_mask, add_imageWithoutTransparency
+
+#cucu dependencies
+from cucu_config import cucuConfForTrainingSession, globalObjectShapesList
+
+#design
+from collections import defaultdict
+
+
+
+ROOT_DIR = os.path.abspath("../")
+sys.path.append(ROOT_DIR)  # To find local version of the library
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from project_assets.cucu_utils import *
 
-from cucu_config import *
-from cucu_config import cucuConf
-from cucu_config import globalObjectShapesList
-
-import math
-
-from collections import defaultdict
 class genDataset(utils.Dataset):
     def __init__(self,objByCategoryPaths,config):
         def collectAndCountObjImagesByCategory():
@@ -155,12 +166,12 @@ class genDataset(utils.Dataset):
         shape = drawObjCategoryFromDistribution()
         
         # Location in Image
-        verifyObjIntersectsWithImageFrame = cucuConf.BOUNDING_DELTA
+        verifyObjIntersectsWithImageFrame = cucuConfForTrainingSession.BOUNDING_DELTA
         topLeftX_location = randint(0, height - int(verifyObjIntersectsWithImageFrame*height))
         topLeftY_location = randint(0, width - int(verifyObjIntersectsWithImageFrame*width))
         
         # Scalinf of object
-        x_scale = uniform(cucuConf.MIN_SCALE_OBJ, cucuConf.MAX_SCALE_OBJ)
+        x_scale = uniform(cucuConfForTrainingSession.MIN_SCALE_OBJ, cucuConfForTrainingSession.MAX_SCALE_OBJ)
         y_scale = x_scale
         
         # Angle
@@ -186,8 +197,8 @@ class genDataset(utils.Dataset):
         boxes = []
 
         # pick objects number in generated image
-        randomObjAmmountInGeneratedImage = randint(math.floor(cucuConf.MIN_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND),\
-                                            math.floor(cucuConf.MAX_GENERATED_OBJECTS * cucuConf.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND))
+        randomObjAmmountInGeneratedImage = randint(math.floor(cucuConfForTrainingSession.MIN_GENERATED_OBJECTS * cucuConfForTrainingSession.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND),\
+                                            math.floor(cucuConfForTrainingSession.MAX_GENERATED_OBJECTS * cucuConfForTrainingSession.SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND))
             
         for _ in range(randomObjAmmountInGeneratedImage):
             shape, location, scale, angle, index = self.GenerateRandomSpecsForObjInImage(height, width)
@@ -232,21 +243,6 @@ class genDataset(utils.Dataset):
         # Map class names to class IDs.
         class_ids = np.array([self.class_names.index(s[0]) for s in shapes])
         return mask.astype(np.bool), class_ids.astype(np.int32)        
-
-
-
-
-import os
-import numpy as np
-import json
-from mrcnn import utils
-from project_assets.cocoapi.PythonAPI.pycocotools.coco import COCO
-from project_assets.cocoapi.PythonAPI.pycocotools import mask as maskUtils
-
-
-
-
-
 
 
 class realDataset(utils.Dataset):
@@ -392,3 +388,18 @@ class project_paths(object):
         self.trainOutputLog=trainOutputLog
 
 
+
+class CucuLogger(object):
+    def __init__(self, original_out, filepath):
+        self.logger_file = open(filepath, "w+")
+        self.orig_out = original_out
+
+    def write(self, str):
+        self.logger_file.write(str)
+        self.orig_out.write(str)
+
+    def flush(self):
+        pass
+
+    def __del__(self):
+        self.logger_file.close()

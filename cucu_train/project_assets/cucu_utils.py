@@ -163,18 +163,3 @@ def mask_to_image(mask):
         image += mask[:,:,i]*(i+1)
     print(z)
     return image
-
-class CucuLogger(object):
-    def __init__(self, original_out, filepath):
-        self.logger_file = open(filepath, "w+")
-        self.orig_out = original_out
-
-    def write(self, str):
-        self.logger_file.write(str)
-        self.orig_out.write(str)
-
-    def flush(self):
-        pass
-
-    def __del__(self):
-        self.logger_file.close()
