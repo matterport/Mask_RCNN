@@ -954,10 +954,8 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     print("\nOne Shot is even more in!\n")
     mrcnn_embedding = KL.TimeDistributed(KL.Dense(128),
                                             name='mrcnn_embedding')(shared)
-    mrcnn_embedding_act = KL.TimeDistributed(KL.Activation("softmax"),
-                                     name="mrcnn_embedding_activation")(mrcnn_embedding)
 
-    return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding_act
+    return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding
 
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
@@ -1998,7 +1996,7 @@ class MaskRCNN():
 
             # Network Heads
             # TODO: verify that this handles zero padded ROIs
-            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding_act =\
+            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding =\
                 fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN,
@@ -2038,7 +2036,7 @@ class MaskRCNN():
         else:
             # Network Heads
             # Proposal classifier and BBox regressor heads
-            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding_act=\
+            mrcnn_class_logits, mrcnn_class, mrcnn_bbox, mrcnn_embedding =\
                 fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
                                      train_bn=config.TRAIN_BN,
@@ -2060,7 +2058,7 @@ class MaskRCNN():
 
             model = KM.Model([input_image, input_image_meta, input_anchors],
                              [detections, mrcnn_class, mrcnn_bbox,
-                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox],
+                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox, mrcnn_embedding],
                              name='mask_rcnn')
 
         # Add multi-GPU support.
