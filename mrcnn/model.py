@@ -951,7 +951,6 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     # One shot head
-    print("\nOne Shot is even more in!\n")
     mrcnn_embedding = KL.TimeDistributed(KL.Dense(128),
                                             name='mrcnn_embedding')(shared)
 
