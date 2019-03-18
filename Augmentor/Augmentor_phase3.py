@@ -114,99 +114,101 @@ def get_image_json_doc(orig_json, image_name, new_id):
                 'path': image_name[13:],
                 'url': url,
                 'width': img['width'],
-                'dataset_id':dataset_id,
+                # 'dataset_id': dataset_id,
                 'annotated': annotated,
                 'metadata': metadata
             }
             return result
     return []
 
-dir_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/output_phase2/'
+def augment_reconstruct_json(dir_path, orig_json_path):
+    # dir_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/output_phase2/'
+    # dir_path: directory containing IMG... and groundtruth...
+    # orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/leaves.json'
 
-files_in_dir = os.listdir(dir_path)
-ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
-augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
+    files_in_dir = os.listdir(dir_path)
+    ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
+    augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
 
 
-orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/leaves.json'
-with open(orig_json_path) as f:
-    orig_json = json.load(f)
+    with open(orig_json_path) as f:
+        orig_json = json.load(f)
 
-# new_image_jason = get_image_json_doc(orig_json, img1.filename.split('/')[-1].split('.')[0], 17)
-# new_image_jason2 = get_image_json_doc(orig_json, img2.filename.split('/')[-1], 18)
+    # new_image_jason = get_image_json_doc(orig_json, img1.filename.split('/')[-1].split('.')[0], 17)
+    # new_image_jason2 = get_image_json_doc(orig_json, img2.filename.split('/')[-1], 18)
 
-# Define which colors match which categories in the images
-# houseplant_id, book_id, bottle_id, lamp_id = [1, 2, 3, 4]
-# category_ids = {
-#     1: {
-#         '(0, 255, 0)': houseplant_id,
-#         '(0, 0, 255)': book_id,
-#     },
-#     2: {
-#         '(255, 255, 0)': bottle_id,
-#         '(255, 0, 128)': book_id,
-#         '(255, 100, 0)': lamp_id,
-#     }
-# }
+    # Define which colors match which categories in the images
+    # houseplant_id, book_id, bottle_id, lamp_id = [1, 2, 3, 4]
+    # category_ids = {
+    #     1: {
+    #         '(0, 255, 0)': houseplant_id,
+    #         '(0, 0, 255)': book_id,
+    #     },
+    #     2: {
+    #         '(255, 255, 0)': bottle_id,
+    #         '(255, 0, 128)': book_id,
+    #         '(255, 100, 0)': lamp_id,
+    #     }
+    # }
 
-is_crowd = 0
+    is_crowd = 0
 
-# These ids will be automatically increased as we go
-annotation_id = 0
-image_id = 0
-dataset_id = 2
+    # These ids will be automatically increased as we go
+    annotation_id = 0
+    image_id = 0
+    # dataset_id = 2
 
-if 'info' in orig_json:
-    info = orig_json['info']
-else:
-    info = 'GeverNet project 2019!'
-categories = orig_json['categories']
-
-output = {
-    'categories': categories,
-    'images': [],
-    'annotations': [],
-    'info': info
-}
-
-category_id = categories[0]['id']
-
-# Create the annotations
-annotations = []
-images = []
-error_num = 0
-for file in ground_truth_images:
-    mask_image = Image.open(dir_path+file)
-    new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
-    if new_image_json_doc == []:
-        print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
-        continue
-    sub_masks = create_sub_masks(mask_image)
-    mask_image.close()
-    has_annotation = False
-    for color, sub_mask in sub_masks.items():
-        # category_id = category_ids[image_id][color]
-        annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
-        if annotation != []:
-            annotations.append(annotation)
-            annotation_id += 1
-            has_annotation = True
-
-    if has_annotation:
-        images.append(new_image_json_doc)
-        print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
+    if 'info' in orig_json:
+        info = orig_json['info']
     else:
-        print('no annotation for {} {}'.format(mask_image.filename, image_id))
-        continue
+        info = 'GeverNet project 2019!'
+    categories = orig_json['categories']
 
-    image_id += 1
-    output['images'] = images
-    output['annotations'] = annotations
+    output = {
+        'categories': categories,
+        'images': [],
+        'annotations': [],
+        'info': info
+    }
 
-    if image_id % 100 == 0:
-        with open(dir_path+'new_annotations2_' + str(image_id) + '.json', 'w') as outfile:
-            json.dump(output, outfile)
+    category_id = categories[0]['id']
 
-print(json.dumps(output))
-with open(dir_path+'new_annotations2.json', 'w') as outfile:
-    json.dump(output, outfile)
+    # Create the annotations
+    annotations = []
+    images = []
+    error_num = 0
+    for file in ground_truth_images:
+        mask_image = Image.open(dir_path+file)
+        new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
+        if new_image_json_doc == []:
+            print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
+            continue
+        sub_masks = create_sub_masks(mask_image)
+        mask_image.close()
+        has_annotation = False
+        for color, sub_mask in sub_masks.items():
+            # category_id = category_ids[image_id][color]
+            annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
+            if annotation != []:
+                annotations.append(annotation)
+                annotation_id += 1
+                has_annotation = True
+
+        if has_annotation:
+            images.append(new_image_json_doc)
+            print('{} Done! {} out of {}'.format(mask_image.filename, image_id, len(ground_truth_images)))
+        else:
+            print('no annotation for {} {}'.format(mask_image.filename, image_id))
+            continue
+
+        image_id += 1
+        output['images'] = images
+        output['annotations'] = annotations
+
+        if image_id % 100 == 0:
+            with open(dir_path+'new_annotations2_' + str(image_id) + '.json', 'w') as outfile:
+                json.dump(output, outfile)
+
+    print(json.dumps(output))
+    with open(dir_path+'new_annotations2.json', 'w') as outfile:
+        json.dump(output, outfile)
