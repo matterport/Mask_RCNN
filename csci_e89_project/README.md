@@ -1,7 +1,7 @@
 
 ## Overview
 
-This was done for a CSCI E89 class project that demonstrates single and multi-class instance segmentation using Mask R-CNN. ![matterport/Mask_RCNN](https://github.com/matterport/Mask_RCNN) was choosen since it used Keras/Tensorflow, well written, pulled togehter various network architectures (Faster R-CNN, FPN, Mask R-CNN), and is well writtent and documented.
+This was done for a CSCI E89 class project that demonstrates single and multi-class instance segmentation using Mask R-CNN. ![matterport/Mask_RCNN](https://github.com/matterport/Mask_RCNN) was choosen since it used Keras/Tensorflow, pulled together various network architectures (Faster R-CNN, FPN, Mask R-CNN), and is well writtent and documented.
 
 This project leverage data from ImageNet (wolves, signs) as well as my own photos to train and test. The data was annotated using VGG Iamge Annotator.
 
@@ -12,6 +12,16 @@ Classification is concerned with identifying a single object in an image. Classi
 * Instance segmentation - Detection of one or more objects of different classes, labeling each pixel with a category label. A Segment mask is generated for each instance.
 
 ![Instance Segmentation](assets/detection_definition.jpg)
+
+## Installation 
+
+Follow the installation instruction here: https://github.com/sabderra/Mask_RCNN
+
+Additional installation steps:
+
+```bash
+pip install git+https://github.com/aleju/imgaug
+```
 
 ## Image Annotation
 
