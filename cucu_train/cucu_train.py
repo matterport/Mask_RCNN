@@ -143,6 +143,7 @@ for _ in range(config.EPOCHS_ROUNDS):
     now = datetime.datetime.now()
     model_path = os.path.join(cucuPaths.trainedModelsDir, "cucuWheights_" + str(now) + ".h5")
     model.keras_model.save_weights(model_path)
+
     #load just trained weights again
     list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
     latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
@@ -397,10 +398,6 @@ def compute_batch_ap(image_ids):
 image_ids = np.random.choice(dataset_val.image_ids, 10)
 APs = compute_batch_ap(image_ids)
 print("mAP @ IoU=50: ", np.mean(APs))
-
-
-
-# In[ ]:
 
 
 

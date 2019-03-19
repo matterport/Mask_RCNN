@@ -25,11 +25,7 @@ class cucumberConfig(Config):
     IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
-<<<<<<< HEAD
-    NUM_CLASSES = 1 + 4# background + cucumber, leaf, flower, stems
-=======
-    NUM_CLASSES = 1 + 1 # background + cucumber, leaf, flower
->>>>>>> commmiting changes in playground.ipynb
+    NUM_CLASSES = 1 + 4 # background + cucumber, leaf, flower, stems
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
