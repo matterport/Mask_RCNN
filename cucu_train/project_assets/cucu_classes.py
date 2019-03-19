@@ -372,7 +372,9 @@ class realDataset(utils.Dataset):
         m = maskUtils.decode(rle)
         return m
 
-
+class HybridDataset(utils.Dataset):
+    pass
+    
 class project_paths(object):
     def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, currSessionInitialModelWeights,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
         self.projectRootDir=projectRootDir
