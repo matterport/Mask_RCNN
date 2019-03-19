@@ -363,7 +363,7 @@ class realDataset(utils.Dataset):
             rle = ann['segmentation']
         return rle
 
-    def annToMask(self, ann, height, width):
+    def annToMask(self, ann, height, width): #asher note: no need to copy
         """
         Convert annotation which can be polygons, uncompressed RLE, or RLE to binary mask.
         :return: binary mask (numpy 2D array)
@@ -373,8 +373,22 @@ class realDataset(utils.Dataset):
         return m
 
 class HybridDataset(utils.Dataset):
-    pass
+    def __init__(self, realDataset, generatedDataset):
+        utils.Dataset.__init__(self)
+        self.object_realDataset = realDataset
+        self.object_generatedDataset = generatedDataset
     
+        def load_mask(self, image_id):
+            pass
+        def load_dataset(self,annotations_path, dataset_dir):
+            pass
+        def load_shapes(self, numOfImagesToGenerate, height, width):
+            pass
+        def load_image(self, specification_id):
+            pass
+        
+
+
 class project_paths(object):
     def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, currSessionInitialModelWeights,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
         self.projectRootDir=projectRootDir
