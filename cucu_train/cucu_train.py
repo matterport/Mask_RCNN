@@ -117,16 +117,12 @@ custom_callbacks= prepareCallbackForCurrentSession()
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
-    # asher todo: add a choice from which dataset to generate
-    dataset_train = genDataset(trainCategoryPathsDict, config)
-    dataset_train.load_shapes(config.TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    dataset_train.prepare()
-
+    dataset_train = realDataset()
+    dataset_train.load_dataset(os.path.join(cucuPaths.trainDatasetDir, "annotations.json"), cucuPaths.trainDatasetDir)
 
     # Validation dataset
-    dataset_val = genDataset(validCategoryPathsDict, config)
-    dataset_val.load_shapes(config.VALID_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-    dataset_val.prepare()
+    dataset_val = realDataset()
+    dataset_val.load_dataset(os.path.join(cucuPaths.valDatasetDir, "annotations.json"), cucuPaths.valDatasetDir)
 
     # In[ ]:
 

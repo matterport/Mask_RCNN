@@ -5,6 +5,7 @@ from shapely.geometry import Polygon, MultiPolygon # (pip install Shapely)
 import json
 import os
 import datetime
+import os
 
 def create_sub_masks(mask_image):
     width, height = mask_image.size
@@ -53,7 +54,7 @@ def create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, i
 
         # Make a polygon and simplify it
         poly = Polygon(contour)
-        poly = poly.simplify(1.0, preserve_topology=False)
+        poly = poly.simplify(1.0)
         polygons.append(poly)
         try:
             segmentation = np.array(poly.exterior.coords).ravel().tolist()
@@ -128,7 +129,7 @@ def augment_reconstruct_json(dir_path, orig_json_path):
 
     files_in_dir = os.listdir(dir_path)
     ground_truth_images = [file for file in files_in_dir if file.find('ground_truth') != -1]
-    augmented_image_names = [file for file in files_in_dir if file.find('.PNG') != -1 and file.find('ground_truth') == -1]
+    # augmented_image_names = [file for file in files_in_dir if file.find('ground_truth') == -1]
 
 
     with open(orig_json_path) as f:
@@ -178,7 +179,7 @@ def augment_reconstruct_json(dir_path, orig_json_path):
     images = []
     error_num = 0
     for file in ground_truth_images:
-        mask_image = Image.open(dir_path+file)
+        mask_image = Image.open(os.path.join(dir_path, file))
         new_image_json_doc = get_image_json_doc(orig_json, mask_image.filename.split('/')[-1], image_id)
         if new_image_json_doc == []:
             print("{} : can't find augmented image or relevant image field in origin json!".format(mask_image.filename.split('/')[-1]))
@@ -206,9 +207,9 @@ def augment_reconstruct_json(dir_path, orig_json_path):
         output['annotations'] = annotations
 
         if image_id % 100 == 0:
-            with open(dir_path+'new_annotations2_' + str(image_id) + '.json', 'w') as outfile:
-                json.dump(output, outfile)
+            with open(os.path.join(dir_path, 'new_annotations2_' + str(image_id) + '.json'), 'w') as outfile:
+                json.dump(output, outfile, indent=4, sort_keys=True)
 
-    print(json.dumps(output))
-    with open(dir_path+'new_annotations2.json', 'w') as outfile:
+    # print(json.dumps(output))
+    with open(os.path.join(dir_path, 'new_annotations2.json'), 'w') as outfile:
         json.dump(output, outfile)
