@@ -82,17 +82,17 @@ class genDataset(utils.Dataset):
             bg_color, shapes = self.GenerateRandomSpecsForImage(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, shapes=shapes, bgIndex=bgIndex)
     
-    def load_image(self, specification_id):
+    def load_image(self, image_id):
         """
         creates an image using spcifications choosed earlier for creating it.
-        the specifications are tracked usiing specification_id
+        the specifications are tracked usiing image_id
 
         function is called by load_image_gt - it is crucial for generating on-the-fly training set 
         for NN.
-        specification_id - associates with certain attributes (image_info) of this image generated 
+        image_id - associates with certain attributes (image_info) of this image generated 
                    on constructing train_dataset and val_dataset
         """
-        info = self.image_info[specification_id]
+        info = self.image_info[image_id]
                 
         # load shape of pre-specified background
         y_max, x_max ,_ = np.asarray(self.containerOfObjForGeneratingImages['BG'][info['bgIndex']]).shape
@@ -373,20 +373,82 @@ class realDataset(utils.Dataset):
         return m
 
 class HybridDataset(utils.Dataset):
-    def __init__(self, realDataset, generatedDataset):
+    def __init__(self,pathsToHandleGeneratingImages, pathToRealImagesAnnotations, pathToRealImagesDataset, config):
         utils.Dataset.__init__(self)
-        self.object_realDataset = realDataset
-        self.object_generatedDataset = generatedDataset
+        self.config = config
+        self.pathToRealImagesAnnotations = pathToRealImagesAnnotations
+        self.pathToRealImagesDataset = pathToRealImagesDataset
+        self.generatedDataset = genDataset(pathsToHandleGeneratingImages, config)
+        self.realDataset = realDataset()
     
-        def load_mask(self, image_id):
-            pass
-        def load_dataset(self,annotations_path, dataset_dir):
-            pass
-        def load_shapes(self, numOfImagesToGenerate, height, width):
-            pass
-        def load_image(self, specification_id):
-            pass
+    def imageIdBelongsToGeneratedDataset(self, image_id):
+        # since image_id starts from zero, if image_id = num_images, it's actually the first image in realDataset
+        return image_id < self.generatedDataset.num_images
+    def mapToRealDatasetImageId(self, image_id):
+        return image_id - self.generatedDataset.num_images
+
+    def load_mask(self, image_id):
         
+        
+        if self.imageIdBelongsToGeneratedDataset(image_id):
+            return self.generatedDataset.load_mask(image_id)
+        else:
+            realImageId = self.mapToRealDatasetImageId(image_id)
+            return self.realDataset.load_mask(realImageId)
+
+
+    def load_dataset(self,annotations_path, dataset_dir):
+        self.generatedDataset.load_shapes(self.config.TRAIN_SET_SIZE, self.config.IMAGE_SHAPE[0], self.config.IMAGE_SHAPE[1])
+        self.realDataset.load_dataset(self.pathToRealImagesAnnotations, self.pathToRealImagesDataset)
+
+    def load_image(self, image_id):
+        if self.imageIdBelongsToGeneratedDataset(image_id):
+            return self.generatedDataset.load_image(image_id)
+        else:
+            realImageId = self.mapToRealDatasetImageId(image_id)
+            return self.realDataset.load_image(realImageId)
+
+
+    def prepare(self, class_map=None):
+        """Prepares the Dataset class for use."""
+
+        def clean_name(name):
+            """Returns a shorter version of object names for cleaner display."""
+            return ",".join(name.split(",")[:1])
+        def createHybridClassInfoDict():
+            return dict(self.generatedDataset.class_info, self.realDataset.class_info)
+        def createHybridImageInfoListStartsWithGenImages():
+            return self.generatedDataset.image_info.extend(self.realDataset.image_info)
+            
+        self.generatedDataset.prepare()
+        self.realDataset.prepare()
+        # Build (or rebuild) everything else from the info dicts.
+        self.class_info = createHybridClassInfoDict()
+        self.image_info = createHybridImageInfoListStartsWithGenImages()
+        
+        self.num_classes = len(self.class_info)
+        self.class_ids = np.arange(self.num_classes)
+        self.class_names = [clean_name(c["name"]) for c in self.class_info]
+        self.num_images = len(self.image_info)
+        self._image_ids = np.arange(self.num_images)
+
+        # Mapping from source class and image IDs to internal IDs
+        self.class_from_source_map = {"{}.{}".format(info['source'], info['id']): id
+                                    for info, id in zip(self.class_info, self.class_ids)}
+        self.image_from_source_map = {"{}.{}".format(info['source'], info['id']): id
+                                    for info, id in zip(self.image_info, self.image_ids)}
+
+        # Map sources to class_ids they support
+        self.sources = list(set([i['source'] for i in self.class_info]))
+        self.source_class_ids = {}
+        # Loop over datasets
+        for source in self.sources:
+            self.source_class_ids[source] = []
+            # Find classes that belong to this dataset
+            for i, info in enumerate(self.class_info):
+                # Include BG class in all datasets
+                if i == 0 or source == info['source']:
+                    self.source_class_ids[source].append(i)
 
 
 class project_paths(object):

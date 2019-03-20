@@ -20,7 +20,7 @@ import mrcnn.model as modellib
 from mrcnn import visualize
 from mrcnn.model import log
 from shutil import copyfile, copytree
-from keras.callbacks import *
+from keras.callbacks import EarlyStopping,LearningRateScheduler
 import math
 
 def setRootPathForCurrentSession():
@@ -70,7 +70,12 @@ os.chmod(rootDir, mode=0o777)
 currentContainerDir = constructContainerPath()
 #todo: get it inside function below
 print('Enter full path for initial model weights:')
-currentSessionInitialWeights=input()
+# currentSessionInitialWeights=input()
+currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
+#asher todo: delete this debug if
+# if len(currentSessionInitialWeights) == 1:
+#     currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
+
 cucuPaths = initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSessionInitialWeights)
 sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
 
@@ -96,7 +101,8 @@ print("loaded weights from path:", weightPath)
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
 
-#create path dictionaries
+#create path dictionaries for generating images composed of objects in this paths
+#asher todo: decide if abstraction makes code clearer or better leave here for sequenciality
 trainCategoryPathsDict = {}
 trainCategoryPathsDict['BG']         = cucuPaths.trainDatasetDir + '/background_folder/1024'
 trainCategoryPathsDict['cucumber']   = cucuPaths.trainDatasetDir + '/cucumbers_objects'
