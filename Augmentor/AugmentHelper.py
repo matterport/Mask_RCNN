@@ -43,8 +43,8 @@ class AugmentHelper(object):
         shutil.rmtree(self.ground_truth_path)   
         purge(self.output_dataset_path, "ground_truth")
 
-augmentor = AugmentHelper("/home/simon/Mask_RCNN/cucu_train/project_dataset/real/1024/original", 
-                            "/home/simon/Mask_RCNN/cucu_train/project_dataset/real/1024/augmented")
+augmentor = AugmentHelper("/home/simon/Mask_RCNN/cucu_train/project_dataset/real/original/stems/train", 
+                            "/home/simon/Mask_RCNN/cucu_train/project_dataset/real/1024/stems/train")
 augmentor.generate()
 print("finish")
 
