@@ -92,8 +92,10 @@ class cucumberConfig(Config):
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    TRAIN_SET_SIZE = 10
+    GEN_TRAIN_SET_SIZE = 10
+    REAL_TRAIN_SET_SIZE = 20
     VALID_SET_SIZE = 5
+    TEST_SET_SIZE = 12
 
     #in case images are synthesized
     MIN_GENERATED_OBJECTS = 2
@@ -124,8 +126,8 @@ class cucumberConfig(Config):
 
         # Image meta data length
         # See compose_image_meta() for details
-        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
-        self.STEPS_PER_EPOCH  = self.TRAIN_SET_SIZE // self.IMAGES_PER_GPU
+        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES + 1
+        self.STEPS_PER_EPOCH  = (self.GEN_TRAIN_SET_SIZE + self.REAL_TRAIN_SET_SIZE)  // self.IMAGES_PER_GPU
 
 
 

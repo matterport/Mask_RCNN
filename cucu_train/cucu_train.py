@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
 from cucu_config import cucumberConfig
 from cucu_config import cucuConfForTrainingSession as config
-from project_assets.cucu_classes import genDataset, CucuLogger, project_paths, realDataset
+from project_assets.cucu_classes import genDataset, CucuLogger, project_paths,HybridDataset, realDataset
+from project_assets.cucu_utils import get_ax
+
 from PIL import Image
 import json
 from mrcnn import utils
@@ -41,9 +43,20 @@ def initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSession
     trainedModelsDir=      os.path.join(currentContainerDir, "trained_models"),
     visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
     currSessionInitialModelWeights=         currentSessionInitialWeights,
-    trainDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/train_data"), #asher todo: generalize paths ( 'generated' inside pre-defined path is bad)
-    valDatasetDir=         os.path.join(currentContainerDir, "project_dataset/generated/valid_data"),
+
+    #dataset paths
+    trainGenDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/train_data"), 
+    valGenDatasetDir=         os.path.join(currentContainerDir, "project_dataset/generated/valid_data"),
+    
+    trainRealDatasetDir = os.path.join(currentContainerDir, "project_dataset/real/train_data/dataset"),
+    trainRealDatasetAnnotations = os.path.join(currentContainerDir, "project_dataset/real/train_data/annotations/annotations.json"),
+    valRealDatasetDir = os.path.join(currentContainerDir, "project_dataset/real/val_data/dataset"),
+    valRealDatasetAnnotations = os.path.join(currentContainerDir, "project_dataset/real/val_data/annotations/annotations.json"),
+
+
     testDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test_data"),
+    
+    
     trainResultContainer=  currentContainerDir,
     trainOutputLog      =  currentContainerDir)
     return cucuPaths
@@ -69,7 +82,7 @@ rootDir = setRootPathForCurrentSession()
 os.chmod(rootDir, mode=0o777)
 currentContainerDir = constructContainerPath()
 #todo: get it inside function below
-print('Enter full path for initial model weights:')
+# print('Enter full path for initial model weights:')
 # currentSessionInitialWeights=input()
 currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
 #asher todo: delete this debug if
@@ -103,19 +116,19 @@ os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
 
 #create path dictionaries for generating images composed of objects in this paths
 #asher todo: decide if abstraction makes code clearer or better leave here for sequenciality
-trainCategoryPathsDict = {}
-trainCategoryPathsDict['BG']         = cucuPaths.trainDatasetDir + '/background_folder/1024'
-trainCategoryPathsDict['cucumber']   = cucuPaths.trainDatasetDir + '/cucumbers_objects'
-trainCategoryPathsDict['leaf']       = cucuPaths.trainDatasetDir + '/leaves_objects'
-trainCategoryPathsDict['flower']     = cucuPaths.trainDatasetDir + '/flower_objects'
-trainCategoryPathsDict['stem']       = cucuPaths.trainDatasetDir + '/stems_objects'
+genTrainCategoryPathsDict = {}
+genTrainCategoryPathsDict['BG']         = cucuPaths.trainGenDatasetDir + '/background_folder/1024'
+genTrainCategoryPathsDict['cucumber']   = cucuPaths.trainGenDatasetDir + '/cucumbers_objects'
+genTrainCategoryPathsDict['leaf']       = cucuPaths.trainGenDatasetDir + '/leaves_objects'
+genTrainCategoryPathsDict['flower']     = cucuPaths.trainGenDatasetDir + '/flower_objects'
+genTrainCategoryPathsDict['stem']       = cucuPaths.trainGenDatasetDir + '/stems_objects'
 
-validCategoryPathsDict = {}
-validCategoryPathsDict['BG']         = cucuPaths.valDatasetDir + '/background_folder/1024'
-validCategoryPathsDict['cucumber']   = cucuPaths.valDatasetDir + '/cucumbers_objects'
-validCategoryPathsDict['leaf']       = cucuPaths.valDatasetDir + '/leaves_objects'
-validCategoryPathsDict['flower']     = cucuPaths.valDatasetDir + '/flower_objects'
-validCategoryPathsDict['stem']       = cucuPaths.valDatasetDir + '/stems_objects'
+genValidCategoryPathsDict = {}
+genValidCategoryPathsDict['BG']         = cucuPaths.valGenDatasetDir + '/background_folder/1024'
+genValidCategoryPathsDict['cucumber']   = cucuPaths.valGenDatasetDir + '/cucumbers_objects'
+genValidCategoryPathsDict['leaf']       = cucuPaths.valGenDatasetDir + '/leaves_objects'
+genValidCategoryPathsDict['flower']     = cucuPaths.valGenDatasetDir + '/flower_objects'
+genValidCategoryPathsDict['stem']       = cucuPaths.valGenDatasetDir + '/stems_objects'
 
 # add custom callbacks if needed as a preparation to training model
 custom_callbacks= prepareCallbackForCurrentSession()
@@ -123,15 +136,16 @@ custom_callbacks= prepareCallbackForCurrentSession()
 # start training loop
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
-    # asher todo: add a choice from which dataset to generate
-    dataset_train = realDataset()
-    dataset_train.load_dataset(os.path.join(cucuPaths.trainDatasetDir, "annotations.json"), cucuPaths.trainDatasetDir)
-
+    dataset_train = HybridDataset(genTrainCategoryPathsDict,cucuPaths.trainRealDatasetAnnotations,cucuPaths.trainRealDatasetDir,config)
+    dataset_train.load_dataset()
+    dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = realDataset()
-    dataset_val.load_dataset(os.path.join(cucuPaths.valDatasetDir, "annotations.json"), cucuPaths.valDatasetDir)
+    dataset_val = HybridDataset(genTrainCategoryPathsDict,cucuPaths.valRealDatasetAnnotations,cucuPaths.valRealDatasetDir,config)
+    dataset_val.load_dataset()
     dataset_val.prepare()
+    # In[ ]:
+
 
     #show n random image&mask train examples
     n = 1
@@ -174,6 +188,24 @@ for _ in range(config.EPOCHS_ROUNDS):
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
+    def __init__(self):
+        super().__init__()
+        """Set values of computed attributes."""
+        # Effective batch size
+        self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+
+        # Input image size
+        if self.IMAGE_RESIZE_MODE == "crop":
+            self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
+                self.IMAGE_CHANNEL_COUNT])
+        else:
+            self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM,
+                self.IMAGE_CHANNEL_COUNT])
+
+        # Image meta data length
+        # See compose_image_meta() for details
+        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+        self.STEPS_PER_EPOCH  = self.TEST_SET_SIZE // self.IMAGES_PER_GPU
 
 inference_config = InferenceConfig()
 
@@ -300,29 +332,29 @@ for image_id in image_ids:
                         savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_beforeAndAfterRefine_" + "image_" + str(image_id) +".png")
 
 
-    # asher todo: this module stilll doesn't work
-    # Run RPN sub-graph
-    pillar = model.keras_model.get_layer("mrcnn_bbox").output  # node to start searching from
+    # # asher todo: this module stilll doesn't work
+    # # Run RPN sub-graph
+    # pillar = model.keras_model.get_layer("mrcnn_bbox").output  # node to start searching from
 
-    # TF 1.4 and 1.9 introduce new versions of NMS. Search for all names to support TF 1.3~1.10
-    nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression:0")
-    if nms_node is None:
-        nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression/NonMaxSuppressionV2:0")
-    # if nms_node is None: #TF 1.9-1.10
-    #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV3:0")
+    # # TF 1.4 and 1.9 introduce new versions of NMS. Search for all names to support TF 1.3~1.10
+    # nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression:0")
+    # if nms_node is None:
+    #     nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression/NonMaxSuppressionV2:0")
+    # # if nms_node is None: #TF 1.9-1.10
+    # #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV3:0")
 
-    rpn = model.run_graph([image], [
-        ("mrcnn_bbox", model.keras_model.get_layer("mrcnn_bbox").output),
-        # ("pre_nms_anchors", model.ancestor(pillar, "ROI/pre_nms_anchors:0")),
-        # ("refined_anchors", model.ancestor(pillar, "mrcnn_bbox_fc")),
-        # ("refined_anchors_clipped", model.ancestor(pillar, "RPN/ROI/refined_anchors_clipped:0"))
-        # ,("post_nms_anchor_ix", nms_node)
-        # ,("rois", model.keras_model.get_layer("TrainGroundTruths/proposal_targets/rois").output),
-    ])
-    # Show top anchors by score (before refinement)
-    limit = 100
-    sorted_anchor_ids = np.argsort(rpn['mrcnn_bbox'][:,:,1].flatten())[::-1]
-    visualize.draw_boxes(image, boxes=model.anchors[sorted_anchor_ids[:limit]], ax=get_ax(),savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsNotRefined_" + "image_" + str(image_id) +".png")
+    # rpn = model.run_graph([image], [
+    #     ("mrcnn_bbox", model.keras_model.get_layer("mrcnn_bbox").output),
+    #     # ("pre_nms_anchors", model.ancestor(pillar, "ROI/pre_nms_anchors:0")),
+    #     # ("refined_anchors", model.ancestor(pillar, "mrcnn_bbox_fc")),
+    #     # ("refined_anchors_clipped", model.ancestor(pillar, "RPN/ROI/refined_anchors_clipped:0"))
+    #     # ,("post_nms_anchor_ix", nms_node)
+    #     # ,("rois", model.keras_model.get_layer("TrainGroundTruths/proposal_targets/rois").output),
+    # ])
+    # # Show top anchors by score (before refinement)
+    # limit = 100
+    # sorted_anchor_ids = np.argsort(rpn['mrcnn_bbox'][:,:,1].flatten())[::-1]
+    # visualize.draw_boxes(image, boxes=model.anchors[sorted_anchor_ids[:limit]], ax=get_ax(),savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsNotRefined_" + "image_" + str(image_id) +".png")
 
     # Show top anchors with refinement. Then with clipping to image boundaries
     # limit = 50
