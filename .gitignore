@@ -21,6 +21,7 @@ samples/coco/train2014
 samples/coco/val2014
 bigGuns/
 cucu_train/trainResultContainers*
+cucu_train/project_dataset*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
