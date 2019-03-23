@@ -380,16 +380,16 @@ class HybridDataset(utils.Dataset):
         self.pathToRealImagesDataset = pathToRealImagesDataset
         self.generatedDataset = genDataset(pathsToHandleGeneratingImages, config)
         self.realDataset = realDataset()
-    
+
     def imageIdBelongsToGeneratedDataset(self, image_id):
         # since image_id starts from zero, if image_id = num_images, it's actually the first image in realDataset
         return image_id < self.generatedDataset.num_images
     def mapToRealDatasetImageId(self, image_id):
         return image_id - self.generatedDataset.num_images
+    def mapToGenDatasetImageId(self, image_id):
+        return image_id + self.generatedDataset.num_images
 
     def load_mask(self, image_id):
-        
-        
         if self.imageIdBelongsToGeneratedDataset(image_id):
             return self.generatedDataset.load_mask(image_id)
         else:
@@ -397,9 +397,10 @@ class HybridDataset(utils.Dataset):
             return self.realDataset.load_mask(realImageId)
 
 
-    def load_dataset(self,annotations_path, dataset_dir):
-        self.generatedDataset.load_shapes(self.config.TRAIN_SET_SIZE, self.config.IMAGE_SHAPE[0], self.config.IMAGE_SHAPE[1])
+    def load_dataset(self):
+        self.generatedDataset.load_shapes(self.config.GEN_TRAIN_SET_SIZE, self.config.IMAGE_SHAPE[0], self.config.IMAGE_SHAPE[1])
         self.realDataset.load_dataset(self.pathToRealImagesAnnotations, self.pathToRealImagesDataset)
+
 
     def load_image(self, image_id):
         if self.imageIdBelongsToGeneratedDataset(image_id):
@@ -415,15 +416,35 @@ class HybridDataset(utils.Dataset):
         def clean_name(name):
             """Returns a shorter version of object names for cleaner display."""
             return ",".join(name.split(",")[:1])
-        def createHybridClassInfoDict():
-            return dict(self.generatedDataset.class_info, self.realDataset.class_info)
+        def createHybridClassInfo():
+            def mergeclassInfos():
+                genClassdInfo = self.generatedDataset.class_info
+                realClassInfo = self.realDataset.class_info
+                mergedClassInfo = genClassdInfo
+                for realInfo in realClassInfo:
+                    isThere = False
+                    for mergedInfo in mergedClassInfo:
+                        if mergedInfo['source'] == realInfo['source']:
+                            isThere = True
+                    if not isThere:
+                        mergedClassInfo.append(realInfo)
+                    else:
+                        isThere = False
+                
+                return mergedClassInfo
+                    
+            hybridClassInfo = mergeclassInfos()
+
+            return hybridClassInfo
         def createHybridImageInfoListStartsWithGenImages():
-            return self.generatedDataset.image_info.extend(self.realDataset.image_info)
+            hybridImageInfo = self.generatedDataset.image_info
+            hybridImageInfo.extend(self.realDataset.image_info)
+            return hybridImageInfo
             
         self.generatedDataset.prepare()
         self.realDataset.prepare()
         # Build (or rebuild) everything else from the info dicts.
-        self.class_info = createHybridClassInfoDict()
+        self.class_info = createHybridClassInfo()
         self.image_info = createHybridImageInfoListStartsWithGenImages()
         
         self.num_classes = len(self.class_info)
@@ -450,15 +471,38 @@ class HybridDataset(utils.Dataset):
                 if i == 0 or source == info['source']:
                     self.source_class_ids[source].append(i)
 
-
+#asher todo: organize it better
 class project_paths(object):
-    def __init__(self, projectRootDir, TensorboardDir, trainedModelsDir,visualizeEvaluationsDir,trainOutputLog, currSessionInitialModelWeights,trainDatasetDir, valDatasetDir, testDatasetDir,trainResultContainer,testAnnotationsDir=None):
+    def __init__(self, projectRootDir, 
+                        TensorboardDir, 
+                        trainedModelsDir,
+                        visualizeEvaluationsDir,
+                        trainOutputLog, 
+                        currSessionInitialModelWeights,
+                        trainGenDatasetDir,
+                        valGenDatasetDir,
+                        trainRealDatasetDir,
+                        trainRealDatasetAnnotations,
+                        valRealDatasetDir,
+                        valRealDatasetAnnotations,
+                        testDatasetDir,
+                        trainResultContainer,
+                        testAnnotationsDir=None):
+
         self.projectRootDir=projectRootDir
         self.TensorboardDir=TensorboardDir
         self.trainedModelsDir=trainedModelsDir
         self.currSessionInitialModelWeights=currSessionInitialModelWeights
-        self.trainDatasetDir=trainDatasetDir
-        self.valDatasetDir=valDatasetDir
+       
+        self.trainGenDatasetDir = trainGenDatasetDir
+        self.valGenDatasetDir = valGenDatasetDir
+        self.trainRealDatasetDir = trainRealDatasetDir
+        self.trainRealDatasetAnnotations = trainRealDatasetAnnotations
+        self.valRealDatasetDir = valRealDatasetDir
+        self.valRealDatasetAnnotations = valRealDatasetAnnotations
+
+        
+        
         self.testDatasetDir=testDatasetDir
         self.testAnnotationsDir=testAnnotationsDir
         self.trainResultContainer=trainResultContainer
