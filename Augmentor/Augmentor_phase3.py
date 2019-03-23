@@ -100,8 +100,9 @@ def get_image_json_doc(orig_json, gt_image_path, new_id):
     image_name = os.path.split(image_file_path)[-1]
 
     # original name in original json
+    extension = image_name.split(".")[-1]
     core_name_parts = core_name.split('_')
-    image_orig_name = core_name_parts[0] + "_" + core_name_parts[1] + '.JPG'
+    image_orig_name = "_".join(core_name_parts[:-1]) + "." + extension
 
     # get new width and height of image
     tmp = Image.open(os.path.join(image_file_path))
@@ -236,3 +237,5 @@ def augment_reconstruct_json(dir_path, orig_json_path):
         json.dump(output, outfile, indent=4, sort_keys=True)
 
     print(errors)
+
+# augment_reconstruct_json("/home/simon/Documents/cucu_dataset/real/1024/fruit/train/augmented", "/home/simon/Documents/cucu_dataset/real/1024/fruit/train/original/annotations.json")
