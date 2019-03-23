@@ -25,7 +25,7 @@ class cucumberConfig(Config):
     IMAGES_PER_GPU = 4
     
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 4# background + cucumber, leaf, flower, stems
+    NUM_CLASSES = 1 + 4 # background + cucumber, leaf, flower, stems
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -41,6 +41,7 @@ class cucumberConfig(Config):
     #asher todo: can we utilize it better?
     # ROI_POSITIVE_RATIO = 66  
     
+    IMAGE_RESIZE_MODE = "crop"
 
     # Maximum number of ground truth instances to use in one image
     MAX_GT_INSTANCES = 300

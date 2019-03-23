@@ -30,6 +30,16 @@ from project_assets.cucu_classes import *
 from cucu_config import cucuConfForTrainingSession as config
 from PIL import Image
 # from cucu_realDatasetClass import *
+
+import json
+# Import Mask RCNN
+sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
+from mrcnn import utils
+import mrcnn.model as modellib
+from mrcnn import visualize
+from mrcnn.model import log
+
+
 ROOT_DIR = dirname(dirname(os.path.realpath(__file__)))
 
 # create a container for training result per exexution of cucu_train.py
@@ -70,15 +80,6 @@ sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.t
 print("####################################### PREFACE HEADER #######################################")
 print("This is a TEST on last container weights which be specified when weight's origin will be printed (in the path)")
 
-
-
-import json
-# Import Mask RCNN
-sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
-from mrcnn import utils
-import mrcnn.model as modellib
-from mrcnn import visualize
-from mrcnn.model import log
 
 # In[11]:
 

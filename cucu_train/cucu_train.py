@@ -130,7 +130,6 @@ genValidCategoryPathsDict['leaf']       = cucuPaths.valGenDatasetDir + '/leaves_
 genValidCategoryPathsDict['flower']     = cucuPaths.valGenDatasetDir + '/flower_objects'
 genValidCategoryPathsDict['stem']       = cucuPaths.valGenDatasetDir + '/stems_objects'
 
-# In[ ]:
 # add custom callbacks if needed as a preparation to training model
 custom_callbacks= prepareCallbackForCurrentSession()
 
@@ -140,7 +139,6 @@ for _ in range(config.EPOCHS_ROUNDS):
     dataset_train = HybridDataset(genTrainCategoryPathsDict,cucuPaths.trainRealDatasetAnnotations,cucuPaths.trainRealDatasetDir,config)
     dataset_train.load_dataset()
     dataset_train.prepare()
-
 
     # Validation dataset
     dataset_val = HybridDataset(genTrainCategoryPathsDict,cucuPaths.valRealDatasetAnnotations,cucuPaths.valRealDatasetDir,config)
@@ -157,8 +155,7 @@ for _ in range(config.EPOCHS_ROUNDS):
         mask, class_ids = dataset_train.load_mask(image_id)
         print(image.shape)
         visualize.display_top_masks( image, mask, class_ids, \
-        dataset_train.class_names,cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset/" + "image_" + str(image_id) +".png", 4)
-
+        dataset_train.class_names,cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset/" + "image_" + str(image_id) +".png", 2)
 
     model.train(dataset_train, dataset_val, learning_rate= config.LEARNING_RATE, epochs=config.EPOCHS,\
                             custom_callbacks=custom_callbacks, layers="heads",verbose=1)
@@ -167,6 +164,7 @@ for _ in range(config.EPOCHS_ROUNDS):
     now = datetime.datetime.now()
     model_path = os.path.join(cucuPaths.trainedModelsDir, "cucuWheights_" + str(now) + ".h5")
     model.keras_model.save_weights(model_path)
+
     #load just trained weights again
     list_of_trained_models = glob.glob(cucuPaths.trainedModelsDir +'/*')
     latest_trained_model = sorted(list_of_trained_models, key=os.path.getctime)[-1]
@@ -230,11 +228,15 @@ model.load_weights(latest_trained_model, by_name=True)
 # DISPLAY_TOP_MASKS
 #create container directories per function calls from Visualize module
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_top_masks")
-tests_location = cucuPaths.testDatasetDir + "/1024"
+tests_location = cucuPaths.testDatasetDir
 for filename in sorted(os.listdir(tests_location)):
-
+    
     testImage = os.path.join(tests_location,filename)
-    t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
+    try:
+        t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)
+    except Exception as e:
+        print("error: {}, \n probably a non image file is in the directory".format(e))
+        continue
     results = model.detect([t], verbose=1)
     r = results[0]
     # visualize.display_instances(t, r['rois'], r['masks'], r['class_ids'] ,dataset_train.class_names, r['scores'], ax=get_ax())
@@ -299,8 +301,6 @@ for image_id in image_ids:
     # Grid of ground truth objects and their predictions
     visualize.plot_overlaps(gt_class_id, r['class_ids'], r['scores'],
                         overlaps, dataset.class_names,savePath=cucuPaths.visualizeEvaluationsDir + "/plot_overlaps/" + "plot_overlaps" + "image_" + str(image_id) +".png")
-
-
 
 
     # Generate RPN trainig targets
@@ -422,14 +422,14 @@ def compute_batch_ap(image_ids):
         # Load image
         image, image_meta, gt_class_id, gt_bbox, gt_mask =\
             modellib.load_image_gt(dataset_val, config,
-                                image_id, use_mini_mask=False)
+                                   image_id, use_mini_mask=False)
         # Run object detection
         results = model.detect([image], verbose=0)
         # Compute AP
         r = results[0]
         AP, precisions, recalls, overlaps =\
             utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                            r['rois'], r['class_ids'], r['scores'], r['masks'])
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
         APs.append(AP)
     return APs
 
@@ -437,10 +437,6 @@ def compute_batch_ap(image_ids):
 image_ids = np.random.choice(dataset_val.image_ids, 10)
 APs = compute_batch_ap(image_ids)
 print("mAP @ IoU=50: ", np.mean(APs))
-
-
-
-# In[ ]:
 
 
 
