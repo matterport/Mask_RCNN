@@ -6,9 +6,9 @@ from pycocotools.coco import COCO
 
 size_threshold = 15 #in percent of picture
 ratio_threshold = 3
-normalize_size = (500, 500) #px
-dataDir = '/home/simon/Documents/cucu_dataset/leaves/valid/'
-annFile = '/home/simon/Documents/cucu_dataset/leaves/valid/annotations.json'
+normalize_size = (700, 700) #px
+dataDir = '/home/simon/Documents/cucu_dataset/real/4000/stems/valid/'
+annFile = '/home/simon/Documents/cucu_dataset/real/4000/stems/valid/annotations.json'
 
 coco = COCO(annFile)
 
@@ -101,7 +101,7 @@ for img in imgs:
             newIm = Image.fromarray(newImArray, "RGBA")
 			# normalize object size
             newIm.thumbnail(normalize_size, Image.ANTIALIAS)
-            newIm.save(dataDir + "leaves_objects/"+image_name.split('.')[0]+"_"+str(i)+".png")
+            newIm.save(dataDir + "stem_objects/"+image_name.split('.')[0]+"_"+str(i)+".png")
         except Exception as e:
             print("Unexpected error: image {} annotation id {}".format(image_name.split('.')[0]+"_"+str(i)+".png", annotation[0]['id']))
             print(e)
