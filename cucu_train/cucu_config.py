@@ -6,7 +6,7 @@ import numpy as np
 
 
 # here you can add more object shapes 
-globalObjectShapesList= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
 
 
 class cucumberConfig(Config):
@@ -83,8 +83,10 @@ class cucumberConfig(Config):
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 512
+    SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = 512
+    
+    IMAGE_MIN_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
+    IMAGE_MAX_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
     
     #SCALES OF GENERATED OBJECTS
     MIN_SCALE_OBJ = 0.1
@@ -129,6 +131,28 @@ class cucumberConfig(Config):
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES + 1
         self.STEPS_PER_EPOCH  = (self.GEN_TRAIN_SET_SIZE + self.REAL_TRAIN_SET_SIZE)  // self.IMAGES_PER_GPU
 
+
+class InferenceConfig(cucumberConfig):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    def __init__(self):
+        super().__init__()
+        """Set values of computed attributes."""
+        # Effective batch size
+        self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+
+        # Input image size
+        if self.IMAGE_RESIZE_MODE == "crop":
+            self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
+                self.IMAGE_CHANNEL_COUNT])
+        else:
+            self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM,
+                self.IMAGE_CHANNEL_COUNT])
+
+        # Image meta data length
+        # See compose_image_meta() for details
+        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+        self.STEPS_PER_EPOCH  = self.TEST_SET_SIZE // self.IMAGES_PER_GPU
 
 
 cucuConfForTrainingSession = cucumberConfig()

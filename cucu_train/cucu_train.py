@@ -10,8 +10,9 @@ import cv2
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('QT5Agg')
-from cucu_config import cucumberConfig
+from cucu_config import cucumberConfig, InferenceConfig
 from cucu_config import cucuConfForTrainingSession as config
+from cucu_config import globalObjectCategories
 from project_assets.cucu_classes import genDataset, CucuLogger, project_paths,HybridDataset, realDataset
 from project_assets.cucu_utils import get_ax
 
@@ -26,7 +27,10 @@ from keras.callbacks import EarlyStopping,LearningRateScheduler
 import math
 
 def setRootPathForCurrentSession():
-    return dirname(dirname(os.path.realpath(__file__)))
+    rootDir = dirname(dirname(os.path.realpath(__file__)))
+    os.chmod(rootDir, mode=0o777)
+    return rootDir
+
 def constructContainerPath():
     # create a container for training result per exexution of cucu_train.py
     CONTAINER_ROOT_DIR = rootDir + "/cucu_train/trainResultContainers/"
@@ -35,38 +39,48 @@ def constructContainerPath():
 def cloneDataSetIntoSessionFolderTree():
     copytree(rootDir+ '/cucu_train/project_dataset', currentContainerDir+ '/project_dataset')
     return
-def initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSessionInitialWeights):
+
+def initiateAllPathsForCurrentSession(rootDir,currentContainerDir):
+    #asher todo: change to get from user
+    # currentSessionInitialWeights = input()
+    currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
     # create centralized class for used paths during current session
     cucuPaths = project_paths(
     projectRootDir=rootDir,
+    currSessionInitialModelWeights=         currentSessionInitialWeights,
     TensorboardDir=        os.path.join(currentContainerDir, "TensorBoardGraphs"),
     trainedModelsDir=      os.path.join(currentContainerDir, "trained_models"),
     visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
-    currSessionInitialModelWeights=         currentSessionInitialWeights,
 
     #dataset paths
-    trainGenDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/train_data"), 
-    valGenDatasetDir=         os.path.join(currentContainerDir, "project_dataset/generated/valid_data"),
-    
-    trainRealDatasetDir = os.path.join(currentContainerDir, "project_dataset/real/train_data/dataset"),
-    trainRealDatasetAnnotations = os.path.join(currentContainerDir, "project_dataset/real/train_data/annotations/annotations.json"),
-    valRealDatasetDir = os.path.join(currentContainerDir, "project_dataset/real/val_data/dataset"),
-    valRealDatasetAnnotations = os.path.join(currentContainerDir, "project_dataset/real/val_data/annotations/annotations.json"),
-
-
-    testDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test_data"),
-    
+    GenDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/"), 
+    RealDatasetDir=     os.path.join(currentContainerDir, "project_dataset/real/"), 
+    TestDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test_data/"),
     
     trainResultContainer=  currentContainerDir,
     trainOutputLog      =  currentContainerDir)
-    return cucuPaths
 
-#todo: simplify
+    sys.path.append(cucuPaths.projectRootDir)   # To find local version of the library
+
+    return cucuPaths
 def createFoldersForModelWeightsAndVizualizations():
     try:
         original_umask = os.umask(0)
         os.makedirs(cucuPaths.trainedModelsDir, mode=0o777)
         os.makedirs(cucuPaths.visualizeEvaluationsDir, mode=0o777)
+
+        #create directory to hold inside samples of images we pass to model during training
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
+        
+        #create container directories per function calls from Visualize module
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_instances")
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/plot_precision_recall")
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/plot_overlaps")
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/draw_boxes")
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/masks_detections")
+        os.mkdir(cucuPaths.visualizeEvaluationsDir + "/activationsImages")
+
+        
     finally:
         os.umask(original_umask)
     return
@@ -77,71 +91,48 @@ def prepareCallbackForCurrentSession():
     return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
             LearningRateScheduler(scheduleLearningRate, verbose=1)]
 
+def createSessionLoggerToCollectPrintOutputs():
+    sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
+    sys.stdout.getFromUserCurrentSessionSpecs() 
+
+def initiateTensorflowModel():
+    # Create model in training mode
+    model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
+
+    # load initial weights
+    weightPath=cucuPaths.currSessionInitialModelWeights
+    model.load_weights(weightPath, by_name=True,
+                    exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
+                            "mrcnn_bbox", "mrcnn_mask"])
+    print("loaded weights from path:", weightPath)
+    return model
+
 #handle paths,new folders and logger
 rootDir = setRootPathForCurrentSession()
-os.chmod(rootDir, mode=0o777)
 currentContainerDir = constructContainerPath()
-#todo: get it inside function below
-# print('Enter full path for initial model weights:')
-# currentSessionInitialWeights=input()
-currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
-#asher todo: delete this debug if
-# if len(currentSessionInitialWeights) == 1:
-#     currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
-
-cucuPaths = initiateAllPathsForCurrentSession(rootDir,currentContainerDir,currentSessionInitialWeights)
-sys.path.append(cucuPaths.projectRootDir)  # To find local version of the library
-
+cucuPaths = initiateAllPathsForCurrentSession(rootDir,currentContainerDir)
 createFoldersForModelWeightsAndVizualizations()
-cloneDataSetIntoSessionFolderTree()
 
-sys.stdout = CucuLogger(sys.stdout, cucuPaths.trainOutputLog + "/sessionLogger.txt")
-sys.stdout.getFromUserCurrentSessionSpecs()
+cloneDataSetIntoSessionFolderTree()
+createSessionLoggerToCollectPrintOutputs()
+
 #print current session configuration to logger
 config.display()
 
-# Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config, model_dir=cucuPaths.TensorboardDir)
-
-# load initial weights
-weightPath=cucuPaths.currSessionInitialModelWeights
-model.load_weights(weightPath, by_name=True,
-                exclude=["mrcnn_class_logits", "mrcnn_bbox_fc",
-                        "mrcnn_bbox", "mrcnn_mask"])
-print("loaded weights from path:", weightPath)
-
-#create directory to hold inside samples of images we pass to model during training
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/SamplesOfTrainDataset")
-
-
-#create path dictionaries for generating images composed of objects in this paths
-#asher todo: decide if abstraction makes code clearer or better leave here for sequenciality
-genTrainCategoryPathsDict = {}
-genTrainCategoryPathsDict['BG']         = cucuPaths.trainGenDatasetDir + '/background_folder/1024'
-genTrainCategoryPathsDict['cucumber']   = cucuPaths.trainGenDatasetDir + '/cucumbers_objects'
-genTrainCategoryPathsDict['leaf']       = cucuPaths.trainGenDatasetDir + '/leaves_objects'
-genTrainCategoryPathsDict['flower']     = cucuPaths.trainGenDatasetDir + '/flower_objects'
-genTrainCategoryPathsDict['stem']       = cucuPaths.trainGenDatasetDir + '/stems_objects'
-
-genValidCategoryPathsDict = {}
-genValidCategoryPathsDict['BG']         = cucuPaths.valGenDatasetDir + '/background_folder/1024'
-genValidCategoryPathsDict['cucumber']   = cucuPaths.valGenDatasetDir + '/cucumbers_objects'
-genValidCategoryPathsDict['leaf']       = cucuPaths.valGenDatasetDir + '/leaves_objects'
-genValidCategoryPathsDict['flower']     = cucuPaths.valGenDatasetDir + '/flower_objects'
-genValidCategoryPathsDict['stem']       = cucuPaths.valGenDatasetDir + '/stems_objects'
-
+model = initiateTensorflowModel()
 # add custom callbacks if needed as a preparation to training model
 custom_callbacks= prepareCallbackForCurrentSession()
 
 # start training loop
+#asher todo: EPOCHS_ROUNDS can be deleted
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
-    dataset_train = HybridDataset(genTrainCategoryPathsDict,cucuPaths.trainRealDatasetAnnotations,cucuPaths.trainRealDatasetDir,config)
+    dataset_train = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'train',augmentedCategory = 'cucumber')
     dataset_train.load_dataset()
     dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = HybridDataset(genTrainCategoryPathsDict,cucuPaths.valRealDatasetAnnotations,cucuPaths.valRealDatasetDir,config)
+    dataset_val = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'valid',augmentedCategory = 'cucumber')
     dataset_val.load_dataset()
     dataset_val.prepare()
     # In[ ]:
@@ -182,30 +173,8 @@ for _ in range(config.EPOCHS_ROUNDS):
 
 
 
-# In[12]:
+###################### TEST TRAINED MODEL PART########################################
 
-
-class InferenceConfig(cucumberConfig):
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
-    def __init__(self):
-        super().__init__()
-        """Set values of computed attributes."""
-        # Effective batch size
-        self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
-
-        # Input image size
-        if self.IMAGE_RESIZE_MODE == "crop":
-            self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
-                self.IMAGE_CHANNEL_COUNT])
-        else:
-            self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM,
-                self.IMAGE_CHANNEL_COUNT])
-
-        # Image meta data length
-        # See compose_image_meta() for details
-        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
-        self.STEPS_PER_EPOCH  = self.TEST_SET_SIZE // self.IMAGES_PER_GPU
 
 inference_config = InferenceConfig()
 
@@ -228,7 +197,7 @@ model.load_weights(latest_trained_model, by_name=True)
 # DISPLAY_TOP_MASKS
 #create container directories per function calls from Visualize module
 os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_top_masks")
-tests_location = cucuPaths.testDatasetDir
+tests_location = cucuPaths.TestDatasetDir
 for filename in sorted(os.listdir(tests_location)):
     
     testImage = os.path.join(tests_location,filename)
@@ -247,20 +216,18 @@ for filename in sorted(os.listdir(tests_location)):
 
 
 # DISPLAY_INSTANCES
-#create container directories per function calls from Visualize module
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_instances")
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/plot_precision_recall")
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/plot_overlaps")
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/draw_boxes")
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/masks_detections")
-os.mkdir(cucuPaths.visualizeEvaluationsDir + "/activationsImages")
 
 
 # in future we want to generate from dataset_test!
 dataset = dataset_val
 
 image_ids = np.random.choice(dataset.image_ids, 20)
+
 for image_id in image_ids:
+    
+    
+    ################# todo: function ##########################################
+
     image, image_meta, gt_class_id, gt_bbox, gt_mask =\
         modellib.load_image_gt(dataset, config, image_id, use_mini_mask=False)
     info = dataset.image_info[image_id]
@@ -277,6 +244,10 @@ for image_id in image_ids:
     log("gt_class_id", gt_class_id)
     log("gt_bbox", gt_bbox)
     log("gt_mask", gt_mask)
+
+
+
+    ################# todo: function ##########################################
 
     # Load random image and mask.
     image = dataset.load_image(image_id)
@@ -303,6 +274,10 @@ for image_id in image_ids:
                         overlaps, dataset.class_names,savePath=cucuPaths.visualizeEvaluationsDir + "/plot_overlaps/" + "plot_overlaps" + "image_" + str(image_id) +".png")
 
 
+
+
+
+    ################# todo: function ##########################################
     # Generate RPN trainig targets
     # target_rpn_match is 1 for positive anchors, -1 for negative anchors
     # and 0 for neutral anchors.
@@ -332,40 +307,9 @@ for image_id in image_ids:
                         savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_beforeAndAfterRefine_" + "image_" + str(image_id) +".png")
 
 
-    # # asher todo: this module stilll doesn't work
-    # # Run RPN sub-graph
-    # pillar = model.keras_model.get_layer("mrcnn_bbox").output  # node to start searching from
 
-    # # TF 1.4 and 1.9 introduce new versions of NMS. Search for all names to support TF 1.3~1.10
-    # nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression:0")
-    # if nms_node is None:
-    #     nms_node = model.ancestor(model.keras_model.get_layer("mrcnn_bbox").output, "ROI/rpn_non_max_suppression/NonMaxSuppressionV2:0")
-    # # if nms_node is None: #TF 1.9-1.10
-    # #     nms_node = model.ancestor(pillar, "ROI/rpn_non_max_suppression/NonMaxSuppressionV3:0")
 
-    # rpn = model.run_graph([image], [
-    #     ("mrcnn_bbox", model.keras_model.get_layer("mrcnn_bbox").output),
-    #     # ("pre_nms_anchors", model.ancestor(pillar, "ROI/pre_nms_anchors:0")),
-    #     # ("refined_anchors", model.ancestor(pillar, "mrcnn_bbox_fc")),
-    #     # ("refined_anchors_clipped", model.ancestor(pillar, "RPN/ROI/refined_anchors_clipped:0"))
-    #     # ,("post_nms_anchor_ix", nms_node)
-    #     # ,("rois", model.keras_model.get_layer("TrainGroundTruths/proposal_targets/rois").output),
-    # ])
-    # # Show top anchors by score (before refinement)
-    # limit = 100
-    # sorted_anchor_ids = np.argsort(rpn['mrcnn_bbox'][:,:,1].flatten())[::-1]
-    # visualize.draw_boxes(image, boxes=model.anchors[sorted_anchor_ids[:limit]], ax=get_ax(),savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsNotRefined_" + "image_" + str(image_id) +".png")
-
-    # Show top anchors with refinement. Then with clipping to image boundaries
-    # limit = 50
-    # ax = get_ax(1, 2)
-    # pre_nms_anchors = utils.denorm_boxes(rpn["pre_nms_anchors"][0], image.shape[:2])
-    # refined_anchors = utils.denorm_boxes(rpn["refined_anchors"][0], image.shape[:2])
-    # refined_anchors_clipped = utils.denorm_boxes(rpn["refined_anchors_clipped"][0], image.shape[:2])
-    # visualize.draw_boxes(image, boxes=pre_nms_anchors[:limit],
-    #                     refined_boxes=refined_anchors[:limit], ax=ax[0],savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsRefinedWithoutClip_" + "image_" + str(image_id) +".png")
-    # visualize.draw_boxes(image, refined_boxes=refined_anchors_clipped[:limit], ax=ax[1],savePath=cucuPaths.visualizeEvaluationsDir + "/draw_boxes/" + "draw_boxes_topAnchorsRefinedWithClip_" + "image_" + str(image_id) +".png")
-
+    ################# todo: function ##########################################
     # Get predictions of mask head
     mrcnn = model.run_graph([image], [
         ("detections", model.keras_model.get_layer("mrcnn_detection").output),
@@ -387,6 +331,11 @@ for image_id in image_ids:
     log("det_masks", det_masks)
     visualize.display_images(det_masks[:4] * 255, cmap="Blues", interpolation="none", savePath=cucuPaths.visualizeEvaluationsDir + "/masks_detections/" + "masks_detections_" + "image_" + str(image_id) +".png" )
 
+
+
+
+
+    ################# todo: function ##########################################
     # Get activations of a few sample layers
     activations = model.run_graph([image], [
         ("input_image",        model.keras_model.get_layer("input_image").output),
@@ -411,6 +360,9 @@ for image_id in image_ids:
     plt.savefig(cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "normInputImage" + "image_" + str(image_id) +".png")
     # Backbone feature map
     visualize.display_images(np.transpose(activations["res3a_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationRes3aImage" + "image_" + str(image_id) +".png")
+
+
+
 
 
 

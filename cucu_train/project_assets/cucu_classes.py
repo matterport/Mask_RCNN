@@ -20,7 +20,7 @@ from PIL import Image, ImageFile
 from project_assets.cucu_utils import add_image, image_to_mask, add_imageWithoutTransparency
 
 #cucu dependencies
-from cucu_config import cucuConfForTrainingSession, globalObjectShapesList
+from cucu_config import cucuConfForTrainingSession, globalObjectCategories
 
 #design
 from collections import defaultdict
@@ -36,10 +36,11 @@ class genDataset(utils.Dataset):
     def __init__(self,objByCategoryPaths,config):
         def collectAndCountObjImagesByCategory():
             self.objByCategoryPaths = objByCategoryPaths
+            print(objByCategoryPaths)
             self.containerOfObjForGeneratingImages= defaultdict(list)
             self.quantityOfObjByCategory={}
             
-            for key in globalObjectShapesList:
+            for key in globalObjectCategories:
                 for root, _, files in os.walk(self.objByCategoryPaths[key]):
                     for filename in files:
                         self.containerOfObjForGeneratingImages[key].append(Image.open(os.path.join(root, filename)).convert('RGBA'))
@@ -50,7 +51,7 @@ class genDataset(utils.Dataset):
             self.config = config
 
         def initiateClassificationNames():
-            for index, key in enumerate(globalObjectShapesList):
+            for index, key in enumerate(globalObjectCategories):
                 addClassificationToNN("shapes", index, key)
 
         def addClassificationToNN(classificationType, index, classificationName):
@@ -373,12 +374,27 @@ class realDataset(utils.Dataset):
         return m
 
 class HybridDataset(utils.Dataset):
-    def __init__(self,pathsToHandleGeneratingImages, pathToRealImagesAnnotations, pathToRealImagesDataset, config):
+    def __init__(self,config, pathToHandleGeneratingImages, pathToHandleRealImages,dataSetType, augmentedCategory):
+        def constructGenImagesPathsByCategory(pathToHandleGeneratingImages,subDatasetType):
+            innerPathsByCategoty = {}
+            for category in globalObjectCategories:
+                innerPathsByCategoty[category] = pathToHandleGeneratingImages + '/{}/{}'.format(category,subDatasetType)
+            return innerPathsByCategoty
         utils.Dataset.__init__(self)
+        
         self.config = config
-        self.pathToRealImagesAnnotations = pathToRealImagesAnnotations
-        self.pathToRealImagesDataset = pathToRealImagesDataset
-        self.generatedDataset = genDataset(pathsToHandleGeneratingImages, config)
+        self.pathToRealImagesDataset = pathToHandleRealImages + '/{}/{}/{}'.format(config.SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION, 
+                                                                                augmentedCategory, dataSetType)
+       
+        #asher todo:  make 'augmented' a parameter, or re-order folders names.
+        if dataSetType == 'train':
+            self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/augmented'
+
+        self.pathToRealImagesAnnotations = self.pathToRealImagesDataset + '/annotations.json'
+        
+        genTrainCategoryPathsDict = constructGenImagesPathsByCategory(pathToHandleGeneratingImages,dataSetType)
+        self.generatedDataset = genDataset(genTrainCategoryPathsDict, config)
+        
         self.realDataset = realDataset()
 
     def imageIdBelongsToGeneratedDataset(self, image_id):
@@ -471,7 +487,6 @@ class HybridDataset(utils.Dataset):
                 if i == 0 or source == info['source']:
                     self.source_class_ids[source].append(i)
 
-#asher todo: organize it better
 class project_paths(object):
     def __init__(self, projectRootDir, 
                         TensorboardDir, 
@@ -479,13 +494,9 @@ class project_paths(object):
                         visualizeEvaluationsDir,
                         trainOutputLog, 
                         currSessionInitialModelWeights,
-                        trainGenDatasetDir,
-                        valGenDatasetDir,
-                        trainRealDatasetDir,
-                        trainRealDatasetAnnotations,
-                        valRealDatasetDir,
-                        valRealDatasetAnnotations,
-                        testDatasetDir,
+                        GenDatasetDir,
+                        RealDatasetDir,
+                        TestDatasetDir,
                         trainResultContainer,
                         testAnnotationsDir=None):
 
@@ -494,16 +505,10 @@ class project_paths(object):
         self.trainedModelsDir=trainedModelsDir
         self.currSessionInitialModelWeights=currSessionInitialModelWeights
        
-        self.trainGenDatasetDir = trainGenDatasetDir
-        self.valGenDatasetDir = valGenDatasetDir
-        self.trainRealDatasetDir = trainRealDatasetDir
-        self.trainRealDatasetAnnotations = trainRealDatasetAnnotations
-        self.valRealDatasetDir = valRealDatasetDir
-        self.valRealDatasetAnnotations = valRealDatasetAnnotations
-
+        self.GenDatasetDir = GenDatasetDir
+        self.RealDatasetDir = RealDatasetDir
+        self.TestDatasetDir=TestDatasetDir
         
-        
-        self.testDatasetDir=testDatasetDir
         self.testAnnotationsDir=testAnnotationsDir
         self.trainResultContainer=trainResultContainer
         self.visualizeEvaluationsDir=visualizeEvaluationsDir
