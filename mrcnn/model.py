@@ -22,9 +22,7 @@ import keras.backend as K
 import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
-
 from mrcnn import utils
-
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
@@ -821,6 +819,32 @@ class DetectionLayer(KE.Layer):
 
     def compute_output_shape(self, input_shape):
         return (None, self.config.DETECTION_MAX_INSTANCES, 6)
+
+
+############################################################
+#  One Shot Layer
+############################################################
+class OneShotLayer(KE.Layer):
+
+    def __init__(self, config=None, **kwargs):
+        super(OneShotLayer, self).__init__(**kwargs)
+        self.config = config
+
+    def call(self, embeddings):
+
+        """
+        1. Run a "similarity" check between the embeddings and the database of reference images.
+           This could (to begin with) be the euclidean distance, but eventually we could use the
+           Mahalanobis distance.
+        2. Filter out the non-relevant embeddings
+        3. Somehow relate the relevant embeddings to a bounding box
+        4. Return a Tensor of some format (label, [BBox])
+
+        """
+        print("Shape is {}".format(np.shape(embeddings)))
+
+        return None
+
 
 
 ############################################################
@@ -2041,6 +2065,9 @@ class MaskRCNN():
                                      train_bn=config.TRAIN_BN,
                                      fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
+            one_shot_detections = OneShotLayer(config, name="one-shot_layer")(mrcnn_embedding)
+
+
             # Detections
             # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in
             # normalized coordinates
@@ -2057,7 +2084,7 @@ class MaskRCNN():
 
             model = KM.Model([input_image, input_image_meta, input_anchors],
                              [detections, mrcnn_class, mrcnn_bbox,
-                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox, mrcnn_embedding],
+                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox, one_shot_detections],
                              name='mask_rcnn')
 
         # Add multi-GPU support.
