@@ -22,6 +22,8 @@ import keras.backend as K
 import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
+import samples.wireframe.database_actions as dbactions
+from samples.wireframe.knn import knn
 from mrcnn import utils
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -679,7 +681,7 @@ class DetectionTargetLayer(KE.Layer):
 #  Detection Layer
 ############################################################
 
-def refine_detections_graph(rois, probs, deltas, window, config):
+def refine_detections_graph(rois, probs, deltas, window, embeddings, config):
     """Refine classified proposals and filter overlaps and return final
     detections.
 
@@ -724,6 +726,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     pre_nms_class_ids = tf.gather(class_ids, keep)
     pre_nms_scores = tf.gather(class_scores, keep)
     pre_nms_rois = tf.gather(refined_rois,   keep)
+    pre_nms_embeddings = tf.gather(embeddings, keep)
     unique_pre_nms_class_ids = tf.unique(pre_nms_class_ids)[0]
 
     def nms_keep_map(class_id):
@@ -774,7 +777,9 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Pad with zeros if detections < DETECTION_MAX_INSTANCES
     gap = config.DETECTION_MAX_INSTANCES - tf.shape(detections)[0]
     detections = tf.pad(detections, [(0, gap), (0, 0)], "CONSTANT")
-    return detections
+
+    embeddings = tf.gather(embeddings, keep)
+    return detections, embeddings
 
 
 class DetectionLayer(KE.Layer):
@@ -794,7 +799,8 @@ class DetectionLayer(KE.Layer):
         rois = inputs[0]
         mrcnn_class = inputs[1]
         mrcnn_bbox = inputs[2]
-        image_meta = inputs[3]
+        mrcnn_embedding = inputs[3]
+        image_meta = inputs[4]
 
         # Get windows of images in normalized coordinates. Windows are the area
         # in the image that excludes the padding.
@@ -805,46 +811,22 @@ class DetectionLayer(KE.Layer):
         window = norm_boxes_graph(m['window'], image_shape[:2])
 
         # Run detection refinement graph on each item in the batch
-        detections_batch = utils.batch_slice(
-            [rois, mrcnn_class, mrcnn_bbox, window],
-            lambda x, y, w, z: refine_detections_graph(x, y, w, z, self.config),
+        detections_batch, filtered_embeddings = utils.batch_slice(
+            [rois, mrcnn_class, mrcnn_bbox, window, mrcnn_embedding],
+            lambda x, y, w, z, q: refine_detections_graph(x, y, w, z, q, self.config),
             self.config.IMAGES_PER_GPU)
 
         # Reshape output
         # [batch, num_detections, (y1, x1, y2, x2, class_id, class_score)] in
         # normalized coordinates
-        return tf.reshape(
+        detections = tf.reshape(
             detections_batch,
             [self.config.BATCH_SIZE, self.config.DETECTION_MAX_INSTANCES, 6])
 
+        return [detections, filtered_embeddings]
+
     def compute_output_shape(self, input_shape):
-        return (None, self.config.DETECTION_MAX_INSTANCES, 6)
-
-
-############################################################
-#  One Shot Layer
-############################################################
-class OneShotLayer(KE.Layer):
-
-    def __init__(self, config=None, **kwargs):
-        super(OneShotLayer, self).__init__(**kwargs)
-        self.config = config
-
-    def call(self, embeddings):
-
-        """
-        1. Run a "similarity" check between the embeddings and the database of reference images.
-           This could (to begin with) be the euclidean distance, but eventually we could use the
-           Mahalanobis distance.
-        2. Filter out the non-relevant embeddings
-        3. Somehow relate the relevant embeddings to a bounding box
-        4. Return a Tensor of some format (label, [BBox])
-
-        """
-        print("Shape is {}".format(np.shape(embeddings)))
-
-        return None
-
+        return [(None, self.config.DETECTION_MAX_INSTANCES, 6), (None, self.config.DETECTION_MAX_INSTANCES, 128)]
 
 
 ############################################################
@@ -975,8 +957,10 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     # One shot head
-    mrcnn_embedding = KL.TimeDistributed(KL.Dense(128),
-                                            name='mrcnn_embedding')(shared)
+    #mrcnn_embedding = KL.TimeDistributed(KL.Dense(128, kernel_initializer='glorot_normal'),
+    #                                        name='mrcnn_embedding')(shared)
+
+    mrcnn_embedding = shared
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding
 
@@ -2065,14 +2049,15 @@ class MaskRCNN():
                                      train_bn=config.TRAIN_BN,
                                      fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
-            one_shot_detections = OneShotLayer(config, name="one-shot_layer")(mrcnn_embedding)
-
 
             # Detections
             # output is [batch, num_detections, (y1, x1, y2, x2, class_id, score)] in
             # normalized coordinates
-            detections = DetectionLayer(config, name="mrcnn_detection")(
-                [rpn_rois, mrcnn_class, mrcnn_bbox, input_image_meta])
+            detections_list = DetectionLayer(config, name="mrcnn_detection")(
+                [rpn_rois, mrcnn_class, mrcnn_bbox, mrcnn_embedding, input_image_meta])
+
+            detections = detections_list[0]
+            embeddings = detections_list[1]
 
             # Create masks for detections
             detection_boxes = KL.Lambda(lambda x: x[..., :4])(detections)
@@ -2084,7 +2069,7 @@ class MaskRCNN():
 
             model = KM.Model([input_image, input_image_meta, input_anchors],
                              [detections, mrcnn_class, mrcnn_bbox,
-                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox, one_shot_detections],
+                                 mrcnn_mask, rpn_rois, rpn_class, rpn_bbox, embeddings],
                              name='mask_rcnn')
 
         # Add multi-GPU support.
@@ -2570,6 +2555,32 @@ class MaskRCNN():
             })
         results.append(embedding)
         return results
+
+############################################################
+#  One Shot Functions
+############################################################
+
+    def OneShotAnchor(self, images, anchor_label, verbose=0):
+        results = self.detect([images])
+        embedding = results[1]
+
+        assert np.shape(embedding) == (1, 1, 1024) or \
+               np.shape(embedding) == (1, 0, 1024), \
+            "Shape issue: {}".format(np.shape(embedding))
+        dbactions.add_encoding(embedding, anchor_label)
+
+    def OneShotDetect(self, images, verbose=0):
+        results = self.detect([images])
+        embedding = results[1]
+
+        _, n_rois, _ = np.shape(embedding)
+        results = []
+        for i in range(n_rois):
+            results.append(knn(embedding[:, i, :]))
+        return results
+
+
+############################################################
 
     def detect_molded(self, molded_images, image_metas, verbose=0):
         """Runs the detection pipeline, but expect inputs that are
