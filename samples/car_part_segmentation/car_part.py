@@ -206,7 +206,7 @@ if __name__ == '__main__':
 
     augmentation = imgaug.augmenters.Fliplr(0.5)
 
-    with td.device('/gpu:1'):
+    with tf.device('/gpu:1'):
     # Create model in training mode
         model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=model_checkpoints)
