@@ -123,7 +123,7 @@ class CarPartConfig(Config):
     NAME = 'car_parts'
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 8
+    IMAGES_PER_GPU = 64
 
     # Number of classes (including background)
     NUM_CLASSES = 31  # 26 parts
@@ -135,7 +135,7 @@ class CarPartConfig(Config):
 
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 30
+    # TRAIN_ROIS_PER_IMAGE = 30
 
     IMAGE_MIN_DIM = 512
     IMAGE_MAX_DIM = 512
@@ -175,6 +175,9 @@ class CarPartDataset(utils.Dataset):
 
 
 if __name__ == '__main__':
+    from keras import backend as K
+    print(K.tensorflow_backend._get_available_gpus())
+
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -203,31 +206,32 @@ if __name__ == '__main__':
 
     augmentation = imgaug.augmenters.Fliplr(0.5)
 
+    with td.device('/gpu:1'):
     # Create model in training mode
-    model = modellib.MaskRCNN(mode="training", config=config,
-                              model_dir=model_checkpoints)
-    model.load_weights(model.get_imagenet_weights(), by_name=True)
+        model = modellib.MaskRCNN(mode="training", config=config,
+                                  model_dir=model_checkpoints)
+        model.load_weights(model.get_imagenet_weights(), by_name=True)
 
-    print("Training network heads")
-    model.train(dataset_val, dataset_val,
-            learning_rate=config.LEARNING_RATE,
-            epochs=10,
-            layers='heads')
-
-    # Training - Stage 2
-    # Finetune layers from ResNet stage 4 and up
-    print("Fine tune Resnet stage 4 and up")
-    model.train(dataset_val, dataset_val,
+        print("Training network heads")
+        model.train(dataset_val, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=10,
-                layers='4+',
-                augmentation=augmentation)
+                layers='heads')
 
-    # Training - Stage 3
-    # Fine tune all layers
-    print("Fine tune all layers")
-    model.train(dataset_val, dataset_val,
-                learning_rate=config.LEARNING_RATE / 10,
-                epochs=10,
-                layers='all',
-                augmentation=augmentation)
+        # Training - Stage 2
+        # Finetune layers from ResNet stage 4 and up
+        print("Fine tune Resnet stage 4 and up")
+        model.train(dataset_val, dataset_val,
+                    learning_rate=config.LEARNING_RATE,
+                    epochs=10,
+                    layers='4+',
+                    augmentation=augmentation)
+
+        # Training - Stage 3
+        # Fine tune all layers
+        print("Fine tune all layers")
+        model.train(dataset_val, dataset_val,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=10,
+                    layers='all',
+                    augmentation=augmentation)
