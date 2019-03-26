@@ -1,4 +1,5 @@
-from samples.wireframe.database_actions import get_known_encodings
+from database_actions import get_known_encodings
+#from samples.wireframe.database_actions import get_known_encodings
 import numpy as np
 
 
@@ -28,4 +29,41 @@ def euclidean_distance(vector, matrix):
 def manhattan_distance(vector, matrix):
     dif_matrix = np.abs(np.subtract(np.transpose(matrix), vector))
     return dif_matrix.sum(axis = 1)
+
+
+def overlaps(rois):
+    """
+    :param rois: regions of interest in format (y1, x1, y2, x2)
+    :return: List of objects
+
+
+    Example:
+    [[ 99,325,135,363], [ 54,229,88,264], [ 53,230,94,266], [ 93,321,132,361]]
+        -> [1, 2, 2, 1]
+    """
+    n_objects = np.zeros(len(rois))
+    objects = 1
+    for i in range(len(rois) - 1):
+        if n_objects[i] != 0:
+            continue
+        l_1_y1 = rois[i][0]
+        l_1_x1 = rois[i][1]
+        r_1_y2 = rois[i][2]
+        r_1_x2 = rois[i][3]
+        n_objects[i] = objects
+        for j in range(i+1, len(rois)):
+            if n_objects[j] != 0:
+                continue
+            l_2_y1 = rois[j][0]
+            l_2_x1 = rois[j][1]
+            r_2_y2 = rois[j][2]
+            r_2_x2 = rois[j][3]
+            if l_1_x1 > r_2_x2 or l_2_x1 > r_1_x2:
+                continue
+            elif l_1_y1 > r_2_y2 or l_2_y1 > r_1_y2:
+                continue
+            else:
+                n_objects[j] = objects
+        objects += 1
+    return n_objects
 

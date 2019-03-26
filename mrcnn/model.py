@@ -23,7 +23,7 @@ import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
 import samples.wireframe.database_actions as dbactions
-from samples.wireframe.knn import knn
+from samples.wireframe.knn import knn, overlaps
 from mrcnn import utils
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
 from distutils.version import LooseVersion
@@ -714,19 +714,19 @@ def refine_detections_graph(rois, probs, deltas, window, embeddings, config):
 
     # Filter out background boxes
     keep = tf.where(class_ids > 0)[:, 0]
+    """
     # Filter out low confidence boxes
     if config.DETECTION_MIN_CONFIDENCE:
         conf_keep = tf.where(class_scores >= config.DETECTION_MIN_CONFIDENCE)[:, 0]
         keep = tf.sets.set_intersection(tf.expand_dims(keep, 0),
                                         tf.expand_dims(conf_keep, 0))
         keep = tf.sparse_tensor_to_dense(keep)[0]
-
+    """
     # Apply per-class NMS
     # 1. Prepare variables
     pre_nms_class_ids = tf.gather(class_ids, keep)
     pre_nms_scores = tf.gather(class_scores, keep)
     pre_nms_rois = tf.gather(refined_rois,   keep)
-    pre_nms_embeddings = tf.gather(embeddings, keep)
     unique_pre_nms_class_ids = tf.unique(pre_nms_class_ids)[0]
 
     def nms_keep_map(class_id):
@@ -2572,11 +2572,11 @@ class MaskRCNN():
     def OneShotDetect(self, images, verbose=0):
         results = self.detect([images])
         embedding = results[1]
-
+        num_of_classes = overlaps(results[0]['rois'])
         _, n_rois, _ = np.shape(embedding)
         results = []
         for i in range(n_rois):
-            results.append(knn(embedding[:, i, :]))
+            results.append((int(num_of_classes[i]), knn(embedding[:, i, :])))
         return results
 
 
