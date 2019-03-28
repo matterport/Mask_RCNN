@@ -99,9 +99,10 @@ Sample results are:
 ## Multi Class Instance Segmentation
 This builds on the previous, but trains on mulitple different traffic signs. det.py is used for configuration creating the datasets.
 
-For multi-class traffic signs were used. The ![dataset](https://s3.amazonaws.com/sabderra/data/signs_dataset.tar.gz) consisted of images were downloaded from ImageNet and those taken locally using an iPhone.
+For multi-class traffic signs were used. The dataset consisted of images were downloaded from ImageNet and those taken locally using an iPhone.
 * Used to train the network to detect multiple traffic signs. 
 * This batch consisted of 85 annotated images
+* Training data: https://s3.amazonaws.com/sabderra/data/signs_dataset.tar.gz
 * Total size was  26M
 
 ![Signs Instance Segmentation Sample](assets/sign_detection.jpg)
