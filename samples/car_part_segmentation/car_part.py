@@ -123,7 +123,7 @@ class CarPartConfig(Config):
     NAME = 'car_parts'
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 64
+    IMAGES_PER_GPU = 4
 
     # Number of classes (including background)
     NUM_CLASSES = 31  # 26 parts
@@ -188,10 +188,16 @@ if __name__ == '__main__':
     parser.add_argument('--annotations_path', required=True,
         metavar="/path/to/balloon/annotations/",
         help='The directory to load the annotations')
+    parse.add_argument('--weights', required=True,
+        help='the weights that can be used, values: imagenet or last')
+    parse.add_argument('--checkpoint', required=True,
+        help='the folder where the checkpoints are saved')
+    # parser.
 
     args = parser.parse_args()
 
-    model_checkpoints = './logs'
+    model_checkpoints = args.checkpoint
+    print('checkointing models in folder {}'.format(model_checkpoints))
 
     images_path = Path(args.images_path)
     annotations_path = Path(args.annotations_path).glob('*.mat')
@@ -206,11 +212,15 @@ if __name__ == '__main__':
 
     augmentation = imgaug.augmenters.Fliplr(0.5)
 
-    with tf.device('/gpu:1'):
+    with tf.device('/gpu:0'):
     # Create model in training mode
         model = modellib.MaskRCNN(mode="training", config=config,
                                   model_dir=model_checkpoints)
-        model.load_weights(model.get_imagenet_weights(), by_name=True)
+
+        if args.weights == 'imagenet':
+            model.load_weights(model.get_imagenet_weights(), by_name=True)
+        else:
+            model.load_weights(model.find_last(), by_name=True)
 
         print("Training network heads")
         model.train(dataset_val, dataset_val,
@@ -218,12 +228,12 @@ if __name__ == '__main__':
                 epochs=10,
                 layers='heads')
 
-        # Training - Stage 2
-        # Finetune layers from ResNet stage 4 and up
+        Training - Stage 2
+        Finetune layers from ResNet stage 4 and up
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_val, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=10,
+                    epochs=30,
                     layers='4+',
                     augmentation=augmentation)
 
@@ -232,6 +242,6 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_val, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=10,
+                    epochs=40,
                     layers='all',
                     augmentation=augmentation)
