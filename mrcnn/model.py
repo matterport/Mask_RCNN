@@ -957,10 +957,8 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     # One shot head
-    #mrcnn_embedding = KL.TimeDistributed(KL.Dense(128, kernel_initializer='glorot_normal'),
-    #                                        name='mrcnn_embedding')(shared)
-
-    mrcnn_embedding = shared
+    #mrcnn_embedding = shared
+    mrcnn_embedding = KL.Activation('softmax')(shared)
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding
 
@@ -2563,11 +2561,12 @@ class MaskRCNN():
     def OneShotAnchor(self, images, anchor_label, verbose=0):
         results = self.detect([images])
         embedding = results[1]
+        num_of_classes = overlaps(results[0]['rois'])
+        assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
+        _, N_Boxes, _ = np.shape(embedding)
 
-        assert np.shape(embedding) == (1, 1, 1024) or \
-               np.shape(embedding) == (1, 0, 1024), \
-            "Shape issue: {}".format(np.shape(embedding))
-        dbactions.add_encoding(embedding, anchor_label)
+        for i in range(N_Boxes):
+            dbactions.add_encoding(embedding[:, i, :], anchor_label)
 
     def OneShotDetect(self, images, verbose=0):
         results = self.detect([images])
@@ -2577,7 +2576,16 @@ class MaskRCNN():
         results = []
         for i in range(n_rois):
             results.append((int(num_of_classes[i]), knn(embedding[:, i, :])))
-        return results
+
+        some_dict = {}
+        for i in range(n_rois):
+            new_object = num_of_classes[i]
+            if new_object in some_dict:
+                if knn(embedding[:, i, :])[0][1] < some_dict[new_object][0][1]:
+                    some_dict[new_object] = knn(embedding[:, i, :])
+            else:
+                some_dict[new_object] = knn(embedding[:, i, :])
+        return some_dict, results
 
 
 ############################################################
