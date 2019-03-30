@@ -56,7 +56,10 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
         for j in range(NUM_IMAGES):
             icon_list = []
             NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
-
+            R = random.randint(200, 255)
+            G = random.randint(200, 255)
+            B = random.randint(200, 255)
+            COLOR = (R, G, B, R)
             background = Image.new('RGBA', DIMENSIONS, COLOR)
             for i in range(NUM_ICONS):
                 cur_icon = ICONS[random.randint(0, len(ICONS) - 1)]

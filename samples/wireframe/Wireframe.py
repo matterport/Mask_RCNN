@@ -61,6 +61,14 @@ class WireframeDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val or predict
         """
+        """
+        icon_dir = os.path.join(os.getcwd(), "Icons")
+        icons = os.listdir(icon_dir)
+        for icon in icons:
+            icon_name = icon.split(".")[0]
+            self.add_class("wireframe", i + 1, icon_name)
+        """
+
         # Add classes. We have only one class to add.
         self.add_class("wireframe", 1, "Cloud")
         self.add_class("wireframe", 2, "Cross")
@@ -130,6 +138,8 @@ class WireframeDataset(utils.Dataset):
         # Assign class_ids by reading class_names
         class_ids = np.zeros([len(info["polygons"])])
         # In the surgery dataset, pictures are labeled with name 'a' and 'r' representing arm and ring.
+        print("Class names are: ")
+        print(class_names)
         for i, p in enumerate(class_names):
         #"name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
             if p['name'] == 'Cloud':
