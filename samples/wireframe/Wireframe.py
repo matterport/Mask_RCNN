@@ -61,22 +61,15 @@ class WireframeDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val or predict
         """
-        """
+
         icon_dir = os.path.join(os.getcwd(), "Icons")
         icons = os.listdir(icon_dir)
-        for icon in icons:
+        for i, icon in enumerate(icons):
             icon_name = icon.split(".")[0]
             self.add_class("wireframe", i + 1, icon_name)
-        """
-
-        # Add classes. We have only one class to add.
-        self.add_class("wireframe", 1, "Cloud")
-        self.add_class("wireframe", 2, "Cross")
-        self.add_class("wireframe", 3, "Menu")
-        self.add_class("wireframe", 4, "More")
 
         # Train or validation dataset?
-        assert subset in ["train", "val", "predict"]
+        assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
 
         # We mostly care about the x and y coordinates of each region
@@ -138,19 +131,9 @@ class WireframeDataset(utils.Dataset):
         # Assign class_ids by reading class_names
         class_ids = np.zeros([len(info["polygons"])])
         # In the surgery dataset, pictures are labeled with name 'a' and 'r' representing arm and ring.
-        print("Class names are: ")
-        print(class_names)
         for i, p in enumerate(class_names):
-        #"name" is the attributes name decided when labeling, etc. 'region_attributes': {name:'a'}
-            if p['name'] == 'Cloud':
-                class_ids[i] = 1
-            elif p['name'] == 'Cross':
-                class_ids[i] = 2
-            elif p['name'] == 'Menu':
-                class_ids[i] = 3
-            elif p['name'] == 'More':
-                class_ids[i] = 4
-            #assert code here to extend to other labels
+            icon = list(filter(lambda icon: icon['name'] == p['name'], self.class_info))
+            class_ids[i] = int(icon[0]["id"])
         class_ids = class_ids.astype(int)
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s
@@ -163,3 +146,37 @@ class WireframeDataset(utils.Dataset):
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
+
+    def load_natural_image(self, dataset_dir, subset):
+        """Load the surgery dataset from VIA.
+        dataset_dir: Root directory of the dataset.
+        subset: Subset to load: train or val or predict
+        """
+        icon_dir = os.path.join(os.getcwd(), "Icons")
+        icons = os.listdir(icon_dir)
+        for i, icon in enumerate(icons):
+            icon_name = icon.split(".")[0]
+            self.add_class("wireframe", i + 1, icon_name)
+
+        # Prediction data set?
+        assert subset in ["predict"]
+        dataset_dir = os.path.join(dataset_dir, subset)
+
+        # Add images
+        for image_file in os.listdir(dataset_dir):
+            if image_file == "__init__.py" or image_file == ".DS_Store":
+                continue
+            else:
+                image_path = os.path.join(dataset_dir, image_file)
+                image = skimage.io.imread(image_path)
+                height, width = image.shape[:2]
+                id = int(image_file.split(".")[0])
+                self.image_ids.append(id)
+                self.add_image(
+                    "wireframe",
+                    image_id=id,
+                    path=image_path,
+                    width=width, height=height,
+                    polygons="",
+                    names=""
+                )
