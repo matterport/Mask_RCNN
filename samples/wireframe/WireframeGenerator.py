@@ -1,8 +1,16 @@
 import os
 from PIL import Image
 import random
+import numpy as np
 
+BACKGROUND_DIR = os.getcwd() + "/Backgrounds"
 ICONS = os.listdir(os.getcwd() + "/Icons")
+BACKGROUNDS = os.listdir(BACKGROUND_DIR)
+
+if ".DS_Store" in ICONS:
+    ICONS.remove(".DS_Store")
+if ".DS_Store" in BACKGROUNDS:
+    BACKGROUNDS.remove(".DS_Store")
 MASK_DIR = os.path.abspath(os.path.join(os.getcwd(),"../../"))
 DATA_DIR = os.path.abspath(os.path.join(MASK_DIR, "datasets/wireframe"))
 
@@ -12,7 +20,7 @@ bg_w, bg_h = DIMENSIONS
 COLOR = (255, 255, 255, 255)
 
 # Icon Dimensions
-ICON_W = ICON_H = 50
+ICON_W = ICON_H = 150
 
 #Specify training data or validation data
 TYPES = ["/train", "/val"]
@@ -46,6 +54,12 @@ def write_string_to_json(string, type):
     with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
         f.write(string)
 
+def oriention(image):
+    imgarr = np.array(image)
+    HEIGHT, WIDTH = np.shape(imgarr)
+    if WIDTH > HEIGHT:
+        imgarr = imgarr.T
+    return Image.fromarray(imgarr)
 
 def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
     global file_content
@@ -56,16 +70,14 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
         for j in range(NUM_IMAGES):
             icon_list = []
             NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
-            R = random.randint(200, 255)
-            G = random.randint(200, 255)
-            B = random.randint(200, 255)
-            COLOR = (R, G, B, R)
-            background = Image.new('RGBA', DIMENSIONS, COLOR)
+
+            background = Image.open(BACKGROUND_DIR + "/" + BACKGROUNDS[random.randint(0, len(BACKGROUNDS) - 1)]).convert("L")
+            background = oriention(background)
             for i in range(NUM_ICONS):
                 cur_icon = ICONS[random.randint(0, len(ICONS) - 1)]
                 img = Image.open('Icons/' + cur_icon, 'r').resize((ICON_W, ICON_H))
                 offset = random.randint(1, bg_w - ICON_W), random.randint(1, bg_h - ICON_H)
-                background.paste(img, offset)
+                background.paste(img, offset, img)
                 icon_list.append((cur_icon[0:-4], offset[0], offset[1]))
             img_dir_name = DATA_DIR + type + '/' + str(j) + ".png"
             background.save(img_dir_name)
