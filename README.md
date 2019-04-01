@@ -239,3 +239,6 @@ A computer vision class project by HU Shiyu to apply the color pop effect on peo
 
 ### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
 ![GRASS GIS Image](assets/project_grass_gis.png)
+
+### [Ship Segmentation](https://medium.com/@gabogarza/mask-r-cnn-for-ship-detection-segmentation-a1108b5a083): Detect and segment ship instances from satellite imagery.
+![Ship Segmentation](https://cdn-images-1.medium.com/max/1600/1*0QsZg_-RAbr09nUhJiv3bQ.png)
