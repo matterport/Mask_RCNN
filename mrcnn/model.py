@@ -1136,7 +1136,7 @@ def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
     loss = K.switch(tf.size(target_bbox) > 0,
                     smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox),
                     tf.constant(0.0))
-    loss = K.mean(loss)
+    loss = K.sum(loss)/K.int_shape(target_class_ids)[0]
     return loss
 
 
