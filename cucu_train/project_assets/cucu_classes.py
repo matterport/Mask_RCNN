@@ -388,7 +388,7 @@ class HybridDataset(utils.Dataset):
        
         #asher todo:  make 'augmented' a parameter, or re-order folders names.
         if dataSetType == 'train':
-            self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/augmented'
+            self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/augmented'\
 
         self.pathToRealImagesAnnotations = self.pathToRealImagesDataset + '/annotations.json'
         
