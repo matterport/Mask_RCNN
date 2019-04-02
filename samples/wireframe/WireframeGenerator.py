@@ -54,13 +54,6 @@ def write_string_to_json(string, type):
     with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
         f.write(string)
 
-def oriention(image):
-    imgarr = np.array(image)
-    HEIGHT, WIDTH = np.shape(imgarr)
-    if WIDTH > HEIGHT:
-        imgarr = imgarr.T
-    return Image.fromarray(imgarr)
-
 def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
     global file_content
     for type in TYPES:
@@ -68,11 +61,10 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
         if type == "/val":
             NUM_IMAGES = int(NUM_IMAGES / 5)
         for j in range(NUM_IMAGES):
+            print("We are at image no {} in {}".format(j, type))
             icon_list = []
             NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
-
             background = Image.open(BACKGROUND_DIR + "/" + BACKGROUNDS[random.randint(0, len(BACKGROUNDS) - 1)]).convert("L")
-            background = oriention(background)
             for i in range(NUM_ICONS):
                 cur_icon = ICONS[random.randint(0, len(ICONS) - 1)]
                 img = Image.open('Icons/' + cur_icon, 'r').resize((ICON_W, ICON_H))
