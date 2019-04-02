@@ -496,11 +496,11 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
 
     Returns: Target ROIs and corresponding class IDs, bounding box shifts,
     and masks.
-    rois: [TRAIN_ROIS_PER_IMAGE, (y1, x1, y2, x2)] in normalized coordinates
+    rois: [TRAIN_ROIS_PER_IMAGE, (y1, x1, y2, x2)] in normalized coordinates. Zero padded.
     class_ids: [TRAIN_ROIS_PER_IMAGE]. Integer class IDs. Zero padded.
-    deltas: [TRAIN_ROIS_PER_IMAGE, (dy, dx, log(dh), log(dw))]
+    deltas: [TRAIN_ROIS_PER_IMAGE, (dy, dx, log(dh), log(dw))]. Zero padded.
     masks: [TRAIN_ROIS_PER_IMAGE, height, width]. Masks cropped to bbox
-           boundaries and resized to neural network output size.
+           boundaries and resized to neural network output size. Zero padded.
 
     Note: Returned arrays might be zero padded if not enough target ROIs.
     """
@@ -898,13 +898,15 @@ def build_rpn_model(anchor_stride, anchors_per_location, depth):
 ############################################################
 
 def fpn_classifier_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True,
+                         pool_size, num_classes, 
+			 images_per_gpu,
+			 train_bn=True,
                          fc_layers_size=1024):
     """Builds the computation graph of the feature pyramid network classifier
     and regressor heads.
 
     rois: [batch, num_rois, (y1, x1, y2, x2)] Proposal boxes in normalized
-          coordinates.
+          coordinates. Zero padded.
     feature_maps: List of feature maps from different layers of the pyramid,
                   [P2, P3, P4, P5]. Each has a different resolution.
     image_meta: [batch, (meta data)] Image details. See compose_image_meta()
@@ -914,11 +916,18 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     fc_layers_size: Size of the 2 FC layers
 
     Returns:
-        logits: [batch, num_rois, NUM_CLASSES] classifier logits (before softmax)
-        probs: [batch, num_rois, NUM_CLASSES] classifier probabilities
+        logits: [batch, num_rois, NUM_CLASSES] classifier logits (before softmax). Zero padded.
+        probs: [batch, num_rois, NUM_CLASSES] classifier probabilities. Zero padded.
         bbox_deltas: [batch, num_rois, NUM_CLASSES, (dy, dx, log(dh), log(dw))] Deltas to apply to
-                     proposal boxes
+                     proposal boxes. Zero padded.
     """
+    # first find which rois are padded
+    # non_zeros: [batch, num_rois]
+    _, non_zeros = utils.batch_slice(
+            rois,
+            lambda x: trim_zeros_graph(x, name="trim_rois"),
+            images_per_gpu)
+    
     # ROI Pooling
     # Shape: [batch, num_rois, POOL_SIZE, POOL_SIZE, channels]
     x = PyramidROIAlign([pool_size, pool_size],
@@ -950,6 +959,24 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     s = K.int_shape(x)
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
+    # finally zero out the results which are calculated from zero padded rois
+    # non_zeros: [batch, num_rois, num_classes]
+    non_zeros = K.tile(K.expand_dims(non_zeros, -1), (1,1,num_classes))
+
+    mrcnn_class_logits = KL.Lambda(lambda x: \
+                       K.tf.where(non_zeros, x, \
+                       K.zeros_like(x)),
+                       name="mrcnn_class_logits_trimed")(mrcnn_class_logits)
+    mrcnn_probs = KL.Lambda(lambda x: \
+                       K.tf.where(non_zeros, x, K.zeros_like(x)),
+                       name="mrcnn_class_trimed")(mrcnn_probs)
+    
+    # non_zeros: [batch, num_rois, num_classes, 4]
+    non_zeros = K.tile(K.expand_dims(non_zeros, -1), (1,1,1,4))
+    mrcnn_bbox = KL.Lambda(lambda x: \
+                       K.tf.where(non_zeros, x, K.zeros_like(x)),
+                       name="mrcnn_bbox_trimed")(mrcnn_bbox)
+    
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
 
 
@@ -1079,11 +1106,16 @@ def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
 
     target_class_ids: [batch, num_rois]. Integer class IDs. Uses zero
         padding to fill in the array.
-    pred_class_logits: [batch, num_rois, num_classes]
+    pred_class_logits: [batch, num_rois, num_classes]. Uses zero
+        padding to fill in the array.
     active_class_ids: [batch, num_classes]. Has a value of 1 for
         classes that are in the dataset of the image, and 0
         for classes that are not in the dataset.
     """
+
+    # Specify which rois in target_class_ids is zero padding or not
+    non_zeros = tf.cast(tf.greater(target_class_ids, 0), 'float32')
+
     # During model building, Keras calls this function with
     # target_class_ids of type float32. Unclear why. Cast it
     # to int to get around it.
@@ -1099,13 +1131,19 @@ def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
         labels=target_class_ids, logits=pred_class_logits)
 
+    # Ensure the shape of loss, pred_active, non_zeros are the same
+    pred_active = tf.reshape(pred_active, tf.shape(loss))
+    non_zeros = tf.reshape(non_zeros, tf.shape(loss))
+
     # Erase losses of predictions of classes that are not in the active
-    # classes of the image.
-    loss = loss * pred_active
+    # classes of the image or is padding.
+    loss = loss * pred_active * non_zeros
 
     # Computer loss mean. Use only predictions that contribute
     # to the loss to get a correct mean.
-    loss = tf.reduce_sum(loss) / tf.reduce_sum(pred_active)
+    denominator = tf.reduce_sum(tf.multiply(pred_active, non_zeros))
+    loss = tf.cond(tf.not_equal(denominator, 0), 
+        lambda: tf.reduce_sum(loss)/denominator, lambda: tf.constant(0, 'float32'))
     return loss
 
 
@@ -1451,10 +1489,17 @@ def build_rpn_targets(image_shape, anchors, gt_class_ids, gt_boxes, config):
     gt_boxes: [num_gt_boxes, (y1, x1, y2, x2)]
 
     Returns:
-    rpn_match: [N] (int32) matches between anchors and GT boxes.
+    rpn_match: [num_anchors] (int32) matches between anchors and GT boxes.
                1 = positive anchor, -1 = negative anchor, 0 = neutral
-    rpn_bbox: [N, (dy, dx, log(dh), log(dw))] Anchor bbox deltas.
+    rpn_bbox: [num_anchors, (dy, dx, log(dh), log(dw))] Anchor bbox deltas.
     """
+    # Generate negative anchors for sample that doesn't have instances
+    if gt_class_ids.shape[0]==0:
+        rpn_match = -1 * np.ones([anchors.shape[0]], dtype=np.int32)
+        rpn_bbox = generate_random_rois(image_shape, \
+            config.RPN_TRAIN_ANCHORS_PER_IMAGE, gt_class_ids, gt_boxes)
+        return rpn_match, rpn_bbox
+
     # RPN Match: 1 = positive anchor, -1 = negative anchor, 0 = neutral
     rpn_match = np.zeros([anchors.shape[0]], dtype=np.int32)
     # RPN bounding boxes: [max anchors per image, (dy, dx, log(dh), log(dw))]
@@ -1567,39 +1612,44 @@ def generate_random_rois(image_shape, count, gt_class_ids, gt_boxes):
     # placeholder
     rois = np.zeros((count, 4), dtype=np.int32)
 
-    # Generate random ROIs around GT boxes (90% of count)
-    rois_per_box = int(0.9 * count / gt_boxes.shape[0])
-    for i in range(gt_boxes.shape[0]):
-        gt_y1, gt_x1, gt_y2, gt_x2 = gt_boxes[i]
-        h = gt_y2 - gt_y1
-        w = gt_x2 - gt_x1
-        # random boundaries
-        r_y1 = max(gt_y1 - h, 0)
-        r_y2 = min(gt_y2 + h, image_shape[0])
-        r_x1 = max(gt_x1 - w, 0)
-        r_x2 = min(gt_x2 + w, image_shape[1])
+    if gt_boxes.shape[0]==0:
+        # If there are no instances in the image,
+        # we don't generate GT-box-specific ROIs
+        rois_per_box = 0
+    else:
+        # Generate random ROIs around GT boxes (90% of count)
+        rois_per_box = int(0.9 * count / gt_boxes.shape[0])
+        for i in range(gt_boxes.shape[0]):
+            gt_y1, gt_x1, gt_y2, gt_x2 = gt_boxes[i]
+            h = gt_y2 - gt_y1
+            w = gt_x2 - gt_x1
+            # random boundaries
+            r_y1 = max(gt_y1 - h, 0)
+            r_y2 = min(gt_y2 + h, image_shape[0])
+            r_x1 = max(gt_x1 - w, 0)
+            r_x2 = min(gt_x2 + w, image_shape[1])
 
-        # To avoid generating boxes with zero area, we generate double what
-        # we need and filter out the extra. If we get fewer valid boxes
-        # than we need, we loop and try again.
-        while True:
-            y1y2 = np.random.randint(r_y1, r_y2, (rois_per_box * 2, 2))
-            x1x2 = np.random.randint(r_x1, r_x2, (rois_per_box * 2, 2))
-            # Filter out zero area boxes
-            threshold = 1
-            y1y2 = y1y2[np.abs(y1y2[:, 0] - y1y2[:, 1]) >=
-                        threshold][:rois_per_box]
-            x1x2 = x1x2[np.abs(x1x2[:, 0] - x1x2[:, 1]) >=
-                        threshold][:rois_per_box]
-            if y1y2.shape[0] == rois_per_box and x1x2.shape[0] == rois_per_box:
-                break
+            # To avoid generating boxes with zero area, we generate double what
+            # we need and filter out the extra. If we get fewer valid boxes
+            # than we need, we loop and try again.
+            while True:
+                y1y2 = np.random.randint(r_y1, r_y2, (rois_per_box * 2, 2))
+                x1x2 = np.random.randint(r_x1, r_x2, (rois_per_box * 2, 2))
+                # Filter out zero area boxes
+                threshold = 1
+                y1y2 = y1y2[np.abs(y1y2[:, 0] - y1y2[:, 1]) >=
+                            threshold][:rois_per_box]
+                x1x2 = x1x2[np.abs(x1x2[:, 0] - x1x2[:, 1]) >=
+                            threshold][:rois_per_box]
+                if y1y2.shape[0] == rois_per_box and x1x2.shape[0] == rois_per_box:
+                    break
 
-        # Sort on axis 1 to ensure x1 <= x2 and y1 <= y2 and then reshape
-        # into x1, y1, x2, y2 order
-        x1, x2 = np.split(np.sort(x1x2, axis=1), 2, axis=1)
-        y1, y2 = np.split(np.sort(y1y2, axis=1), 2, axis=1)
-        box_rois = np.hstack([y1, x1, y2, x2])
-        rois[rois_per_box * i:rois_per_box * (i + 1)] = box_rois
+            # Sort on axis 1 to ensure x1 <= x2 and y1 <= y2 and then reshape
+            # into x1, y1, x2, y2 order
+            x1, x2 = np.split(np.sort(x1x2, axis=1), 2, axis=1)
+            y1, y2 = np.split(np.sort(y1y2, axis=1), 2, axis=1)
+            box_rois = np.hstack([y1, x1, y2, x2])
+            rois[rois_per_box * i:rois_per_box * (i + 1)] = box_rois
 
     # Generate random ROIs anywhere in the image (10% of count)
     remaining_count = count - (rois_per_box * gt_boxes.shape[0])
@@ -1707,12 +1757,6 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                     load_image_gt(dataset, config, image_id, augment=augment,
                                 augmentation=augmentation,
                                 use_mini_mask=config.USE_MINI_MASK)
-
-            # Skip images that have no instances. This can happen in cases
-            # where we train on a subset of classes and the image doesn't
-            # have any of the classes we care about.
-            if not np.any(gt_class_ids > 0):
-                continue
 
             # RPN Targets
             rpn_match, rpn_bbox = build_rpn_targets(image.shape, anchors,
@@ -1994,6 +2038,7 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
+				     config.IMAGES_PER_GPU,
                                      train_bn=config.TRAIN_BN,
                                      fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
@@ -2034,6 +2079,7 @@ class MaskRCNN():
             mrcnn_class_logits, mrcnn_class, mrcnn_bbox =\
                 fpn_classifier_graph(rpn_rois, mrcnn_feature_maps, input_image_meta,
                                      config.POOL_SIZE, config.NUM_CLASSES,
+				     config.IMAGES_PER_GPU,
                                      train_bn=config.TRAIN_BN,
                                      fc_layers_size=config.FPN_CLASSIF_FC_LAYERS_SIZE)
 
