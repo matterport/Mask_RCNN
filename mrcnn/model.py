@@ -954,7 +954,7 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True):
+                         pool_size, num_classes, num_deconv_layers, train_bn=True):
     """Builds the computation graph of the mask head of Feature Pyramid Network.
 
     rois: [batch, num_rois, (y1, x1, y2, x2)] Proposal boxes in normalized
@@ -964,9 +964,14 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
+    num_deconv_layers: The number of Conv2DTranspose layers. 
+                       In the paper of Mask R-CNN(Ch. 3 - Network Architecture),
+                       it only has one deconv layer.
+                       Adding additional deconv layers increases output mask resolution,
+                       and it is an extra feature not described in the paper.
     train_bn: Boolean. Train or freeze Batch Norm layers
 
-    Returns: Masks [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, NUM_CLASSES]
+    Returns: Masks [batch, num_rois, MASK_SHAPE[0], MASK_SHAPE[1], NUM_CLASSES]
     """
     # ROI Pooling
     # Shape: [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, channels]
@@ -997,9 +1002,13 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     x = KL.TimeDistributed(BatchNorm(),
                            name='mrcnn_mask_bn4')(x, training=train_bn)
     x = KL.Activation('relu')(x)
-
+    
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
+    for i in range(1, num_deconv_layers):
+        x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
+                           name="mrcnn_mask_deconv" + str(i+1))(x)
+    
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
                            name="mrcnn_mask")(x)
     return x
@@ -2001,6 +2010,7 @@ class MaskRCNN():
                                               input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
+                                              config.NUM_DECONV_LAYERS,
                                               train_bn=config.TRAIN_BN)
 
             # TODO: clean up (use tf.identify if necessary)
@@ -2049,6 +2059,7 @@ class MaskRCNN():
                                               input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
+                                              config.NUM_DECONV_LAYERS,
                                               train_bn=config.TRAIN_BN)
 
             model = KM.Model([input_image, input_image_meta, input_anchors],
