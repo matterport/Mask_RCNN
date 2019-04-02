@@ -42,7 +42,7 @@ class WireframeConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 4  # Background + objects
+    NUM_CLASSES = 1 + 9  # Background + objects
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -64,6 +64,8 @@ class WireframeDataset(utils.Dataset):
 
         icon_dir = os.path.join(os.getcwd(), "Icons")
         icons = os.listdir(icon_dir)
+        if ".DS_Store" in icons:
+            icons.remove(".DS_Store")
         for i, icon in enumerate(icons):
             icon_name = icon.split(".")[0]
             self.add_class("wireframe", i + 1, icon_name)

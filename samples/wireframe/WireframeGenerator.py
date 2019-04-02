@@ -15,12 +15,12 @@ MASK_DIR = os.path.abspath(os.path.join(os.getcwd(),"../../"))
 DATA_DIR = os.path.abspath(os.path.join(MASK_DIR, "datasets/wireframe"))
 
 # Wire-frame dimensions (iPhone 8)
-DIMENSIONS = (750, 1334)
+DIMENSIONS = (900, 1200)
 bg_w, bg_h = DIMENSIONS
 COLOR = (255, 255, 255, 255)
 
 # Icon Dimensions
-ICON_W = ICON_H = 150
+ICON_W = ICON_H = 50
 
 #Specify training data or validation data
 TYPES = ["/train", "/val"]
@@ -61,7 +61,6 @@ def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
         if type == "/val":
             NUM_IMAGES = int(NUM_IMAGES / 5)
         for j in range(NUM_IMAGES):
-            print("We are at image no {} in {}".format(j, type))
             icon_list = []
             NUM_ICONS = random.randint(1, ICONS_PER_IMAGE)
             background = Image.open(BACKGROUND_DIR + "/" + BACKGROUNDS[random.randint(0, len(BACKGROUNDS) - 1)]).convert("L")
