@@ -54,7 +54,7 @@ def write_string_to_json(string, type):
     with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
         f.write(string)
 
-def generate_data(NUM_IMAGES=10, ICONS_PER_IMAGE=3):
+def generate_data(NUM_IMAGES, ICONS_PER_IMAGE):
     global file_content
     for type in TYPES:
         file_content = "{"
