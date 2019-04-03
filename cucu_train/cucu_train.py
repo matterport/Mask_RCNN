@@ -43,7 +43,7 @@ def cloneDataSetIntoSessionFolderTree():
 def initiateAllPathsForCurrentSession(rootDir,currentContainerDir):
     #asher todo: change to get from user
     # currentSessionInitialWeights = input()
-    currentSessionInitialWeights ='/home/simon/Mask_RCNN/mask_rcnn_coco.h5'
+    currentSessionInitialWeights =rootDir +'/mask_rcnn_coco.h5'
     # create centralized class for used paths during current session
     cucuPaths = project_paths(
     projectRootDir=rootDir,

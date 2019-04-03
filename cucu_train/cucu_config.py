@@ -30,7 +30,7 @@ class cucumberConfig(Config):
     
     # Ratios of anchors at each cell (width/height)
     # A value of 1 represents a square anchor, and 0.5 is a wide anchor
-    RPN_ANCHOR_RATIOS = [0.1 ,0.5, 1, 2]
+    RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     
     # Maximum number of ground truth instances to use in one image
     # Pay attention to these when you realize you have "too much" annotations on one image
