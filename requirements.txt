@@ -7,6 +7,8 @@ scikit-image
 tensorflow>=1.3.0
 keras>=2.0.8
 opencv-python
+pandas
+sklearn
 h5py
 imgaug
 IPython[all]
