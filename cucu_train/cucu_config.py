@@ -65,8 +65,10 @@ class cucumberConfig(Config):
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 512
+    SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = 512
+
+    IMAGE_MIN_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
+    IMAGE_MAX_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
     
     #SCALE BOUNDRIES OF GENERATED OBJECTS
     MIN_SCALE_OBJ = 0.1
