@@ -16,6 +16,7 @@ import logging
 from collections import OrderedDict
 import multiprocessing
 import numpy as np
+from __future__ import division
 import tensorflow as tf
 import keras
 import keras.backend as K
