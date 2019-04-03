@@ -10,20 +10,18 @@ globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
 
 
 class cucumberConfig(Config):
-    """Configuration for training on the toy shapes dataset.
+    """Configuration for training on dataset.
     Derives from the base Config class and overrides values specific
     to the toy shapes dataset.
     """
-
-    """MODEL HYPER PARAMETERS"""
-    # Give the configuration a recognizable name
-    NAME = "agriculture"
-
-    # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
-    # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 4
     
+
+    """FREQUENTLY TUNED HYPER PARAMETERS"""
+
+
+    """ ARCHITECTURE HYPER-PARAMETERS"""
+    IMAGES_PER_GPU = 4
+
     # Number of classes (including background)
     NUM_CLASSES = 1 + 4 # background + cucumber, leaf, flower, stems
 
@@ -32,43 +30,27 @@ class cucumberConfig(Config):
     
     # Ratios of anchors at each cell (width/height)
     # A value of 1 represents a square anchor, and 0.5 is a wide anchor
-    RPN_ANCHOR_RATIOS = [0.5, 1, 2]
-
-    # Reduce training ROIs per image because the images are small and have
-    # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 200
+    RPN_ANCHOR_RATIOS = [0.1 ,0.5, 1, 2]
     
-    #asher todo: can we utilize it better?
-    # ROI_POSITIVE_RATIO = 66  
-    
-    IMAGE_RESIZE_MODE = "crop"
-
     # Maximum number of ground truth instances to use in one image
+    # Pay attention to these when you realize you have "too much" annotations on one image
     MAX_GT_INSTANCES = 300
-
-
-    VALIDATION_STEPS = 4
-
-
-    MAX_SAVED_TRAINED_MODELS = 30
-
-    LEARNING_RATE = 0.0001
-    LEARNING_MOMENTUM = 0.9
-    # each EPOCHS times we save the weights of the net
-    EPOCHS = 1
-    # EPOCHS_ROUNDS is the number of times we generate new training data with different stats.
-    EPOCHS_ROUNDS = 1
-    POST_NMS_ROIS_TRAINING = 2000
-
-    # If enabled, resizes instance masks to a smaller size to reduce
-    # memory load. Recommended when using high-resolution images.
-    USE_MINI_MASK = False
-    ''' DETECTION '''
+    
     # Max number of final detections
     DETECTION_MAX_INSTANCES = 300
 
-    # ROIs kept after non-maximum suppression (training and inference)
-    POST_NMS_ROIS_INFERENCE = 2000
+
+    '''ACTIVE TRAINING HYPER PARAMETERS'''
+
+    LEARNING_RATE = 0.0001
+    LEARNING_MOMENTUM = 0.9
+
+
+    # each EPOCHS times we save the weights of the net
+    EPOCHS = 1
+    # STEPS_PER_EPOCH is set in __init__ procedure
+    VALIDATION_STEPS = 4
+    
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.5
@@ -76,21 +58,20 @@ class cucumberConfig(Config):
     # Non-maximum suppression threshold for detection
     DETECTION_NMS_THRESHOLD = 0.5
     
-    # Skip detections with < 50% confidence
+    # Skip detections with lower than DETECTION_MIN_CONFIDENCE percents confidence
     DETECTION_MIN_CONFIDENCE = 0.7
 
     """ DATA GENERATION HYPER PARAMETERS """
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
-    SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = 512
+    IMAGE_MIN_DIM = 512
+    IMAGE_MAX_DIM = 512
     
-    IMAGE_MIN_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
-    IMAGE_MAX_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
-    
-    #SCALES OF GENERATED OBJECTS
+    #SCALE BOUNDRIES OF GENERATED OBJECTS
     MIN_SCALE_OBJ = 0.1
     MAX_SCALE_OBJ = 0.3
+
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
@@ -99,18 +80,41 @@ class cucumberConfig(Config):
     VALID_SET_SIZE = 5
     TEST_SET_SIZE = 12
 
-    #in case images are synthesized
+    #Boundries for num of objects in image in case images are synthesized,
     MIN_GENERATED_OBJECTS = 2
     MAX_GENERATED_OBJECTS = 10
 
     # this threshold determines how much objects will cover each other
     OBJECTS_IOU_THRESHOLD = 0.05
 
-    # asher todo: decide what todo with those parameters
+
+
+    """SELDOM TUNED HYPER PARAMETERS"""
+
+    # Give the configuration a recognizable name
+    NAME = "agriculture"
+
+    # Train on 1 GPU and X images per GPU. We can put multiple images on each
+    # GPU because the images are small. Batch size is  (GPUs * (imagesPerGPU)).
+    GPU_COUNT = 1
+
+
+    # If enabled, resizes instance masks to a smaller size to reduce
+    # memory load. Recommended when using high-resolution images.
+    USE_MINI_MASK = False
+
+    # EPOCHS_ROUNDS is the number of times we generate new training data with different stats.
+    EPOCHS_ROUNDS = 1
+
+    # control disk space on computer, non relevant when EPOCH_ROUNDS is 1
+    MAX_SAVED_TRAINED_MODELS = 30
+
     #in case we want to generate new dataset each iteratation in EPOCH_ROUNDS
     SCALE_OBJECT_NUM_NEXT_EPOCH_ROUND = 1
     #this is an optional scaler when starting new epochs run
     SCALE_OBJECTS_IOU_THRESHOLD = 1
+
+
 
     def __init__(self):
         super().__init__()
