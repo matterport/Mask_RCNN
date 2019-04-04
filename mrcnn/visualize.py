@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
+import cv2
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -266,16 +267,12 @@ def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10)
         class_ids[class_ids > 0].shape[0] / class_ids.shape[0]))
 
 
-# TODO: Replace with matplotlib equivalent?
 def draw_box(image, box, color):
     """Draw 3-pixel width bounding boxes on the given image array.
     color: list of 3 int values for RGB.
     """
     y1, x1, y2, x2 = box
-    image[y1:y1 + 2, x1:x2] = color
-    image[y2:y2 + 2, x1:x2] = color
-    image[y1:y2, x1:x1 + 2] = color
-    image[y1:y2, x2:x2 + 2] = color
+    image = cv2.rectangle(image, (x1,y1), (x2,y2), color=color, thickness=2)
     return image
 
 
