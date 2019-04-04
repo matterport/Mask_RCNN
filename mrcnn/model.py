@@ -2461,6 +2461,13 @@ class MaskRCNN():
         # network weights are still random
         exclude_ix = np.where(
             (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1]) <= 0)[0]
+	
+	# To avoid X2-X1 or Y2-Y1  < 0, this bug will effect resize
+	exclude_ix2 = np.where((boxes[:, 2] - boxes[:, 0])<=0)[0]
+        exclude_ix =np.append(exclude_ix,exclude_ix2)
+        exclude_ix=np.unique(exclude_ix)
+	
+	
         if exclude_ix.shape[0] > 0:
             boxes = np.delete(boxes, exclude_ix, axis=0)
             class_ids = np.delete(class_ids, exclude_ix, axis=0)
