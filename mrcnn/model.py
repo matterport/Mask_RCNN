@@ -1189,8 +1189,8 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
     return loss
 
 def mrcnn_embedding_loss(target_class_ids, embeddings):
-    print("Target_class_ids shape is {}".format(target_class_ids.get_shape()))
-    print("Embeddings Shape is {}".format(embeddings.get_shape()))
+    #print("Target_class_ids shape is {}".format(target_class_ids.get_shape()))
+    #print("Embeddings Shape is {}".format(embeddings.get_shape()))
     return K.sum(embeddings, axis=1)
 
 ############################################################
