@@ -1191,7 +1191,16 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
 def mrcnn_embedding_loss(target_class_ids, embeddings):
     #print("Target_class_ids shape is {}".format(target_class_ids.get_shape()))
     #print("Embeddings Shape is {}".format(embeddings.get_shape()))
-    return K.sum(embeddings, axis=1)
+    return K.sum(embeddings, axis=0)
+
+
+def triplet_loss(y_pred):
+
+    embeddings = K.reshape(y_pred, (-1, 3, 1024))
+
+    positive_distance = K.mean(K.square(embeddings[:, 0] - embeddings[:, 1]), axis=-1)
+    negative_distance = K.mean(K.square(embeddings[:, 0] - embeddings[:, 2]), axis=-1)
+    return K.mean(K.maximum(0.0, positive_distance - negative_distance))
 
 ############################################################
 #  Data Generator
@@ -2031,8 +2040,8 @@ class MaskRCNN():
                 [target_bbox, target_class_ids, mrcnn_bbox])
             mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
                 [target_mask, target_class_ids, mrcnn_mask])
-            embedding_loss = KL.Lambda(lambda x: mrcnn_embedding_loss(*x), name="embedding_loss")(
-                [target_class_ids, mrcnn_embedding])
+            embedding_loss = KL.Lambda(lambda x: triplet_loss(*x), name="embedding_loss")(
+                [mrcnn_embedding])
 
             # Model
             inputs = [input_image, input_image_meta,
