@@ -2564,7 +2564,6 @@ class MaskRCNN():
         num_of_classes = overlaps(results[0]['rois'])
         assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
         _, N_Boxes, _ = np.shape(embedding)
-
         for i in range(N_Boxes):
             dbactions.add_encoding(embedding[:, i, :], anchor_label)
 

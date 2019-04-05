@@ -67,3 +67,33 @@ def overlaps(rois):
         objects += 1
     return n_objects
 
+def overlapsTrueAndPredicted(roisTrue, roisPred):
+    """
+    :param rois: regions of interest in format (y1, x1, y2, x2)
+    :return: List of objects
+
+
+    Example:
+    ([[ 99,325,135,363], [ 54,229,88,264]], [[ 53,230,94,266], [ 93,321,132,361]])
+        -> [2, 1]
+    """
+    n_objects = np.zeros(len(roisTrue))
+    for i in range(len(roisTrue) - 1):
+        if n_objects[i] != 0:
+            continue
+        l_1_y1 = roisTrue[i][0]
+        l_1_x1 = roisTrue[i][1]
+        r_1_y2 = roisTrue[i][2]
+        r_1_x2 = roisTrue[i][3]
+        for j in range(len(roisPred)):
+            l_2_y1 = roisPred[j][0]
+            l_2_x1 = roisPred[j][1]
+            r_2_y2 = roisPred[j][2]
+            r_2_x2 = roisPred[j][3]
+            if l_1_x1 > r_2_x2 or l_2_x1 > r_1_x2:
+                continue
+            elif l_1_y1 > r_2_y2 or l_2_y1 > r_1_y2:
+                continue
+            else:
+                n_objects[i] = j
+    return n_objects
