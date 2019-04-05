@@ -1188,9 +1188,10 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
     loss = K.mean(loss)
     return loss
 
-def mrcnn_embedding_loss(Something1, Something2, Something3):
-    print("Shape is {}".format(Something3.get_shape()))
-    return K.sum(Something3, axis=1)
+def mrcnn_embedding_loss(target_class_ids, embeddings):
+    print("Target_class_ids shape is {}".format(target_class_ids.get_shape()))
+    print("Embeddings Shape is {}".format(embeddings.get_shape()))
+    return K.sum(embeddings, axis=1)
 
 ############################################################
 #  Data Generator
@@ -2031,7 +2032,7 @@ class MaskRCNN():
             mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
                 [target_mask, target_class_ids, mrcnn_mask])
             embedding_loss = KL.Lambda(lambda x: mrcnn_embedding_loss(*x), name="embedding_loss")(
-                [input_rpn_match, rpn_class_logits, mrcnn_embedding])
+                [target_class_ids, mrcnn_embedding])
 
             # Model
             inputs = [input_image, input_image_meta,
