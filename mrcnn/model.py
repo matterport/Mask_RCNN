@@ -2399,7 +2399,6 @@ class MaskRCNN():
         if os.name is 'nt':
             workers = 0
         else:
-            # asher todo: num of workers should be as num of batches to create
             workers = multiprocessing.cpu_count()
 
         self.keras_model.fit_generator(

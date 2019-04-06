@@ -124,7 +124,6 @@ model = initiateTensorflowModel()
 custom_callbacks= prepareCallbackForCurrentSession()
 
 # start training loop
-#asher todo: EPOCHS_ROUNDS can be deleted
 for _ in range(config.EPOCHS_ROUNDS):
     # Training dataset
     dataset_train = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'train',augmentedCategory = 'cucumber')

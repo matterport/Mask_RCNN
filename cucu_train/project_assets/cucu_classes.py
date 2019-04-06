@@ -25,7 +25,8 @@ from cucu_config import cucuConfForTrainingSession, globalObjectCategories
 #design
 from collections import defaultdict
 
-
+#debug - to be deleted
+import platform
 
 ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -79,8 +80,7 @@ class genDataset(utils.Dataset):
         for i in range(numOfImagesToGenerate):  
             # decide which background:
             bgIndex = randint(0, self.quantityOfObjByCategory['BG']-1) 
-            #asher todo: remove bg_color when generating
-            bg_color, shapes = self.GenerateRandomSpecsForImage(height, width)
+            _ , shapes = self.GenerateRandomSpecsForImage(height, width)
             self.add_image("shapes", image_id=i, path=None, width=width, height=height, shapes=shapes, bgIndex=bgIndex)
     
     def load_image(self, image_id):
@@ -263,7 +263,6 @@ class realDataset(utils.Dataset):
         image_dir = "{}".format(dataset_dir)
 
         # All classes
-        # asher todo: instead of coco lets add our categories
         class_ids = sorted(coco.getCatIds())
 
         # All images or a subset?
@@ -388,7 +387,11 @@ class HybridDataset(utils.Dataset):
        
         #asher todo:  make 'augmented' a parameter, or re-order folders names.
         if dataSetType == 'train':
-            self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/augmented'\
+            if  platform.system() == 'Darwin':
+                self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/original'
+            else:
+                self.pathToRealImagesDataset = self.pathToRealImagesDataset + '/augmented'
+
 
         self.pathToRealImagesAnnotations = self.pathToRealImagesDataset + '/annotations.json'
         
