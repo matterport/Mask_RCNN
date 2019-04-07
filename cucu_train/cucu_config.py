@@ -6,8 +6,11 @@ import numpy as np
 
 
 # here you can add more object shapes 
-globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+# globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+globalObjectCategories= ['BG', 'stem']
 
+# objectsDistribution = ["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower","stem","stem","stem","stem"]
+objectsDistribution = ['stem']
 
 class cucumberConfig(Config):
     """Configuration for training on dataset.
@@ -20,10 +23,10 @@ class cucumberConfig(Config):
 
 
     """ ARCHITECTURE HYPER-PARAMETERS"""
-    IMAGES_PER_GPU = 4
+    IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 4 # background + cucumber, leaf, flower, stems
+    NUM_CLASSES = len(globalObjectCategories) # background + cucumber, leaf, flower, stems
 
     # anchor side in pixels, for each of RPN layer
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  
@@ -42,13 +45,16 @@ class cucumberConfig(Config):
 
     '''ACTIVE TRAINING HYPER PARAMETERS'''
 
-    LEARNING_RATE = 0.0001
+    LEARNING_RATE = 0.001
     LEARNING_MOMENTUM = 0.9
 
 
     # each EPOCHS times we save the weights of the net
-    EPOCHS = 1
+    EPOCHS = 10
+
     # STEPS_PER_EPOCH is set in __init__ procedure
+
+
     VALIDATION_STEPS = 4
     
     # Minimum probability value to accept a detected instance
@@ -62,10 +68,13 @@ class cucumberConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0.7
 
     """ DATA GENERATION HYPER PARAMETERS """
+    # make sure namings inside are compatible with globalObjectCategories
+    RANDOM_DISTRIBUTION = objectsDistribution
+
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
     #THIS PARTICULAR HYPERPARAMETER IS BOTH FOR SETTING DIMS FOR NET AND FOR DATA GENERATION AS WELL!
-    SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = 512
+    SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = 1024
 
     IMAGE_MIN_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
     IMAGE_MAX_DIM = SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
@@ -77,9 +86,9 @@ class cucumberConfig(Config):
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    GEN_TRAIN_SET_SIZE = 10
-    REAL_TRAIN_SET_SIZE = 20
-    VALID_SET_SIZE = 5
+    GEN_TRAIN_SET_SIZE = 10000
+    REAL_TRAIN_SET_SIZE = 10099
+    # VALID_SET_SIZE = 5
     TEST_SET_SIZE = 12
 
     #Boundries for num of objects in image in case images are synthesized,
@@ -134,7 +143,7 @@ class cucumberConfig(Config):
 
         # Image meta data length
         # See compose_image_meta() for details
-        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES + 1
+        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
         self.STEPS_PER_EPOCH  = (self.GEN_TRAIN_SET_SIZE + self.REAL_TRAIN_SET_SIZE)  // self.IMAGES_PER_GPU
 
 

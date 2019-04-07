@@ -53,9 +53,12 @@ def initiateAllPathsForCurrentSession(rootDir,currentContainerDir):
     visualizeEvaluationsDir = os.path.join(currentContainerDir, "visualizeEvaluations"),
 
     #dataset paths
-    GenDatasetDir=       os.path.join(currentContainerDir, "project_dataset/generated/"), 
-    RealDatasetDir=     os.path.join(currentContainerDir, "project_dataset/real/"), 
-    TestDatasetDir=        os.path.join(currentContainerDir, "project_dataset/test/test_data/"),
+    GenDatasetDir=       os.path.join(currentContainerDir, "../../project_dataset/generated/"), 
+    RealDatasetDir=     os.path.join(currentContainerDir, "../../project_dataset/real/"), 
+    TestDatasetDir=        os.path.join(currentContainerDir, "../../project_dataset/test/test_data/"),
+    #GenDatasetDir=       os.path.join(rootDir, "/cucu_train/project_dataset/generated/"), 
+    #RealDatasetDir=     os.path.join(rootDir, "/cucu_train/project_dataset/real/"), 
+    #TestDatasetDir=        os.path.join(rootDir, "/cucu_train/project_dataset/test/test_data/"),
     
     trainResultContainer=  currentContainerDir,
     trainOutputLog      =  currentContainerDir)
@@ -86,9 +89,9 @@ def createFoldersForModelWeightsAndVizualizations():
     return
 def prepareCallbackForCurrentSession():
     def scheduleLearningRate(epoch, lr):
-        return lr*0.5
+        return lr*0.8
     
-    return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=3, verbose=1, mode='auto'),
+    return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=2, verbose=1, mode='auto'),
             LearningRateScheduler(scheduleLearningRate, verbose=1)]
 
 def createSessionLoggerToCollectPrintOutputs():
@@ -114,7 +117,7 @@ if __name__ == "__main__":
     cucuPaths = initiateAllPathsForCurrentSession(rootDir,currentContainerDir)
     createFoldersForModelWeightsAndVizualizations()
 
-    cloneDataSetIntoSessionFolderTree()
+    #cloneDataSetIntoSessionFolderTree()
     createSessionLoggerToCollectPrintOutputs()
 
     #print current session configuration to logger
@@ -127,14 +130,31 @@ if __name__ == "__main__":
     # start training loop
     #asher todo: EPOCHS_ROUNDS can be deleted
     for _ in range(config.EPOCHS_ROUNDS):
+        ## Training dataset
+        #dataset_train = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'train',augmentedCategory = 'cucumber')
+        #dataset_train.load_dataset()
+        #dataset_train.prepare()
+        ## Validation dataset
+        #dataset_val = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'valid',augmentedCategory = 'cucumber')
+        #dataset_val.load_dataset()
+        #dataset_val.prepare()
+        
         # Training dataset
-        dataset_train = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'train',augmentedCategory = 'cucumber')
-        dataset_train.load_dataset()
+        #dataset_train = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'train')
+        #dataset_train.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+        #dataset_train.prepare()
+        
+        # Validation dataset
+        #dataset_val = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'valid')
+        #dataset_val.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+        #dataset_val.prepare()
+
+        dataset_train = realDataset()
+        dataset_train.load_dataset(cucuPaths.RealDatasetDir + '1024/cucumber/train/augmented/annotations.json',cucuPaths.RealDatasetDir + '/1024/cucumber/train/augmented')
         dataset_train.prepare()
 
-        # Validation dataset
-        dataset_val = HybridDataset(config,cucuPaths.GenDatasetDir,cucuPaths.RealDatasetDir,dataSetType = 'valid',augmentedCategory = 'cucumber')
-        dataset_val.load_dataset()
+        dataset_val = realDataset()
+        dataset_val.load_dataset(cucuPaths.RealDatasetDir + '/1024/cucumber/valid/annotations.json',cucuPaths.RealDatasetDir + '/1024/cucumber/valid')
         dataset_val.prepare()
         # In[ ]:
 
@@ -363,32 +383,33 @@ if __name__ == "__main__":
         visualize.display_images(np.transpose(activations["res3a_out"][0,:,:,:4], [2, 0, 1]), savePath=cucuPaths.visualizeEvaluationsDir + "/activationsImages/" + "activationRes3aImage" + "image_" + str(image_id) +".png")
 
     # Pick a set of random images
+
+
+    # Compute VOC-style Average Precision
+    def compute_batch_ap(image_ids):
+        APs = []
+        for image_id in image_ids:
+            # Load image
+            image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+                modellib.load_image_gt(dataset_val, config,
+                                    image_id, use_mini_mask=False)
+            # Run object detection
+            results = model.detect([image], verbose=0)
+            # Compute AP
+            r = results[0]
+            AP, precisions, recalls, overlaps =\
+                utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                                r['rois'], r['class_ids'], r['scores'], r['masks'])
+            APs.append(AP)
+        return APs
+
     image_ids = np.random.choice(dataset_val.image_ids, 10)
     APs = compute_batch_ap(image_ids)
-    print("mAP @ IoU=50: ", np.mean(APs))
+    print("mAP @ IoU=5{}:{} ".format(config.DETECTION_NMS_THRESHOLD,np.mean(APs)) )
 
 
 
 
-
-
-# Compute VOC-style Average Precision
-def compute_batch_ap(image_ids):
-    APs = []
-    for image_id in image_ids:
-        # Load image
-        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-            modellib.load_image_gt(dataset_val, config,
-                                   image_id, use_mini_mask=False)
-        # Run object detection
-        results = model.detect([image], verbose=0)
-        # Compute AP
-        r = results[0]
-        AP, precisions, recalls, overlaps =\
-            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
-                              r['rois'], r['class_ids'], r['scores'], r['masks'])
-        APs.append(AP)
-    return APs
 
 
 

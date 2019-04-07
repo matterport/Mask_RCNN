@@ -33,10 +33,14 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class genDataset(utils.Dataset):
-    def __init__(self,objByCategoryPaths,config):
+    def __init__(self,config,pathToHandleGeneratingImages,datasetType):
+        def constructGenImagesPathsByCategory(pathToHandleGeneratingImages,subDatasetType):
+            innerPathsByCategoty = {}
+            for category in globalObjectCategories:
+                innerPathsByCategoty[category] = pathToHandleGeneratingImages + '/{}/{}'.format(category,subDatasetType)
+            return innerPathsByCategoty        
         def collectAndCountObjImagesByCategory():
-            self.objByCategoryPaths = objByCategoryPaths
-            print(objByCategoryPaths)
+            print(self.objByCategoryPaths)
             self.containerOfObjForGeneratingImages= defaultdict(list)
             self.quantityOfObjByCategory={}
             
@@ -63,6 +67,7 @@ class genDataset(utils.Dataset):
                 self.add_class(classificationType, index, classificationName)
         
         utils.Dataset.__init__(self)
+        self.objByCategoryPaths = constructGenImagesPathsByCategory(pathToHandleGeneratingImages, datasetType)
         collectAndCountObjImagesByCategory()
         initiateConfiguration()
         initiateClassificationNames()
@@ -162,7 +167,7 @@ class genDataset(utils.Dataset):
         of generated image.
         """
         def drawObjCategoryFromDistribution():
-            return choice(["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower","stem","stem","stem","stem"])
+            return choice(cucuConfForTrainingSession.RANDOM_DISTRIBUTION)
         # Shape
         shape = drawObjCategoryFromDistribution()
         
@@ -375,11 +380,7 @@ class realDataset(utils.Dataset):
 
 class HybridDataset(utils.Dataset):
     def __init__(self,config, pathToHandleGeneratingImages, pathToHandleRealImages,dataSetType, augmentedCategory):
-        def constructGenImagesPathsByCategory(pathToHandleGeneratingImages,subDatasetType):
-            innerPathsByCategoty = {}
-            for category in globalObjectCategories:
-                innerPathsByCategoty[category] = pathToHandleGeneratingImages + '/{}/{}'.format(category,subDatasetType)
-            return innerPathsByCategoty
+        
         utils.Dataset.__init__(self)
         
         self.config = config
@@ -392,8 +393,7 @@ class HybridDataset(utils.Dataset):
 
         self.pathToRealImagesAnnotations = self.pathToRealImagesDataset + '/annotations.json'
         
-        genTrainCategoryPathsDict = constructGenImagesPathsByCategory(pathToHandleGeneratingImages,dataSetType)
-        self.generatedDataset = genDataset(genTrainCategoryPathsDict, config)
+        self.generatedDataset = genDataset(config,pathToHandleGeneratingImages,datasetType = 'valid')
         
         self.realDataset = realDataset()
 
@@ -531,7 +531,8 @@ class CucuLogger(object):
     def getFromUserCurrentSessionSpecs(self):
         print("####################################### PREFACE HEADER #######################################")
         print('Hello handsome, please provide spsifications for this session for easier analyzing later:')
-        input()
+        x = input()
+        print(x)
         return 
 
     def __del__(self):
