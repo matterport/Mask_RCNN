@@ -64,7 +64,7 @@ def random_colors(N, bright=True):
     """
     brightness = 1.0 if bright else 0.7
     hsv = [(i / N, 1, brightness) for i in range(N)]
-    colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
+    colors = list(map(lambda c: tuple(x*255 for x in hsv_to_rgb(*c)), hsv))
     random.shuffle(colors)
     return colors
 
@@ -75,7 +75,7 @@ def apply_mask(image, mask, color, alpha=0.5):
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
                                   image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c] * 255,
+                                  (1 - alpha) + alpha * color[c],
                                   image[:, :, c])
     return image
 
@@ -180,8 +180,8 @@ def display_differences(image,
         pred_box, pred_class_id, pred_score, pred_mask,
         iou_threshold=iou_threshold, score_threshold=score_threshold)
     # Ground truth = green. Predictions = red
-    colors = [(0, 1, 0, .8)] * len(gt_match)\
-           + [(1, 0, 0, 1)] * len(pred_match)
+    colors = [(0, 255, 0, .8)] * len(gt_match)\
+           + [(255, 0, 0, 1)] * len(pred_match)
     # Concatenate GT and predictions
     class_ids = np.concatenate([gt_class_id, pred_class_id])
     scores = np.concatenate([np.zeros([len(gt_match)]), pred_score])
