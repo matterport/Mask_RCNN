@@ -2584,6 +2584,7 @@ class MaskRCNN():
 
     def OneShotDetect(self, images, verbose=0):
         results = self.detect([images])
+
         embedding = results[1]
         num_of_classes = overlaps(results[0]['rois'])
         _, n_rois, _ = np.shape(embedding)
@@ -2600,7 +2601,6 @@ class MaskRCNN():
             else:
                 some_dict[new_object] = knn(embedding[:, i, :])
         return some_dict, results
-
 
 ############################################################
 
