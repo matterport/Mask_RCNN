@@ -25,7 +25,6 @@ class Config(object):
     NAME = "Stage1_PassCucumberImageThroughNet"  # Override in sub-classes
 
     # NUMBER OF GPUs to use. When using only a CPU, this needs to be set to 1.
-    # asher todo: set to 2 later
     GPU_COUNT = 1
 
     # Number of images to train with on each GPU. A 12GB GPU can typically

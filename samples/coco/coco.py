@@ -361,7 +361,6 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     results = []
     for i, image_id in enumerate(image_ids):
         # Load image
-        #  asher todo: here a conversion is needed to expected format
         image = dataset.load_image(image_id)
 
         # Run detection
