@@ -2574,12 +2574,12 @@ class MaskRCNN():
         num_of_classes = overlaps(results[0]['rois'])
         assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
         _, N_Boxes, _ = np.shape(embedding)
-
         for i in range(N_Boxes):
             dbactions.add_encoding(embedding[:, i, :], anchor_label)
 
     def OneShotDetect(self, images, verbose=0):
         results = self.detect([images])
+
         embedding = results[1]
         num_of_classes = overlaps(results[0]['rois'])
         _, n_rois, _ = np.shape(embedding)
@@ -2596,7 +2596,6 @@ class MaskRCNN():
             else:
                 some_dict[new_object] = knn(embedding[:, i, :])
         return some_dict, results
-
 
 ############################################################
 
