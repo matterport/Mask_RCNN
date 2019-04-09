@@ -27,7 +27,7 @@ def get_bbox_from_geojson(path):
     bbox = list(watershed.envelope.boundary.bounds.iloc[0])
     return bbox
 
-def get_bbox_from_wbd(wbd_national_path, name, layer_id='WBDHU8'):
+def get_bbox_from_wbd(wbd_national_path, huc_layer_level=8, huc_id==None, name==None):
     """
     Gets bbox from National WBD Dataset, which can be downloaded from
     http://prd-tnm.s3-website-us-west-2.amazonaws.com/?prefix=StagedProducts/Hydrography/WBD/National/GDB/
@@ -39,12 +39,16 @@ def get_bbox_from_wbd(wbd_national_path, name, layer_id='WBDHU8'):
 
     Once the geodataframe has been read in based on a HUC level, it can be subset by any of the 
     values in the following columns (tested with HUC8):
-    'NAME', 'GLOBALID', 'HUC8' (this is a number), 'STATES' (can contain multiple two letter codes),
+    'NAME', 'GLOBALID', 'HUC8' (this is an integer), 'STATES' (can contain multiple two letter codes),
     or geometry. Right now, only filtering by name is implemented.
+    
+    Can only be filtered on name or huc_id not both. 
 
     Args:
         wbd_national_path (str): National WBD .gdb file for USA.
-        layer_id (list): the HUC level to filter on, defaults to 'WBDHU8'.
+        huc_layer_level (int): the HUC level to filter on, defaults to '8' for 'HUC8'.
+        huc_id (int): the HUC ID to subset on. Only matches within the HUC level. Number of 
+            digits in the huc_id is the huc_layer_level.
         name (str): the name of the watershed to filter on with column "NAME"
 
     Returns:
@@ -53,9 +57,13 @@ def get_bbox_from_wbd(wbd_national_path, name, layer_id='WBDHU8'):
     Raises:
         KeyError
     """
-
+    layer_id = "WBDHU"+str(huc_layer_level)
     WBD = gpd.read_file(wbd_national_path, driver='FileGDB', layer=layer_id)
-    bbox = list(WBD[WBD['NAME']==name].envelope.boundary.bounds.iloc[0])
+    if name != None:
+        bbox = list(WBD[WBD['NAME']==name].envelope.boundary.bounds.iloc[0])
+    if huc_id != None:
+        huc_level = "HUC" + str(huc_layer_level)
+        bbox = list(WBD[WBD[huc_level]==str(huc_id)].envelope.boundary.bounds.iloc[0])
     return bbox
 
 def get_scene_list(collection, bbox, begin, end, max_results, max_cloud_cover):
@@ -154,8 +162,9 @@ if __name__ == "__main__":
     usgs.login()
 
     # Parse the WBD Boundary dataset to get bbox for a single watershed
-
-    bbox = get_bbox_from_wbd(WBD_PATH, "Upper North Platte")
+    # Pick a watershed using https://water.usgs.gov/wsc/map_index.html
+    # the number of digits in the HUC ID is the second argument to the func
+    bbox = get_bbox_from_wbd(WBD_PATH, 8, 15050202)
 
     # Query the Usgs api to find scene intersecting with the spatio-temporal window
     # help(usgs.search)
