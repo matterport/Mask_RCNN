@@ -125,7 +125,8 @@ def get_scene_list(collection, bbox, begin, end, max_results, max_cloud_cover):
 
     # Extract Landsat scene ids for each hit from the metadata
     scene_list = [x["displayId"] for x in scene_list]
-    # TODO nested dict needs to be parsed a level and return value for 'products' key  #print(espa.get_available_products(scene_list))
+    # TODO nested dict needs to be parsed a level and return value for 'products' key   
+    #print(espa.get_available_products(scene_list))
     return scene_list
 
 
@@ -163,10 +164,11 @@ def submit_order(filtered_scene_list, product_list):
     return order
 
 
-def download_order(order):
+def download_order():
     """
     Checks the status of an order made with submit_order until it is complete, then
-    downloads the order. Waits for 5 minutes if the order is not ready yet.
+    downloads the order. Waits for 5 minutes if the order is not ready yet. Checks to 
+    see if it is already downloaded by file size and name.
     """
     for order in espa.orders:
         while order.is_complete == False:
