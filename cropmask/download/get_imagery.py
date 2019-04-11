@@ -14,20 +14,25 @@ config_path = "/home/ryan/work/azure_configs.yaml"
 
 with open(config_path) as f:
     configs = yaml.safe_load(f)
-    
+
 # Instantiate Usgs class and login. requires setting config with credentials
-usgs = Usgs(conf=configs['download']['lsru_config'])
+usgs = Usgs(conf=configs["download"]["lsru_config"])
 usgs.login()
-espa = Espa(conf=configs['download']['lsru_config'])
+espa = Espa(conf=configs["download"]["lsru_config"])
 
-file_service = FileService(configs['storage']['storage_name'], configs['storage']['storage_key'])
+file_service = FileService(
+    configs["storage"]["storage_name"], configs["storage"]["storage_key"]
+)
 
-DATA_DIR = configs['storage']['vm_temp_path']
-WBD_PATH = configs['storage']['wbd_gdb_path']
+DATA_DIR = configs["storage"]["vm_temp_path"]
+WBD_PATH = configs["storage"]["wbd_gdb_path"]
 
-REGION_DIR = os.path.join(configs['storage']['region_dir'],configs['storage']['region_name'])
+REGION_DIR = os.path.join(
+    configs["storage"]["region_dir"], configs["storage"]["region_name"]
+)
 
-LANDSAT_DWNLD_DIR = os.path.join(REGION_DIR, "landsat_downloaded") 
+LANDSAT_DWNLD_DIR = os.path.join(REGION_DIR, "landsat_downloaded")
+
 
 def get_bbox_from_geojson(path):
     """
@@ -47,7 +52,8 @@ def get_bbox_from_geojson(path):
     bbox = list(watershed.envelope.boundary.bounds.iloc[0])
     return bbox
 
-def get_bbox_from_wbd(wbd_national_path, huc_layer_level, huc_id, name=None):
+
+def get_bbox_from_wbd(huc_layer_level, huc_id, name=None, wbd_national_path=WBD_PATH):
     """
     Gets bbox from National WBD Dataset, which can be downloaded from
     http://prd-tnm.s3-website-us-west-2.amazonaws.com/?prefix=StagedProducts/Hydrography/WBD/National/GDB/
@@ -76,14 +82,15 @@ def get_bbox_from_wbd(wbd_national_path, huc_layer_level, huc_id, name=None):
     Raises:
         KeyError
     """
-    layer_id = "WBDHU"+str(huc_layer_level)
-    WBD = gpd.read_file(wbd_national_path, driver='FileGDB', layer=layer_id)
+    layer_id = "WBDHU" + str(huc_layer_level)
+    WBD = gpd.read_file(wbd_national_path, driver="FileGDB", layer=layer_id)
     if name != None:
-        bbox = list(WBD[WBD['NAME']==name].envelope.boundary.bounds.iloc[0])
+        bbox = list(WBD[WBD["NAME"] == name].envelope.boundary.bounds.iloc[0])
     else:
         huc_level = "HUC" + str(huc_layer_level)
-        bbox = list(WBD[WBD[huc_level]==str(huc_id)].envelope.boundary.bounds.iloc[0])
+        bbox = list(WBD[WBD[huc_level] == str(huc_id)].envelope.boundary.bounds.iloc[0])
     return bbox
+
 
 def get_scene_list(collection, bbox, begin, end, max_results, max_cloud_cover):
     """
@@ -107,17 +114,20 @@ def get_scene_list(collection, bbox, begin, end, max_results, max_cloud_cover):
     """
     # Query the Usgs api to find scene intersecting with the spatio-temporal window
     # help(usgs.search)
-    scene_list = usgs.search(collection=collection,
-                    bbox=bbox,
-                    begin=begin,
-                    end=end,
-                    max_results=max_results,
-                    max_cloud_cover=max_cloud_cover)
+    scene_list = usgs.search(
+        collection=collection,
+        bbox=bbox,
+        begin=begin,
+        end=end,
+        max_results=max_results,
+        max_cloud_cover=max_cloud_cover,
+    )
 
     # Extract Landsat scene ids for each hit from the metadata
-    scene_list = [x['displayId'] for x in scene_list]
-    print(espa.get_available_products(scene_list))
+    scene_list = [x["displayId"] for x in scene_list]
+    # TODO nested dict needs to be parsed a level and return value for 'products' key  #print(espa.get_available_products(scene_list))
     return scene_list
+
 
 def filter_scenes_by_path_row(scene_list, path_row_list):
     """
@@ -135,11 +145,14 @@ def filter_scenes_by_path_row(scene_list, path_row_list):
         KeyError: Raises an exception.
     """
 
-    filtered = [scene for scene in scene_list if any(good_pathrow \
-        in scene for good_pathrow in path_row_list)]
-    espa = Espa()
-    print(espa.get_available_products(filtered))
+    filtered = [
+        scene
+        for scene in scene_list
+        if any(good_pathrow in scene for good_pathrow in path_row_list)
+    ]
+    # print(espa.get_available_products(filtered))
     return filtered
+
 
 def submit_order(filtered_scene_list, product_list):
     """
@@ -149,13 +162,16 @@ def submit_order(filtered_scene_list, product_list):
     order = espa.order(scene_list=filtered_scene_list, products=product_list)
     return order
 
+
 def download_order(order):
     """
     Checks the status of an order made with submit_order until it is complete, then
     downloads the order. Waits for 5 minutes if the order is not ready yet.
     """
     for order in espa.orders:
-        while order.is_complete==False:
-        # Orders have their own class with attributes and methods
-            print('%s: %s' % (order.orderid, order.status))
+        while order.is_complete == False:
+            # Orders have their own class with attributes and methods
+            print("%s: %s" % (order.orderid, order.status))
             time.sleep(300)
+        order.download_all_complete(path=DATA_DIR, unpack=True)
+        print("Order downloaded")

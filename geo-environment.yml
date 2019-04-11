@@ -1,4 +1,4 @@
-#name: geo-dl
+#name: cropmask
 channels:
   - conda-forge
 dependencies:
