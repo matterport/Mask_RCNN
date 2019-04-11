@@ -31,6 +31,7 @@ except Exception:
     logging.warning("Fail load requirements file, so using default ones.")
     install_reqs = []
 
+    
 setup(
     name="mask-rcnn",
     version="2.1",

@@ -6,7 +6,7 @@ The following README and terraform scripts come from Andreas Offenhaeuser's [Aut
 az login
 ```
 
-After following these instructions, you can run the configure.sh script manually once it has been uploaded to the cluster, to install extra packages that do not come with the Data Science VM, like MaskRCNN, the python geospatial stack, and [Landsat Surface Reflectance Utils](https://github.com/loicdtx/lsru). These packages will be installed to the `py36` conda environment on the Data Science VM, so you should use that environment/kernel when testing with Jupyter. You will also need to follow the instructions on the [lsru page](https://github.com/loicdtx/lsru) to provide credentials to order Landsat imagery.
+After following these instructions, you can run the configure.sh script manually once it has been uploaded to the cluster, to install extra packages that do not come with the Data Science VM, like MaskRCNN, the python geospatial stack, and [Landsat Surface Reflectance Utils](https://github.com/loicdtx/lsru). These packages will be installed to the `py36` conda environment on the Data Science VM, so you should use that environment/kernel when testing with Jupyter. You will also need to follow the instructions on the [lsru page](https://github.com/loicdtx/lsru) to provide credentials to order Landsat imagery. These credentials should be placed in the `work/` folder next to the azure config file. The WBD_GDB_National.gdb folder/geodatabase should also go in the `work` directory on the azure instance.
 
 
 # manage deep learning VM with GPU on Azure ☁️
