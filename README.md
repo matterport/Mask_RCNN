@@ -12,13 +12,14 @@ Below are Preliminary results from test on 2004 Landsat SR scene over western Ne
 ## Local Installation of matterport's maskrcnn, see `terraform/` folder for Azure instructions
 1. Install dependencies
    ```bash
-   conda env create -f requirements.txt
+   conda env create -f geo-environment.yml
    ```
 2. Clone this repository
 3. Run setup from the repository root directory
     ```bash
     source activate cropmask
-    python setup.py install
+    python setup_cropmask.py install # for some reason this also installs mrcnn
+    python setup_mrcnn.py install # but just in case
     ``` 
 3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
 4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
