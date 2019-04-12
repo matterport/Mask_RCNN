@@ -11,6 +11,7 @@ import tensorflow as tf
 import mrcnn.model as modellib
 from mrcnn.model import log
 import imgaug
+from tqdm import tqdm
 
 
 np.random.seed = 42
@@ -62,7 +63,7 @@ def preprocess_dataset(images_path, images_annotations_files):
 
     results = []
 
-    for ann_path in images_annotations_files:
+    for ann_path in tqdm(images_annotations_files):
         #process the annotations
         img_objects = process_annotation(ann_path)
 
@@ -123,7 +124,7 @@ class CarPartConfig(Config):
     NAME = 'car_parts'
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 4
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 31  # 26 parts
@@ -140,6 +141,7 @@ class CarPartConfig(Config):
     IMAGE_MIN_DIM = 512
     IMAGE_MAX_DIM = 512
 
+
 class CarPartDataset(utils.Dataset):
 
     def load_dataset(self, parts_idx_dict, preprocessed_images):
@@ -150,7 +152,6 @@ class CarPartDataset(utils.Dataset):
         """
         for part_name, i in parts_idx_dict.items():
             self.add_class('car_parts', i, part_name)
-
 
         for file_name, image_path, masks, classes in preprocessed_images:
             #add all the classes classes
@@ -188,9 +189,9 @@ if __name__ == '__main__':
     parser.add_argument('--annotations_path', required=True,
         metavar="/path/to/balloon/annotations/",
         help='The directory to load the annotations')
-    parse.add_argument('--weights', required=True,
+    parser.add_argument('--weights', required=True,
         help='the weights that can be used, values: imagenet or last')
-    parse.add_argument('--checkpoint', required=True,
+    parser.add_argument('--checkpoint', required=True,
         help='the folder where the checkpoints are saved')
     # parser.
 
@@ -228,8 +229,8 @@ if __name__ == '__main__':
                 epochs=10,
                 layers='heads')
 
-        Training - Stage 2
-        Finetune layers from ResNet stage 4 and up
+        #Training - Stage 2
+        #Finetune layers from ResNet stage 4 and up
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_val, dataset_val,
                     learning_rate=config.LEARNING_RATE,
