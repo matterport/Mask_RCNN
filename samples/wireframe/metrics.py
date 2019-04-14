@@ -1,15 +1,13 @@
-#from sklearn.cluster import KMeans, AgglomerativeClustering, SpectralClustering
-
 import sklearn.cluster as skclus
 from sklearn import metrics
 import pandas as pd
 
-def metricFunction(embeddings, labels):
+def metricFunction(embeddings, labels, n_clusters):
     algorithms = []
-    algorithms.append(skclus.KMeans(n_clusters=5, random_state=1))
-    algorithms.append(skclus.SpectralClustering(n_clusters=5, random_state=1,
+    algorithms.append(skclus.KMeans(n_clusters=n_clusters, random_state=1))
+    algorithms.append(skclus.SpectralClustering(n_clusters=n_clusters, random_state=1,
                                          affinity='nearest_neighbors'))
-    algorithms.append(skclus.AgglomerativeClustering(n_clusters=5))
+    algorithms.append(skclus.AgglomerativeClustering(n_clusters=n_clusters))
 
     data = []
     for algo in algorithms:
@@ -27,11 +25,3 @@ def metricFunction(embeddings, labels):
                                                'Silhouette'],
                            index=['K-means', 'Spectral', 'Agglomerative'])
     return results
-
-
-
-# import samples.wireframe.database_actions as db
-# import numpy as np
-# embeddings, labels = db.get_known_encodings()
-# embeddings = np.transpose(embeddings)
-# metricFunction(embeddings, labels)
