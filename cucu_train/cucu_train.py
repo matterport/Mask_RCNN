@@ -91,7 +91,7 @@ def prepareCallbackForCurrentSession():
     def scheduleLearningRate(epoch, lr):
         return lr*0.8
     
-    return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=2, verbose=1, mode='auto'),
+    return [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=1, verbose=1, mode='auto'),
             LearningRateScheduler(scheduleLearningRate, verbose=1)]
 
 def createSessionLoggerToCollectPrintOutputs():
@@ -140,22 +140,23 @@ if __name__ == "__main__":
         #dataset_val.prepare()
         
         # Training dataset
-        #dataset_train = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'train')
-        #dataset_train.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-        #dataset_train.prepare()
+        dataset_train = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'train')
+        dataset_train.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+        dataset_train.prepare()
         
         # Validation dataset
-        #dataset_val = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'valid')
-        #dataset_val.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
-        #dataset_val.prepare()
-
-        dataset_train = realDataset()
-        dataset_train.load_dataset(cucuPaths.RealDatasetDir + '1024/cucumber/train/augmented/annotations.json',cucuPaths.RealDatasetDir + '/1024/cucumber/train/augmented')
-        dataset_train.prepare()
-
-        dataset_val = realDataset()
-        dataset_val.load_dataset(cucuPaths.RealDatasetDir + '/1024/cucumber/valid/annotations.json',cucuPaths.RealDatasetDir + '/1024/cucumber/valid')
+        dataset_val = genDataset(config,cucuPaths.GenDatasetDir,datasetType = 'valid')
+        dataset_val.load_shapes(config.GEN_TRAIN_SET_SIZE, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
         dataset_val.prepare()
+
+        # dataset_train = realDataset()
+        # dataset_train.load_dataset(cucuPaths.RealDatasetDir + '/512/cucumber/train/augmented/annotations.json',cucuPaths.RealDatasetDir + '/512/cucumber/train/augmented')
+        # dataset_train.prepare()
+
+        # dataset_val = realDataset()
+        # dataset_val.load_dataset(cucuPaths.RealDatasetDir + '/512/cucumber/valid/annotations.json',cucuPaths.RealDatasetDir + '/512/cucumber/valid')
+        # dataset_val.prepare()
+
         # In[ ]:
 
 
@@ -220,7 +221,6 @@ if __name__ == "__main__":
     os.mkdir(cucuPaths.visualizeEvaluationsDir + "/display_top_masks")
     tests_location = cucuPaths.TestDatasetDir
     for filename in sorted(os.listdir(tests_location)):
-        
         testImage = os.path.join(tests_location,filename)
         try:
             t = cv2.cvtColor(cv2.imread(testImage), cv2.COLOR_BGR2RGB)

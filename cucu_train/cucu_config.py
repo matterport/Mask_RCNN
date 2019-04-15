@@ -6,10 +6,10 @@ import numpy as np
 
 
 # here you can add more object shapes 
-# globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf', 'stem']
+# globalObjectCategories= ['BG', 'cucumber', 'flower', 'leaf']
 globalObjectCategories= ['BG', 'stem']
 
-# objectsDistribution = ["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower","stem","stem","stem","stem"]
+# objectsDistribution = ["cucumber","cucumber","cucumber", "leaf","leaf","leaf","leaf", "flower", "flower"]
 objectsDistribution = ['stem']
 
 class cucumberConfig(Config):
@@ -82,12 +82,14 @@ class cucumberConfig(Config):
     #SCALE BOUNDRIES OF GENERATED OBJECTS
     MIN_SCALE_OBJ = 0.1
     MAX_SCALE_OBJ = 0.3
+    # MIN_SCALE_OBJ = 0.5
+    # MAX_SCALE_OBJ = 0.8
 
     # this hyper parameter varifies that object is not generated outside boundries of image being generated
     BOUNDING_DELTA = 0.2
 
-    GEN_TRAIN_SET_SIZE = 10000
-    REAL_TRAIN_SET_SIZE = 10099
+    GEN_TRAIN_SET_SIZE = 2000
+    REAL_TRAIN_SET_SIZE = 0
     # VALID_SET_SIZE = 5
     TEST_SET_SIZE = 12
 
