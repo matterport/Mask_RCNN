@@ -1,16 +1,12 @@
 import os
 import sys
-import math
 import random
 import numpy as np
-import cv2
 from pathlib import Path
 import scipy.io as sio
-import pickle
 import tensorflow as tf
 import mrcnn.model as modellib
-from mrcnn.model import log
-import imgaug
+import imgaug.augmenters as iaa
 from tqdm import tqdm
 
 
@@ -211,7 +207,18 @@ if __name__ == '__main__':
     config = CarPartConfig()
     print(config.display())
 
-    augmentation = imgaug.augmenters.Fliplr(0.5)
+    seq = iaa.OneOf([
+        iaa.Noop(),
+        iaa.Fliplr(0.5),
+        iaa.Flipud(0.5),
+        iaa.GaussianBlur(sigma=(0.0, 3.0)),
+        iaa.AverageBlur(k=(2, 11)),
+        iaa.Affine(scale=(.5, 2.)),
+        iaa.Affine(scale={"x": (.5, 2.), "y": (.5, 2.)}),
+        iaa.Affine(rotate=(-45, 45)),
+        iaa.Affine(shear=(-16, 16)),
+        iaa.CropAndPad(percent=(-0.25, 0.25)),
+    ])
 
     with tf.device('/gpu:0'):
     # Create model in training mode
