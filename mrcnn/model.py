@@ -1191,11 +1191,12 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
 
 from mrcnn.triplet_loss import triplet_semihard_loss
 
+
 def triplet_loss(embeddings, labels):
-    shape = tf.shape(labels, name=None, out_type=tf.dtypes.int32)
-    new_embeddings = tf.slice(embeddings, 0, shape)
-    loss = triplet_semihard_loss(labels, new_embeddings)
-    return loss
+    labels = tf.print(labels, [labels])
+    #new_embeddings = tf.slice(embeddings, 0, shape)
+    #loss = triplet_semihard_loss(labels, embeddings)
+    return K.mean(embeddings)
 
 ############################################################
 #  Data Generator
