@@ -163,6 +163,9 @@ def triplet_semihard_loss(labels, embeddings, margin=1.0):
   """
   # Reshape [batch_size] label tensor to a [batch_size, 1] label tensor.
   lshape = array_ops.shape(labels)
+  print("Starting Triplet loss")
+  print("Labels shape is {}".format(lshape.shape))
+  print("Embeddings shape is {}".format(embeddings.shape))
   assert lshape.shape == 1
   labels = array_ops.reshape(labels, [lshape[0], 1])
 

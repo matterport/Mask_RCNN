@@ -26,7 +26,7 @@ Data Preperation
 
 NUM_TRAINING_IMAGES = 10
 MAX_ICONS_PER_IMAGE = 3
-generate_data(NUM_TRAINING_IMAGES, MAX_ICONS_PER_IMAGE)
+#generate_data(NUM_TRAINING_IMAGES, MAX_ICONS_PER_IMAGE)
 
 # Training dataset
 dataset_train = Wireframe.WireframeDataset()
@@ -60,9 +60,6 @@ if not os.path.exists(COCO_MODEL_PATH):
 # Create model in training mode
 model = modellib.MaskRCNN(mode="training", config=config,
                           model_dir=MODEL_DIR)
-
-
-sess = tf.InteractiveSession()
 
 
 

@@ -980,6 +980,7 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     """
     # ROI Pooling
     # Shape: [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, channels]
+    # Shape: [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, channels]
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
 
@@ -1193,10 +1194,11 @@ from mrcnn.triplet_loss import triplet_semihard_loss
 
 
 def triplet_loss(embeddings, labels):
-    labels = tf.print(labels, [labels])
-    #new_embeddings = tf.slice(embeddings, 0, shape)
-    #loss = triplet_semihard_loss(labels, embeddings)
-    return K.mean(embeddings)
+    labels = labels[0, :]
+    embeddings = tf.transpose(embeddings, perm=[0, 2, 1])
+    embeddings = embeddings[:, :, 0]
+    loss = triplet_semihard_loss(labels, embeddings)
+    return loss
 
 ############################################################
 #  Data Generator
