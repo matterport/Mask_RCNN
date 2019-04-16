@@ -23,6 +23,7 @@ mu = 0.5
 K = 2
 alpha = 0.001
 
+
 def chi_square_distance(xi, xj):
     """
     Chi square distance
@@ -53,6 +54,7 @@ def distance(xi, X, L):
 def find_target_neighbors(X, Y, L):
     """
     Find target neighbours for all points
+
     :param X: Data Matrix      (N, D)
     :param Y: Labels           (1, N)
     :return: TN_lookup_table   (N, K)
@@ -88,39 +90,9 @@ def find_target_neighbors(X, Y, L):
     return TN_lookup_table, TN_distance_table
 
 
-def find_imposters(i, X, Y, L):
-    """
-    Find imposters for a given point in index i
-
-    :param i: Index in data matrix
-    :param X: Data Matrix    (N, D)
-    :param Y: Labels         (1, N)
-    :return: imposters       (?, D)
-    :return: imposters_dist  (1, D)
-    """
-
-    # Max margin = max distance of a target neighbour for that point + l
-    max_dist = 0
-    for TN in TN_lookup_table[i, :]:
-
-        # We need to update the distance to our target neighbours and compute the max distance
-        dist = chi_square_distance(L @ X[i], L @ X[TN])
-        if dist > max_dist:
-            max_dist = dist
-
-    # Max dist + margin l
-    max_margin = max_dist + l
-
-    # Find distances
-    distances = distance(X[i, :], X, L)
-    imposters = np.array([0])
-    for j, index in enumerate(np.argsort(distances)):
-        if distances[j] > max_margin:
-            break
-        elif Y[i] != Y[index]:
-            imposters = np.append(imposters, index)
-    imposters.astype(int)
-    return imposters[1:]
+# Check if the impostor is within the margin of the target neighbor + marginal distance l
+def check(L, xi, xj, xk):
+    return (chi_square_distance(L @ xi, L @ xj) + l >= chi_square_distance(L @ xi, L @ xk))
 
 #Tau Function
 def tau_function(X_Matrix, L_Matrix, i, j, alpha):
@@ -131,10 +103,6 @@ def tau_function(X_Matrix, L_Matrix, i, j, alpha):
         numerator +=   L_Matrix[alpha, k] * (X_Matrix[i, k] - X_Matrix[j, k])
         denominator += L_Matrix[alpha, k] * (X_Matrix[i, k] + X_Matrix[j, k])
     return numerator / denominator
-
-#Check if the impostor is the margin of the target neighbor + marginal distance l
-def check(L, xi, xj, xk):
-    return chi_square_distance(L @ xi, L @ xj) + l >= chi_square_distance(L @ xi, L @ xk)
 
 
 def gradient_and_loss_function(X, Y, L_Matrix):
@@ -154,38 +122,40 @@ def gradient_and_loss_element(X_Matrix, Y, L_Matrix, alpha, beta):
     Inner_sum = 0
     loss = 0
     for i in range(N):
-        imposters = find_imposters(i, X_Matrix, Y, L_Matrix)
         Pull = 0
         for j in TN_lookup_table[i, :]:
             tauij = tau_function(X_Matrix, L_Matrix, i, j, alpha)
             Lij = 2 * tauij * (X_Matrix[i, beta] - X_Matrix[j, beta]) - (tauij ** 2) * (
                         X_Matrix[i, beta] + X_Matrix[j, beta])
             outer_sum += Lij
-            for l_imposter in imposters:
-                if check(L_Matrix, X_Matrix[i],  X_Matrix[j],  X_Matrix[l_imposter]):
-                    tauik = tau_function(X_Matrix, L_Matrix, i, l_imposter, alpha)
-                    Lik = 2 * tauik * (X_Matrix[i, beta] - X_Matrix[l_imposter, beta]) - (tauik ** 2) * (
-                                X_Matrix[i, beta] + X_Matrix[l_imposter, beta])
+            for k in range(N):
+                # We need to update the distance to our target neighbours and compute the max distance
+                if (check(L_Matrix, X_Matrix[i], X_Matrix[j], X_Matrix[k]) and (Y[i] != Y[k])):
+                    tauik = tau_function(X_Matrix, L_Matrix, i, k, alpha)
+                    Lik = 2 * tauik * (X_Matrix[i, beta] - X_Matrix[k, beta]) - (tauik ** 2) * (
+                                X_Matrix[i, beta] + X_Matrix[k, beta])
                     Inner_sum += Lij - Lik
                 else:
-                    print(i, j, l_imposter)
+                    Inner_sum = 0
             # Calculate loss
-            loss += (1 - mu) * pull_loss(X_Matrix, L_Matrix, i, j) + mu * push_loss(X_Matrix, L_Matrix, i, j, imposters)
+            loss += (1 - mu) * pullLoss(X_Matrix, L_Matrix, i, j) + mu * pushLoss(X_Matrix, Y, L_Matrix, i, j)
 
     gradient = (1 - mu) * outer_sum + mu * Inner_sum
     return gradient, loss
 
 
 # Loss for pull
-def pull_loss(X_Matrix, L, i, j):
-    return chi_square_distance(L @ X_Matrix[i], L @ X_Matrix[j])
+def pullLoss(X_Matrix, L_Matrix, i, j):
+    return chi_square_distance(L_Matrix @ X_Matrix[i], L_Matrix @ X_Matrix[j])
 
 
 # Loss for push
-def push_loss(X_Matrix, L, i, j, imposters):
+def pushLoss(X_Matrix, Y, L_Matrix, i, j):
     loss = 0
-    for l_imposter in imposters:
-        loss += max(0, l + chi_square_distance(L @ X_Matrix[i], L @ X_Matrix[j]) - chi_square_distance(L @ X_Matrix[i],
-                                                                                                       L @ X_Matrix[
-                                                                                                           l_imposter]))
+    N, _ = np.shape(X_Matrix)
+    for k in range(N):
+        if (check(L_Matrix, X_Matrix[i], X_Matrix[j], X_Matrix[k]) and (Y[i] != Y[k])):
+            loss += max(0,
+                        l + chi_square_distance(L_Matrix @ X_Matrix[i], L_Matrix @ X_Matrix[j]) - chi_square_distance(
+                            L_Matrix @ X_Matrix[i], L_Matrix @ X_Matrix[k]))
     return loss
