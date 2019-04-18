@@ -4,35 +4,24 @@ import geopandas as gpd
 import os
 from lsru import Usgs
 from lsru import Espa
+from lsru import download_all_complete_azure
 from pprint import pprint
 import datetime
 import time
 import yaml
-from azure.storage.file.fileservice import FileService
 
-config_path = "/home/ryan/work/azure_configs.yaml"
-
-with open(config_path) as f:
-    configs = yaml.safe_load(f)
-
-# Instantiate Usgs class and login. requires setting config with credentials
-usgs = Usgs(conf=configs["download"]["lsru_config"])
+# Instantiate Usgs class and login. requires setting config with credentials in home dir
+login_path = os.path.expanduser("~/.lsru")
+usgs = Usgs(conf=login_path)
 usgs.login()
-espa = Espa(conf=configs["download"]["lsru_config"])
+espa = Espa(conf=login_path)
 
-file_service = FileService(
-    configs["storage"]["storage_name"], configs["storage"]["storage_key"]
-)
+def load_config(config_path="/home/ryan/work/azure_configs.yaml"):
 
-DATA_DIR = configs["storage"]["vm_temp_path"]
-WBD_PATH = configs["storage"]["wbd_gdb_path"]
-
-REGION_DIR = os.path.join(
-    configs["storage"]["region_dir"], configs["storage"]["region_name"]
-)
-
-LANDSAT_DWNLD_DIR = os.path.join(REGION_DIR, "landsat_downloaded")
-
+    with open(config_path) as f:
+        configs = yaml.safe_load(f)
+        
+    return configs
 
 def get_bbox_from_geojson(path):
     """
@@ -53,7 +42,7 @@ def get_bbox_from_geojson(path):
     return bbox
 
 
-def get_bbox_from_wbd(huc_layer_level, huc_id, name=None, wbd_national_path=WBD_PATH):
+def get_bbox_from_wbd(huc_layer_level, huc_id, wbd_national_path, name=None):
     """
     Gets bbox from National WBD Dataset, which can be downloaded from
     http://prd-tnm.s3-website-us-west-2.amazonaws.com/?prefix=StagedProducts/Hydrography/WBD/National/GDB/
@@ -164,7 +153,7 @@ def submit_order(filtered_scene_list, product_list):
     return order
 
 
-def download_order():
+def local_download_order(download_path):
     """
     Checks the status of an order made with submit_order until it is complete, then
     downloads the order. Waits for 5 minutes if the order is not ready yet. Checks to 
@@ -175,5 +164,11 @@ def download_order():
             # Orders have their own class with attributes and methods
             print("%s: %s" % (order.orderid, order.status))
             time.sleep(300)
-        order.download_all_complete(path=DATA_DIR, unpack=True)
+        order.download_all_complete(path=download_path, unpack=True)
         print("Order downloaded")
+        
+def azure_download_order(order)
+    while order.is_completed == False:
+        time.sleep(600)
+    download_all_complete_azure(configs['storage']['container'],configs["storage"]["storage_name"], configs["storage"]["storage_key"])
+    print("Finished downloading order to azure")

@@ -26,4 +26,5 @@ product_list = configs['download']['product_list']
 
 order = du.submit_order(scene_list, product_list)
 
-du.download_order()
+du.azure_download_order(order)
+#du.download_order()
