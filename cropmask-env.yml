@@ -55,6 +55,5 @@ dependencies:
       - hydrofunctions
       - "git+https://github.com/ecohydro/lsru@master#egg=lsru"
       - porder
-      - imgaug # for MaskRCNN
-      - "git+https://github.com/ecohydro/CropMask_RCNN@master#egg=mrcnn&mrcnn=CropMask_RCNN"
+      - imgaug # for mrcnn
       - azure
