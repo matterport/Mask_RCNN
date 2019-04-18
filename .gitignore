@@ -62,3 +62,5 @@ ENV/
 
 .vm*
 terraform/.vm*
+
+cropmask/tests/.cache

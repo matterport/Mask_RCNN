@@ -2,13 +2,23 @@ from cropmask.download import download_utils as du
 import datetime
 import yaml
 import time
+import click
 
-config_path = "/home/ryan/work/azure_configs.yaml"
+@click.command()
+@click.argument('config_path')
+def load_config(config_path):
+    """
+    Takes the path to the config file with credentials for azure,
+    storage paths, and other info (see template).
+    """
 
-with open(config_path) as f:
-    configs = yaml.safe_load(f)
+    with open(config_path) as f:
+        configs = yaml.safe_load(f)
+        
+    return configs
     
-
+configs = load_config()
+    
 bbox = du.get_bbox_from_wbd(configs['download']['huc_level'], configs['download']['huc_id'])
 
 scene_list = du.get_scene_list(collection=configs['download']['collection'],

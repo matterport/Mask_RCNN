@@ -1,16 +1,17 @@
-#name: cropmask
+name: cropmask
 channels:
   - conda-forge
 dependencies:
   # Core scientific python
   - numpy
   - matplotlib
-  - python=3.6
+  - python=3.7
   - pyqt
   - seaborn
   - xlrd # for excel sheets in pandas
   - scipy
   - scikit-learn
+  - scikit-image
 
 # Mask_RCNN requirements
   - Pillow
@@ -23,9 +24,12 @@ dependencies:
   - h5py
   - IPython[all]
 
+  # cloud related
+  - azure
 
   # Extensions
   - autopep8
+  - black
 
   # Geo stuff
   - rasterstats
@@ -37,17 +41,11 @@ dependencies:
   - pysal
   - pyproj
   - folium
-  - scikit-image
   - gdal
   - libgdal
   - kealib
   - geocoder
   - geojson
-
-  # Natural language processing
-  - tweepy
-  - nltk
-  - textblob
 
   - pip:
       # Utilities
@@ -57,6 +55,6 @@ dependencies:
       # EA tools via pip
       - mapboxgl
       - hydrofunctions
-      - lsru
+      - "--editable=git+https://github.com/ecohydro/lsru@master#egg=lsru"
       - porder
       - imgaug # for MaskRCNN

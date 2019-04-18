@@ -4,24 +4,15 @@ import geopandas as gpd
 import os
 from lsru import Usgs
 from lsru import Espa
-from lsru import download_all_complete_azure
 from pprint import pprint
 import datetime
 import time
-import yaml
 
 # Instantiate Usgs class and login. requires setting config with credentials in home dir
 login_path = os.path.expanduser("~/.lsru")
 usgs = Usgs(conf=login_path)
 usgs.login()
 espa = Espa(conf=login_path)
-
-def load_config(config_path="/home/ryan/work/azure_configs.yaml"):
-
-    with open(config_path) as f:
-        configs = yaml.safe_load(f)
-        
-    return configs
 
 def get_bbox_from_geojson(path):
     """
@@ -167,8 +158,8 @@ def local_download_order(download_path):
         order.download_all_complete(path=download_path, unpack=True)
         print("Order downloaded")
         
-def azure_download_order(order)
+def azure_download_order(order, configs):
     while order.is_completed == False:
         time.sleep(600)
-    download_all_complete_azure(configs['storage']['container'],configs["storage"]["storage_name"], configs["storage"]["storage_key"])
+    order.download_all_complete_azure(configs['storage']['container'],configs["storage"]["storage_name"], configs["storage"]["storage_key"])
     print("Finished downloading order to azure")
