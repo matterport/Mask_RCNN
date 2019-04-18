@@ -1,8 +1,8 @@
 """
 The build/compilations setup
 
+>> conda env create -f cropmask-env.yml
 >> conda activate cropmask
->> conda env update -f cropmask-env.yml
 >> python setup.py install
 """
 import pip
@@ -14,10 +14,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-logging.warning(
-    " Activate and install geo-environment.yml requirements prior to installing cropmask! Need to figure how to trigger install of requirements in the .yml file."
-)
-install_reqs = []
+install_reqs = ['Click',]
 setup(
     name="cropmask",
     version="0.0.1",
@@ -28,6 +25,10 @@ setup(
     description="Instance segmentation of agriculture in Landsat imagery",
     packages=find_packages(),
     install_requires=install_reqs,
+    entry_points='''
+    [console_scripts]
+    order_landsat_to_azure=cropmask.download.order_landsat_to_azure:cli
+    ''',
     include_package_data=True,
     python_requires=">=3.6",
     long_description="""Contains modules for downloading, preprocessing and training mrcnn on Landsat satellite imagery in order to detect center pivot agriculture and other land cover types. Runs on Microsoft Azure.""",
