@@ -12,6 +12,8 @@ dependencies:
   - scipy
   - scikit-learn
   - scikit-image
+  - xarray
+  - dask
 
 # Mask_RCNN requirements
   - Pillow
@@ -23,9 +25,6 @@ dependencies:
   - opencv
   - h5py
   - IPython[all]
-
-  # cloud related
-  - azure
 
   # Extensions
   - autopep8
@@ -44,7 +43,6 @@ dependencies:
   - gdal
   - libgdal
   - kealib
-  - geocoder
   - geojson
 
   - pip:
@@ -55,6 +53,8 @@ dependencies:
       # EA tools via pip
       - mapboxgl
       - hydrofunctions
-      - "--editable=git+https://github.com/ecohydro/lsru@master#egg=lsru"
+      - "git+https://github.com/ecohydro/lsru@master#egg=lsru"
       - porder
       - imgaug # for MaskRCNN
+      - "git+https://github.com/ecohydro/CropMask_RCNN@master#egg=mrcnn&mrcnn=CropMask_RCNN"
+      - azure

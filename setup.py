@@ -1,7 +1,8 @@
 """
 The build/compilations setup
 
->> pip install -r requirements.txt
+>> conda activate cropmask
+>> conda env update -f cropmask-env.yml
 >> python setup.py install
 """
 import pip
@@ -28,7 +29,7 @@ setup(
     packages=find_packages(),
     install_requires=install_reqs,
     include_package_data=True,
-    python_requires=">=3.4",
+    python_requires=">=3.6",
     long_description="""Contains modules for downloading, preprocessing and training mrcnn on Landsat satellite imagery in order to detect center pivot agriculture and other land cover types. Runs on Microsoft Azure.""",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
