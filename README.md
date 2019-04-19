@@ -9,18 +9,19 @@ For an overview of the project in poster form, see this poster I presented at th
 Below are Preliminary results from test on 2004 Landsat SR scene over western Nebraska. Detections are in Red, Targets from the Nebraska Department of Agriculture are in Green. Metrics are (probability score)/(intersection over union)
 ![Center Pivot Detections](assets/cp_detection.png)
 
-## Local Installation of matterport's maskrcnn, see `terraform/` folder for Azure instructions
-1. Install dependencies
+## Local Installation of cropmask dependencies, see `terraform/` folder for instructions to set up azure components.
+1. Install dependencies and install the package
    ```bash
-   conda env create -f requirements.txt
+   conda env create -f cropmask-env.yml
+   python setup.py install # use develop instead of install for editable mode
    ```
-2. Clone this repository
-3. Run setup from the repository root directory
-    ```bash
-    source activate cropmask
-    python setup_cropmask.py install
-    python setup_mrcnn.py install
-    ``` 
+2. Create a file called `.lsru` at `~` and fill in your NASA Earth Explorer Login credentials
+   ```
+   [usgs]
+   username=
+   password=
+   ```
+3. Copy the `azure_configs_template.yaml`, name it `azure_configs.yaml` and place it outside of the git repository (so you don't accidently commit it). Fill it in according to the comments int he template.
 3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
 4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
@@ -28,4 +29,4 @@ Below are Preliminary results from test on 2004 Landsat SR scene over western Ne
     * Windows: https://github.com/philferriere/cocoapi.
     You must have the Visual C++ 2015 build tools on your path (see the repo for additional details)
 
-## For instructions on setting up the entire project on Azure, see the README in the terraform folder
+### This setup will allow you to run the parts of the project that don't require Azure, like locally downloading Landsat products according to watershed boundaries. For instructions on setting up the entire project on Azure, see the README in the terraform folder

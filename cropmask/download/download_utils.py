@@ -14,6 +14,7 @@ usgs = Usgs(conf=login_path)
 usgs.login()
 espa = Espa(conf=login_path)
 
+
 def get_bbox_from_geojson(path):
     """
     Reads in a geojson, takes envelope,
@@ -105,8 +106,8 @@ def get_scene_list(collection, bbox, begin, end, max_results, max_cloud_cover):
 
     # Extract Landsat scene ids for each hit from the metadata
     scene_list = [x["displayId"] for x in scene_list]
-    # TODO nested dict needs to be parsed a level and return value for 'products' key   
-    #print(espa.get_available_products(scene_list))
+    # TODO nested dict needs to be parsed a level and return value for 'products' key
+    # print(espa.get_available_products(scene_list))
     return scene_list
 
 
@@ -157,9 +158,14 @@ def local_download_order(download_path):
             time.sleep(300)
         order.download_all_complete(path=download_path, unpack=True)
         print("Order downloaded")
-        
+
+
 def azure_download_order(order, configs):
     while order.is_completed == False:
         time.sleep(600)
-    order.download_all_complete_azure(configs['storage']['container'],configs["storage"]["storage_name"], configs["storage"]["storage_key"])
+    order.download_all_complete_azure(
+        configs["storage"]["container"],
+        configs["storage"]["storage_name"],
+        configs["storage"]["storage_key"],
+    )
     print("Finished downloading order to azure")

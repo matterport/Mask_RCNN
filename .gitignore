@@ -1,5 +1,6 @@
 # 
 src/ # this is built from installing packages from github with conda
+azure_configs.yaml
 
 # Data files and directories common in repo root
 data/
