@@ -34,7 +34,7 @@ def get_bbox_from_geojson(path):
     return bbox
 
 
-def get_bbox_from_wbd(huc_layer_level, huc_id, wbd_national_path, name=None):
+def get_bbox_from_wbd(wbd_national_path, huc_layer_level, huc_id, name=None):
     """
     Gets bbox from National WBD Dataset, which can be downloaded from
     http://prd-tnm.s3-website-us-west-2.amazonaws.com/?prefix=StagedProducts/Hydrography/WBD/National/GDB/
@@ -161,7 +161,7 @@ def local_download_order(download_path):
 
 
 def azure_download_order(order, configs):
-    while order.is_completed == False:
+    while order.is_complete == False:
         time.sleep(600)
     order.download_all_complete_azure(
         configs["storage"]["container"],

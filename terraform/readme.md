@@ -124,3 +124,14 @@ make syncdown # copy any changes you made on the remote system over to your loca
 
 The Data Science VM might lack the Cuda Deep Neural Net framework. To install it download it from the [nVidia website](https://developer.nvidia.com/rdp/cudnn-download) (needs a free dev account) for your Cuda version (`nvcc --version`) and follow [this blogpost](https://aboustati.github.io/How-to-Setup-a-VM-in-Azure-for-Deep-Learning/) for the installation. You might need cUDNN 5.0.
 
+
+## Setup cropmask conda environment for Jupyter
+
+On the Azure VM do the following
+```
+conda activate cropmask
+conda install nb_conda ipykernel
+python -m ipykernel install --user --name cropmask
+```
+
+Now you can run `jupyter lab` or `jupyter notebook` and the environment will be accessible.
