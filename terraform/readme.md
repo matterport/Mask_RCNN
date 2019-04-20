@@ -135,3 +135,30 @@ python -m ipykernel install --user --name cropmask
 ```
 
 Now you can run `jupyter lab` or `jupyter notebook` and the environment will be accessible.
+
+## Mounting Azure blob storage
+From [these instructions](https://blogs.msdn.microsoft.com/uk_faculty_connection/2019/02/20/blobfuse-is-an-open-source-project-developed-to-provide-a-virtual-filesystem-backed-by-the-azure-blob-storage/)
+Do the following
+
+```
+sudo nano /opt/blobfuse.cfg
+```
+
+enter in the following information
+
+```
+accountName #account name here#
+accountKey #account key here#
+containerName #container name here#
+```
+
+then
+
+```
+sudo mkdir /az-ml-container
+sudo mkdir /mnt/blobfusecache
+chown -R <your user account> /az-ml-container
+chown -R <your user account> /mnt/blobfusecache/
+# mounts the blob container at az-ml-container
+blobfuse /images --tmp-path=/mnt/blobfusecache -o big_writes -o max_read=131072 -o max_write=131072 -o attr_timeout=240 -o fsname=blobfuse -o entry_timeout=240 -o negative_timeout=120 --config-file=/opt/blobfuse.cfg
+```
