@@ -30,3 +30,6 @@ python3 nucleus.py detect --dataset=/path/to/dataset --subset=stage1_test --weig
 ## Jupyter notebooks
 Two Jupyter notebooks are provided as well: `inspect_nucleus_data.ipynb` and `inspect_nucleus_model.ipynb`.
 They explore the dataset, run stats on it, and go through the detection process step by step.
+
+# TODO edit the above for cropmask.
+Download the [Nebraska 2005 Center Pivot Dataset](https://calmit.unl.edu/data/2005_NE_Center_Pivots.zip) for testing
