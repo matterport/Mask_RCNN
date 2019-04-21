@@ -163,6 +163,7 @@ chown -R <your user account> /mnt/blobfusecache/
 blobfuse /images --tmp-path=/mnt/blobfusecache -o big_writes -o max_read=131072 -o max_write=131072 -o attr_timeout=240 -o fsname=blobfuse -o entry_timeout=240 -o negative_timeout=120 --config-file=/opt/blobfuse.cfg
 ```
 
+# The following does not work yet, waiting on a github issue with blobfuse
 to persist the mounting, add the following to `/etc/fstab`
 
 ```
@@ -170,3 +171,6 @@ to persist the mounting, add the following to `/etc/fstab`
 blobfuse /az-ml-container --tmp-path=/mnt/blobfusetmp -o big_writes -o max_read=131072 -o max_write=131072 -o attr_timeout=240 -o fsname=blobfuse -o entry_timeout=240 -o negative_timeout=120 --config-file
 =/opt/blobfuse.cfg fuse _netdev
 ```
+
+# use the custom mount script in this folder after starting and sshing into the vm. requires /az-ml-container to already be a directory
+`bash mount.sh`
