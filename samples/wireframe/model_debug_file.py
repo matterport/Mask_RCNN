@@ -24,9 +24,9 @@ WIREFRAME_DIR = os.path.join(ROOT_DIR, "datasets/wireframe")
 Data Preperation
 """
 
-NUM_TRAINING_IMAGES = 10
+NUM_TRAINING_IMAGES = 100
 MAX_ICONS_PER_IMAGE = 3
-#generate_data(NUM_TRAINING_IMAGES, MAX_ICONS_PER_IMAGE)
+# generate_data(NUM_TRAINING_IMAGES, MAX_ICONS_PER_IMAGE)
 
 # Training dataset
 dataset_train = Wireframe.WireframeDataset()
@@ -74,5 +74,5 @@ Train
 
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=1,
+            epochs=2,
             layers='heads')
