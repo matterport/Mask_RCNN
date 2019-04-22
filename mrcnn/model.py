@@ -957,8 +957,9 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     # One shot head
-    #mrcnn_embedding = shared
-    mrcnn_embedding = KL.Activation('softmax')(shared)
+    mrcnn_oneshot = KL.TimeDistributed(KL.Dense(128),
+                                            name='mrcnn_oneshot')(shared)
+    mrcnn_embedding = KL.Activation('softmax')(mrcnn_oneshot)
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding
 
