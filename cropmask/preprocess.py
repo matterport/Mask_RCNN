@@ -90,70 +90,26 @@ def yaml_to_band_index(params):
 
 
 def reorder_images(params):
-    """Load the os, gs, both, or any single date images and subset bands. Growing
+    """Load the images and subset bands. Growing
     Season is stacked first before OS if both true.
     """
     file_ids_all = next(os.walk(SOURCE_IMGS))[2]
     band_indices = yaml_to_band_index(params)
-    if params["seasons"]["GS"] or params["seasons"]["OS"]:
-        image_ids_gs = sorted(
-            [
-                image_id
-                for image_id in file_ids_all
-                if "GS" in image_id and ".aux" not in image_id
-            ]
-        )
-        image_ids_os = sorted(
-            [
-                image_id
-                for image_id in file_ids_all
-                if "OS" in image_id and ".aux" not in image_id
-            ]
-        )
-    else:
-        image_ids = sorted(
-            [
-                image_id
-                for image_id in file_ids_all
-                if ".tif" in image_id and ".aux" not in image_id
-            ]
-        )
 
-    if params["seasons"]["GS"] and params["seasons"]["OS"] == False:
-        for img_path in image_ids_gs:
-            gs_image = skio.imread(os.path.join(SOURCE_IMGS, img_path))
-            gs_image = gs_image[:, :, band_indices]
-            skio.imsave(img_path, gs_image, plugin="tifffile")
+    image_ids = sorted(
+        [
+            image_id
+            for image_id in file_ids_all
+            if ".tif" in image_id and ".aux" not in image_id
+        ]
+    )
 
-    elif params["seasons"]["OS"] and params["seasons"]["GS"] == False:
-        for img_path in image_ids_os:
-            os_image = skio.imread(os.path.join(SOURCE_IMGS, img_path))
-            os_image = gs_image[:, :, band_indices]
-            skio.imsave(img_path, os_image, plugin="tifffile")
-    elif params["seasons"]["OS"] and params["seasons"]["GS"]:
-        for gs_path, os_path in zip(image_ids_gs, image_ids_os):
-            gs_image = skio.imread(os.path.join(SOURCE_IMGS, gs_path))
-            os_image = skio.imread(os.path.join(SOURCE_IMGS, os_path))
-            gsos_image = np.dstack(
-                [gs_image[:, :, band_indices], os_image[:, :, band_indices]]
-            )
-
-            match = SequenceMatcher(None, gs_path, os_path).find_longest_match(
-                0, len(gs_path), 0, len(os_path)
-            )
-            path = gs_path[match.b : match.b + match.size]
-            # this may need to be reworked for diff file names
-            # works best if unique ids like GS go in front of filename
-            gsos_image_path = os.path.join(REORDER, path + "OSGS.tif")
-            skio.imsave(gsos_image_path, gsos_image, plugin="tifffile")
-
-    else:  # for non wv2, single date case
-        for img_path in image_ids:
-            image = skio.imread(os.path.join(SOURCE_IMGS, img_path))
-            image = image[
-                :, :, band_indices
-            ]  # might be best to sav all image bands in each tiff with tile align notebook since we subset here
-            skio.imsave(os.path.join(REORDER, img_path), image, plugin="tifffile")
+    for img_path in image_ids:
+        image = skio.imread(os.path.join(SOURCE_IMGS, img_path))
+        image = image[
+            :, :, band_indices
+        ]  # might be best to save all image bands in each tiff with tile align notebook since we subset here
+        skio.imsave(os.path.join(REORDER, img_path), image, plugin="tifffile")
 
 
 def negative_buffer_and_small_filter(params):
@@ -191,132 +147,47 @@ def negative_buffer_and_small_filter(params):
     # need to use Source imagery for geotransform data for rasterized shapes, didn't preserve when save imgs to reorder
     scenes = os.listdir(SOURCE_IMGS)
 
-    if params["image_vals"]["dataset"] == "wv2":
-        # hard coded season because it will take more tinkering to have the model and preprocessing work with multichannel
-        scenes = [scene for scene in scenes if "GS" in scene]
-        img_list = []
-        for name in scenes:
-            img_list.append(os.path.join(SOURCE_IMGS, name))
+    scenes = [scene for scene in scenes if ".tif" in scene and ".aux" not in scene]
+    img_list = []
+    for name in scenes:
+        img_list.append(os.path.join(SOURCE_IMGS, name))
 
-        img_list = sorted(img_list)
-
-        for shp_path, img_path in zip(shp_list, img_list):
-            shp_frame = gpd.read_file(shp_path)
-            # keeps the class of interest if it is there and the polygon of raster extent
-            shp_frame = shp_frame[
-                (shp_frame["class"] == class_int) | (shp_frame["DN"] == 1)
-            ]
-            with rasterio.open(img_path) as rast:
-                meta = rast.meta.copy()
-                meta.update(compress="lzw")
-                meta["count"] = 1
+    img_list = sorted(img_list)
+    for shp_path, img_path in zip(shp_list, img_list):
+        shp_frame = gpd.read_file(shp_path)
+        # keeps the class of interest if it is there and the polygon of raster extent
+        with rasterio.open(img_path) as rast:
+            meta = rast.meta.copy()
+            meta.update(compress="lzw")
+            meta["count"] = 1
             tifname = os.path.splitext(os.path.basename(shp_path))[0] + ".tif"
             rasterized_name = os.path.join(NEG_BUFFERED, tifname)
             with rasterio.open(rasterized_name, "w+", **meta) as out:
                 out_arr = out.read(1)
-                # we get bounds to deterimine which projection to use for neg buffer
-                shp_frame.loc[0, "DN"] = 0
-                shp_frame.loc[1:, "DN"] = 1
-                maxx_bound = shp_frame.bounds.maxx.max()
-                minx_bound = shp_frame.bounds.minx.min()
-                # need to project to correct utm before buffering in units of meters, should move into seperate func
-                if maxx_bound >= 30 and minx_bound >= 30:
-                    shp_frame = shp_frame.to_crs({"init": "epsg:32736"})
-                    shp_frame["geometry"] = shp_frame["geometry"].buffer(neg_buffer)
-                    shp_frame["Shape_Area"] = shp_frame.area
-                    shp_frame = shp_frame.to_crs({"init": "epsg:4326"})
-
-                else:
-                    shp_frame = shp_frame.to_crs({"init": "epsg:32735"})
-                    shp_frame["geometry"] = shp_frame["geometry"].buffer(neg_buffer)
-                    shp_frame["Shape_Area"] = shp_frame.area
-                    shp_frame = shp_frame.to_crs({"init": "epsg:4326"})
-
-                if (
-                    len(shp_frame) == 1
-                ):  # added for case, where entire wv2 scenes have no foreground class and need empty masks
-                    shapes = (
-                        (geom, value)
-                        for geom, value in zip(shp_frame.geometry, shp_frame.DN)
-                    )
-                    burned = features.rasterize(
-                        shapes=shapes,
-                        fill=0,
-                        out=out_arr,
-                        transform=out.transform,
-                        default_value=1,
-                    )
-                    burned[burned < 0] = 0
-                    out.write_band(1, burned)
-
-                else:  # added for center pivot case, where entire wv2 scenes have no center pivots and need empty masks
-                    shp_frame = shp_frame.loc[shp_frame.Shape_Area > small_area_filter]
-                    shp_frame = shp_frame.loc[shp_frame.Shape_Area < big_area_filter]
-                    shp_frame = shp_frame[
-                        shp_frame.DN == 1
-                    ]  # get rid of extent polygon
-                    # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
-                    shapes = (
-                        (geom, value)
-                        for geom, value in zip(shp_frame.geometry, shp_frame.DN)
-                    )
-                    burned = features.rasterize(
-                        shapes=shapes,
-                        fill=0,
-                        out=out_arr,
-                        transform=out.transform,
-                        default_value=1,
-                    )
-                    burned[burned < 0] = 0
-                    out.write_band(1, burned)
-        print(
-            "Done applying negbuff of {negbuff} and filtering small labels of area less than {area}".format(
-                negbuff=neg_buffer, area=small_area_filter
-            )
+                shp_frame = shp_frame.loc[shp_frame.area > small_area_filter]
+                shp_frame = shp_frame.loc[shp_frame.area < big_area_filter]
+                shp_frame["geometry"] = shp_frame["geometry"].buffer(neg_buffer)
+                # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
+                shapes = (
+                    (geom, value)
+                    for geom, value in zip(shp_frame.geometry, shp_frame.ObjectID)
+                )
+                burned = features.rasterize(
+                    shapes=shapes,
+                    fill=0,
+                    out_shape=rast.shape,
+                    transform=out.transform,
+                    default_value=1,
+                )
+                burned[burned < 0] = 0
+                burned[burned > 0] = 1
+                burned = burned.astype(np.int16, copy=False)
+                out.write(burned, 1)
+    print(
+        "Done applying negbuff of {negbuff} and filtering small labels of area less than {area}".format(
+            negbuff=neg_buffer, area=small_area_filter
         )
-
-    elif params["image_vals"]["dataset"] == "landsat":
-        scenes = [scene for scene in scenes if ".tif" in scene and ".aux" not in scene]
-        img_list = []
-        for name in scenes:
-            img_list.append(os.path.join(SOURCE_IMGS, name))
-
-        img_list = sorted(img_list)
-        for shp_path, img_path in zip(shp_list, img_list):
-            shp_frame = gpd.read_file(shp_path)
-            # keeps the class of interest if it is there and the polygon of raster extent
-            with rasterio.open(img_path) as rast:
-                meta = rast.meta.copy()
-                meta.update(compress="lzw")
-                meta["count"] = 1
-                tifname = os.path.splitext(os.path.basename(shp_path))[0] + ".tif"
-                rasterized_name = os.path.join(NEG_BUFFERED, tifname)
-                with rasterio.open(rasterized_name, "w+", **meta) as out:
-                    out_arr = out.read(1)
-                    shp_frame = shp_frame.loc[shp_frame.area > small_area_filter]
-                    shp_frame = shp_frame.loc[shp_frame.area < big_area_filter]
-                    shp_frame["geometry"] = shp_frame["geometry"].buffer(neg_buffer)
-                    # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
-                    shapes = (
-                        (geom, value)
-                        for geom, value in zip(shp_frame.geometry, shp_frame.ObjectID)
-                    )
-                    burned = features.rasterize(
-                        shapes=shapes,
-                        fill=0,
-                        out_shape=rast.shape,
-                        transform=out.transform,
-                        default_value=1,
-                    )
-                    burned[burned < 0] = 0
-                    burned[burned > 0] = 1
-                    burned = burned.astype(np.int16, copy=False)
-                    out.write(burned, 1)
-        print(
-            "Done applying negbuff of {negbuff} and filtering small labels of area less than {area}".format(
-                negbuff=neg_buffer, area=small_area_filter
-            )
-        )
+    )
 
 
 def rm_mostly_empty(scene_path, label_path):

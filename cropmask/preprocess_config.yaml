@@ -1,6 +1,6 @@
 dirs:
-    root: /home/rave/tana-crunch/waves/cropmask/data
-    dataset: landsat-1024-cp-nobaddata # rename this based on the imagery and labels
+    root: /az-ml-container
+    dataset: landsat-1024-cp # rename this based on the imagery and labels
     reorder: reorder
     train: train
     test: test
@@ -11,9 +11,6 @@ dirs:
     source_imgs: North_Platte_Western_NB_L5_2004-2006_stacked
     source_labels: north_platte_landsat_tile_labels
     neg_buffered_labels: neg_buffered_labels
-seasons:
-    GS: false # if GS and OS are false, seasons are disregarded
-    OS: false
 landsat_bands_to_include:
     - blue: true
     - green: true
