@@ -1197,12 +1197,23 @@ def triplet_loss(y_pred, y_true):
     print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
     print("Y Pred (embeddings) shape: {}".format(K.int_shape(y_pred)))
 
-    # Reshape data
-    #y_pred = tf.squeeze(y_pred, axis=1)
-    #y_true = tf.squeeze(y_true, axis=1)
+    NUM_ROIS = 100
 
-    #y_pred = tf.reshape(y_pred, [tf.shape(y_pred)[0] + tf.shape(y_pred)[1], tf.shape(y_pred)[2]])
-    #y_true = tf.reshape(y_true, [tf.shape(y_true)[0] + tf.shape(y_true)[1]])
+
+    # (None, 200)
+    y_true = tf.slice(y_true, [0, 0], [-1, NUM_ROIS])
+    # (None, 10)
+    shape = tf.shape(y_true)
+    y_true = tf.reshape(y_true, [shape[0] * shape[1]])
+    # (None * 10,)
+
+
+    # (None, 200, 1024)
+    y_pred = tf.slice(y_pred, [0, 0, 0], [-1, NUM_ROIS, -1])
+    # (None, 10, 1024)
+    shape = tf.shape(y_pred)
+    y_pred = tf.reshape(y_pred, [shape[0] * shape[1],  shape[2]])
+    # (None * 10, 1024)
 
     print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
     print("Y Pred (embeddings) shape: {}".format(K.int_shape(y_pred)))
