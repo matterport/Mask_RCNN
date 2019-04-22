@@ -2,7 +2,7 @@
 
 Based on the implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow, one shot object recognition was developed. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
 
-![Instance Segmentation Sample](assets/street.png)
+![Instance Segmentation Sample](assets/train/4.png)
 
 The repository includes:
 * Source code of Mask R-CNN built on FPN and ResNet101.
@@ -17,7 +17,7 @@ The base code, provided by [Matterport3D](https://matterport.com/blog/2017/09/20
 # Getting Started
 * [Data_Preprocessing.ipynb](samples/wireframe/Data_Preprocessing.ipynb) - use it to train the weights for the model.
 
-* [train_icons_data.ipynb](samples/wireframe/train_icons_data.ipynb) - use it to process the icons and format them in the write way to generate images with wireframes.
+* [train_icons_data.ipynb](samples/wireframe/train_icons_data.ipynb) - use it to process the icons and format them in the write way to generate images with wireframes.street.png
 
 * ([One-Shot.py](samples/wireframes/One-Shot.ipynb) - it comprises the main code for the one shot object recognition, making the overall Mask R-CNN more computationally efficient.  
 
