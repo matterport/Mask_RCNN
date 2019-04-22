@@ -70,7 +70,7 @@ TensorBoard is another great debugging and visualization tool. The model is conf
 
 ![](assets/detection_tensorboard.png)
 
-## 6. Composing the different pieces into a final result
+## 7. Composing the different pieces into a final result
 
 ![](assets/detection_final.png)
 
