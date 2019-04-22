@@ -22,7 +22,7 @@ random.seed(1)
 def parse_yaml(input_file):
     """Parse yaml file of configuration parameters."""
     with open(input_file, "r") as yaml_file:
-        params = yaml.load(yaml_file)
+        params = yaml.safe_load(yaml_file)
     return params
 
 
@@ -32,7 +32,7 @@ ROOT = params["dirs"]["root"]
 
 DATASET = os.path.join(ROOT, params["dirs"]["dataset"])
 
-REORDER = os.path.join(DATASET, params["dirs"]["reorder"])
+STACKED = os.path.join(DATASET, params["dirs"]["stacked"])
 
 TRAIN = os.path.join(DATASET, params["dirs"]["train"])
 
@@ -47,19 +47,16 @@ OPENED = os.path.join(DATASET, params["dirs"]["opened"])
 NEG_BUFFERED = os.path.join(DATASET, params["dirs"]["neg_buffered_labels"])
 
 RESULTS = os.path.join(
-    ROOT, "../", params["dirs"]["results"], params["dirs"]["dataset"]
+    ROOT, params["dirs"]["results"], params["dirs"]["dataset"]
 )
 
 SOURCE_IMGS = os.path.join(ROOT, params["dirs"]["source_imgs"])
 
 SOURCE_LABELS = os.path.join(ROOT, params["dirs"]["source_labels"])
 
-
-def make_dirs():
-
-    dirs = [
+DIRECTORY_LIST = [
         DATASET,
-        REORDER,
+        STACKED,
         TRAIN,
         TEST,
         GRIDDED_IMGS,
@@ -69,12 +66,16 @@ def make_dirs():
         RESULTS,
     ]
 
-    # Make directory and subdirectories
-    for d in dirs:
-        pathlib.Path(d).mkdir(parents=False, exist_ok=False)
+def make_dirs(directory_list):
 
+    # Make directory and subdirectories
+    for d in directory_list:
+        try: 
+            pathlib.Path(d).mkdir(parents=False, exist_ok=False)
+        except: 
+            FileExistsError
     # Change working directory to project directory
-    os.chdir(dirs[0])
+    os.chdir(directory_list[0])
 
 
 def yaml_to_band_index(params):
@@ -105,7 +106,7 @@ def yaml_to_band_index(params):
     return band_list
 
 
-def load_gs_wv2(scene_dir_path, band_list):
+def load_and_stack_bands(scene_dir_path, band_list):
     """Load the landsat bands specified by yaml_to_band_index and returns 
     a [H,W,N] Numpy array for a single scene, where N is the number of bands 
     and H and W are the height and width of the original band arrays. 
@@ -131,10 +132,17 @@ def load_gs_wv2(scene_dir_path, band_list):
     filtered_product_list = sorted(filtered_product_list)
     filtered_product_paths = [os.path.join(scene_dir_path, fname) for fname in filtered_product_list]
     arr_list = [skio.imread(product_path) for product_path in filtered_product_paths]
+    
+    with rasterio.open(product_path) as rast:
+            meta = rast.meta.copy()
+            meta.update(compress="lzw")
+            meta["count"] = len(arr_list)
+    
     stacked_arr = np.dstack(arr_list)
     stacked_arr[stacked_arr <= 0]=0
-    reorder_path = os.path.join(REORDER_DIR,image_id+'.tif')
-    skio.imsave(reorder_path,stacked_arr, plugin='tifffile')
+    stacked_name = os.path.basename(product_path)[0][:-10] + ".tif"
+    stacked_path = os.path.join(STACKED_DIR, stacked_name)
+    skio.imsave(stacked_path,stacked_arr, plugin='tifffile')
 
 def negative_buffer_and_small_filter(params):
     """

@@ -1,14 +1,14 @@
 dirs:
     root: /az-ml-container
     dataset: landsat-1024-cp # rename this based on the imagery and labels
-    reorder: reorder
+    stacked: stacked
     train: train
     test: test
     gridded_imgs: landsat_grid_imgs
     gridded_labels: landsat_grid_labels
     opened: opened_labels
     results: results
-    source_imgs: North_Platte_Western_NB_L5_2004-2006_stacked
+    source_imgs: LT050320312005101501T1-SC20190418222716
     source_labels: north_platte_landsat_tile_labels
     neg_buffered_labels: neg_buffered_labels
 landsat_bands_to_include:

@@ -18,14 +18,14 @@ def percentile_rescale(arr):
     return rescaled_arr
 
 
-def remove_dir_folders(directory):
+def remove_dir_folders(directory_list, root):
     """
-    Removes all files and sub-folders in a folder and keeps the folder.
+    Removes all files and sub-folders in each folder.
     """
 
-    folderlist = [f for f in os.listdir(directory)]
-    for f in folderlist:
-        shutil.rmtree(os.path.join(directory, f))
+    directory_list
+    for f in directory_list:
+        shutil.rmtree(os.path.join(root, f))
 
 
 def max_normalize(arr):
