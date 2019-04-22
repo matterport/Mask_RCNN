@@ -2603,8 +2603,8 @@ class MaskRCNN():
 
     def get_pretrained_weights(self):
         from keras.utils.data_utils import get_file
-        TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/Holstrup/Mask_RCNN/releases/download/v2.2/mask_rcnn_newdata_20.h5'
-        weights_path = get_file('mask_rcnn_newdata_20.h5',
+        TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/Holstrup/Mask_RCNN/releases/download/v2.2/mask_rcnn_triplet20.h5'
+        weights_path = get_file('mask_rcnn_triplet20.h5',
                                 TF_WEIGHTS_PATH_NO_TOP,
                                 cache_subdir='models',
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
