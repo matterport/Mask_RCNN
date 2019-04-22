@@ -16,15 +16,6 @@ landsat_bands_to_include:
     - green: true
     - red: true
     - near-IR : false
-wv2_bands_to_include:
-    - coastal: false
-    - blue: true
-    - green: true
-    - yellow: false
-    - red: true
-    - red_edge: false
-    - near_IR1: false
-    - near_IR2: false
 image_vals:
     dataset: "landsat"
     img_id: "LT05_L1TP_032031_20040318_20160914_01rgb.tif" #check REORDER folder for what id this should be. If False, operates on whole folder, extent of images and shape pairs must match

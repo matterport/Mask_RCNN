@@ -78,39 +78,63 @@ def make_dirs():
 
 
 def yaml_to_band_index(params):
+    """Parses config booleans to a list of band indexes to be stacked.
+
+    Landsat has 6 bands (7 if you count band 6, thermal) that we can use
+    for masking.
+
+    Args:
+        params (dict): The configuration dictionary that is read with yaml.
+
+    Returns:
+        list: A list of ints for the band numbers, starting from 0. 0 would
+        represent the blue band, 1 green, and so on. 
+        
+        See https://landsat.usgs.gov/what-are-band-designations-landsat-satellites
+
+    .. _PEP 484:
+        https://www.python.org/dev/peps/pep-0484/
+
+    """
     band_list = []
     if params["image_vals"]["dataset"] == "landsat":
         bands = params["landsat_bands_to_include"]
-    elif params["image_vals"]["dataset"] == "wv2":
-        bands = params["wv2_bands_to_include"]
     for i, band in enumerate(bands):
         if list(band.values())[0] == True:
             band_list.append(i)
     return band_list
 
 
-def reorder_images(params):
-    """Load the images and subset bands. Growing
-    Season is stacked first before OS if both true.
+def load_gs_wv2(scene_dir_path, band_list):
+    """Load the landsat bands specified by yaml_to_band_index and returns 
+    a [H,W,N] Numpy array for a single scene, where N is the number of bands 
+    and H and W are the height and width of the original band arrays. 
+    Channels are ordered in band order.
+
+    Args:
+        scene_dir_path (str): The path to the scene directory. The dir name should be the standard scene id that is the same as
+        as the blob name of the folder that has the landsat product bands downloaded using lsru or
+        download_utils.
+        band_list (str): a list of band indices to include
+
+    Returns:
+        ndarray:  
+        
+    .. _PEP 484:
+        https://www.python.org/dev/peps/pep-0484/
+
     """
-    file_ids_all = next(os.walk(SOURCE_IMGS))[2]
-    band_indices = yaml_to_band_index(params)
-
-    image_ids = sorted(
-        [
-            image_id
-            for image_id in file_ids_all
-            if ".tif" in image_id and ".aux" not in image_id
-        ]
-    )
-
-    for img_path in image_ids:
-        image = skio.imread(os.path.join(SOURCE_IMGS, img_path))
-        image = image[
-            :, :, band_indices
-        ]  # might be best to save all image bands in each tiff with tile align notebook since we subset here
-        skio.imsave(os.path.join(REORDER, img_path), image, plugin="tifffile")
-
+    # Load image
+    product_list = os.listdir(scene_dir_path)
+    # below works because only products that are bands have a int in the 4th to last position
+    filtered_product_list = [band for band in product_list if band[-4] in band_list]
+    filtered_product_list = sorted(filtered_product_list)
+    filtered_product_paths = [os.path.join(scene_dir_path, fname) for fname in filtered_product_list]
+    arr_list = [skio.imread(product_path) for product_path in filtered_product_paths]
+    stacked_arr = np.dstack(arr_list)
+    stacked_arr[stacked_arr <= 0]=0
+    reorder_path = os.path.join(REORDER_DIR,image_id+'.tif')
+    skio.imsave(reorder_path,stacked_arr, plugin='tifffile')
 
 def negative_buffer_and_small_filter(params):
     """
@@ -118,13 +142,10 @@ def negative_buffer_and_small_filter(params):
     produce conjoined instances when connected components is run (even after 
     erosion/dilation). This may not get rid of all conjoinments and should be adjusted.
     It relies too on the source projection of the label file to calculate distances for
-    the negative buffer. Currently, if using wv2, labels are reprojected. for other imagery
-    it's assumed that the projection is in meters and that a negative buffer in meter units 
+    the negative buffer. It's assumed that the projection is in meters and that a negative buffer in meter units 
     will work with this projection.
 
     Returns rasterized labels that are ready to be gridded
-    
-    The function is unfortunately split, one process if the data source is wv2 and one if it is landsat.
     """
 
     class_int = params["label_vals"]["class"]
