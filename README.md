@@ -19,7 +19,7 @@ The base code, provided by [Matterport3D](https://matterport.com/blog/2017/09/20
 
 * [train_icons_data.ipynb](samples/wireframe/train_icons_data.ipynb) - use it to process the icons and format them in the write way to generate images with wireframes.street.png
 
-* [One-Shot.py](samples/wireframes/One-Shot.ipynb) - it comprises the main code for the one shot object recognition, making the overall Mask R-CNN more computationally efficient.  
+* [One-Shot.py](samples/wireframe/One-Shot.ipynb) - it comprises the main code for the one shot object recognition, making the overall Mask R-CNN more computationally efficient.  
 
 ## Installation
 1. Clone this repository
