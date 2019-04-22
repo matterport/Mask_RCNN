@@ -1,0 +1,59 @@
+name: cropmask
+channels:
+  - conda-forge
+dependencies:
+  # Core scientific python
+  - numpy
+  - matplotlib
+  - python=3.7
+  - pyqt
+  - seaborn
+  - xlrd # for excel sheets in pandas
+  - scipy
+  - scikit-learn
+  - scikit-image
+  - xarray
+  - dask
+
+# Mask_RCNN requirements
+  - Pillow
+  - cython
+  - matplotlib
+  - scikit-image
+  - tensorflow>=1.3.0
+  - keras>=2.0.8
+  - opencv
+  - h5py
+  - IPython[all]
+
+  # Extensions
+  - autopep8
+  - black
+
+  # Geo stuff
+  - rasterstats
+  - geopy
+  - cartopy
+  - geopandas
+  - rasterio
+  - contextily
+  - pysal
+  - pyproj
+  - folium
+  - gdal
+  - libgdal
+  - kealib
+  - geojson
+
+  - pip:
+      # Utilities
+      - download
+      - tqdm
+      - kiwisolver
+      # EA tools via pip
+      - mapboxgl
+      - hydrofunctions
+      - "git+https://github.com/ecohydro/lsru@master#egg=lsru"
+      - porder
+      - imgaug # for mrcnn
+      - azure

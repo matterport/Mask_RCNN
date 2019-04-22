@@ -1,10 +1,18 @@
+# 
+src/ # this is built from installing packages from github with conda
+azure_configs.yaml
+
 # Data files and directories common in repo root
+data/
 datasets/
 logs/
 *.h5
 results/
 temp/
 test/
+notebooks/aml_config/
+aml_config/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -56,3 +64,8 @@ pip-delete-this-directory.txt
 .venv
 venv/
 ENV/
+
+.vm*
+terraform/.vm*
+
+cropmask/tests/.cache
