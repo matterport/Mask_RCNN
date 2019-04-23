@@ -1,8 +1,8 @@
+import keras
 import keras.backend as K
 import keras.layers as KL
 from mrcnn.triplet_loss import batch_all_triplet_loss
 import tensorflow as tf
-from keras.models import Sequential
 
 class Model:
     def __init__(self):
@@ -10,10 +10,10 @@ class Model:
         self.compile_model()
 
     def build_model(self):
-        base_model = KL.Input(shape=(None, 200, 128))
-        x = base_model.output
-        x = KL.TimeDistributed(KL.Dense(128), name='x')(x)
-        full_model = KL.Activation('softmax')(x)
+        input = KL.Input(shape=(1024,))
+        x = KL.TimeDistributed(KL.Dense(128), name='x')(input)
+        x = KL.Activation('softmax')(x)
+        full_model = keras.Model(inputs=input.input, outputs=x)
         return full_model
 
     def compile_model(self):
