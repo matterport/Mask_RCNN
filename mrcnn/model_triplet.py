@@ -4,6 +4,7 @@ import keras.backend as K
 import keras.layers as KL
 from mrcnn.triplet_loss import batch_all_triplet_loss
 import tensorflow as tf
+from keras.losses import sparse_categorical_crossentropy
 
 class Model:
     def __init__(self):
@@ -12,13 +13,13 @@ class Model:
 
     def build_model(self):
         base = KL.Input(shape=(1024,))
-        x = KL.TimeDistributed(KL.Dense(128), name='x')(input)
+        x = KL.Dense(128)(base)
         x = KL.Activation('softmax')(x)
         full_model = keras.Model(inputs=base, outputs=x)
         return full_model
 
     def compile_model(self):
-        self.model.compile(optimizer='adam', loss=triplet_loss,
+        self.model.compile(optimizer='adam', loss=sparse_categorical_crossentropy,
                            metrics=['accuracy'])
 
 def triplet_loss(y_true, y_pred):
