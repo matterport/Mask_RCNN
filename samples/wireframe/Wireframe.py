@@ -159,7 +159,7 @@ class WireframeDataset(utils.Dataset):
         for i, icon in enumerate(icons):
             icon_name = icon.split(".")[0]
             self.add_class("wireframe", i + 1, icon_name)
-
+        print(self.class_info)
         # Prediction data set?
         assert subset in ["predict"]
         dataset_dir = os.path.join(dataset_dir, subset)
