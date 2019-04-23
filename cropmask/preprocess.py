@@ -12,6 +12,7 @@ import pathlib
 import yaml
 import geopandas as gpd
 from rasterio import features, coords
+from rasterio.plot import reshape_as_raster
 import rasterio
 from shapely.geometry import shape
 import gdal
@@ -30,7 +31,9 @@ params = parse_yaml("preprocess_config.yaml")
 
 ROOT = params["dirs"]["root"]
 
-DATASET = os.path.join(ROOT, params["dirs"]["dataset"])
+REGION = os.path.join(ROOT, params["dirs"]["region_name"])
+
+DATASET = os.path.join(REGION, params["dirs"]["dataset"])
 
 STACKED = os.path.join(DATASET, params["dirs"]["stacked"])
 
@@ -50,11 +53,12 @@ RESULTS = os.path.join(
     ROOT, params["dirs"]["results"], params["dirs"]["dataset"]
 )
 
-SOURCE_IMGS = os.path.join(ROOT, params["dirs"]["source_imgs"])
+SOURCE_IMGS = os.path.join(ROOT, params["dirs"]["region_name"])
 
-SOURCE_LABELS = os.path.join(ROOT, params["dirs"]["source_labels"])
+SOURCE_LABELS = os.path.join(ROOT, params["dirs"]["region_labels"])
 
 DIRECTORY_LIST = [
+        REGION,
         DATASET,
         STACKED,
         TRAIN,
@@ -81,15 +85,16 @@ def make_dirs(directory_list):
 def yaml_to_band_index(params):
     """Parses config booleans to a list of band indexes to be stacked.
 
-    Landsat has 6 bands (7 if you count band 6, thermal) that we can use
-    for masking.
+    For example, Landsat 5 has 6 bands (7 if you count band 6, thermal) 
+    that we can use for masking.
 
     Args:
         params (dict): The configuration dictionary that is read with yaml.
 
     Returns:
-        list: A list of ints for the band numbers, starting from 0. 0 would
-        represent the blue band, 1 green, and so on. 
+        list: A list of strings for the band numbers, starting from 1. For Landsat 5 1 would
+        represent the blue band, 2 green, and so on. For Landsat 8, band 1 would be coastal blue,
+        band 2 would be blue, and so on.
         
         See https://landsat.usgs.gov/what-are-band-designations-landsat-satellites
 
@@ -102,11 +107,11 @@ def yaml_to_band_index(params):
         bands = params["landsat_bands_to_include"]
     for i, band in enumerate(bands):
         if list(band.values())[0] == True:
-            band_list.append(i)
-    return band_list
+            band_list.append(i+1)
+    return [str(b) for b in band_list]
 
 
-def load_and_stack_bands(scene_dir_path, band_list):
+def stack_and_save_bands(scene_dir_path, band_list, out_dir):
     """Load the landsat bands specified by yaml_to_band_index and returns 
     a [H,W,N] Numpy array for a single scene, where N is the number of bands 
     and H and W are the height and width of the original band arrays. 
@@ -117,6 +122,7 @@ def load_and_stack_bands(scene_dir_path, band_list):
         as the blob name of the folder that has the landsat product bands downloaded using lsru or
         download_utils.
         band_list (str): a list of band indices to include
+        out_dir (str): the path to the stacked directory
 
     Returns:
         ndarray:  
@@ -127,22 +133,43 @@ def load_and_stack_bands(scene_dir_path, band_list):
     """
     # Load image
     product_list = os.listdir(scene_dir_path)
-    # below works because only products that are bands have a int in the 4th to last position
-    filtered_product_list = [band for band in product_list if band[-4] in band_list]
+    # below works because only products that are bands have a int in the 5th to last position
+    filtered_product_list = [band for band in product_list if band[-5] in band_list]
     filtered_product_list = sorted(filtered_product_list)
     filtered_product_paths = [os.path.join(scene_dir_path, fname) for fname in filtered_product_list]
     arr_list = [skio.imread(product_path) for product_path in filtered_product_paths]
-    
-    with rasterio.open(product_path) as rast:
+    # get metadata and edit meta obj for stacked raster
+    with rasterio.open(filtered_product_paths[0]) as rast:
             meta = rast.meta.copy()
             meta.update(compress="lzw")
             meta["count"] = len(arr_list)
     
     stacked_arr = np.dstack(arr_list)
     stacked_arr[stacked_arr <= 0]=0
-    stacked_name = os.path.basename(product_path)[0][:-10] + ".tif"
-    stacked_path = os.path.join(STACKED_DIR, stacked_name)
-    skio.imsave(stacked_path,stacked_arr, plugin='tifffile')
+    stacked_name = filtered_product_list[0][:-10] + ".tif"
+    stacked_path = os.path.join(out_dir, stacked_name)
+    with rasterio.open(stacked_path, "w+", **meta) as out:
+        out.write(reshape_as_raster(stacked_arr))
+
+def stack_and_save_all(scenes_source_dir, band_list, out_dir):
+    """Runs stack_and_save_bands for all ordered scenes in SOURCE_IMGS. SOURCE_IMGS should contain a set of unpacked tar archives, and can be a single region order or a couple of concatenated region orders for training and testing on multiple geographies.
+
+    Args:
+        scenes_source_dir (str): the path to the dir with the source scenes
+        band_list (str): a list of band indices to include
+        out_dir (str): the path to the stacked directory
+
+    Returns:
+        ndarray:  
+        
+    .. _PEP 484:
+        https://www.python.org/dev/peps/pep-0484/
+
+    """
+    
+    
+    
+    
 
 def negative_buffer_and_small_filter(params):
     """

@@ -8,8 +8,8 @@ dirs:
     gridded_labels: landsat_grid_labels
     opened: opened_labels
     results: results
-    source_imgs: LT050320312005101501T1-SC20190418222716
-    source_labels: north_platte_landsat_tile_labels
+    region_name: western_nebraska # should be the same as azure_configs used for downloading the order, where source image folders (unpacked tars) are located
+    region_labels: north_platte_landsat_tile_labels
     neg_buffered_labels: neg_buffered_labels
 landsat_bands_to_include:
     - blue: true
@@ -18,7 +18,6 @@ landsat_bands_to_include:
     - near-IR : false
 image_vals:
     dataset: "landsat"
-    img_id: "LT05_L1TP_032031_20040318_20160914_01rgb.tif" #check REORDER folder for what id this should be. If False, operates on whole folder, extent of images and shape pairs must match
     grid_size: 512 # in pixel units
     usable_thresh: .00 #image must have no more than this percentage of values that are zero from either clouds or no_data (tile edges)
     split: .10 # the proportion of samples that will be used for testing
