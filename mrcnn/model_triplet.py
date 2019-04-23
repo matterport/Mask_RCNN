@@ -1,3 +1,4 @@
+import numpy as np
 import keras
 import keras.backend as K
 import keras.layers as KL
@@ -10,10 +11,10 @@ class Model:
         self.compile_model()
 
     def build_model(self):
-        input = KL.Input(shape=(1024,))
+        base = KL.Input(shape=(1024,))
         x = KL.TimeDistributed(KL.Dense(128), name='x')(input)
         x = KL.Activation('softmax')(x)
-        full_model = keras.Model(inputs=input.input, outputs=x)
+        full_model = keras.Model(inputs=base, outputs=x)
         return full_model
 
     def compile_model(self):
@@ -36,3 +37,8 @@ def triplet_loss(y_true, y_pred):
     # Run
     loss, _ = batch_all_triplet_loss(embeddings=y_pred, labels=y_true, margin=def_margin)
     return loss
+
+embeddings = np.ones((2, 1024))
+labels = np.ones(2)
+model = Model()
+model.model.fit(embeddings, labels, batch_size=10, epochs=1)
