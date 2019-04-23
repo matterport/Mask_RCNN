@@ -957,8 +957,8 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
     mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     # One shot head
-    #mrcnn_embedding = shared
-    mrcnn_embedding = KL.Activation('softmax')(shared)
+    mrcnn_embedding = KL.TimeDistributed(KL.Dense(128, activation='relu'), name='embedding_dense')(shared)
+    mrcnn_embedding = KL.TimeDistributed(KL.Activation("softmax"), name="embedding_softmax")(mrcnn_embedding)
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox, mrcnn_embedding
 
@@ -1160,6 +1160,7 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
     pred_masks: [batch, proposals, height, width, num_classes] float32 tensor
                 with values from 0 to 1.
     """
+
     # Reshape for simplicity. Merge first two dimensions into one.
     target_class_ids = K.reshape(target_class_ids, (-1,))
     mask_shape = tf.shape(target_masks)
@@ -1199,14 +1200,35 @@ def triplet_loss(y_pred, y_true):
 
     NUM_ROIS = 100
 
+    y_true = K.reshape(y_true, (-1,))
 
+    # Find non zero elements
+    positive_ix = tf.where(y_true > 0)[:, 0]
+
+    # Gather non zero elements
+    y_true = tf.cast(
+        tf.gather(y_true, positive_ix), tf.int64)
+    # Reshape from (None, 200) to (None + 200,)
+
+    #shape = tf.shape(y_true)
+    #y_true = tf.reshape(y_true, [shape[0] * shape[1]])
+
+    # Gather non zero elements
+    y_pred = tf.cast(
+        tf.gather(y_pred, positive_ix), tf.float32)
+    shape = tf.shape(y_pred)
+    # Reshape from (None, 200, 1024) to (None + 200, 1024)
+    y_pred = tf.reshape(y_pred, [shape[0] * shape[1], shape[2]])
+
+
+    """
     # (None, 200)
     y_true = tf.slice(y_true, [0, 0], [-1, NUM_ROIS])
     # (None, 10)
     shape = tf.shape(y_true)
     y_true = tf.reshape(y_true, [shape[0] * shape[1]])
     # (None * 10,)
-
+    
 
     # (None, 200, 1024)
     y_pred = tf.slice(y_pred, [0, 0, 0], [-1, NUM_ROIS, -1])
@@ -1214,14 +1236,17 @@ def triplet_loss(y_pred, y_true):
     shape = tf.shape(y_pred)
     y_pred = tf.reshape(y_pred, [shape[0] * shape[1],  shape[2]])
     # (None * 10, 1024)
+    """
 
     print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
     print("Y Pred (embeddings) shape: {}".format(K.int_shape(y_pred)))
 
-    def_margin = tf.constant(1.0, dtype=tf.float32)
+    def_margin = tf.constant(0.8, dtype=tf.float32)
 
     # Print
     y_true = K.print_tensor(y_true, message='y_true is = ')
+    K.print_tensor(positive_ix,     message='Non zero is = ')
+
 
 
     # Run
@@ -2368,7 +2393,8 @@ class MaskRCNN():
         # Pre-defined layer regular expressions
         layer_regex = {
             # all layers but the backbone
-            "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)|(embedding\_.*)",
+            "oneshot": r"(embedding\_.*)",
             # From a specific Resnet stage and up
             "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
