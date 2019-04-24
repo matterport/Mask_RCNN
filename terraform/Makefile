@@ -14,9 +14,9 @@ VM_CONN=$(shell cat ${PATH_VM_IP}) # user@IP
 mkfile_path=$(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR=$(notdir $(patsubst %/,%,$(dir $(mkfile_path))))
 
-# sync code
+# sync code disabled strict key checking for syncup for terraform build
 syncup:
-	rsync -e "ssh -i ${PATH_SSH_KEY}" -avz --exclude=".git/" --exclude-from=.gitignore ${LOCAL_DIR} $(shell echo ${VM_CONN}:${REMOTE_DIR}/${CURRENT_DIR} | tr -d '[:space:]')
+	rsync -e "ssh -i ${PATH_SSH_KEY} -o StrictHostKeyChecking=no" -avz --exclude=".git/" --exclude-from=.gitignore ${LOCAL_DIR} $(shell echo ${VM_CONN}:${REMOTE_DIR}/${CURRENT_DIR} | tr -d '[:space:]')
 syncdown:
 	rsync -e "ssh -i ${PATH_SSH_KEY}" -avz --exclude=".git/" --exclude-from=.gitignore $(shell echo ${VM_CONN}:${REMOTE_DIR}/${CURRENT_DIR}/ | tr -d '[:space:]') ${LOCAL_DIR}
 # start/stop instance

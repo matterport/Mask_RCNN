@@ -68,6 +68,14 @@ ENV/
 .vm*
 terraform/.vm*
 terraform/terraform.tfvars 
+terraform/.terraform
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform.tfvars
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+
 
 # etc.
 cropmask/tests/.cache
