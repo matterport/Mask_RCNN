@@ -75,7 +75,8 @@ terraform.tfvars
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
-
+.terraform.tfstate.lock.info
+terraform/.terraform.tfstate.lock.info
 
 # etc.
 cropmask/tests/.cache

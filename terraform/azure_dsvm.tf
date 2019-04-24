@@ -201,14 +201,28 @@ resource "null_resource" "ds" {
       "export ACCOUNT_KEY=${var.account_key}",
       "export STORAGE_NAME=${var.storage_name}",
       "export STORAGE_KEY=${var.storage_key}",    
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup_env.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup-env.sh",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/mount.sh",
     ]
+
+    connection {
+      type        = "ssh"
+      user        = "${var.admin_user}"
+      private_key = "${file(var.admin_private_key)}"
+      host        = "${azurerm_public_ip.ds.ip_address}"
+    }
   }
 
   provisioner "file"{
     source = "${var.lsru_config}"
     destination = "/home/${var.admin_user}/.lsru"
+    
+    connection {
+      type        = "ssh"
+      user        = "${var.admin_user}"
+      private_key = "${file(var.admin_private_key)}"
+      host        = "${azurerm_public_ip.ds.ip_address}"
+    }
   }
 
 }
