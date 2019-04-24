@@ -68,12 +68,12 @@ class LossHistory(keras.callbacks.Callback):
         self.losses = []
 
     def on_epoch_end(self, epoch, logs={}):
-        self.losses.append(logs.get('loss'))
+        self.losses.append(logs.get('val_loss'))
 
 #Train the model
 history = LossHistory()
 model = Model()
-model.model.fit(embeddings.T, labels, batch_size=10, epochs=100, callbacks=[history])
+model.model.fit(embeddings.T, labels, batch_size=10, epochs=100, callbacks=[history], validation_split = 0.25)
 
 #Plot the training loss
 import matplotlib.pyplot as plt
