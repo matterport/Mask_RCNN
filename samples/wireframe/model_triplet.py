@@ -57,33 +57,3 @@ def get_data(database):
     encodings = np.nan_to_num(encodings)
     labels = [x for x in labels]
     return encodings.astype('float32'), labels
-
-import os
-os.chdir('/Users/BotezatuCristian/PycharmProjects/Mask_RCNN/samples/wireframe/')
-embeddings, labels = get_data('Database_emb_labels.db')
-
-#Save the losses
-class LossHistory(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.trainlosses = []
-        self.vallosses = []
-
-    def on_epoch_end(self, epoch, logs={}):
-        self.trainlosses.append(logs.get('loss'))
-        self.vallosses.append(logs.get('val_loss'))
-
-#Train the model
-history = LossHistory()
-model = Model()
-model.model.fit(embeddings.T, labels, batch_size=10, epochs=100, callbacks=[history], validation_split = 0.25)
-
-#Plot the training loss
-import matplotlib.pyplot as plt
-line1 = plt.plot(history.trainlosses, 'r--', label = "Training loss")
-plt.plot(history.vallosses, 'b--', label = "Validation loss")
-plt.legend()
-plt.show()
-
-#Save the weights
-model_path = os.path.join('/Users/BotezatuCristian/PycharmProjects/Mask_RCNN/', "weights_emb_labels.h5")
-model.model.save_weights(model_path)

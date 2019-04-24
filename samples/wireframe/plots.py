@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from samples.wireframe.database_actions import get_known_encodings
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
 

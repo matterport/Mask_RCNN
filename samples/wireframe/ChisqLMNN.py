@@ -1,10 +1,9 @@
 import numpy as np
-from sklearn.utils.extmath import softmax
 import sklearn.decomposition as sk_decomp
 import database_actions as db
 
 #Initial embeddings and labels
-embeddings, labels = db.get_known_encodings()
+embeddings, labels = db.get_known_encodings('Database_emb_labels.db')
 
 #Reduce the dimensionality
 pca = sk_decomp.PCA(n_components=3)
