@@ -201,8 +201,8 @@ resource "null_resource" "ds" {
       "export ACCOUNT_KEY=${var.account_key}",
       "export STORAGE_NAME=${var.storage_name}",
       "export STORAGE_KEY=${var.storage_key}",    
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup-env.sh",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/mount.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
     ]
 
     connection {
