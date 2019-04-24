@@ -26,6 +26,10 @@ dependencies:
   - h5py
   - IPython[all]
 
+  # notebook stuff
+  - nb_conda
+  - ipykernel
+
   # Extensions
   - autopep8
   - black

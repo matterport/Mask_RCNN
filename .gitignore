@@ -65,7 +65,10 @@ pip-delete-this-directory.txt
 venv/
 ENV/
 
+#terraform
 .vm*
 terraform/.vm*
+terraform/terraform.tfvars #secrets! Don't commit this to version control
 
+# etc.
 cropmask/tests/.cache

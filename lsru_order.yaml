@@ -1,0 +1,14 @@
+product_list: ['source_metadata', 'sr', 'sr_evi', 'sr_ndmi', 'stats', 'pixel_qa']
+huc_level: 6
+huc_id: 102100
+collection: LANDSAT_TM_C1 # format according to lsru strings, see help for usgs.search
+year_start: 2005
+month_start: 1
+day_start: 1
+year_end: 2006
+month_end: 1
+day_end: 1
+max_results: 300
+max_cloud_cover: 10
+path_row_list: ['032031']
+

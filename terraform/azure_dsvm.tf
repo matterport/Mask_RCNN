@@ -156,4 +156,17 @@ resource "null_resource" "ds" {
   provisioner "local-exec" {
     command = "echo ${var.admin_user}@${azurerm_public_ip.ds.ip_address} > .vm-ip"
   }
+
+  provisioner "local-exec" {
+    command = "make syncup"
+  }
+  
+  provisioner "remote-exec"{
+    command = "bash /home/rave/work/CropMask_RCNN/bash_scripts/setup_env.sh"
+  }
+
+  provisioner "remote-exec"{
+    command = "bash /home/rave/work/CropMask_RCNN/bash_scripts/mount.sh"
+  }
+
 }
