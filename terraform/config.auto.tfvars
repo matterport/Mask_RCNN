@@ -8,7 +8,7 @@ admin_private_key = "~/.ssh/id_rsa"
 location    = "westus"
 
 # Name of the virtual machine (acts as prefix for all generated resources, default: dsvm)"
-vm_name     = "cropmask-dev"
+vm_name     = "cropmask-dev-2"
 
 # Admin username (default: root)
 admin_user = "ryan"
