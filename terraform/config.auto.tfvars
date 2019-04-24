@@ -18,5 +18,5 @@ vm_type = "Standard_D4s_v3"
 
 # Name of your repo
 
-repo_name = "CropMask_RCNN"
+repo_name = "CropMask_RCNN-2"
 

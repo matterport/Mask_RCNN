@@ -3,8 +3,8 @@
 PATH_SSH_KEY=~/.ssh/id_rsa
 REMOTE_DIR=~/work
 LOCAL_DIR=.
-PATH_VM_ID=./.vm-id
-PATH_VM_IP=./.vm-ip
+PATH_VM_ID=./terraform/.vm-id
+PATH_VM_IP=./terraform/.vm-ip
 
 ##### You should not have to touch stuff below this line
 

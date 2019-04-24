@@ -8,6 +8,11 @@ variable "vm_name" {
   default     = "dsvm"
 }
 
+variable "vm_type" {
+  description = "The type of VM to deploy"
+  default     = "Standard_NC6"
+}
+
 variable "admin_user" {
   description = "Admin username"
   default     = "root"
@@ -23,9 +28,34 @@ variable "admin_private_key" {
   default     = "~/.ssh/id_rsa"
 }
 
-variable "vm_type" {
-  description = "The type of VM to deploy"
-  default     = "Standard_NC6"
+variable "repo_name" {
+  description = "The name of the repo, or folder you sync from"
+  default     = "CropMask_RCNN"
+}
+
+variable "account_name" {
+  description = "Name of the azure account"
+  default     = ""
+}
+
+variable "account_key" {
+  description = "Key for the account"
+  default     = ""
+}
+
+variable "storage_name" {
+  description = "Name of the azure storage account"
+  default     = ""
+}
+
+variable "storage_key" {
+  description = "Key for the storage account"
+  default     = ""
+}
+
+variable "lsru_config" {
+  description = "Path to the .lsru config gile on your local machine"
+  default     = ""
 }
 
 resource "azurerm_resource_group" "ds" {
@@ -158,35 +188,22 @@ resource "null_resource" "ds" {
   }
 
   provisioner "local-exec" {
-    command = "make syncup"
+    command = "make syncup",
+    working_dir = "../"
   }
   
 # sets up conda environment with analysis and custom cropmask package and ipykernel for jupyter
-  provisioner "remote-exec"{
-    command = "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup_env.sh"
-  }
-
-
 # mounts the blob container with blobfuse on the vm. used for saving out landsat
-  provisioner "remote-exec"{
-    command = "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/mount.sh"
-  }
-
 # setting secrets
   provisioner "remote-exec"{
-    command = "export ACCOUNT_NAME=${var.account_name}"
-  }
-
-  provisioner "remote-exec"{
-    command = "export ACCOUNT_KEY=${var.account_key}"
-  }
-
-  provisioner "remote-exec"{
-    command = "export STORAGE_NAME=${var.storage_name}"
-  }
-
-  provisioner "remote-exec"{
-    command = "export STORAGE_KEY=${var.storage_key}"
+    inline = [
+      "export ACCOUNT_NAME=${var.account_name}",
+      "export ACCOUNT_KEY=${var.account_key}",
+      "export STORAGE_NAME=${var.storage_name}",
+      "export STORAGE_KEY=${var.storage_key}",    
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup_env.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/mount.sh",
+    ]
   }
 
   provisioner "file"{
