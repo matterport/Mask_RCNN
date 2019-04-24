@@ -53,6 +53,12 @@ variable "storage_key" {
   default     = ""
 }
 
+variable "container_name" {
+  description = "Name of the blob container in the storage account"
+  default     = ""
+}
+
+
 variable "lsru_config" {
   description = "Path to the .lsru config gile on your local machine"
   default     = ""
@@ -119,7 +125,7 @@ resource "azurerm_virtual_machine" "ds" {
     managed_disk_type = "Standard_LRS"
   }
 
-  # Optional data disks
+  # Optional data disks  provisioner "file"{
   storage_data_disk {
     name              = "${var.vm_name}-data"
     managed_disk_type = "Standard_LRS"
@@ -203,6 +209,7 @@ resource "null_resource" "ds" {
       "export STORAGE_KEY=${var.storage_key}",    
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
+      "sudo echo -e \\\"accountName ${var.account_name} \naccountKey ${var.account_key} \ncontainerName ${var.container_name}\\\" >> /opt/blobfuse.cfg"
     ]
 
     connection {
