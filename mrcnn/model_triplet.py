@@ -29,12 +29,10 @@ def triplet_loss(y_true, y_pred):
     y_true = tf.reshape(y_true, [-1])
     def_margin = tf.constant(1.0, dtype=tf.float32)
 
-    # Print
-    #y_true = K.print_tensor(y_true, message='y_true is = ')
-
     # Run
     loss, _ = batch_all_triplet_loss(embeddings=y_pred, labels=y_true, margin=def_margin)
     return loss
+
 
 embeddings = np.ones((2, 1024))
 labels = np.ones(2)

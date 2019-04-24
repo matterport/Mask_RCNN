@@ -67,6 +67,31 @@ def overlaps(rois):
         objects += 1
     return n_objects
 
+def overlaps_bool(pred_roi, bbox):
+    """
+    :param rois: regions of interest in format (y1, x1, y2, x2)
+    :return: List of objects
+
+
+    Example:
+    [[ 99,325,135,363], [ 54,229,88,264], [ 53,230,94,266], [ 93,321,132,361]]
+        -> [1, 2, 2, 1]
+    """
+    l_1_y1 = pred_roi[0]
+    l_1_x1 = pred_roi[1]
+    r_1_y2 = pred_roi[2]
+    r_1_x2 = pred_roi[3]
+    l_2_y1 = bbox[0]
+    l_2_x1 = bbox[1]
+    r_2_y2 = bbox[2]
+    r_2_x2 = bbox[3]
+    if l_1_x1 > r_2_x2 or l_2_x1 > r_1_x2:
+        return False
+    elif l_1_y1 > r_2_y2 or l_2_y1 > r_1_y2:
+        return False
+    else:
+        return True
+
 def overlapsTrueAndPredicted(roisTrue, roisPred):
     """
     :param rois: regions of interest in format (y1, x1, y2, x2)

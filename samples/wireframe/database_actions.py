@@ -26,7 +26,7 @@ def reinitialize_table():
     con = sqlite3.connect('Database.db', detect_types=sqlite3.PARSE_DECLTYPES)
     cur = con.cursor()
     cur.execute("DROP TABLE IF EXISTS embeddings")
-    cur.execute("CREATE TABLE embeddings (embedding ARRAY, label VARCHAR(10))")
+    cur.execute("CREATE TABLE embeddings (embedding ARRAY, label INT)")
 
 def connect():
     """

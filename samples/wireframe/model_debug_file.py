@@ -1,32 +1,19 @@
-
-"""
-Imports
-"""
 import os
-import sys
-from mrcnn import utils
-import mrcnn.model as modellib
-from samples.wireframe.WireframeGenerator import generate_data
+
 from samples.wireframe import Wireframe
-import tensorflow as tf
-
-
-"""
-Configs
-"""
+from samples.wireframe.database_actions import reinitialize_table, add_encoding
+from samples.wireframe.knn import overlaps_bool
+import mrcnn.model as modellib
+import numpy as np
 ROOT_DIR = os.path.abspath("../../")
-sys.path.append(ROOT_DIR)  # To find local version of the library
-config = Wireframe.WireframeConfig()
-WIREFRAME_DIR = os.path.join(ROOT_DIR, "datasets/wireframe")
 
-
-"""
-Data Preperation
-"""
 
 NUM_TRAINING_IMAGES = 100
 MAX_ICONS_PER_IMAGE = 3
 # generate_data(NUM_TRAINING_IMAGES, MAX_ICONS_PER_IMAGE)
+
+config = Wireframe.WireframeConfig()
+WIREFRAME_DIR = os.path.join(ROOT_DIR, "datasets/wireframe")
 
 # Training dataset
 dataset_train = Wireframe.WireframeDataset()
@@ -38,43 +25,46 @@ dataset_val = Wireframe.WireframeDataset()
 dataset_val.load_wireframe(WIREFRAME_DIR, "val")
 dataset_val.prepare()
 
-dataset = Wireframe.WireframeDataset()
-dataset.load_wireframe(WIREFRAME_DIR, "train")
 
-dataset.prepare()
+MODEL_FILE_NAME = "mask_rcnn_newdata_20.h5"
+#MODEL_FILE_NAME = model.get_pretrained_weights()
+class InferenceConfig(Wireframe.WireframeConfig):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
 
+inference_config = InferenceConfig()
 
-
-"""
-Model Generation
-"""
 # Directory to save logs and trained model
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
-# Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
-# Download COCO trained weights from Releases if needed
-if not os.path.exists(COCO_MODEL_PATH):
-    utils.download_trained_weights(COCO_MODEL_PATH)
-
-# Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config,
+# Recreate the model in inference mode
+model = modellib.MaskRCNN(mode="inference",
+                          config=inference_config,
                           model_dir=MODEL_DIR)
 
-print(dataset_train.class_info)
+
+# Get path to saved weights
+model_path = os.path.join(ROOT_DIR, MODEL_FILE_NAME)
+
+# Load trained weights
+print("Loading weights from ", model_path)
+model.load_weights(model_path, by_name=True)
 
 
-
-"""
-Train
-"""
-# Train the head branches
-# Passing layers="heads" freezes all layers except the head
-# layers. You can also pass a regular expression to select
-# which layers to train by name pattern.
-
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE,
-            epochs=2,
-            layers='heads')
-
+reinitialize_table()
+for image_id in dataset_train.image_ids:
+    print("Image no: {}".format(image_id))
+    original_image, _, real_labels, real_bboxes, gt_mask = \
+        modellib.load_image_gt(dataset_val, inference_config,
+                               image_id, use_mini_mask=False)
+    results = model.detect([original_image])
+    detected_rois = results[0]['rois']
+    embeddings = results[1]
+    print(np.shape(embeddings))
+    # For each roi: 
+    for i, roi in enumerate(detected_rois):
+        for j, bbox in enumerate(real_bboxes):
+            if overlaps_bool(roi, bbox):
+                embedding = embeddings[:, i, :]
+                label = real_labels[j]
+                add_encoding(embedding, int(label))
