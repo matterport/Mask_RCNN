@@ -161,12 +161,37 @@ resource "null_resource" "ds" {
     command = "make syncup"
   }
   
+# sets up conda environment with analysis and custom cropmask package and ipykernel for jupyter
   provisioner "remote-exec"{
-    command = "bash /home/rave/work/CropMask_RCNN/bash_scripts/setup_env.sh"
+    command = "bash /home/${var.admin_user}/work/CropMask_RCNN/bash_scripts/setup_env.sh"
+  }
+
+
+# mounts the blob container with blobfuse on the vm. used for saving out landsat
+  provisioner "remote-exec"{
+    command = "bash /home/${var.admin_user}/work/CropMask_RCNN/bash_scripts/mount.sh"
+  }
+
+# setting secrets
+  provisioner "remote-exec"{
+    command = "export ACCOUNT_NAME=${var.account_name}"
   }
 
   provisioner "remote-exec"{
-    command = "bash /home/rave/work/CropMask_RCNN/bash_scripts/mount.sh"
+    command = "export ACCOUNT_KEY=${var.account_key}"
+  }
+
+  provisioner "remote-exec"{
+    command = "export STORAGE_NAME=${var.storage_name}"
+  }
+
+  provisioner "remote-exec"{
+    command = "export STORAGE_KEY=${var.storage_key}"
+  }
+
+  provisioner "file"{
+    source = "${var.lsru_config}"
+    destination = "/home/${var.admin_user}/.lsru"
   }
 
 }
