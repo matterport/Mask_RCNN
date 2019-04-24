@@ -65,10 +65,12 @@ embeddings, labels = get_data('Database_emb_labels.db')
 #Save the losses
 class LossHistory(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
-        self.losses = []
+        self.trainlosses = []
+        self.vallosses = []
 
     def on_epoch_end(self, epoch, logs={}):
-        self.losses.append(logs.get('val_loss'))
+        self.trainlosses.append(logs.get('loss'))
+        self.vallosses.append(logs.get('val_loss'))
 
 #Train the model
 history = LossHistory()
@@ -77,7 +79,9 @@ model.model.fit(embeddings.T, labels, batch_size=10, epochs=100, callbacks=[hist
 
 #Plot the training loss
 import matplotlib.pyplot as plt
-plt.plot(history.losses)
+line1 = plt.plot(history.trainlosses, 'r--', label = "Training loss")
+plt.plot(history.vallosses, 'b--', label = "Validation loss")
+plt.legend()
 plt.show()
 
 #Save the weights
