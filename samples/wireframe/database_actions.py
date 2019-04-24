@@ -17,18 +17,18 @@ def convert_array(text):
 
 
 
-def reinitialize_table():
+def reinitialize_table(database):
     """
     Creates Table in database.db file and drops it if it exists already
     """
     sqlite3.register_adapter(np.ndarray, adapt_array)
     sqlite3.register_converter("array", convert_array)
-    con = sqlite3.connect('Database.db', detect_types=sqlite3.PARSE_DECLTYPES)
+    con = sqlite3.connect(database, detect_types=sqlite3.PARSE_DECLTYPES)
     cur = con.cursor()
     cur.execute("DROP TABLE IF EXISTS embeddings")
     cur.execute("CREATE TABLE embeddings (embedding ARRAY, label VARCHAR(10))")
 
-def connect():
+def connect(database):
     """
     Connects to the database
 
@@ -36,19 +36,19 @@ def connect():
     """
     sqlite3.register_adapter(np.ndarray, adapt_array)
     sqlite3.register_converter("array", convert_array)
-    con = sqlite3.connect('Database.db', detect_types=sqlite3.PARSE_DECLTYPES)
+    con = sqlite3.connect(database, detect_types=sqlite3.PARSE_DECLTYPES)
     cur = con.cursor()
     return cur, con
 
 
-def add_encoding(classification, label="Null"):
+def add_encoding(database, classification, label="Null"):
     """
     Adds an encoding with label to the database. If not label is given it will be Null
 
     :param classification: Encoding array of dimension (128,)
     :param label: Label of the encoding given as a string.
     """
-    cursor, connection = connect()
+    cursor, connection = connect(database)
     if label == "Null":
         query = "INSERT INTO embeddings(embedding, label) VALUES(?, NULL)"
         cursor.execute(query, (classification,))
@@ -58,13 +58,13 @@ def add_encoding(classification, label="Null"):
     connection.commit()
     connection.close()
 
-def get_known_encodings():
+def get_known_encodings(database):
     """
     :return: encodings array of (128, n)
              labels list of (n)
     """
     query = "SELECT * FROM embeddings WHERE label IS NOT NULL"
-    cursor, connection = connect()
+    cursor, connection = connect(database)
     cursor.execute(query)
 
 
