@@ -16,3 +16,7 @@ admin_user = "ryan"
 # Type of VM to deploy (default: Standard_NC6 - GPU instance)
 vm_type = "Standard_D4s_v3"
 
+# Name of your repo
+
+repo_name = "CropMask_RCNN"
+

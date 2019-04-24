@@ -163,13 +163,13 @@ resource "null_resource" "ds" {
   
 # sets up conda environment with analysis and custom cropmask package and ipykernel for jupyter
   provisioner "remote-exec"{
-    command = "bash /home/${var.admin_user}/work/CropMask_RCNN/bash_scripts/setup_env.sh"
+    command = "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/setup_env.sh"
   }
 
 
 # mounts the blob container with blobfuse on the vm. used for saving out landsat
   provisioner "remote-exec"{
-    command = "bash /home/${var.admin_user}/work/CropMask_RCNN/bash_scripts/mount.sh"
+    command = "bash /home/${var.admin_user}/work/${var.repo_name}/bash_scripts/mount.sh"
   }
 
 # setting secrets
