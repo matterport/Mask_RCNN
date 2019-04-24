@@ -1,4 +1,3 @@
-# 
 src/ # this is built from installing packages from github with conda
 azure_configs.yaml
 
@@ -65,10 +64,10 @@ pip-delete-this-directory.txt
 venv/
 ENV/
 
-#terraform
+#terraform secrets, don't commit to version control
 .vm*
 terraform/.vm*
-terraform/terraform.tfvars #secrets! Don't commit this to version control
+terraform/terraform.tfvars 
 
 # etc.
 cropmask/tests/.cache
