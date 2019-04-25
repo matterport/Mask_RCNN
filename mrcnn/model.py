@@ -2653,7 +2653,10 @@ class MaskRCNN():
 ############################################################
 
     def get_pretrained_weights(self, filename):
-
+        """
+        :param filename: Filename of the model file under releases in Github
+        :return:
+        """
         from keras.utils.data_utils import get_file
         TF_WEIGHTS_PATH_NO_TOP = \
             keras.utils.data_utils.get_file\
@@ -2665,8 +2668,14 @@ class MaskRCNN():
         return weights_path
 
     def OneShotAnchor(self, images, anchor_label, triplet_model):
+        """
+
+        :param images: Image we want to look at for an anchor
+        :param anchor_label: The label of the anchor (String)
+        :param triplet_model: Model to perform further processing on the embeddings Mask R-CNN produces (Keras Model)
+        """
         results = self.detect([images])
-        embedding = triplet_model.predict(results[1])
+        embedding = triplet_model.predict(results[1][0, :, :])
         num_of_classes = overlaps(results[0]['rois'])
         assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
         N_Boxes, _ = np.shape(embedding)
@@ -2674,18 +2683,44 @@ class MaskRCNN():
             dbactions.add_encoding('Database.db', embedding[i, :], anchor_label)
 
     def OneShotDetect(self, images, triplet_model):
+        """
+
+        :param images: Image we want to look
+        :param triplet_model: Model to perform further processing on the embeddings Mask R-CNN produces (Keras Model)
+        :return: Results of predictions
+        """
         results = self.detect([images])
-        embedding = np.squeeze(results[1])
-        print(np.shape(embedding))
-        embedding = triplet_model.predict(embedding)
+        embedding = results[1]
+        embedding = triplet_model.predict(embedding[0, :, :])
         knn_predictions = []
         for emb in embedding:
             knn_predictions.append(knn(emb))
         results.append(knn_predictions)
+
+        num_of_classes = overlaps(results[0]['rois'])
+        print(num_of_classes)
+        for object_number in np.unique(num_of_classes):
+            indicies = np.where(num_of_classes == object_number)
+            for index in indicies:
+                element = knn_predictions[int(index)][0]
+                print(knn_predictions[int(index)][0])
+            print("\n")
+
+        """
+        num_of_classes = overlaps(results[0]['rois'])
+        some_dict = {}
+        for i, emb in enumerate(embedding):
+            new_object = num_of_classes[i]
+            if new_object in some_dict:
+                if knn(embedding[:, i, :])[0][1] < some_dict[new_object][0][1]:
+                    some_dict[new_object] = knn(embedding[:, i, :])
+            else:
+                some_dict[new_object] = knn(embedding[:, i, :])
+        """
         return results
 
 
-############################################################
+    ############################################################
 
     def detect_molded(self, molded_images, image_metas, verbose=0):
         """Runs the detection pipeline, but expect inputs that are
