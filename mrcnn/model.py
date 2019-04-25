@@ -2652,43 +2652,36 @@ class MaskRCNN():
 #  One Shot Functions
 ############################################################
 
-    def get_pretrained_weights(self):
+    def get_pretrained_weights(self, filename):
+
         from keras.utils.data_utils import get_file
-        TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/Holstrup/Mask_RCNN/releases/download/v2.2/mask_rcnn_newdata_20.h5'
-        weights_path = get_file('mask_rcnn_newdata_20.h5',
+        TF_WEIGHTS_PATH_NO_TOP = \
+            keras.utils.data_utils.get_file\
+                ('https://github.com/Holstrup/Mask_RCNN/releases/download/v2.2/' + filename)
+        weights_path = get_file(filename,
                                 TF_WEIGHTS_PATH_NO_TOP,
                                 cache_subdir='models',
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
 
-    def OneShotAnchor(self, images, anchor_label, verbose=0):
+    def OneShotAnchor(self, images, anchor_label, triplet_model):
         results = self.detect([images])
-        embedding = results[1]
+        embedding = triplet_model.predict(np.squeeze(results[1]))
         num_of_classes = overlaps(results[0]['rois'])
         assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
-        _, N_Boxes, _ = np.shape(embedding)
+        N_Boxes, _ = np.shape(embedding)
         for i in range(N_Boxes):
-            dbactions.add_encoding('Database.db', embedding[:, i, :], anchor_label)
+            dbactions.add_encoding('Database.db', embedding[i, :], anchor_label)
 
-    def OneShotDetect(self, images, verbose=0):
+    def OneShotDetect(self, images, triplet_model):
         results = self.detect([images])
+        embedding = triplet_model.predict(np.squeeze(results[1]))
+        knn_predictions = []
+        for emb in embedding:
+            knn_predictions.append(knn(emb))
+        results.append(knn_predictions)
+        return results
 
-        embedding = results[1]
-        num_of_classes = overlaps(results[0]['rois'])
-        _, n_rois, _ = np.shape(embedding)
-        results = []
-        for i in range(n_rois):
-            results.append((int(num_of_classes[i]), knn(embedding[:, i, :])))
-
-        some_dict = {}
-        for i in range(n_rois):
-            new_object = num_of_classes[i]
-            if new_object in some_dict:
-                if knn(embedding[:, i, :])[0][1] < some_dict[new_object][0][1]:
-                    some_dict[new_object] = knn(embedding[:, i, :])
-            else:
-                some_dict[new_object] = knn(embedding[:, i, :])
-        return some_dict, results
 
 ############################################################
 

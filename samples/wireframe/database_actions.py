@@ -69,11 +69,11 @@ def get_known_encodings(database):
 
 
     result_list = cursor.fetchall()
-    encodings = np.zeros((1024, len(result_list)))
+    encodings = np.zeros((128, len(result_list)))
     labels = []
 
     for i in range(len(result_list)):
         encodings[:, i] = result_list[i][0]
-        labels.append(result_list[i][1].encode())
+        labels.append(result_list[i][1])
     encodings = np.nan_to_num(encodings)
     return encodings.astype('float32'), labels

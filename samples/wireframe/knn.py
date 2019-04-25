@@ -10,7 +10,7 @@ def knn(embedding):
     :param encodings: Vector of encoding for an image (,128)
     :return: Predicted label
     """
-    matrix_embeddings, labels = get_known_encodings()
+    matrix_embeddings, labels = get_known_encodings("Database.db")
     dist_vector = euclidean_distance(embedding, matrix_embeddings)
     norm_dist_vector = dist_vector / np.linalg.norm(dist_vector)
     closest_indices = np.argsort(dist_vector)[0:2]
