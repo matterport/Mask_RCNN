@@ -2666,7 +2666,7 @@ class MaskRCNN():
 
     def OneShotAnchor(self, images, anchor_label, triplet_model):
         results = self.detect([images])
-        embedding = triplet_model.predict(np.squeeze(results[1]))
+        embedding = triplet_model.predict(results[1])
         num_of_classes = overlaps(results[0]['rois'])
         assert np.size(np.unique(num_of_classes)) == 1, "More than one icon in this image"
         N_Boxes, _ = np.shape(embedding)
@@ -2675,7 +2675,9 @@ class MaskRCNN():
 
     def OneShotDetect(self, images, triplet_model):
         results = self.detect([images])
-        embedding = triplet_model.predict(np.squeeze(results[1]))
+        embedding = np.squeeze(results[1])
+        print(np.shape(embedding))
+        embedding = triplet_model.predict(embedding)
         knn_predictions = []
         for emb in embedding:
             knn_predictions.append(knn(emb))
