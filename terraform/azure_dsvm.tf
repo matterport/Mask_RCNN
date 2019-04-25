@@ -208,7 +208,8 @@ resource "null_resource" "ds" {
       "export STORAGE_KEY=${var.storage_key}",
       "export CONTAINER_NAME=${var.container_name}",    
       "sudo echo -e \\\"accountName $STORAGE_NAME \naccountKey $STORAGE_KEY \ncontainerName $CONTAINER_NAME\\\" >> /opt/blobfuse.cfg",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh"
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh"
     ]
 
     connection {
