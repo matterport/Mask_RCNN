@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 ROOT_DIR = os.path.abspath("../../")
 
-
 class Model:
     def __init__(self):
         self.model = self.build_model()
