@@ -198,7 +198,6 @@ resource "null_resource" "ds" {
     working_dir = "../"
   }
   
-# sets up conda environment with analysis and custom cropmask package and ipykernel for jupyter
 # mounts the blob container with blobfuse on the vm. used for saving out landsat
 # setting secrets
   provisioner "remote-exec"{
@@ -206,10 +205,10 @@ resource "null_resource" "ds" {
       "export ACCOUNT_NAME=${var.account_name}",
       "export ACCOUNT_KEY=${var.account_key}",
       "export STORAGE_NAME=${var.storage_name}",
-      "export STORAGE_KEY=${var.storage_key}",    
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
-      "sudo echo -e \\\"accountName ${var.account_name} \naccountKey ${var.account_key} \ncontainerName ${var.container_name}\\\" >> /opt/blobfuse.cfg"
+      "export STORAGE_KEY=${var.storage_key}",
+      "export CONTAINER_NAME=${var.container_name}",    
+      "sudo echo -e \\\"accountName $STORAGE_NAME \naccountKey $STORAGE_KEY \ncontainerName $CONTAINER_NAME\\\" >> /opt/blobfuse.cfg",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh"
     ]
 
     connection {
