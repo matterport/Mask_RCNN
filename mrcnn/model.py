@@ -23,6 +23,7 @@ import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
 import samples.wireframe.database_actions as dbactions
+from samples.wireframe.database_actions import get_known_encodings
 from samples.wireframe.knn import knn, overlaps
 from mrcnn import utils
 # Requires TensorFlow 1.3+ and Keras 2.0.8+.
@@ -2593,7 +2594,7 @@ class MaskRCNN():
         for i in range(N_Boxes):
             dbactions.add_encoding('Database.db', embedding[i, :], anchor_label)
 
-    def OneShotDetect(self, images, triplet_model):
+    def OneShotDetect(self, images, triplet_model, k):
         """
 
         :param images: Image we want to look
@@ -2603,9 +2604,10 @@ class MaskRCNN():
         results = self.detect([images])
         embedding = results[1]
         embedding = triplet_model.predict(embedding[0, :, :])
+        matrix_embeddings, labels = get_known_encodings("Database.db", 128)
         knn_predictions = []
         for emb in embedding:
-            knn_predictions.append(knn(emb))
+            knn_predictions.append(knn(emb, matrix_embeddings, labels, k))
         results.append(knn_predictions)
 
         num_of_classes = overlaps(results[0]['rois'])

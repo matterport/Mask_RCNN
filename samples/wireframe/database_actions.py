@@ -58,7 +58,7 @@ def add_encoding(database, classification, label="Null"):
     connection.commit()
     connection.close()
 
-def get_known_encodings(database):
+def get_known_encodings(database, dim):
     """
     :return: encodings array of (128, n)
              labels list of (n)
@@ -69,7 +69,7 @@ def get_known_encodings(database):
 
 
     result_list = cursor.fetchall()
-    encodings = np.zeros((128, len(result_list)))
+    encodings = np.zeros((dim, len(result_list)))
     labels = []
 
     for i in range(len(result_list)):
