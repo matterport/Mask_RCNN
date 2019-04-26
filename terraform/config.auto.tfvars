@@ -8,7 +8,7 @@ admin_private_key = "~/.ssh/id_rsa"
 location    = "westus"
 
 # Name of the virtual machine (acts as prefix for all generated resources, default: dsvm)"
-vm_name     = "cropmask-dev-2"
+vm_name     = "cropmask-dev"
 
 # Admin username (default: root)
 admin_user = "ryan"
@@ -17,6 +17,5 @@ admin_user = "ryan"
 vm_type = "Standard_D4s_v3"
 
 # Name of your repo
-
-repo_name = "CropMask_RCNN-2"
+repo_name = "CropMask_RCNN"
 

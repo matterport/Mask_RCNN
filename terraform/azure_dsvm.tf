@@ -210,8 +210,9 @@ resource "null_resource" "ds" {
       "echo \"accountName $STORAGE_NAME\" > /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"accountKey $STORAGE_KEY\" >> /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"containerName $CONTAINER_NAME\" >> /home/${var.admin_user}/work/blobfuse.cfg",
+      "sleep 1",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh"
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh ${var.repo_name}"
     ]
 
     connection {
