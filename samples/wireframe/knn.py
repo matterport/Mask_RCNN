@@ -70,7 +70,7 @@ def overlaps(rois):
 def overlaps_bool(pred_roi, bbox):
     """
     :param rois: regions of interest in format (y1, x1, y2, x2)
-    :return: List of objects
+    :return: Boolean
 
 
     Example:

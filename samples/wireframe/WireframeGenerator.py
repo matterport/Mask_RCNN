@@ -1,17 +1,20 @@
 import os
 from PIL import Image
 import random
-import numpy as np
+
 
 BACKGROUND_DIR = os.getcwd() + "/Backgrounds"
 ICONS = os.listdir(os.getcwd() + "/Icons")
 BACKGROUNDS = os.listdir(BACKGROUND_DIR)
 
+# Remove annoying Mac files
 if ".DS_Store" in ICONS:
     ICONS.remove(".DS_Store")
 if ".DS_Store" in BACKGROUNDS:
     BACKGROUNDS.remove(".DS_Store")
-MASK_DIR = os.path.abspath(os.path.join(os.getcwd(),"../../"))
+
+# Define Dirs
+MASK_DIR = os.path.abspath(os.path.join(os.getcwd(), "../../"))
 DATA_DIR = os.path.abspath(os.path.join(MASK_DIR, "datasets/wireframe"))
 
 # Wire-frame dimensions (iPhone 8)
@@ -25,19 +28,28 @@ ICON_W = ICON_H = 50
 #Specify training data or validation data
 TYPES = ["/train", "/val"]
 
+
 file_content = "{"
 
 
-def add_box_json(filename, size, icons):
-    s = " '{}{}':{{ 'filename': '{}', 'size': {}, 'regions': [".format(filename, size, filename, size)
-    for icon in icons:
-        s += "{{'shape_attributes': {{'name': 'rect', 'x': {}, 'y': {}, 'width': 50, 'height': 50}}, " \
-                "'region_attributes': {{'name': '{}'}} }} ,".format(icon[1], icon[2], icon[0])
-    s = s[0:-1] + "]" + " },"
-    s = s.replace("'", '"')
-    return s
+def write_string_to_json(string, type):
+    """
+    :param string: Content to write to file
+    :param type: Train or validation dir
+    """
+    with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
+        f.write(string)
+
 
 def add_box_json_polygon(filename, size, icons):
+    """
+    Helper function for the generate data function
+
+    :param filename: Filename or image file
+    :param size: Size of the image
+    :param icons: List of icons in image
+    :return:
+    """
     s = " '{}{}':{{ 'filename': '{}', 'size': {}, 'regions': [".format(filename, size, filename, size)
     for icon in icons:
         x1, x2 = (icon[1], icon[1] + ICON_W)
@@ -50,11 +62,14 @@ def add_box_json_polygon(filename, size, icons):
     return s
 
 
-def write_string_to_json(string, type):
-    with open(DATA_DIR + type + '/via_region_data.json', 'w+') as f:
-        f.write(string)
-
 def generate_data(NUM_IMAGES, ICONS_PER_IMAGE):
+    """
+    Generates wireframes by inserting icons into backgrounds, and writing a "regions data" file
+    that lets Mask R-CNN know where the BBoxes are on the image
+
+    :param NUM_IMAGES: Number of images you want to generate
+    :param ICONS_PER_IMAGE: MAX icons per image
+    """
     global file_content
     for type in TYPES:
         file_content = "{"

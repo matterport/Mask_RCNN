@@ -29,7 +29,6 @@ from mrcnn import utils
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
-from mrcnn.triplet_loss import batch_all_triplet_loss
 
 
 ############################################################
@@ -1195,92 +1194,6 @@ def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
     return loss
 
 
-def triplet_loss(y_pred, y_true):
-    print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
-    print("Y Pred (embeddings) shape: {}".format(K.int_shape(y_pred)))
-    shape = tf.shape(y_pred)
-
-    # Reshape to final shape
-    y_true = K.reshape(y_true, (-1,))
-    y_pred = tf.reshape(y_pred, [shape[0] * shape[1], shape[2]])
-
-
-    # Find non zero elements in y true
-    non_zero_elems = tf.where(y_true > 0)[:, 0]
-
-    # Filter y true and y pred based on these elements
-    y_true = tf.cast(tf.gather(y_true, non_zero_elems), tf.int64)
-    y_pred = tf.cast(tf.gather(y_pred, non_zero_elems), tf.float32)
-
-
-    # Define margin
-    def_margin = tf.constant(1.0, dtype=tf.float32)
-
-    # Run
-    loss, _ = batch_all_triplet_loss(embeddings=y_pred, labels=y_true, margin=def_margin)
-    return loss
-
-
-def triplet_loss2(y_pred, y_true):
-    print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
-    print("Y Pred (embeddings) shape: {}".format(K.int_shape(y_pred)))
-
-    y_true = K.reshape(y_true, (-1,))
-
-    # Find non zero elements
-    """
-    positive_ix = tf.where(y_true > 0)[:, 0]
-    y_true = tf.cast(tf.gather(y_true, positive_ix), tf.int64)
-    """
-    # Gather non zero elements
-    # Reshape from (None, 200) to (None + 200,)
-
-    #shape = tf.shape(y_true)
-    #y_true = tf.reshape(y_true, [shape[0] * shape[1]])
-
-    # Gather non zero elements
-    """
-    y_pred = tf.cast(
-        tf.gather(y_pred, positive_ix), tf.float32)
-    """
-    shape = tf.shape(y_pred)
-    # Reshape from (None, 200, 1024) to (None + 200, 1024)
-    y_pred = tf.reshape(y_pred, [shape[0] * shape[1], shape[2]])
-
-
-    """
-    # (None, 200)
-    y_true = tf.slice(y_true, [0, 0], [-1, NUM_ROIS])
-    # (None, 10)
-    shape = tf.shape(y_true)
-    y_true = tf.reshape(y_true, [shape[0] * shape[1]])
-    # (None * 10,)
-    
-
-    # (None, 200, 1024)
-    y_pred = tf.slice(y_pred, [0, 0, 0], [-1, NUM_ROIS, -1])
-    # (None, 10, 1024)
-    shape = tf.shape(y_pred)
-    y_pred = tf.reshape(y_pred, [shape[0] * shape[1],  shape[2]])
-    # (None * 10, 1024)
-    """
-
-    print("Y True (labels) shape: {}".format(K.int_shape(y_true)))
-
-    def_margin = tf.constant(1.0, dtype=tf.float32)
-
-    # Print
-    y_true = tf.sort(y_true, direction='DESCENDING')
-    #y_true = K.print_tensor(y_true, message='y_true is = ')
-
-
-
-
-    # Run
-    loss, _ = batch_all_triplet_loss(embeddings=y_pred, labels=y_true, margin=def_margin)
-    return loss
-
-
 ############################################################
 #  Data Generator
 ############################################################
@@ -2118,8 +2031,6 @@ class MaskRCNN():
                 [target_bbox, target_class_ids, mrcnn_bbox])
             mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
                 [target_mask, target_class_ids, mrcnn_mask])
-            embedding_loss = KL.Lambda(lambda x: triplet_loss(*x), name="embedding_loss")(
-                [mrcnn_embedding, target_class_ids])
 
             # Model
             inputs = [input_image, input_image_meta,
@@ -2699,6 +2610,7 @@ class MaskRCNN():
 
         num_of_classes = overlaps(results[0]['rois'])
         print(num_of_classes)
+        """
         for object_number in np.unique(num_of_classes):
             indicies = np.where(num_of_classes == object_number)
             for index in indicies:
@@ -2706,7 +2618,7 @@ class MaskRCNN():
                 print(knn_predictions[int(index)][0])
             print("\n")
 
-        """
+        
         num_of_classes = overlaps(results[0]['rois'])
         some_dict = {}
         for i, emb in enumerate(embedding):
