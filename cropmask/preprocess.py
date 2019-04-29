@@ -25,8 +25,9 @@ class PreprocessWorkflow():
     Worflow for loading and gridding a single satellite image and reference dataset of the same extent.
     """
     
-    def __init__(self, scene_dir_path, source_label_path):
+    def __init__(self, param_path, scene_dir_path, source_label_path):
         params = parse_yaml(param_path)
+        self.params = params
         self.source_label_path = source_label_path # if there is a referenc label
         self.scene_dir_path = scene_dir_path # path to the unpacked tar archive on azure storage
         self.scene_id = self.scene_dir_path.split("/")[-1] # gets the name of the folder the bands are in, the scene_id
@@ -34,20 +35,19 @@ class PreprocessWorkflow():
         self.rasterized_label_path = ''
         self.gridded_imgs_dir = ''
         self.gridded_labels_dir = ''
+        self.results_dir = params['dirs']['results']
         self.band_list = [] # the band indices
-        self.tile_size = 0
         self.meta = # meta data for the stacked raster
         self.chip_ids = [] # list of chip ids of form [scene_id]_[random number]
-        self.kernel = params['label_vals']['kernel']
         self.small_area_filter = params['label_vals']['small_area_filter']
         self.neg_buffer = params['label_vals']['neg_buffer']
-        self.ag_class = params['label_vals']['ag_class']
+        self.ag_class_int = params['label_vals']['ag_class_int'] # TO DO, not implemented but needs to be for multi class
         self.dataset_name = params['image_vals']['dataset_name']
         self.grid_size = params['image_vals']['grid_size']
         self.usable_threshold = params['image_vals']['usable_thresh']
         self.split = params['image_vals']['split']
-#### need to replace vars with instance attributes TO DO
-    def yaml_to_band_index(param_path):
+O
+    def yaml_to_band_index():
         """Parses config booleans to a list of band indexes to be stacked.
         For example, Landsat 5 has 6 bands (7 if you count band 6, thermal) 
         that we can use for masking.
@@ -62,15 +62,14 @@ class PreprocessWorkflow():
         .. _PEP 484:
             https://www.python.org/dev/peps/pep-0484/
         """
-        params = parse_yaml(param_path)
-        if params["image_vals"]["dataset_name"] == "landsat5":
-            bands = params["landsat_bands_to_include"]
+        if self.params["image_vals"]["dataset_name"] == "landsat5":
+            bands = self.params["landsat_bands_to_include"]
         for i, band in enumerate(bands):
             if list(band.values())[0] == True:
                 self.band_list.append(i+1)
         return [str(b) for b in self.band_list]
 
-    def setup_dirs(param_path):
+    def setup_dirs():
         """
         A path to a yaml config file that will be parsed as a dictionary 
         containing the directory paths and names to create.
@@ -83,7 +82,7 @@ class PreprocessWorkflow():
         and should already exist.
         """
         
-        params = parse_yaml(param_path)
+        params = self.params['dirs']
 
         ROOT = params["container"]
 
@@ -107,7 +106,7 @@ class PreprocessWorkflow():
 
         SOURCE_IMGS = os.path.join(ROOT, params["source_imgs"])
 
-        SOURCE_LABELS = os.path.join(ROOT, params["source_labels"])
+        SOURCE_LABELS = os.path.join(ROOT, params["source_labels"])k 
 
         directory_list = [
                 DATASET,
@@ -120,22 +119,8 @@ class PreprocessWorkflow():
                 NEG_BUFFERED,
                 RESULTS,
             ]
-        make_dirs(directory_list)
-
-    def load_image(self, image_id):
-        """Load the specified image and return a [H,W,N] Numpy array.
-        Channels are ordered [B, G, R, ...]. This is called by the 
-        Keras data_generator function
-        """
-        # Load image
-        image = skio.imread(self.image_info[image_id]["path"])
-
-        assert image.ndim == 3
-
-        return image
+        make_dirs(directory_list)        
         
-        
-    ##### below are methods used for preprocessing
     def stack_and_save_bands(self, out_dir):
         """Load the landsat bands specified by yaml_to_band_index and returns 
         a [H,W,N] Numpy array for a single scene, where N is the number of bands 
@@ -150,9 +135,9 @@ class PreprocessWorkflow():
             out_dir (str): the path to the stacked directory
 
         Returns:
-            ndarray:  
+            ndarray:k 
 
-        .. _PEP 484:
+        .. _PEP 484:k 
             https://www.python.org/dev/peps/pep-0484/
 
         """
@@ -177,7 +162,7 @@ class PreprocessWorkflow():
         with rasterio.open(stacked_path, "w+", **meta) as out:
             out.write(reshape_as_raster(stacked_arr))
             
-    def negative_buffer_and_small_filter(source_label_path, dest_path, class_int, neg_buffer, small_area_filter):
+    def negative_buffer_and_small_filter(dest_path, neg_buffer, small_area_filter):
         """
         Applies a negative buffer to labels since some are too close together and 
         produce conjoined instances when connected components is run (even after 
@@ -188,26 +173,25 @@ class PreprocessWorkflow():
         
         Args:
             source_label_path (str): the path to the reference shapefile dataset. Should be the same extent as a Landsat scene
-            class_int (int): Integer label for the class that will be negative buffered and size filtered'
             neg_buffer (float): The distance in meters to use for the negative buffer. Should at least be 1 pixel width.
             small_area_filter (float): The area thershold to remove spurious small fields. Particularly useful to remove fields                                         to small to be commercial agriculture
 
         Returns rasterized labels that are ready to be gridded
         """
 
-        shp_frame = gpd.read_file(source_label_path)
+        shp_frame = gpd.read_file(self.source_label_path)
         # keeps the class of interest if it is there and the polygon of raster extent
         with rasterio.open(self.stacked_path) as rast:
             meta = rast.meta.copy()
             meta.update(compress="lzw")
             meta["count"] = 1
-            self.meta = meta # does this store this for later use outside this func?
-            tifname = os.path.splitext(os.path.basename(source_label_path))[0] + ".tif"
+            self.meta = meta
+            tifname = os.path.splitext(os.path.basename(self.source_label_path))[0] + ".tif"
             self.rasterized_label_path = os.path.join(dest_path, tifname)
         with rasterio.open(rasterized_label_path, "w+", **meta) as out:
             out_arr = out.read(1)
-            shp_frame = shp_frame.loc[shp_frame.area > small_area_filter]
-            shp_frame["geometry"] = shp_frame["geometry"].buffer(neg_buffer)
+            shp_frame = shp_frame.loc[shp_frame.area > self.small_area_filter]
+            shp_frame["geometry"] = shp_frame["geometry"].buffer(self.neg_buffer)
             # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
             shapes = (
                 (geom, value)
@@ -226,7 +210,7 @@ class PreprocessWorkflow():
             out.write(burned, 1)
         print(
             "Done applying negbuff of {negbuff} and filtering small labels of area less than {area}".format(
-                negbuff=neg_buffer, area=small_area_filter
+                negbuff=self.neg_buffer, area=self.small_area_filter
                 )
             )
 
@@ -239,31 +223,33 @@ class PreprocessWorkflow():
         
         def rm_mostly_empty(scene_path, label_path):
             """
-            Removes a grid that is mostly (over 1/4th) empty and corrects bad no data value to 0.
-            Ignore the User Warning, unsure why it pops up but doesn't seem to impact the array shape
+            Removes a grid that is emptier than the usable data threshold and corrects bad no data value to 0.
+            Ignore the User Warning, unsure why it pops up but doesn't seem to impact the array shape. Used because
+            very empty grid chips seem to throw off the model by increasing detections at the edges between good data 
+            and nodata.
             """
 
-            usable_data_threshold = params["image_vals"]["usable_thresh"]
             arr = skio.imread(scene_path)
             arr[arr < 0] = 0
             skio.imsave(scene_path, arr)
             pixel_count = arr.shape[0] * arr.shape[1]
             nodata_pixel_count = (arr == 0).sum()
             
-            if nodata_pixel_count / pixel_count > usable_data_threshold:
+            if nodata_pixel_count / pixel_count > self.usable_threshold:
 
                 os.remove(scene_path)
                 os.remove(label_path)
-            print("removed scene and label, {}% bad data".format(usable_data_threshold))
+            print("removed scene and label, {}% bad data".format(self.usable_threshold))
         
 
-        ds = gdal.Open(self.stacked_path) # can get this info earlier and with less file io
+        ds = gdal.Open(self.stacked_path) # TO DO can get this info earlier and with less file io
         band = ds.GetRasterBand(1)
         xsize = band.XSize
         ysize = band.YSize
-
-        for i in range(0, xsize, self.tile_size):
-            for j in range(0, ysize, self.tile_size):
+        ### TO DO MAKE GRID ID DIRECTORY CREATION HAPPEN IN THE MAKE DIRS FUNCTION, MOVE ALL DIR SETUP TO THAT FUNCTION INSTEAD OF HAVING
+        ### IT BE SCATTERED AROUND MULTIPLE FUNCS
+        for i in range(0, xsize, self.grid_size):
+            for j in range(0, ysize, self.grid_size):
                 chip_id = str(random.randint(100000000, 999999999))+'_'+self.scene_id
                 self.chip_ids.append(chip_id)
                 out_path_img = os.path.join(self.gridded_imgs_dir, chip_id) + ".tif"
@@ -274,14 +260,14 @@ class PreprocessWorkflow():
                     + ", "
                     + str(j)
                     + ", "
-                    + str(self.tile_size)
+                    + str(self.grid_size)
                     + ", "
-                    + str(self.tile_size)
+                    + str(self.grid_size)
                     + " "
                     + str(self.stacked_path)
                     + " "
                     + str(out_path_img)
-                )RESULTS
+                )
                 os.system(com_string)
                 com_string = (
                     "gdal_translate -of GTIFF -srcwin "
@@ -289,9 +275,9 @@ class PreprocessWorkflow():
                     + ", "
                     + str(j)
                     + ", "
-                    + str(self.tile_size)
+                    + str(self.grid_size)
                     + ", "
-                    + str(self.tile_size)
+                    + str(self.grid_size)
                     + " "
                     + str(self.rasterized_label_path)
                     + " "
@@ -352,7 +338,7 @@ class PreprocessWorkflow():
 
                     label_stump = os.path.splitext(os.path.basename(label_chip))[0]
                     label_name = label_stump + "_" + str(blob_val) + ".tif"
-                    mask_path = os.path.join(TRAIN, name[:9], "mask")
+                    mask_path = os.path.join(self.train_dir, label_chip[:-11], "mask")
                     label_path = os.path.join(mask_path, label_name)
                     assert labels_copy.ndim == 2
                     with warnings.catch_warnings():
@@ -365,17 +351,20 @@ class PreprocessWorkflow():
         images and corresponding masks folder."""
 
         sample_list = next(os.walk(self.train_dir))[1]
-        k = round(self.k * len(sample_list))
-        test_list = random.sample(sample_list, self.k)
+        k = round(self.split * len(sample_list))
+        test_list = random.sample(sample_list, k)
         for test_sample in test_list:
             shutil.copytree(
                 os.path.join(self.train_dir, test_sample), os.path.join(self.test_dir, test_sample)
             )
+            shutil.rmtree(
+                os.path.join(self.train_dir, test_sample)
+            )
         train_list = list(set(next(os.walk(self.train_dir))[1]) - set(next(os.walk(self.test_dir))[1]))
         train_df = pd.DataFrame({"train": train_list})
         test_df = pd.DataFrame({"test": test_list})
-        train_df.to_csv(os.path.join(self.r, "train_ids.csv"))
-        test_df.to_csv(os.path.join(RESULTS, "test_ids.csv"))
+        train_df.to_csv(os.path.join(self.results_dir, "train_ids.csv"))
+        test_df.to_csv(os.path.join(self.results_dir, "test_ids.csv"))
 
     def get_arr_channel_mean(channel):
         """
@@ -383,9 +372,9 @@ class PreprocessWorkflow():
         """
 
         means = []
-        train_list = list(set(next(os.walk(TRAIN))[1]) - set(TEST))
+        train_list = next(os.walk(self.train_dir))[1]
         for i, fid in enumerate(train_list):
-            im_folder = os.path.join(TRAIN, fid, "image")
+            im_folder = os.path.join(self.train_dir, fid, "image")
             im_path = os.path.join(im_folder, os.listdir(im_folder)[0])
             arr = skio.imread(im_path)
             arr = arr.astype(np.float32, copy=False)
