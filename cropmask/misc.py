@@ -1,7 +1,9 @@
 ### currently random, useful functions
 from skimage import exposure
 import numpy as np
-
+import yaml
+import shutil
+import os
 
 def percentile_rescale(arr):
     """
@@ -31,3 +33,20 @@ def remove_dir_folders(directory_list, root):
 def max_normalize(arr):
     arr *= 255.0 / arr.max()
     return arr
+
+def parse_yaml(input_file):
+    """Parse yaml file of configuration parameters."""
+    with open(input_file, "r") as yaml_file:
+        params = yaml.load(yaml_file)
+    return params
+
+def make_dirs(directory_list):
+
+    # Make directory and subdirectories
+    for d in directory_list:
+        try: 
+            pathlib.Path(d).mkdir(parents=False, exist_ok=False)
+        except: 
+            FileExistsError
+    # Change working directory to project directory
+    os.chdir(directory_list[0])

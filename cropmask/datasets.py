@@ -3,6 +3,9 @@ import os
 import pandas as pd
 import skimage.io as skio
 import numpy as np
+import yaml
+from cropmask.misc import parse_yaml, make_dirs
+
 # need to write/find script for clipping polygon by raster extent where there is data
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -32,6 +35,58 @@ class PreprocessWorflow():
         self.meta = # meta data for the stacked raster
         self.chip_ids = [] # list of chip ids of form [scene_id]_[random number]
         self.kernel
+
+    def setup_dirs(param_path):
+        """
+        A path to a yaml config file that will be parsed as a dictionary 
+        containing the directory paths and names to create.
+
+        This folder structure is used for each unique pre processing and modeling
+        workflow and is made unique by specifying a unique DATASET name
+        or ROOT path (if working on a different container.). 
+        
+        ROOT should be the path to the azure container mounted with blobfuse, 
+        and should already exist.
+        """
+        
+        params = parse_yaml(param_path)
+
+        ROOT = params["container"]
+
+        assert os.path.exists(ROOT)
+
+        DATASET = os.path.join(ROOT, params["dataset"])
+
+        STACKED = os.path.join(DATASET, params["stacked"])
+
+        TRAIN = os.path.join(DATASET, params["train"])
+
+        TEST = os.path.join(DATASET, params["test"])
+
+        GRIDDED_IMGS = os.path.join(DATASET, params["gridded_imgs"])
+
+        GRIDDED_LABELS = os.path.join(DATASET, params["gridded_labels"])
+
+        NEG_BUFFERED = os.path.join(DATASET, params["neg_buffered_labels"])
+
+        RESULTS = os.path.join(ROOT, params["results"], DATASET)
+
+        SOURCE_IMGS = os.path.join(ROOT, params["source_imgs"])
+
+        SOURCE_LABELS = os.path.join(ROOT, params["source_labels"])
+
+        directory_list = [
+                DATASET,
+                STACKED,
+                TRAIN,
+                TEST,
+                GRIDDED_IMGS,
+                GRIDDED_LABELS,
+                OPENED,
+                NEG_BUFFERED,
+                RESULTS,
+            ]
+        make_dirs(directory_list)
 
     def load_image(self, image_id):
         """Load the specified image and return a [H,W,N] Numpy array.
@@ -192,7 +247,7 @@ class PreprocessWorflow():
                     + str(self.stacked_path)
                     + " "
                     + str(out_path_img)
-                )
+                )RESULTS
                 os.system(com_string)
                 com_string = (
                     "gdal_translate -of GTIFF -srcwin "
@@ -236,57 +291,56 @@ class PreprocessWorflow():
     in each folder ID in train folder. If an image has no instances,
     saves it with a empty mask.
     """
-    label_list = next(os.walk(self.rasterized_label_path))[2]
-    # save connected components and give each a number at end of id
-    for label_chip in label_list:
-        arr = skio.imread(os.path.join(self.rasterized_label_path, label_chip))
-        blob_labels = measure.label(arr, background=0)
-        blob_vals = np.unique(blob_labels)
-        # for imgs with no instances, create empty mask
-        if len(blob_vals) == 1:
-            img_chip_folder = os.path.join(self.train_dir, label_chip[:-11], "image")
-            img_chip_name = os.listdir(img_chip_folder)[0]
-            img_chip_path = os.path.join(img_chip_folder, img_chip_name)
-            arr = skio.imread(img_chip_path)
-            mask = np.zeros_like(arr[:, :, 0])
-            mask_folder = os.path.join(self.train_dir, label_chip[:-11], "mask")
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore", category=UserWarning)
-                label_stump = os.path.splitext(os.path.basename(label_chip))[0]
-                skio.imsave(os.path.join(mask_folder, label_stump + "_0.tif"), mask)
-        else:
-            # only run connected comp if there is at least one instance
-            for blob_val in blob_vals[blob_vals != 0]:
-                labels_copy = blob_labels.copy()
-                labels_copy[blob_labels != blob_val] = 0
-                labels_copy[blob_labels == blob_val] = 1
-
-                label_stump = os.path.splitext(os.path.basename(label_chip))[0]
-                label_name = label_stump + "_" + str(blob_val) + ".tif"
-                mask_path = os.path.join(TRAIN, name[:9], "mask")
-                label_path = os.path.join(mask_path, label_name)
-                assert labels_copy.ndim == 2
+        label_list = next(os.walk(self.rasterized_label_path))[2]
+        # save connected components and give each a number at end of id
+        for label_chip in label_list:
+            arr = skio.imread(os.path.join(self.rasterized_label_path, label_chip))
+            blob_labels = measure.label(arr, background=0)
+            blob_vals = np.unique(blob_labels)
+            # for imgs with no instances, create empty mask
+            if len(blob_vals) == 1:
+                img_chip_folder = os.path.join(self.train_dir, label_chip[:-11], "image")
+                img_chip_name = os.listdir(img_chip_folder)[0]
+                img_chip_path = os.path.join(img_chip_folder, img_chip_name)
+                arr = skio.imread(img_chip_path)
+                mask = np.zeros_like(arr[:, :, 0])
+                mask_folder = os.path.join(self.train_dir, label_chip[:-11], "mask")
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
-                    skio.imsave(label_path, labels_copy)
+                    label_stump = os.path.splitext(os.path.basename(label_chip))[0]
+                    skio.imsave(os.path.join(mask_folder, label_stump + "_0.tif"), mask)
+            else:
+                # only run connected comp if there is at least one instance
+                for blob_val in blob_vals[blob_vals != 0]:
+                    labels_copy = blob_labels.copy()
+                    labels_copy[blob_labels != blob_val] = 0
+                    labels_copy[blob_labels == blob_val] = 1
+
+                    label_stump = os.path.splitext(os.path.basename(label_chip))[0]
+                    label_name = label_stump + "_" + str(blob_val) + ".tif"
+                    mask_path = os.path.join(TRAIN, name[:9], "mask")
+                    label_path = os.path.join(mask_path, label_name)
+                    assert labels_copy.ndim == 2
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", category=UserWarning)
+                        skio.imsave(label_path, labels_copy)
             
-    def train_test_split(params):
+    def train_test_split():
         """Takes a sample of folder ids and copies them to a test directory
         from a directory with all folder ids. Each sample folder contains an 
         images and corresponding masks folder."""
 
-        k = params["image_vals"]["split"]
-        sample_list = next(os.walk(TRAIN))[1]
-        k = round(k * len(sample_list))
-        test_list = random.sample(sample_list, k)
+        sample_list = next(os.walk(self.train_dir))[1]
+        k = round(self.k * len(sample_list))
+        test_list = random.sample(sample_list, self.k)
         for test_sample in test_list:
             shutil.copytree(
-                os.path.join(TRAIN, test_sample), os.path.join(TEST, test_sample)
+                os.path.join(self.train_dir, test_sample), os.path.join(self.test_dir, test_sample)
             )
-        train_list = list(set(next(os.walk(TRAIN))[1]) - set(next(os.walk(TEST))[1]))
+        train_list = list(set(next(os.walk(self.train_dir))[1]) - set(next(os.walk(self.test_dir))[1]))
         train_df = pd.DataFrame({"train": train_list})
         test_df = pd.DataFrame({"test": test_list})
-        train_df.to_csv(os.path.join(RESULTS, "train_ids.csv"))
+        train_df.to_csv(os.path.join(self.r, "train_ids.csv"))
         test_df.to_csv(os.path.join(RESULTS, "test_ids.csv"))
 
     def get_arr_channel_mean(channel):
