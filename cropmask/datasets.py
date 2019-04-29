@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import skimage.io as skio
 import numpy as np
-
+# need to write/find script for clipping polygon by raster extent where there is data
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
 # Results directory
@@ -14,9 +14,9 @@ ROOT_DIR = os.path.abspath("../../")
 #  Dataset
 ############################################################
 random.seed(42)
-class Image():
+class PreprocessWorflow():
     """
-    Data Class for a single satellite image that contains the preprocessing steps.
+    Worflow for loading and gridding a single satellite image and reference dataset of the same extent.
     """
     
     def __init__(self, scene_dir_path, source_label_path):
@@ -273,7 +273,7 @@ class Image():
 
 
 class ImageDataset(utils.Dataset):
-    """Generates the Imagery dataset."""
+    """Generates the Imagery dataset used by mrcnn."""
        
     def load_image(self, image_id):
         """Load the specified image and return a [H,W,N] Numpy array.
@@ -287,24 +287,25 @@ class ImageDataset(utils.Dataset):
 
         return image
 
-    def load_imagery(self, dataset_dir, subset, image_source, class_name):
+    def load_imagery(self, dataset_dir, subset, image_source, class_name, train_test_split_dir):
         """Load a subset of the fields dataset.
 
         dataset_dir: Root directory of the dataset
         subset: Subset to load.
                 * train: training images/masks excluding testing
                 * test: testing images moved by train/test split func
-        image_source: string identifier for imagery. "wv2" or "planet"
+        image_source: string identifier for imagery. "wv2" or "planet" or "landsat"
         class_name: string name for class. "agriculture" or another name 
-                depending on labels. self.add_class for multi class model.
+                depending on labels. use self.add_class for a multi class model.
+        train_test_split_dir: the directory to hold the train_ids and test_ids from PreprocessWorflow
         """
-        # Add classes. We have one class.
+        # Add classes here
         self.add_class(image_source, 1, class_name)
         assert subset in ["train", "test"]
         dataset_dir = os.path.join(dataset_dir, subset)
-        train_ids = pd.read_csv(os.path.join(RESULTS_DIR, "train_ids.csv"))
+        train_ids = pd.read_csv(os.path.join(train_test_split_dir, "train_ids.csv"))
         train_list = list(train_ids["train"])
-        test_ids = pd.read_csv(os.path.join(RESULTS_DIR, "test_ids.csv"))
+        test_ids = pd.read_csv(os.path.join(train_test_split_dir, "test_ids.csv"))
         test_list = list(test_ids["test"])
         if subset == "test":
             image_ids = test_list
