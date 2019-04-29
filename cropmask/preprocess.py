@@ -37,7 +37,7 @@ class PreprocessWorkflow():
         self.gridded_labels_dir = ''
         self.results_dir = params['dirs']['results']
         self.band_list = [] # the band indices
-        self.meta = # meta data for the stacked raster
+        self.meta = {} # meta data for the stacked raster
         self.chip_ids = [] # list of chip ids of form [scene_id]_[random number]
         self.small_area_filter = params['label_vals']['small_area_filter']
         self.neg_buffer = params['label_vals']['neg_buffer']
@@ -46,8 +46,8 @@ class PreprocessWorkflow():
         self.grid_size = params['image_vals']['grid_size']
         self.usable_threshold = params['image_vals']['usable_thresh']
         self.split = params['image_vals']['split']
-O
-    def yaml_to_band_index():
+
+    def yaml_to_band_index(self):
         """Parses config booleans to a list of band indexes to be stacked.
         For example, Landsat 5 has 6 bands (7 if you count band 6, thermal) 
         that we can use for masking.
@@ -69,22 +69,19 @@ O
                 self.band_list.append(i+1)
         return [str(b) for b in self.band_list]
 
-    def setup_dirs():
+    def setup_dirs(self):
         """
-        A path to a yaml config file that will be parsed as a dictionary 
-        containing the directory paths and names to create.
-
         This folder structure is used for each unique pre processing and modeling
         workflow and is made unique by specifying a unique DATASET name
         or ROOT path (if working on a different container.). 
         
         ROOT should be the path to the azure container mounted with blobfuse, 
-        and should already exist.
+        and should already exist. The RESULTS folder should be created in a folder named from param["results"], and this should also already exist.
         """
         
         params = self.params['dirs']
 
-        ROOT = params["container"]
+        ROOT = params["root"]
 
         assert os.path.exists(ROOT)
 
@@ -102,11 +99,7 @@ O
 
         NEG_BUFFERED = os.path.join(DATASET, params["neg_buffered_labels"])
 
-        RESULTS = os.path.join(ROOT, params["results"], DATASET)
-
-        SOURCE_IMGS = os.path.join(ROOT, params["source_imgs"])
-
-        SOURCE_LABELS = os.path.join(ROOT, params["source_labels"])k 
+        RESULTS = os.path.join(ROOT, params["results"], params["dataset"])
 
         directory_list = [
                 DATASET,
@@ -115,11 +108,11 @@ O
                 TEST,
                 GRIDDED_IMGS,
                 GRIDDED_LABELS,
-                OPENED,
                 NEG_BUFFERED,
                 RESULTS,
             ]
-        make_dirs(directory_list)        
+        make_dirs(directory_list)
+        return directory_list
         
     def stack_and_save_bands(self, out_dir):
         """Load the landsat bands specified by yaml_to_band_index and returns 
@@ -162,7 +155,7 @@ O
         with rasterio.open(stacked_path, "w+", **meta) as out:
             out.write(reshape_as_raster(stacked_arr))
             
-    def negative_buffer_and_small_filter(dest_path, neg_buffer, small_area_filter):
+    def negative_buffer_and_small_filter(self, dest_path, neg_buffer, small_area_filter):
         """
         Applies a negative buffer to labels since some are too close together and 
         produce conjoined instances when connected components is run (even after 
@@ -214,14 +207,14 @@ O
                 )
             )
 
-    def grid_images():
+    def grid_images(self):
         """
         Grids up imagery to a variable size. Filters out imagery with too little usable data.
         appends a random unique id to each tif and label pair, appending string 'label' to the 
         mask.
         """
         
-        def rm_mostly_empty(scene_path, label_path):
+        def rm_mostly_empty(self, scene_path, label_path):
             """
             Removes a grid that is emptier than the usable data threshold and corrects bad no data value to 0.
             Ignore the User Warning, unsure why it pops up but doesn't seem to impact the array shape. Used because
@@ -286,7 +279,7 @@ O
                 os.system(com_string)
                 rm_mostly_empty(out_path_img, out_path_label)
                 
-    def move_img_to_folder():
+    def move_img_to_folder(self):
         """Moves a file with identifier pattern 760165086.tif to a 
         folder path ZA0165086/image/ZA0165086.tif
         
@@ -305,12 +298,12 @@ O
             old_chip_path = os.path.join(self.gridded_imgs_dir, self.chip_id+'.tif')
             os.rename(old_chip_path, os.path.join(new_chip_path, self.chip_id+'_'+self.scene_id + ".tif")) #names each gridded chip with randomID and scene_id
         
-    def connected_comp():
-    """
-    Extracts individual instances into their own tif files. Saves them
-    in each folder ID in train folder. If an image has no instances,
-    saves it with a empty mask.
-    """
+    def connected_comp(self):
+        """
+        Extracts individual instances into their own tif files. Saves them
+        in each folder ID in train folder. If an image has no instances,
+        saves it with a empty mask.
+        """
         label_list = next(os.walk(self.rasterized_label_path))[2]
         # save connected components and give each a number at end of id
         for label_chip in label_list:
@@ -345,7 +338,7 @@ O
                         warnings.simplefilter("ignore", category=UserWarning)
                         skio.imsave(label_path, labels_copy)
             
-    def train_test_split():
+    def train_test_split(self):
         """Takes a sample of folder ids and copies them to a test directory
         from a directory with all folder ids. Each sample folder contains an 
         images and corresponding masks folder."""
@@ -366,7 +359,7 @@ O
         train_df.to_csv(os.path.join(self.results_dir, "train_ids.csv"))
         test_df.to_csv(os.path.join(self.results_dir, "test_ids.csv"))
 
-    def get_arr_channel_mean(channel):
+    def get_arr_channel_mean(self, channel):
         """
         Calculate the mean of a given channel across all training samples.
         """

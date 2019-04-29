@@ -19,16 +19,14 @@ def percentile_rescale(arr):
     #     rescaled_arr= exposure.adjust_sigmoid(rescaled_arr, cutoff=.50) #adjust from .5 either way
     return rescaled_arr
 
-
-def remove_dir_folders(directory_list, root):
+def remove_dirs(directory_list):
     """
     Removes all files and sub-folders in each folder.
     """
 
-    directory_list
     for f in directory_list:
-        shutil.rmtree(os.path.join(root, f))
-
+        if os.path.exists(f):
+            shutil.rmtree(f)
 
 def max_normalize(arr):
     arr *= 255.0 / arr.max()
@@ -45,8 +43,8 @@ def make_dirs(directory_list):
     # Make directory and subdirectories
     for d in directory_list:
         try: 
-            pathlib.Path(d).mkdir(parents=False, exist_ok=False)
-        except: 
-            FileExistsError
-    # Change working directory to project directory
-    os.chdir(directory_list[0])
+            os.mkdir(d)
+        except:
+            print("Whole directory list: ", directory_list)
+            print("The directory "+d+" exists already. Check it and maybe delete it or change config.")
+            raise FileExistsError
