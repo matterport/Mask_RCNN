@@ -14,7 +14,7 @@ from rasterio import features, coords
 from rasterio.plot import reshape_as_raster
 import rasterio
 from shapely.geometry import shape
-import gdal
+from osgeo import gdal
 
 from cropmask.misc import parse_yaml, make_dirs
 
@@ -31,7 +31,21 @@ class PreprocessWorkflow():
         self.source_label_path = source_label_path # if there is a referenc label
         self.scene_dir_path = scene_dir_path # path to the unpacked tar archive on azure storage
         self.scene_id = self.scene_dir_path.split("/")[-1] # gets the name of the folder the bands are in, the scene_id
-        self.stacked_path = '' # path to the stacked bands
+        
+         # the folder structure for the unique run
+        self.ROOT = params['dirs']["root"]
+        assert os.path.exists(self.ROOT)
+        self.DATASET = os.path.join(self.ROOT, params['dirs']["dataset"])
+        self.STACKED = os.path.join(self.DATASET, params['dirs']["stacked"])
+        self.TRAIN = os.path.join(self.DATASET, params['dirs']["train"])
+        self.TEST = os.path.join(self.DATASET, params['dirs']["test"])
+        self.GRIDDED_IMGS = os.path.join(self.DATASET, params['dirs']["gridded_imgs"])
+        self.GRIDDED_LABELS = os.path.join(self.DATASET, params['dirs']["gridded_labels"])
+        self.NEG_BUFFERED = os.path.join(self.DATASET, params['dirs']["neg_buffered_labels"])
+        self.RESULTS = os.path.join(self.ROOT, params['dirs']["results"], params['dirs']["dataset"])
+        
+        # scene specific paths and variables
+        self.stacked_dir = '' # path to the stacked bands
         self.rasterized_label_path = ''
         self.gridded_imgs_dir = ''
         self.gridded_labels_dir = ''
@@ -62,7 +76,7 @@ class PreprocessWorkflow():
         .. _PEP 484:
             https://www.python.org/dev/peps/pep-0484/
         """
-        if self.params["image_vals"]["dataset_name"] == "landsat5":
+        if self.params["image_vals"]["dataset_name"] == "landsat-5":
             bands = self.params["landsat_bands_to_include"]
         for i, band in enumerate(bands):
             if list(band.values())[0] == True:
@@ -78,43 +92,42 @@ class PreprocessWorkflow():
         ROOT should be the path to the azure container mounted with blobfuse, 
         and should already exist. The RESULTS folder should be created in a folder named from param["results"], and this should also already exist.
         """
-        
-        params = self.params['dirs']
-
-        ROOT = params["root"]
-
-        assert os.path.exists(ROOT)
-
-        DATASET = os.path.join(ROOT, params["dataset"])
-
-        STACKED = os.path.join(DATASET, params["stacked"])
-
-        TRAIN = os.path.join(DATASET, params["train"])
-
-        TEST = os.path.join(DATASET, params["test"])
-
-        GRIDDED_IMGS = os.path.join(DATASET, params["gridded_imgs"])
-
-        GRIDDED_LABELS = os.path.join(DATASET, params["gridded_labels"])
-
-        NEG_BUFFERED = os.path.join(DATASET, params["neg_buffered_labels"])
-
-        RESULTS = os.path.join(ROOT, params["results"], params["dataset"])
 
         directory_list = [
-                DATASET,
-                STACKED,
-                TRAIN,
-                TEST,
-                GRIDDED_IMGS,
-                GRIDDED_LABELS,
-                NEG_BUFFERED,
-                RESULTS,
+                self.DATASET,
+                self.STACKED,
+                self.TRAIN,
+                self.TEST,
+                self.GRIDDED_IMGS,
+                self.GRIDDED_LABELS,
+                self.NEG_BUFFERED,
+                self.RESULTS,
             ]
         make_dirs(directory_list)
         return directory_list
+    
+    def get_product_paths(self):
+        # Load image
+        product_list = os.listdir(self.scene_dir_path)
+        # below works because only products that are bands have a int in the 5th to last position
+        filtered_product_list = [band for band in product_list if band[-5] in self.band_list]
+        filtered_product_list = sorted(filtered_product_list)
+        filtered_product_paths = [os.path.join(self.scene_dir_path, fname) for fname in filtered_product_list]
+        return filtered_product_paths
+    
+    def load_and_stack_bands(self, product_paths):
+        arr_list = [skio.imread(product_path) for product_path in product_paths]
+        # get metadata and edit meta obj for stacked raster
+        with rasterio.open(product_paths[0]) as rast:
+                meta = rast.meta.copy()
+                meta.update(compress="lzw")
+                meta["count"] = len(arr_list)
+                self.meta=meta
+        stacked_arr = np.dstack(arr_list)
+        stacked_arr[stacked_arr <= 0]=0
+        return stacked_arr
         
-    def stack_and_save_bands(self, out_dir):
+    def stack_and_save_bands(self):
         """Load the landsat bands specified by yaml_to_band_index and returns 
         a [H,W,N] Numpy array for a single scene, where N is the number of bands 
         and H and W are the height and width of the original band arrays. 
@@ -125,7 +138,6 @@ class PreprocessWorkflow():
             as the blob name of the folder that has the landsat product bands downloaded using lsru or
             download_utils.
             band_list (str): a list of band indices to include
-            out_dir (str): the path to the stacked directory
 
         Returns:
             ndarray:k 
@@ -134,23 +146,11 @@ class PreprocessWorkflow():
             https://www.python.org/dev/peps/pep-0484/
 
         """
-        # Load image
-        product_list = os.listdir(self.scene_dir_path)
-        # below works because only products that are bands have a int in the 5th to last position
-        filtered_product_list = [band for band in product_list if band[-5] in self.band_list]
-        filtered_product_list = sorted(filtered_product_list)
-        filtered_product_paths = [os.path.join(self.scene_dir_path, fname) for fname in filtered_product_list]
-        arr_list = [skio.imread(product_path) for product_path in filtered_product_paths]
-        # get metadata and edit meta obj for stacked raster
-        with rasterio.open(filtered_product_paths[0]) as rast:
-                meta = rast.meta.copy()
-                meta.update(compress="lzw")
-                meta["count"] = len(arr_list)
-                self.meta=meta
-        stacked_arr = np.dstack(arr_list)
-        stacked_arr[stacked_arr <= 0]=0
-        stacked_name = filtered_product_list[0][:-10] + ".tif"
-        stacked_path = os.path.join(out_dir, stacked_name)
+        
+        product_paths = get_product_paths(self)
+        stacked_arr = load_and_stack_bands(self, product_paths)
+        stacked_name = os.path.basename(product_paths[0])[:-10] + ".tif"
+        stacked_path = os.path.join(self.stacked, stacked_name)
         self.stacked_path = stacked_path
         with rasterio.open(stacked_path, "w+", **meta) as out:
             out.write(reshape_as_raster(stacked_arr))

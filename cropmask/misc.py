@@ -35,7 +35,7 @@ def max_normalize(arr):
 def parse_yaml(input_file):
     """Parse yaml file of configuration parameters."""
     with open(input_file, "r") as yaml_file:
-        params = yaml.load(yaml_file)
+        params = yaml.safe_load(yaml_file)
     return params
 
 def make_dirs(directory_list):
