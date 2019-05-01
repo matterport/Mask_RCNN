@@ -45,11 +45,7 @@ class PreprocessWorkflow():
         self.RESULTS = os.path.join(self.ROOT, params['dirs']["results"], params['dirs']["dataset"])
         
         # scene specific paths and variables
-        self.stacked_dir = '' # path to the stacked bands
         self.rasterized_label_path = ''
-        self.gridded_imgs_dir = ''
-        self.gridded_labels_dir = ''
-        self.results_dir = params['dirs']['results']
         self.band_list = [] # the band indices
         self.meta = {} # meta data for the stacked raster
         self.chip_ids = [] # list of chip ids of form [scene_id]_[random number]
@@ -80,8 +76,8 @@ class PreprocessWorkflow():
             bands = self.params["landsat_bands_to_include"]
         for i, band in enumerate(bands):
             if list(band.values())[0] == True:
-                self.band_list.append(i+1)
-        return [str(b) for b in self.band_list]
+                self.band_list.append(str(i+1))
+        return self.band_list
 
     def setup_dirs(self):
         """
@@ -106,11 +102,11 @@ class PreprocessWorkflow():
         make_dirs(directory_list)
         return directory_list
     
-    def get_product_paths(self):
+    def get_product_paths(self, band_list):
         # Load image
         product_list = os.listdir(self.scene_dir_path)
         # below works because only products that are bands have a int in the 5th to last position
-        filtered_product_list = [band for band in product_list if band[-5] in self.band_list]
+        filtered_product_list = [band for band in product_list if band[-5] in band_list and 'band' in band]
         filtered_product_list = sorted(filtered_product_list)
         filtered_product_paths = [os.path.join(self.scene_dir_path, fname) for fname in filtered_product_list]
         return filtered_product_paths
@@ -147,15 +143,15 @@ class PreprocessWorkflow():
 
         """
         
-        product_paths = get_product_paths(self)
-        stacked_arr = load_and_stack_bands(self, product_paths)
+        product_paths = self.get_product_paths(self.band_list)
+        stacked_arr = self.load_and_stack_bands(product_paths)
         stacked_name = os.path.basename(product_paths[0])[:-10] + ".tif"
-        stacked_path = os.path.join(self.stacked, stacked_name)
+        stacked_path = os.path.join(self.STACKED, stacked_name)
         self.stacked_path = stacked_path
-        with rasterio.open(stacked_path, "w+", **meta) as out:
+        with rasterio.open(stacked_path, "w+", **self.meta) as out:
             out.write(reshape_as_raster(stacked_arr))
             
-    def negative_buffer_and_small_filter(self, dest_path, neg_buffer, small_area_filter):
+    def negative_buffer_and_small_filter(self, neg_buffer, small_area_filter):
         """
         Applies a negative buffer to labels since some are too close together and 
         produce conjoined instances when connected components is run (even after 
@@ -174,26 +170,24 @@ class PreprocessWorkflow():
 
         shp_frame = gpd.read_file(self.source_label_path)
         # keeps the class of interest if it is there and the polygon of raster extent
-        with rasterio.open(self.stacked_path) as rast:
-            meta = rast.meta.copy()
-            meta.update(compress="lzw")
-            meta["count"] = 1
-            self.meta = meta
-            tifname = os.path.splitext(os.path.basename(self.source_label_path))[0] + ".tif"
-            self.rasterized_label_path = os.path.join(dest_path, tifname)
-        with rasterio.open(rasterized_label_path, "w+", **meta) as out:
+        meta = self.meta.copy()
+        meta.update({'count':1})
+        tifname = os.path.splitext(os.path.basename(self.source_label_path))[0] + ".tif"
+        self.rasterized_label_path = os.path.join(self.NEG_BUFFERED, tifname)
+        with rasterio.open(self.rasterized_label_path, "w+", **meta) as out:
             out_arr = out.read(1)
             shp_frame = shp_frame.loc[shp_frame.area > self.small_area_filter]
             shp_frame["geometry"] = shp_frame["geometry"].buffer(self.neg_buffer)
+            shp_frame = shp_frame.loc[shp_frame.geometry.is_empty==False]
             # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
             shapes = (
-                (geom, value)
-                for geom, value in zip(shp_frame.geometry, shp_frame.ObjectID)
-            )
+                (geom.__geo_interface__, value)
+                for geom, value in zip(shp_frame.geometry, shp_frame.ID)
+            ) # this is tricky, had to add geo interface because rasterio takes geojson dicts, not shapely geometries
             burned = features.rasterize(
                 shapes=shapes,
                 fill=0,
-                out_shape=rast.shape,
+                out_shape=(meta['height'],meta['width']),
                 transform=out.transform,
                 default_value=1,
             )
@@ -206,6 +200,7 @@ class PreprocessWorkflow():
                 negbuff=self.neg_buffer, area=self.small_area_filter
                 )
             )
+        return True # for testing to confirm it worked
 
     def grid_images(self):
         """
@@ -245,8 +240,8 @@ class PreprocessWorkflow():
             for j in range(0, ysize, self.grid_size):
                 chip_id = str(random.randint(100000000, 999999999))+'_'+self.scene_id
                 self.chip_ids.append(chip_id)
-                out_path_img = os.path.join(self.gridded_imgs_dir, chip_id) + ".tif"
-                out_path_label = os.path.join(self.gridded_labels_dir, chip_id) + "_label.tif"
+                out_path_img = os.path.join(self.GRIDDED_IMGS, chip_id) + ".tif"
+                out_path_label = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
                 com_string = (
                     "gdal_translate -of GTIFF -srcwin "
                     + str(i)
@@ -277,7 +272,8 @@ class PreprocessWorkflow():
                     + str(out_path_label)
                 )
                 os.system(com_string)
-                rm_mostly_empty(out_path_img, out_path_label)
+                self.rm_mostly_empty(out_path_img, out_path_label)
+        return True # for testing to confirm it worked
                 
     def move_img_to_folder(self):
         """Moves a file with identifier pattern 760165086.tif to a 
@@ -286,7 +282,7 @@ class PreprocessWorkflow():
         """
 
         for chip_id in self.chip_ids:
-            chip_folder_path = os.path.join(self.train_dir, chip_id)
+            chip_folder_path = os.path.join(self.TRAIN, chip_id)
             if os.path.exists(chip_folder_path) == False:
                 os.mkdir(chip_folder_path)
             else:
@@ -295,7 +291,7 @@ class PreprocessWorkflow():
             mask_path = os.path.join(chip_folder_path, "mask")
             os.mkdir(new_path)
             os.mkdir(mask_path)
-            old_chip_path = os.path.join(self.gridded_imgs_dir, self.chip_id+'.tif')
+            old_chip_path = os.path.join(self.GRIDDED_IMGS, self.chip_id+'.tif')
             os.rename(old_chip_path, os.path.join(new_chip_path, self.chip_id+'_'+self.scene_id + ".tif")) #names each gridded chip with randomID and scene_id
         
     def connected_comp(self):
@@ -312,12 +308,12 @@ class PreprocessWorkflow():
             blob_vals = np.unique(blob_labels)
             # for imgs with no instances, create empty mask
             if len(blob_vals) == 1:
-                img_chip_folder = os.path.join(self.train_dir, label_chip[:-11], "image")
+                img_chip_folder = os.path.join(self.TRAIN, label_chip[:-11], "image")
                 img_chip_name = os.listdir(img_chip_folder)[0]
                 img_chip_path = os.path.join(img_chip_folder, img_chip_name)
                 arr = skio.imread(img_chip_path)
                 mask = np.zeros_like(arr[:, :, 0])
-                mask_folder = os.path.join(self.train_dir, label_chip[:-11], "mask")
+                mask_folder = os.path.join(self.TRAIN, label_chip[:-11], "mask")
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
                     label_stump = os.path.splitext(os.path.basename(label_chip))[0]
@@ -331,7 +327,7 @@ class PreprocessWorkflow():
 
                     label_stump = os.path.splitext(os.path.basename(label_chip))[0]
                     label_name = label_stump + "_" + str(blob_val) + ".tif"
-                    mask_path = os.path.join(self.train_dir, label_chip[:-11], "mask")
+                    mask_path = os.path.join(self.TRAIN, label_chip[:-11], "mask")
                     label_path = os.path.join(mask_path, label_name)
                     assert labels_copy.ndim == 2
                     with warnings.catch_warnings():
@@ -343,21 +339,21 @@ class PreprocessWorkflow():
         from a directory with all folder ids. Each sample folder contains an 
         images and corresponding masks folder."""
 
-        sample_list = next(os.walk(self.train_dir))[1]
+        sample_list = next(os.walk(self.TRAIN))[1]
         k = round(self.split * len(sample_list))
         test_list = random.sample(sample_list, k)
         for test_sample in test_list:
             shutil.copytree(
-                os.path.join(self.train_dir, test_sample), os.path.join(self.test_dir, test_sample)
+                os.path.join(self.TRAIN, test_sample), os.path.join(self.TEST, test_sample)
             )
             shutil.rmtree(
-                os.path.join(self.train_dir, test_sample)
+                os.path.join(self.TRAIN, test_sample)
             )
-        train_list = list(set(next(os.walk(self.train_dir))[1]) - set(next(os.walk(self.test_dir))[1]))
+        train_list = list(set(next(os.walk(self.TRAIN))[1]) - set(next(os.walk(self.TEST))[1]))
         train_df = pd.DataFrame({"train": train_list})
         test_df = pd.DataFrame({"test": test_list})
-        train_df.to_csv(os.path.join(self.results_dir, "train_ids.csv"))
-        test_df.to_csv(os.path.join(self.results_dir, "test_ids.csv"))
+        train_df.to_csv(os.path.join(self.RESULTS, "train_ids.csv"))
+        test_df.to_csv(os.path.join(self.RESULTS, "test_ids.csv"))
 
     def get_arr_channel_mean(self, channel):
         """
@@ -365,9 +361,9 @@ class PreprocessWorkflow():
         """
 
         means = []
-        train_list = next(os.walk(self.train_dir))[1]
+        train_list = next(os.walk(self.TRAIN))[1]
         for i, fid in enumerate(train_list):
-            im_folder = os.path.join(self.train_dir, fid, "image")
+            im_folder = os.path.join(self.TRAIN, fid, "image")
             im_path = os.path.join(im_folder, os.listdir(im_folder)[0])
             arr = skio.imread(im_path)
             arr = arr.astype(np.float32, copy=False)
