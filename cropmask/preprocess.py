@@ -30,7 +30,7 @@ class PreprocessWorkflow():
         self.params = params
         self.source_label_path = source_label_path # if there is a referenc label
         self.scene_dir_path = scene_dir_path # path to the unpacked tar archive on azure storage
-        self.scene_id = self.scene_dir_path.split("/")[-1] # gets the name of the folder the bands are in, the scene_id
+        self.scene_id = self.scene_dir_path.split("/")[-2] # gets the name of the folder the bands are in, the scene_id
         
          # the folder structure for the unique run
         self.ROOT = params['dirs']["root"]
@@ -181,7 +181,7 @@ class PreprocessWorkflow():
             shp_frame = shp_frame.loc[shp_frame.geometry.is_empty==False]
             # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
             shapes = (
-                (geom.__geo_interface__, value)
+                (geom, value)
                 for geom, value in zip(shp_frame.geometry, shp_frame.ID)
             ) # this is tricky, had to add geo interface because rasterio takes geojson dicts, not shapely geometries
             burned = features.rasterize(
@@ -201,7 +201,45 @@ class PreprocessWorkflow():
                 )
             )
         return True # for testing to confirm it worked
+    
+    def rm_mostly_empty(self, scene_path, label_path):
+        """
+        Removes a grid that is emptier than the usable data threshold and corrects bad no data value to 0.
+        Ignore the User Warning, unsure why it pops up but doesn't seem to impact the array shape. Used because
+        very empty grid chips seem to throw off the model by increasing detections at the edges between good data 
+        and nodata.
+        """
 
+        arr = skio.imread(scene_path)
+        arr[arr < 0] = 0
+        skio.imsave(scene_path, arr)
+        pixel_count = arr.shape[0] * arr.shape[1]
+        nodata_pixel_count = (arr == 0).sum()
+
+        if nodata_pixel_count / pixel_count > self.usable_threshold:
+
+            os.remove(scene_path)
+            os.remove(label_path)
+        print("removed scene and label, {}% bad data".format(self.usable_threshold))
+
+    def make_command(i, j, scene_id):
+        # returns 
+        """com_string = (
+                    "gdal_translate -of GTIFF -srcwin "
+                    + str(i)
+                    + ", "
+                    + str(j)
+                    + ", "
+                    + str(self.grid_size)
+                    + ", "
+            
+                    + str(self.grid_size)
+                    + " "
+                    + str(self.rasterized_label_path)
+                    + " "
+                    + str(out_path_label)
+                )"""
+        itertools.product # step 1 gets all the tuples of the i and j indices
     def grid_images(self):
         """
         Grids up imagery to a variable size. Filters out imagery with too little usable data.
@@ -209,39 +247,23 @@ class PreprocessWorkflow():
         mask.
         """
         
-        def rm_mostly_empty(self, scene_path, label_path):
-            """
-            Removes a grid that is emptier than the usable data threshold and corrects bad no data value to 0.
-            Ignore the User Warning, unsure why it pops up but doesn't seem to impact the array shape. Used because
-            very empty grid chips seem to throw off the model by increasing detections at the edges between good data 
-            and nodata.
-            """
-
-            arr = skio.imread(scene_path)
-            arr[arr < 0] = 0
-            skio.imsave(scene_path, arr)
-            pixel_count = arr.shape[0] * arr.shape[1]
-            nodata_pixel_count = (arr == 0).sum()
-            
-            if nodata_pixel_count / pixel_count > self.usable_threshold:
-
-                os.remove(scene_path)
-                os.remove(label_path)
-            print("removed scene and label, {}% bad data".format(self.usable_threshold))
-        
-
         ds = gdal.Open(self.stacked_path) # TO DO can get this info earlier and with less file io
         band = ds.GetRasterBand(1)
         xsize = band.XSize
         ysize = band.YSize
         ### TO DO MAKE GRID ID DIRECTORY CREATION HAPPEN IN THE MAKE DIRS FUNCTION, MOVE ALL DIR SETUP TO THAT FUNCTION INSTEAD OF HAVING
         ### IT BE SCATTERED AROUND MULTIPLE FUNCS
+        
         for i in range(0, xsize, self.grid_size):
             for j in range(0, ysize, self.grid_size):
-                chip_id = str(random.randint(100000000, 999999999))+'_'+self.scene_id
+                print(xsize)
+                print(ysize)
+                print(self.grid_size)
+                chip_id = str(i)+'_'+str(j)+'_'+self.scene_id
                 self.chip_ids.append(chip_id)
                 out_path_img = os.path.join(self.GRIDDED_IMGS, chip_id) + ".tif"
                 out_path_label = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
+                print("image chip file name: {}".format(out_path_img))
                 com_string = (
                     "gdal_translate -of GTIFF -srcwin "
                     + str(i)
@@ -255,7 +277,12 @@ class PreprocessWorkflow():
                     + str(self.stacked_path)
                     + " "
                     + str(out_path_img)
-                )
+                ) # echo this to a file and run with bash
+                # get list of commands
+                # functionalize
+                # also try subprocess to speed it up
+                #chunk command list
+                # use multiprocessing pool
                 os.system(com_string)
                 com_string = (
                     "gdal_translate -of GTIFF -srcwin "

@@ -137,10 +137,10 @@ def test_grid_images(wflow):
     wflow.stack_and_save_bands()
     
     wflow.negative_buffer_and_small_filter(-31, 100)
-    
     try: 
         wflow.grid_images()
-    except:
-#         remove_dirs(directory_list)
-        print("The function didn't complete.") 
+        assert len(os.listdir(wflow.GRIDDED_IMGS)) > 1
+    except AssertionError:
+        remove_dirs(directory_list)
+        print("Less than one chip directory was made") 
         
