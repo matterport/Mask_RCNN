@@ -1687,14 +1687,15 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
 
     # Keras requires a generator to run indefinitely.
     while True:
-        try:
-            # Increment index to pick next image. Shuffle if at the start of an epoch.
-            image_index = (image_index + 1) % len(image_ids)
-            if shuffle and image_index == 0:
-                np.random.shuffle(image_ids)
 
-            # Get GT bounding boxes and masks for image.
-            image_id = image_ids[image_index]
+        # Increment index to pick next image. Shuffle if at the start of an epoch.
+        image_index = (image_index + 1) % len(image_ids)
+        if shuffle and image_index == 0:
+            np.random.shuffle(image_ids)
+
+        # Get GT bounding boxes and masks for image.
+        image_id = image_ids[image_index]
+        try:
 
             # If the image source is not to be augmented pass None as augmentation
             if dataset.image_info[image_id]['source'] in no_augmentation_sources:
