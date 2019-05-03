@@ -58,6 +58,10 @@ variable "container_name" {
   default     = ""
 }
 
+variable "fileshare_name" {
+  description = "Name of the file share in the storage account"
+  default     = ""
+}
 
 variable "lsru_config" {
   description = "Path to the .lsru config gile on your local machine"
@@ -206,12 +210,13 @@ resource "null_resource" "ds" {
       "export ACCOUNT_KEY=${var.account_key}",
       "export STORAGE_NAME=${var.storage_name}",
       "export STORAGE_KEY=${var.storage_key}",
+      "export FILESHARE_NAME=${var.fileshare_name}",
       "export CONTAINER_NAME=${var.container_name}",    
       "echo \"accountName $STORAGE_NAME\" > /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"accountKey $STORAGE_KEY\" >> /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"containerName $CONTAINER_NAME\" >> /home/${var.admin_user}/work/blobfuse.cfg",
-      "sleep 1",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount.sh",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount-fileshare.sh $STORAGE_NAME $FILESHARE_NAME $ACCOUNT_KEY",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount-blobfuse.sh",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh ${var.repo_name}"
     ]
 

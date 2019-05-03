@@ -1,6 +1,8 @@
 account_name = 
 account_key = 
 storage_name = 
-storage_key = 
+storage_key =
+container_name =
+fileshare_name = 
 lsru_config = # path to the Landsat Surface reflectance Util python package config file on your local machine
 

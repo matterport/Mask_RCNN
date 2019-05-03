@@ -15,6 +15,10 @@ from rasterio.plot import reshape_as_raster
 import rasterio
 from shapely.geometry import shape
 from osgeo import gdal
+from multiprocessing.pool import ThreadPool
+from subprocess import STDOUT, call
+import subprocess
+import itertools
 
 from cropmask.misc import parse_yaml, make_dirs
 
@@ -222,24 +226,80 @@ class PreprocessWorkflow():
             os.remove(label_path)
         print("removed scene and label, {}% bad data".format(self.usable_threshold))
 
-    def make_command(i, j, scene_id):
-        # returns 
-        """com_string = (
-                    "gdal_translate -of GTIFF -srcwin "
-                    + str(i)
-                    + ", "
-                    + str(j)
-                    + ", "
-                    + str(self.grid_size)
-                    + ", "
+    def make_commands(self, list_x, list_y, suffix):
+        # step 1 gets all the tuples of the i and j indices
+        index_tuples = list(itertools.product(list_x, list_y))
+        #step 2 make commands list
+        return [["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.stacked_path, str(i)+'_'+str(j)+'_'+self.scene_id+suffix] for i,j in index_tuples]
+
+    def thread_commands(self, limit, commands):
+        """
+        Creates a Thread pool and runs command strings
+        """
+        
+        def run(cmd):
+            return cmd, call(cmd, stdout=outputfile, stderr=STDOUT)
+        
+        for cmd, rc in ThreadPool(limit).imap_unordered(run, commands): #run comes from subprocess
+            if rc != 0:
+                print('{cmd} failed with exit status {rc}'.format(**vars()))
+                
+    def grid_images_threaded(self):
+        """
+        Grids up imagery to a variable size. Filters out imagery with too little usable data.
+        appends a random unique id to each tif and label pair, appending string 'label' to the 
+        mask.
+        """    
+        xsize = self.meta['height']
+        ysize = self.meta['width']
+        i_list = [i for i in range(0, xsize, self.grid_size)]
+        j_list = [j for j in range(0, ysize, self.grid_size)]
+        
+        img_commands = self.make_commands(i_list, j_list, ".tif")
+        label_commands = self.make_commands(i_list, j_list, "_label.tif")
+        self.thread_commands(4, img_commands)
+        self.thread_commands(4, label_commands)
+    
+    def grid_images_rasterio(self, source_img_path):
+        # Iterate over image blocks - which are 256x256 - and save new GeoTiffs
+        with rasterio.open(source_img_path) as src:
             
-                    + str(self.grid_size)
-                    + " "
-                    + str(self.rasterized_label_path)
-                    + " "
-                    + str(out_path_label)
-                )"""
-        itertools.product # step 1 gets all the tuples of the i and j indices
+            # Get block dimensions of src
+            for ji, window in src.block_windows(1):
+                
+                # read B,G,R,NIR band
+                r = src.read((1,2,3,4), window=window)
+                
+                # Skip image if missing data
+                if 0 in r:
+                    continue
+           
+                else:
+                    
+                    # Create chip id
+                    chip_name = image_name + '_' + str(ji[0]) + '_' + str(ji[1])                    
+                    
+                    # Create directory for image chip and subdirectories for image and labels
+                    chip_dir = prep_directory + '/' + chip_name + '/'                    
+                    img_dir = chip_dir + '/image/'
+                    mask_dir = chip_dir + '/class_masks/'
+                    
+                    # list of directories to map over
+                    dirs = [chip_dir, img_dir, mask_dir]
+                    
+                    # Make chip directory and subdirectories
+                    for d in dirs:
+                        pathlib.Path(d).mkdir(parents=True, exist_ok=True)
+                    
+                    # Open a new GeoTiff data file in which to save the image chip
+                    with rasterio.open((img_dir + chip_name + '.tif'), 'w', driver='GTiff',
+                               height=r.shape[1], width=r.shape[2], count=4,
+                               dtype=rasterio.uint16, crs=src.crs, 
+                               transform=src.transform) as new_img:
+        
+                        # Write the rescaled image to the new GeoTiff
+                        new_img.write(r)
+        
     def grid_images(self):
         """
         Grids up imagery to a variable size. Filters out imagery with too little usable data.
@@ -256,49 +316,15 @@ class PreprocessWorkflow():
         
         for i in range(0, xsize, self.grid_size):
             for j in range(0, ysize, self.grid_size):
-                print(xsize)
-                print(ysize)
-                print(self.grid_size)
                 chip_id = str(i)+'_'+str(j)+'_'+self.scene_id
                 self.chip_ids.append(chip_id)
                 out_path_img = os.path.join(self.GRIDDED_IMGS, chip_id) + ".tif"
                 out_path_label = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
                 print("image chip file name: {}".format(out_path_img))
-                com_string = (
-                    "gdal_translate -of GTIFF -srcwin "
-                    + str(i)
-                    + ", "
-                    + str(j)
-                    + ", "
-                    + str(self.grid_size)
-                    + ", "
-                    + str(self.grid_size)
-                    + " "
-                    + str(self.stacked_path)
-                    + " "
-                    + str(out_path_img)
-                ) # echo this to a file and run with bash
-                # get list of commands
-                # functionalize
-                # also try subprocess to speed it up
-                #chunk command list
-                # use multiprocessing pool
-                os.system(com_string)
-                com_string = (
-                    "gdal_translate -of GTIFF -srcwin "
-                    + str(i)
-                    + ", "
-                    + str(j)
-                    + ", "
-                    + str(self.grid_size)
-                    + ", "
-                    + str(self.grid_size)
-                    + " "
-                    + str(self.rasterized_label_path)
-                    + " "
-                    + str(out_path_label)
-                )
-                os.system(com_string)
+                com_list = ["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.stacked_path, out_path_img]
+                subprocess.run(com_list)
+                com_list = ["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.rasterized_label_path, out_path_label]
+                subprocess.run(com_list)
                 self.rm_mostly_empty(out_path_img, out_path_label)
         return True # for testing to confirm it worked
                 
