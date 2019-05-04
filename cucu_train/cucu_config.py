@@ -23,7 +23,7 @@ class cucumberConfig(Config):
 
 
     """ ARCHITECTURE HYPER-PARAMETERS"""
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = len(globalObjectCategories) # background + cucumber, leaf, flower, stems
@@ -136,7 +136,7 @@ class cucumberConfig(Config):
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
 
         # Input image size
-        if self.IMAGE_RESIZE_MODE == "crop":
+        if self.IMAGE_RESIZE_MODE == "pad64":
             self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
                 self.IMAGE_CHANNEL_COUNT])
         else:
@@ -152,14 +152,23 @@ class cucumberConfig(Config):
 class InferenceConfig(cucumberConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    def __init__(self):
+    def __init__(self, resolution=1024, categories=None):
         super().__init__()
+        if categories is not None:
+            self.globalObjectCategories = ['BG'] + categories
+            self.NUM_CLASSES = len(self.globalObjectCategories)
+            self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+            
+        self.SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION = resolution
+        self.IMAGE_MIN_DIM = self.SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
+        self.IMAGE_MAX_DIM = self.SQUARED_IMAGES_DIM_FOR_CURRENT_SESSION
+
         """Set values of computed attributes."""
         # Effective batch size
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
 
         # Input image size
-        if self.IMAGE_RESIZE_MODE == "crop":
+        if self.IMAGE_RESIZE_MODE == "pad64":
             self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
                 self.IMAGE_CHANNEL_COUNT])
         else:
