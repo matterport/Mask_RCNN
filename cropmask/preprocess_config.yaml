@@ -1,5 +1,5 @@
 dirs:
-    root: /az-ml-container
+    root: /mnt/point/
     dataset: landsat-1024-cp # rename this based on the imagery and labels
     stacked: stacked
     train: train
@@ -16,7 +16,7 @@ landsat_bands_to_include:
     - red: true
     - near-IR : false
 image_vals:
-    dataset_name: "landsat"
+    dataset_name: "landsat-5"
     grid_size: 512 # in pixel units
     usable_thresh: .00 #image must have no more than this percentage of values that are zero from either clouds or no_data (tile edges)
     split: .10 # the proportion of samples that will be used for testing

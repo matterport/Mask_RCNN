@@ -15,10 +15,9 @@ from rasterio.plot import reshape_as_raster
 import rasterio
 from shapely.geometry import shape
 from osgeo import gdal
+from itertools import product
+from rasterio import windows
 from multiprocessing.pool import ThreadPool
-from subprocess import STDOUT, call
-import subprocess
-import itertools
 
 from cropmask.misc import parse_yaml, make_dirs
 
@@ -103,6 +102,8 @@ class PreprocessWorkflow():
                 self.NEG_BUFFERED,
                 self.RESULTS,
             ]
+        if os.path.exists(os.path.join(self.ROOT, self.params['dirs']["results"])) == False:
+            os.mkdir(os.path.join(self.ROOT, self.params['dirs']["results"]))
         make_dirs(directory_list)
         return directory_list
     
@@ -225,26 +226,33 @@ class PreprocessWorkflow():
             os.remove(scene_path)
             os.remove(label_path)
         print("removed scene and label, {}% bad data".format(self.usable_threshold))
-
-    def make_commands(self, list_x, list_y, suffix):
-        # step 1 gets all the tuples of the i and j indices
-        index_tuples = list(itertools.product(list_x, list_y))
-        #step 2 make commands list
-        return [["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.stacked_path, str(i)+'_'+str(j)+'_'+self.scene_id+suffix] for i,j in index_tuples]
-
-    def thread_commands(self, limit, commands):
-        """
-        Creates a Thread pool and runs command strings
-        """
         
-        def run(cmd):
-            return cmd, call(cmd, stdout=outputfile, stderr=STDOUT)
+    def get_tiles_for_threaded(self, ds, width=256, height=256):
+        nols, nrows = ds.meta['width'], ds.meta['height']
+        offsets = product(range(0, nols, width), range(0, nrows, height))
+        big_window = windows.Window(col_off=0, row_off=0, width=nols, height=nrows)
+        chip_list = []
+        for col_off, row_off in offsets:
+            window =windows.Window(col_off=col_off, row_off=row_off, width=width, height=height).intersection(big_window)
+            transform = windows.transform(window, ds.transform)
+            chip_list.append(window, transform)
+    
+    def grid_images_rasterio(self, in_path, out_dir, output_filename='tile_{}-{}.tif'):
+
+        with rasterio.open(in_path) as inds:
+
+            meta = inds.meta.copy()
+
+            for window, transform in get_tiles(inds, width=self.grid_size, height=self.grid_size):
+                print(window)
+                meta['transform'] = transform
+                meta['width'], meta['height'] = window.width, window.height
+                outpath = os.path.join(out_path,output_filename.format(int(window.col_off), int(window.row_off)))
+                with rasterio.open(outpath, 'w', **meta) as outds:
+                    outds.write(inds.read(window=window))
         
-        for cmd, rc in ThreadPool(limit).imap_unordered(run, commands): #run comes from subprocess
-            if rc != 0:
-                print('{cmd} failed with exit status {rc}'.format(**vars()))
                 
-    def grid_images_threaded(self):
+    def grid_images_rasterio_threaded(self):
         """
         Grids up imagery to a variable size. Filters out imagery with too little usable data.
         appends a random unique id to each tif and label pair, appending string 'label' to the 
@@ -259,46 +267,29 @@ class PreprocessWorkflow():
         label_commands = self.make_commands(i_list, j_list, "_label.tif")
         self.thread_commands(4, img_commands)
         self.thread_commands(4, label_commands)
-    
-    def grid_images_rasterio(self, source_img_path):
-        # Iterate over image blocks - which are 256x256 - and save new GeoTiffs
-        with rasterio.open(source_img_path) as src:
-            
-            # Get block dimensions of src
-            for ji, window in src.block_windows(1):
-                
-                # read B,G,R,NIR band
-                r = src.read((1,2,3,4), window=window)
-                
-                # Skip image if missing data
-                if 0 in r:
-                    continue
-           
-                else:
-                    
-                    # Create chip id
-                    chip_name = image_name + '_' + str(ji[0]) + '_' + str(ji[1])                    
-                    
-                    # Create directory for image chip and subdirectories for image and labels
-                    chip_dir = prep_directory + '/' + chip_name + '/'                    
-                    img_dir = chip_dir + '/image/'
-                    mask_dir = chip_dir + '/class_masks/'
-                    
-                    # list of directories to map over
-                    dirs = [chip_dir, img_dir, mask_dir]
-                    
-                    # Make chip directory and subdirectories
-                    for d in dirs:
-                        pathlib.Path(d).mkdir(parents=True, exist_ok=True)
-                    
-                    # Open a new GeoTiff data file in which to save the image chip
-                    with rasterio.open((img_dir + chip_name + '.tif'), 'w', driver='GTiff',
-                               height=r.shape[1], width=r.shape[2], count=4,
-                               dtype=rasterio.uint16, crs=src.crs, 
-                               transform=src.transform) as new_img:
         
-                        # Write the rescaled image to the new GeoTiff
-                        new_img.write(r)
+    def get_tiles(self, ds, width=256, height=256):
+        nols, nrows = ds.meta['width'], ds.meta['height']
+        offsets = product(range(0, nols, width), range(0, nrows, height))
+        big_window = windows.Window(col_off=0, row_off=0, width=nols, height=nrows)
+        for col_off, row_off in  offsets:
+            window =windows.Window(col_off=col_off, row_off=row_off, width=width, height=height).intersection(big_window)
+            transform = windows.transform(window, ds.transform)
+            yield window, transform
+    
+    def grid_images_rasterio(self, in_path, out_dir, output_filename='tile_{}-{}.tif'):
+
+        with rasterio.open(in_path) as inds:
+
+            meta = inds.meta.copy()
+
+            for window, transform in get_tiles(inds, width=self.grid_size, height=self.grid_size):
+                print(window)
+                meta['transform'] = transform
+                meta['width'], meta['height'] = window.width, window.height
+                outpath = os.path.join(out_path,output_filename.format(int(window.col_off), int(window.row_off)))
+                with rasterio.open(outpath, 'w', **meta) as outds:
+                    outds.write(inds.read(window=window))
         
     def grid_images(self):
         """
@@ -345,7 +336,7 @@ class PreprocessWorkflow():
             os.mkdir(new_path)
             os.mkdir(mask_path)
             old_chip_path = os.path.join(self.GRIDDED_IMGS, self.chip_id+'.tif')
-            os.rename(old_chip_path, os.path.join(new_chip_path, self.chip_id+'_'+self.scene_id + ".tif")) #names each gridded chip with randomID and scene_id
+            os.rename(old_chip_path, os.path.join(new_chip_path, self.chip_id+'_' + ".tif")) #names each gridded chip with randomID and scene_id
         
     def connected_comp(self):
         """
@@ -353,34 +344,31 @@ class PreprocessWorkflow():
         in each folder ID in train folder. If an image has no instances,
         saves it with a empty mask.
         """
-        label_list = next(os.walk(self.rasterized_label_path))[2]
         # save connected components and give each a number at end of id
-        for label_chip in label_list:
-            arr = skio.imread(os.path.join(self.rasterized_label_path, label_chip))
+        for chip_id in self.chip_ids:
+            chip_label_path = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
+            arr = skio.imread(chip_label_path)
             blob_labels = measure.label(arr, background=0)
             blob_vals = np.unique(blob_labels)
             # for imgs with no instances, create empty mask
             if len(blob_vals) == 1:
-                img_chip_folder = os.path.join(self.TRAIN, label_chip[:-11], "image")
+                img_chip_folder = os.path.join(self.TRAIN, chip_id)
                 img_chip_name = os.listdir(img_chip_folder)[0]
                 img_chip_path = os.path.join(img_chip_folder, img_chip_name)
                 arr = skio.imread(img_chip_path)
                 mask = np.zeros_like(arr[:, :, 0])
-                mask_folder = os.path.join(self.TRAIN, label_chip[:-11], "mask")
+                mask_folder = os.path.join(self.TRAIN, chip_id, "mask")
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore", category=UserWarning)
-                    label_stump = os.path.splitext(os.path.basename(label_chip))[0]
-                    skio.imsave(os.path.join(mask_folder, label_stump + "_0.tif"), mask)
+                    skio.imsave(os.path.join(mask_folder, chip_id + "_0.tif"), mask)
             else:
                 # only run connected comp if there is at least one instance
                 for blob_val in blob_vals[blob_vals != 0]:
                     labels_copy = blob_labels.copy()
                     labels_copy[blob_labels != blob_val] = 0
                     labels_copy[blob_labels == blob_val] = 1
-
-                    label_stump = os.path.splitext(os.path.basename(label_chip))[0]
-                    label_name = label_stump + "_" + str(blob_val) + ".tif"
-                    mask_path = os.path.join(self.TRAIN, label_chip[:-11], "mask")
+                    label_name = chip_id + "_label_" + str(blob_val) + ".tif"
+                    mask_path = os.path.join(self.TRAIN, chip_id, "mask")
                     label_path = os.path.join(mask_path, label_name)
                     assert labels_copy.ndim == 2
                     with warnings.catch_warnings():

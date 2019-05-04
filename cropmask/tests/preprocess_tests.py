@@ -5,9 +5,9 @@ import pytest
 
 @pytest.fixture
 def wflow():
-    wflow = pp.PreprocessWorkflow("/az-ml-container/configs/preprocess_config_pytest.yaml", 
-                                 "/az-ml-container/western_nebraska_landsat_scenes_pytest/LT050320312005011601T1-SC20190418222311/",
-                                 "/az-ml-container/external_pytest/nebraska-center-pivots-2005/nbextent-clipped-to-western.geojson")
+    wflow = pp.PreprocessWorkflow("/home/ryan/work/CropMask_RCNN/cropmask/preprocess_config.yaml", 
+                                 "/mnt/point/western_nebraska_landsat_scenes/LT050320312005082801T1-SC20190418222350/",
+                                 "/mnt/point/external/2005_NE_Center_Pivots/nbextent-clipped-to-western.geojson")
     return wflow
 
 def test_init(wflow):
@@ -16,7 +16,7 @@ def test_init(wflow):
     
 def test_make_dir():
     
-    directory_list = ["/az-ml-container/pytest_dir2"]
+    directory_list = ["/mnt/point/pytest_dir"]
     make_dirs(directory_list)
     try: 
         assert os.path.exists(directory_list[0])
@@ -48,7 +48,7 @@ def test_yaml_to_band_index(wflow):
         
 def test_list_products():
     
-    path = "/az-ml-container/western_nebraska_landsat_scenes_pytest/LT050320312005011601T1-SC20190418222311/"
+    path = "/mnt/point/western_nebraska_landsat_scenes_pytest/LT050320312005011601T1-SC20190418222311/"
     
     try: 
         product_list = os.listdir(path)
