@@ -138,7 +138,7 @@ def test_grid_images(wflow):
     
     wflow.negative_buffer_and_small_filter(-31, 100)
     try: 
-        wflow.grid_images_threaded()
+        wflow.grid_images()
         assert len(os.listdir(wflow.GRIDDED_IMGS)) > 1
     except AssertionError:
         remove_dirs(directory_list)

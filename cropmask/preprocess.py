@@ -20,6 +20,7 @@ from rasterio import windows
 from multiprocessing.pool import ThreadPool
 
 from cropmask.misc import parse_yaml, make_dirs
+from cropmask import grid
 
 random.seed(42)
 
@@ -227,96 +228,20 @@ class PreprocessWorkflow():
             os.remove(label_path)
         print("removed scene and label, {}% bad data".format(self.usable_threshold))
         
-    def get_tiles_for_threaded(self, ds, width=256, height=256):
-        nols, nrows = ds.meta['width'], ds.meta['height']
-        offsets = product(range(0, nols, width), range(0, nrows, height))
-        big_window = windows.Window(col_off=0, row_off=0, width=nols, height=nrows)
-        chip_list = []
-        for col_off, row_off in offsets:
-            window =windows.Window(col_off=col_off, row_off=row_off, width=width, height=height).intersection(big_window)
-            transform = windows.transform(window, ds.transform)
-            chip_list.append(window, transform)
-    
-    def grid_images_rasterio(self, in_path, out_dir, output_filename='tile_{}-{}.tif'):
-
-        with rasterio.open(in_path) as inds:
-
-            meta = inds.meta.copy()
-
-            for window, transform in get_tiles(inds, width=self.grid_size, height=self.grid_size):
-                print(window)
-                meta['transform'] = transform
-                meta['width'], meta['height'] = window.width, window.height
-                outpath = os.path.join(out_path,output_filename.format(int(window.col_off), int(window.row_off)))
-                with rasterio.open(outpath, 'w', **meta) as outds:
-                    outds.write(inds.read(window=window))
-        
-                
-    def grid_images_rasterio_threaded(self):
-        """
-        Grids up imagery to a variable size. Filters out imagery with too little usable data.
-        appends a random unique id to each tif and label pair, appending string 'label' to the 
-        mask.
-        """    
-        xsize = self.meta['height']
-        ysize = self.meta['width']
-        i_list = [i for i in range(0, xsize, self.grid_size)]
-        j_list = [j for j in range(0, ysize, self.grid_size)]
-        
-        img_commands = self.make_commands(i_list, j_list, ".tif")
-        label_commands = self.make_commands(i_list, j_list, "_label.tif")
-        self.thread_commands(4, img_commands)
-        self.thread_commands(4, label_commands)
-        
-    def get_tiles(self, ds, width=256, height=256):
-        nols, nrows = ds.meta['width'], ds.meta['height']
-        offsets = product(range(0, nols, width), range(0, nrows, height))
-        big_window = windows.Window(col_off=0, row_off=0, width=nols, height=nrows)
-        for col_off, row_off in  offsets:
-            window =windows.Window(col_off=col_off, row_off=row_off, width=width, height=height).intersection(big_window)
-            transform = windows.transform(window, ds.transform)
-            yield window, transform
-    
-    def grid_images_rasterio(self, in_path, out_dir, output_filename='tile_{}-{}.tif'):
-
-        with rasterio.open(in_path) as inds:
-
-            meta = inds.meta.copy()
-
-            for window, transform in get_tiles(inds, width=self.grid_size, height=self.grid_size):
-                print(window)
-                meta['transform'] = transform
-                meta['width'], meta['height'] = window.width, window.height
-                outpath = os.path.join(out_path,output_filename.format(int(window.col_off), int(window.row_off)))
-                with rasterio.open(outpath, 'w', **meta) as outds:
-                    outds.write(inds.read(window=window))
-        
     def grid_images(self):
         """
         Grids up imagery to a variable size. Filters out imagery with too little usable data.
         appends a random unique id to each tif and label pair, appending string 'label' to the 
         mask.
         """
+        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
+        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
+        chip_img_paths = sorted(chip_img_paths) 
+        chip_label_paths = sorted(chip_label_paths)
         
-        ds = gdal.Open(self.stacked_path) # TO DO can get this info earlier and with less file io
-        band = ds.GetRasterBand(1)
-        xsize = band.XSize
-        ysize = band.YSize
-        ### TO DO MAKE GRID ID DIRECTORY CREATION HAPPEN IN THE MAKE DIRS FUNCTION, MOVE ALL DIR SETUP TO THAT FUNCTION INSTEAD OF HAVING
-        ### IT BE SCATTERED AROUND MULTIPLE FUNCS
-        
-        for i in range(0, xsize, self.grid_size):
-            for j in range(0, ysize, self.grid_size):
-                chip_id = str(i)+'_'+str(j)+'_'+self.scene_id
-                self.chip_ids.append(chip_id)
-                out_path_img = os.path.join(self.GRIDDED_IMGS, chip_id) + ".tif"
-                out_path_label = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
-                print("image chip file name: {}".format(out_path_img))
-                com_list = ["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.stacked_path, out_path_img]
-                subprocess.run(com_list)
-                com_list = ["gdal_translate", "-of", "GTIFF", "-srcwin", str(i), str(j), str(self.grid_size), str(self.grid_size), self.rasterized_label_path, out_path_label]
-                subprocess.run(com_list)
-                self.rm_mostly_empty(out_path_img, out_path_label)
+        for img, label in zip(chip_img_paths, chip_label_paths):
+            self.rm_mostly_empty(img,label)
+
         return True # for testing to confirm it worked
                 
     def move_img_to_folder(self):
