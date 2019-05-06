@@ -20,7 +20,7 @@ from rasterio import windows
 from multiprocessing.pool import ThreadPool
 from cropmask.label_prep import rio_bbox_to_polygon
 from cropmask.misc import parse_yaml, make_dirs
-from cropmask import grid
+from cropmask import grid, label_prep
 
 random.seed(42)
 
@@ -220,8 +220,6 @@ class PreprocessWorkflow():
         """
         chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
         chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
-        chip_img_paths = sorted(chip_img_paths) 
-        chip_label_paths = sorted(chip_label_paths)
         return (chip_img_paths, chip_label_paths)
                 
                 
@@ -247,10 +245,10 @@ class PreprocessWorkflow():
                 
     def remove_from_gridded(self, chip_img_paths, chip_label_paths):
                 
-        for img, label in zip(sorted(chip_img_paths), sorted(chip_label_paths)):
-            print(img)
-            print(label)
-            sleep 
+        def get_chip_id(string,ignore_string):
+            return string.replace(ignore_string, '')
+
+        for img, label in zip(sorted(chip_img_paths, key=lambda x: get_chip_id(x,'.tif')), sorted(chip_label_paths, key=lambda x: get_chip_id(x,'_label.tif'))):
             self.rm_mostly_empty(img,label)
                 
     def move_chips_to_folder(self):
@@ -290,7 +288,10 @@ class PreprocessWorkflow():
                 img_chip_folder = os.path.join(self.TRAIN, chip_id)
                 img_chip_name = os.listdir(img_chip_folder)[0]
                 img_chip_path = os.path.join(img_chip_folder, img_chip_name)
-                arr = skio.imread(img_chip_path)
+                try:
+                    arr = skio.imread(img_chip_path)
+                except ValueError:
+                    print(img_chip_path)
                 mask = np.zeros_like(arr[:, :, 0])
                 mask_folder = os.path.join(self.TRAIN, chip_id, "mask")
                 with warnings.catch_warnings():

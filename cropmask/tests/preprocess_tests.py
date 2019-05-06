@@ -138,8 +138,9 @@ def test_grid_images(wflow):
     
     wflow.negative_buffer_and_small_filter(-31, 100)
     try: 
-        wflow.grid_images()
-        assert len(os.listdir(wflow.GRIDDED_IMGS)) > 1
+        img_paths, label_paths = wflow.grid_images()
+        assert len(img_paths) > 0
+        assert len(img_paths) == len(label_paths)
     except AssertionError:
         remove_dirs(directory_list)
         print("Less than one chip was saved") 
@@ -158,8 +159,9 @@ def test_move_chips_to_folder(wflow):
     
     wflow.negative_buffer_and_small_filter(-31, 100)
     
-    wflow.grid_images()
+    img_paths, label_paths = wflow.grid_images()
     
+    wflow.remove_mostly_empty(img_paths, label_paths)
     try: 
         assert wflow.move_chips_to_folder()
         assert len(os.listdir(wflow.TRAIN)) > 1
@@ -182,7 +184,9 @@ def test_connected_components(wflow):
     
     wflow.negative_buffer_and_small_filter(-31, 100)
     
-    wflow.grid_images()
+    img_paths, label_paths = wflow.grid_images()
+    
+    wflow.remove_mostly_empty(img_paths, label_paths)
     
     wflow.move_chips_to_folder()
     
