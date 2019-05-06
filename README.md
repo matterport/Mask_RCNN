@@ -30,5 +30,6 @@ Below are Preliminary results from test on 2004 Landsat SR scene over western Ne
     * Linux: https://github.com/waleedka/coco
     * Windows: https://github.com/philferriere/cocoapi.
     You must have the Visual C++ 2015 build tools on your path (see the repo for additional details)
+7. To train using labels from the [Nebraska 2005 Center Pivots Dataset](https://calmit.unl.edu/data/2005_NE_Center_Pivots.zip) and define the projection as Nebraska State Plane NAD 1983 in US Feet, which is EPSG code 102704
 
 ### This setup will allow you to run the parts of the project that don't require Azure, like locally downloading Landsat products according to watershed boundaries. For instructions on setting up the entire project on Azure, see the README in the terraform folder

@@ -1,7 +1,4 @@
 """
-Mask R-CNN
-Train on the fields segmentation dataset from Debats 2016 https://doi.org/10.1016/j.rse.2016.03.010 or other remotely sensed datasets.
-
 Original nucleus.py example written by Waleed Abdulla at 
 https://github.com/matterport/Mask_RCNN/blob/master/samples/nucleus/nucleus.py
 ------------------------------------------------------------

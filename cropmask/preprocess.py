@@ -18,7 +18,7 @@ from osgeo import gdal
 from itertools import product
 from rasterio import windows
 from multiprocessing.pool import ThreadPool
-
+from cropmask.label_prep import rio_bbox_to_polygon
 from cropmask.misc import parse_yaml, make_dirs
 from cropmask import grid
 
@@ -125,6 +125,7 @@ class PreprocessWorkflow():
                 meta.update(compress="lzw")
                 meta["count"] = len(arr_list)
                 self.meta=meta
+                self.bounds = rast.bounds
         stacked_arr = np.dstack(arr_list)
         stacked_arr[stacked_arr <= 0]=0
         return stacked_arr
@@ -157,6 +158,17 @@ class PreprocessWorkflow():
         with rasterio.open(stacked_path, "w+", **self.meta) as out:
             out.write(reshape_as_raster(stacked_arr))
             
+    def preprocess_labels(self):
+        """For preprcoessing reference dataset"""
+        shp_frame = gpd.read_file(self.source_label_path)
+        # keeps the class of interest if it is there and the polygon of raster extent
+        shp_frame = shp_frame.to_crs(self.meta['crs'].to_dict()) # reprojects to landsat's utm zone
+        tif_polygon = rio_bbox_to_polygon(self.bounds) 
+        shp_series = shp_frame.intersection(tif_polygon) # clips by landsat's bounds including nodata corners
+        shp_series = shp_series.loc[shp_series.area > self.small_area_filter]
+        shp_series = shp_series.buffer(self.neg_buffer)
+        return shp_series.loc[shp_series.is_empty==False]
+            
     def negative_buffer_and_small_filter(self, neg_buffer, small_area_filter):
         """
         Applies a negative buffer to labels since some are too close together and 
@@ -173,23 +185,15 @@ class PreprocessWorkflow():
 
         Returns rasterized labels that are ready to be gridded
         """
-
-        shp_frame = gpd.read_file(self.source_label_path)
-        # keeps the class of interest if it is there and the polygon of raster extent
+        shp_series = self.preprocess_labels()
         meta = self.meta.copy()
         meta.update({'count':1})
         tifname = os.path.splitext(os.path.basename(self.source_label_path))[0] + ".tif"
         self.rasterized_label_path = os.path.join(self.NEG_BUFFERED, tifname)
         with rasterio.open(self.rasterized_label_path, "w+", **meta) as out:
             out_arr = out.read(1)
-            shp_frame = shp_frame.loc[shp_frame.area > self.small_area_filter]
-            shp_frame["geometry"] = shp_frame["geometry"].buffer(self.neg_buffer)
-            shp_frame = shp_frame.loc[shp_frame.geometry.is_empty==False]
             # https://gis.stackexchange.com/questions/151339/rasterize-a-shapefile-with-geopandas-or-fiona-python#151861
-            shapes = (
-                (geom, value)
-                for geom, value in zip(shp_frame.geometry, shp_frame.ID)
-            ) # this is tricky, had to add geo interface because rasterio takes geojson dicts, not shapely geometries
+            shapes = shp_series.values.tolist()
             burned = features.rasterize(
                 shapes=shapes,
                 fill=0,
@@ -206,8 +210,21 @@ class PreprocessWorkflow():
                 negbuff=self.neg_buffer, area=self.small_area_filter
                 )
             )
-        return True # for testing to confirm it worked
-    
+        return burned # for testing to confirm it worked
+        
+    def grid_images(self):
+        """
+        Grids up imagery to a variable size. Filters out imagery with too little usable data.
+        appends a random unique id to each tif and label pair, appending string 'label' to the 
+        mask.
+        """
+        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
+        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
+        chip_img_paths = sorted(chip_img_paths) 
+        chip_label_paths = sorted(chip_label_paths)
+        return (chip_img_paths, chip_label_paths)
+                
+                
     def rm_mostly_empty(self, scene_path, label_path):
         """
         Removes a grid that is emptier than the usable data threshold and corrects bad no data value to 0.
@@ -226,31 +243,24 @@ class PreprocessWorkflow():
 
             os.remove(scene_path)
             os.remove(label_path)
-        print("removed scene and label, {}% bad data".format(self.usable_threshold))
-        
-    def grid_images(self):
-        """
-        Grids up imagery to a variable size. Filters out imagery with too little usable data.
-        appends a random unique id to each tif and label pair, appending string 'label' to the 
-        mask.
-        """
-        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
-        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
-        chip_img_paths = sorted(chip_img_paths) 
-        chip_label_paths = sorted(chip_label_paths)
-        
-        for img, label in zip(chip_img_paths, chip_label_paths):
-            self.rm_mostly_empty(img,label)
-
-        return True # for testing to confirm it worked
+            print("removed scene and label, {}% bad data".format(self.usable_threshold))
                 
-    def move_img_to_folder(self):
+    def remove_from_gridded(self, chip_img_paths, chip_label_paths):
+                
+        for img, label in zip(sorted(chip_img_paths), sorted(chip_label_paths)):
+            print(img)
+            print(label)
+            sleep 
+            self.rm_mostly_empty(img,label)
+                
+    def move_chips_to_folder(self):
         """Moves a file with identifier pattern 760165086.tif to a 
         folder path ZA0165086/image/ZA0165086.tif
         
         """
 
-        for chip_id in self.chip_ids:
+        for chip_id in os.listdir(self.GRIDDED_IMGS):
+            chip_id = os.path.splitext(chip_id)[0]
             chip_folder_path = os.path.join(self.TRAIN, chip_id)
             if os.path.exists(chip_folder_path) == False:
                 os.mkdir(chip_folder_path)
@@ -258,19 +268,19 @@ class PreprocessWorkflow():
                 raise Exception('{} should not exist prior to being created in this function, it has not been deleted properly prior to a new run'.format(folder_path)) 
             new_chip_path = os.path.join(chip_folder_path, "image")
             mask_path = os.path.join(chip_folder_path, "mask")
-            os.mkdir(new_path)
+            os.mkdir(new_chip_path)
             os.mkdir(mask_path)
-            old_chip_path = os.path.join(self.GRIDDED_IMGS, self.chip_id+'.tif')
-            os.rename(old_chip_path, os.path.join(new_chip_path, self.chip_id+'_' + ".tif")) #names each gridded chip with randomID and scene_id
-        
-    def connected_comp(self):
+            old_chip_path = os.path.join(self.GRIDDED_IMGS, chip_id+'.tif')
+            os.rename(old_chip_path, os.path.join(new_chip_path, chip_id + ".tif")) # moves the chips   
+    
+    def connected_components(self):
         """
         Extracts individual instances into their own tif files. Saves them
         in each folder ID in train folder. If an image has no instances,
         saves it with a empty mask.
         """
         # save connected components and give each a number at end of id
-        for chip_id in self.chip_ids:
+        for chip_id in os.listdir(self.TRAIN):
             chip_label_path = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
             arr = skio.imread(chip_label_path)
             blob_labels = measure.label(arr, background=0)
@@ -318,7 +328,7 @@ class PreprocessWorkflow():
         train_list = list(set(next(os.walk(self.TRAIN))[1]) - set(next(os.walk(self.TEST))[1]))
         train_df = pd.DataFrame({"train": train_list})
         test_df = pd.DataFrame({"test": test_list})
-        train_df.to_csv(os.path.join(self.RESULTS, "train_ids.csv"))
+        train_df.to_csv(os.path.join(self.RESULTS, "train_ids.csv")) # used for reading in trainging and testing in the modeling step
         test_df.to_csv(os.path.join(self.RESULTS, "test_ids.csv"))
 
     def get_arr_channel_mean(self, channel):
@@ -334,7 +344,7 @@ class PreprocessWorkflow():
             arr = skio.imread(im_path)
             arr = arr.astype(np.float32, copy=False)
             # added because no data values different for wv2 and landsat, need to exclude from mean
-            nodata_value = arr.min() if arr.min() < 0 else -9999
+            nodata_value = arr.min() if arr.min() == 0 else -9999
             arr[arr == nodata_value] = np.nan
             means.append(np.nanmean(arr[:, :, channel]))
         print(np.mean(means))
