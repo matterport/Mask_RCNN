@@ -68,13 +68,10 @@ class ImageDataset(utils.Dataset):
 
         # Read mask files from image
         mask = []
+        #can get rid of this for loop since we are reading in a stacked file
         for f in next(os.walk(mask_dir))[2]:
             if f.endswith(".tif"):
                 m = skio.imread(os.path.join(mask_dir, f)).astype(np.bool)
-                mask.append(m)
-                assert m.ndim == 2
-        mask = np.stack(mask, axis=-1)
-        # assert mask.ndim == 3
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID, we return an array of ones
         return mask, np.ones([mask.shape[-1]], dtype=np.int32)

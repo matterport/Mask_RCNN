@@ -82,3 +82,21 @@ def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_templa
         chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
         out_paths = list(map(lambda x: write_by_window(src, out_dir, output_name_template, meta, x[0], x[1]), chip_list)) #change to map_threads for threading but currently fails partway
     return out_paths
+
+def grid_images_rasterio_controlled_threads_actual(in_path, out_dir, output_name_template='tile_{}-{}.tif', grid_size=512):
+    """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
+
+    Args:
+        in_path (str): Path to a raster for which to read with raterio.open()
+        out_dir (str): the output directory for the image chip
+        output_name_template (str): string with curly braces for naming tiles by indices for uniquiness
+        grid_size (int): length in pixels of a side of a single window/tile/chip
+    Returns:
+        Returns the outpaths of the tiles.
+    """
+    with rasterio.Env(VRT_SHARED_SOURCE=0) as env:
+        with rasterio.open(in_path) as src:
+            meta = src.meta.copy()
+            chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
+            out_paths = list(map_threads(lambda x: write_by_window(src, out_dir, output_name_template, meta, x[0], x[1]), chip_list)) #change to map_threads for threading but currently fails partway
+        return out_paths

@@ -2,13 +2,10 @@ import random
 import os
 import shutil
 import copy
-from skimage import measure
-from skimage import morphology as skim
 import skimage.io as skio
 import warnings
 import pandas as pd
 import numpy as np
-import pathlib
 import geopandas as gpd
 from rasterio import features, coords
 from rasterio.plot import reshape_as_raster
@@ -277,39 +274,23 @@ class PreprocessWorkflow():
         in each folder ID in train folder. If an image has no instances,
         saves it with a empty mask.
         """
-        # save connected components and give each a number at end of id
         for chip_id in os.listdir(self.TRAIN):
-            chip_label_path = os.path.join(self.GRIDDED_LABELS, chip_id) + "_label.tif"
+            chip_label_path = os.path.join(self.GRIDDED_LABELS, chip_id+"_label.tif")
             arr = skio.imread(chip_label_path)
-            blob_labels = measure.label(arr, background=0)
-            blob_vals = np.unique(blob_labels)
+
+            blob_labels = label_prep.connected_components(arr)
             # for imgs with no instances, create empty mask
-            if len(blob_vals) == 1:
-                img_chip_folder = os.path.join(self.TRAIN, chip_id)
-                img_chip_name = os.listdir(img_chip_folder)[0]
-                img_chip_path = os.path.join(img_chip_folder, img_chip_name)
-                try:
-                    arr = skio.imread(img_chip_path)
-                except ValueError:
-                    print(img_chip_path)
-                mask = np.zeros_like(arr[:, :, 0])
+            if len(np.unique(blob_labels)) == 1:
                 mask_folder = os.path.join(self.TRAIN, chip_id, "mask")
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=UserWarning)
-                    skio.imsave(os.path.join(mask_folder, chip_id + "_0.tif"), mask)
+                skio.imsave(os.path.join(mask_folder, chip_id + "_0.tif"), blob_labels)
             else:
                 # only run connected comp if there is at least one instance
-                for blob_val in blob_vals[blob_vals != 0]:
-                    labels_copy = blob_labels.copy()
-                    labels_copy[blob_labels != blob_val] = 0
-                    labels_copy[blob_labels == blob_val] = 1
-                    label_name = chip_id + "_label_" + str(blob_val) + ".tif"
-                    mask_path = os.path.join(self.TRAIN, chip_id, "mask")
-                    label_path = os.path.join(mask_path, label_name)
-                    assert labels_copy.ndim == 2
-                    with warnings.catch_warnings():
-                        warnings.simplefilter("ignore", category=UserWarning)
-                        skio.imsave(label_path, labels_copy)
+                label_list = label_prep.extract_labels(blob_labels)
+                label_arrs = np.stack(label_list, axis=-1)
+                label_name = chip_id + "_labels.tif"
+                mask_path = os.path.join(self.TRAIN, chip_id, "mask")
+                label_path = os.path.join(mask_path, label_name)
+                skio.imsave(label_path, label_arrs)
             
     def train_test_split(self):
         """Takes a sample of folder ids and copies them to a test directory
@@ -322,9 +303,6 @@ class PreprocessWorkflow():
         for test_sample in test_list:
             shutil.copytree(
                 os.path.join(self.TRAIN, test_sample), os.path.join(self.TEST, test_sample)
-            )
-            shutil.rmtree(
-                os.path.join(self.TRAIN, test_sample)
             )
         train_list = list(set(next(os.walk(self.TRAIN))[1]) - set(next(os.walk(self.TEST))[1]))
         train_df = pd.DataFrame({"train": train_list})
