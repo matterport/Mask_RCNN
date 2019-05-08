@@ -1,5 +1,6 @@
 dirs:
     root: /mnt/point/
+    tmp: /home/ryan/work/tmp/ # rasterio write operations to vm disk are an order of magnitude faster than writing to mounted Azure File Store
     dataset: landsat-1024-cp # rename this based on the imagery and labels
     stacked: stacked
     train: train
@@ -25,3 +26,7 @@ label_vals:
     neg_buffer: -30 # in meters, applied on vectors before they are rasterized to reduce spurious instance overlap
     small_area_filter: 3600 # in area meters, removes fields with area less than 100 meters from labels 
     kernel: 5 # square kernel size for erosion then dilation of raterized instance labels to reduce overlap
+processing:
+    CHUNK_SIZE: 10
+    MAX_PROCESSES: 100
+    MAX_THREADS: 10

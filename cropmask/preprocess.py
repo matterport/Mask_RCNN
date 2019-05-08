@@ -35,13 +35,14 @@ class PreprocessWorkflow():
         
          # the folder structure for the unique run
         self.ROOT = params['dirs']["root"]
+        self.TMP = params['dirs']["tmp"]
         assert os.path.exists(self.ROOT)
         self.DATASET = os.path.join(self.ROOT, params['dirs']["dataset"])
         self.STACKED = os.path.join(self.DATASET, params['dirs']["stacked"])
         self.TRAIN = os.path.join(self.DATASET, params['dirs']["train"])
         self.TEST = os.path.join(self.DATASET, params['dirs']["test"])
-        self.GRIDDED_IMGS = os.path.join(self.DATASET, params['dirs']["gridded_imgs"])
-        self.GRIDDED_LABELS = os.path.join(self.DATASET, params['dirs']["gridded_labels"])
+        self.GRIDDED_IMGS = os.path.join(self.TMP, params['dirs']["gridded_imgs"])
+        self.GRIDDED_LABELS = os.path.join(self.TMP, params['dirs']["gridded_labels"])
         self.NEG_BUFFERED = os.path.join(self.DATASET, params['dirs']["neg_buffered_labels"])
         self.RESULTS = os.path.join(self.ROOT, params['dirs']["results"], params['dirs']["dataset"])
         
@@ -57,6 +58,9 @@ class PreprocessWorkflow():
         self.grid_size = params['image_vals']['grid_size']
         self.usable_threshold = params['image_vals']['usable_thresh']
         self.split = params['image_vals']['split']
+        self.MAX_THREADS = params['processing']['MAX_THREADS']
+        self.CHUNK_SIZE = params['processing']['CHUNK_SIZE']
+        self.MAX_PROCESSES = params['processing']['MAX_PROCESSES']
 
     def yaml_to_band_index(self):
         """Parses config booleans to a list of band indexes to be stacked.
@@ -91,6 +95,7 @@ class PreprocessWorkflow():
         """
 
         directory_list = [
+                self.TMP,
                 self.DATASET,
                 self.STACKED,
                 self.TRAIN,
@@ -207,7 +212,6 @@ class PreprocessWorkflow():
                 negbuff=self.neg_buffer, area=self.small_area_filter
                 )
             )
-        return burned # for testing to confirm it worked
         
     def grid_images(self):
         """
@@ -215,8 +219,8 @@ class PreprocessWorkflow():
         appends a random unique id to each tif and label pair, appending string 'label' to the 
         mask.
         """
-        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
-        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
+        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size, MAX_THREADS=self.MAX_THREADS, CHUNK_SIZE=self.CHUNK_SIZE)
+        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size, MAX_THREADS=self.MAX_THREADS, CHUNK_SIZE=self.CHUNK_SIZE)
         return (chip_img_paths, chip_label_paths)
                 
                 
