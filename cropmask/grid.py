@@ -39,13 +39,13 @@ def get_tiles_for_threaded_map(ds, width, height):
     chip_list = list(map(lambda x: get_win(ds, x[0], x[1], width, height, big_window), offsets))
     return chip_list
 
-def chunk_chips(l, chunk_size=1):
+def chunk_chips(l, CHUNK_SIZE=10):
     """
     Takes a list and returns list of lists where each sub list is a chunk to be passed to 
     the write_by window function to be written sequentially in a single thread.
     A chunk = a list of chips. a chip is a window and transform tuple
     """ 
-    return [l[i:i+chunk_size] for i in range(0, len(l), chunk_size)]
+    return [l[i:i+CHUNK_SIZE] for i in range(0, len(l), CHUNK_SIZE)]
 
 def write_by_window(in_path, out_dir, output_name_template, chip_list):
     """Writes out a window of a larger image given a widnow and transform. 
@@ -84,7 +84,7 @@ def map_threads(func, sequence, MAX_THREADS=10):
     pool.join()
     return results
 
-def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_template='tile_{}-{}.tif', MAX_THREADS = 10, grid_size=512):
+def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_template='tile_{}-{}.tif', MAX_THREADS=10, CHUNK_SIZE=10, grid_size=512):
     """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
 
     Args:
@@ -97,5 +97,5 @@ def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_templa
     """
     with rasterio.open(in_path, shared=False) as src:
         all_chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
-    chunk_list = chunk_chips(all_chip_list) # a chunk is a list of chips 
+    chunk_list = chunk_chips(all_chip_list, CHUNK_SIZE) # a chunk is a list of chips 
     return list(map_threads(lambda x: write_by_window(in_path, out_dir, output_name_template, x), chunk_list, MAX_THREADS=MAX_THREADS))
