@@ -3,6 +3,7 @@ from itertools import product
 import rasterio
 from rasterio import windows
 from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing import Pool, cpu_count
 
 def get_tiles_for_threaded_map(ds, width, height):
     """
@@ -84,6 +85,17 @@ def map_threads(func, sequence, MAX_THREADS=10):
     pool.join()
     return results
 
+def map_processes(func, sequence, MAX_PROCESSES):
+    """
+    Set MAX_THREADS in preprocess_config.yaml
+    """
+    processes = min(cpu_count, MAX_PROCESSES)
+    pool = Pool(processes)
+    results = pool.map(func, sequence)
+    pool.close()
+    pool.join()
+    return results
+
 def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_template='tile_{}-{}.tif', MAX_THREADS=10, CHUNK_SIZE=10, grid_size=512):
     """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
 
@@ -99,3 +111,19 @@ def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_templa
         all_chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
     chunk_list = chunk_chips(all_chip_list, CHUNK_SIZE) # a chunk is a list of chips 
     return list(map_threads(lambda x: write_by_window(in_path, out_dir, output_name_template, x), chunk_list, MAX_THREADS=MAX_THREADS))
+
+def grid_images_rasterio_controlled_processes(in_path, out_dir, output_name_template='tile_{}-{}.tif', MAX_PROCESSES=4, grid_size=512):
+    """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
+
+    Args:
+        in_path (str): Path to a raster for which to read with raterio.open()
+        out_dir (str): the output directory for the image chip
+        output_name_template (str): string with curly braces for naming tiles by indices for uniquiness
+        grid_size (int): length in pixels of a side of a single window/tile/chip
+    Returns:
+        Returns the outpaths of the tiles.
+    """
+    with rasterio.open(in_path, shared=False) as src:
+        all_chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
+    chunk_list = chunk_chips(all_chip_list, MAX_PROCESSES) # a chunk is a list of chips, we want a chunk for each process 
+    return list(map_processes(lambda x: write_by_window(in_path, out_dir, output_name_template, x), chunk_list, MAX_PROCESSES=MAX_PROCESSES))
