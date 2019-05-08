@@ -301,7 +301,7 @@ class PreprocessWorkflow():
         k = round(self.split * len(sample_list))
         test_list = random.sample(sample_list, k)
         for test_sample in test_list:
-            shutil.copytree(
+            os.rename(
                 os.path.join(self.TRAIN, test_sample), os.path.join(self.TEST, test_sample)
             )
         train_list = list(set(next(os.walk(self.TRAIN))[1]) - set(next(os.walk(self.TEST))[1]))
@@ -323,7 +323,7 @@ class PreprocessWorkflow():
             arr = skio.imread(im_path)
             arr = arr.astype(np.float32, copy=False)
             # added because no data values different for wv2 and landsat, need to exclude from mean
-            nodata_value = arr.min() if arr.min() == 0 else -9999
+            nodata_value = 0 # best to do no data masking up front and set bad qa bands to 0 rather than assuming 0 is no data. This is assumed from looking at no data values at corners being equal to 0
             arr[arr == nodata_value] = np.nan
             means.append(np.nanmean(arr[:, :, channel]))
         print(np.mean(means))

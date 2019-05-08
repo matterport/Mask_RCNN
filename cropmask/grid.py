@@ -39,7 +39,15 @@ def get_tiles_for_threaded_map(ds, width, height):
     chip_list = list(map(lambda x: get_win(ds, x[0], x[1], width, height, big_window), offsets))
     return chip_list
 
-def write_by_window(ds, out_dir, output_name_template, meta, window, transform):
+def chunk_chips(l, chunk_size=1):
+    """
+    Takes a list and returns list of lists where each sub list is a chunk to be passed to 
+    the write_by window function to be written sequentially in a single thread.
+    A chunk = a list of chips. a chip is a window and transform tuple
+    """ 
+    return [l[i:i+chunk_size] for i in range(0, len(l), chunk_size)]
+
+def write_by_window(in_path, out_dir, output_name_template, chunk_list):
     """Writes out a window of a larger image given a widnow and transform. 
 
     Args:
@@ -52,14 +60,24 @@ def write_by_window(ds, out_dir, output_name_template, meta, window, transform):
     Returns:
         Returns the outpath of the window that has been written as a tile
     """
-    meta['transform'] = transform
-    meta['width'], meta['height'] = window.width, window.height
-    outpath = os.path.join(out_dir,output_name_template.format(int(window.col_off), int(window.row_off)))
-    with rasterio.open(outpath, 'w', **meta) as outds:
-        outds.write(ds.read(window=window))
-    return outpath
+    # open the part we need right here
+    outpaths = []
+    with rasterio.open(in_path, shared=False) as ds:
+        for chip in chunk_list:
+            window, transform = chip
+            ds.meta['transform'] = transform
+            ds.meta['width'], ds.meta['height'] = window.width, window.height
+            outpath = os.path.join(out_dir,output_name_template.format(int(window.col_off), int(window.row_off)))
+            with rasterio.open(outpath, 'w', **meta, shared=False) as outds:
+                outds.write(ds.read(window=window))
+            outpaths.extend(outpath)
+    return outpaths
 
-def map_threads(func, sequence, threads=4):
+def map_threads(func, sequence, MAX_THREADS=10):
+    """
+    Set MAX_THREADS in preprocess_config.yaml
+    """
+    threads = min(len(sequence), MAX_THREADS)
     pool = ThreadPool(threads)
     results = pool.map(func, sequence)
     pool.close()
@@ -77,11 +95,24 @@ def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_templa
     Returns:
         Returns the outpaths of the tiles.
     """
-    with rasterio.open(in_path) as src:
-        meta = src.meta.copy()
+    with rasterio.open(in_path, shared=False) as src:
         chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
-        out_paths = list(map(lambda x: write_by_window(src, out_dir, output_name_template, meta, x[0], x[1]), chip_list)) #change to map_threads for threading but currently fails partway
+    chunk_list = chunk_chips(chip_list) # all possible chips, gets chunked into list of lists of chips
+    out_paths = [] 
+    out_paths.extend(list(map_threads(lambda x: write_by_window(in_path, out_dir, output_name_template, x), chunk_list))) 
     return out_paths
+
+
+
+
+
+
+
+
+
+
+
+
 
 def grid_images_rasterio_controlled_threads_actual(in_path, out_dir, output_name_template='tile_{}-{}.tif', grid_size=512):
     """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
