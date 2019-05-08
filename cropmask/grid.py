@@ -85,13 +85,14 @@ def map_threads(func, sequence, MAX_THREADS=10):
     pool.join()
     return results
 
-def map_processes(func, sequence, MAX_PROCESSES):
+def map_processes(func, args_list, MAX_PROCESSES):
     """
-    Set MAX_THREADS in preprocess_config.yaml
+    Set MAX_PROCESSES in preprocess_config.yaml
+    args_sequence is a list of lists of args
     """
-    processes = min(cpu_count, MAX_PROCESSES)
+    processes = min(cpu_count(), MAX_PROCESSES)
     pool = Pool(processes)
-    results = pool.map(func, sequence)
+    results = pool.starmap(func, args_list)
     pool.close()
     pool.join()
     return results
@@ -125,5 +126,9 @@ def grid_images_rasterio_controlled_processes(in_path, out_dir, output_name_temp
     """
     with rasterio.open(in_path, shared=False) as src:
         all_chip_list = get_tiles_for_threaded_map(src, width=grid_size, height=grid_size)
-    chunk_list = chunk_chips(all_chip_list, MAX_PROCESSES) # a chunk is a list of chips, we want a chunk for each process 
-    return list(map_processes(lambda x: write_by_window(in_path, out_dir, output_name_template, x), chunk_list, MAX_PROCESSES=MAX_PROCESSES))
+    processes = min(cpu_count(), MAX_PROCESSES)
+    chunk_list = chunk_chips(all_chip_list, len(all_chip_list)//processes) # a chunk is a list of chips, we want a chunk for each process 
+    print(len(chunk_list))
+    args_list = [[in_path, out_dir, output_name_template]+[chunk] for chunk in chunk_list]
+    print(len(args_list))
+    return list(map_processes(write_by_window, args_list, MAX_PROCESSES=MAX_PROCESSES))
