@@ -58,7 +58,7 @@ def write_by_window(ds, out_dir, output_name_template, meta, window, transform):
         outds.write(ds.read(window=window))
     return outpath
 
-def grid_images_rasterio_controlled_threads(in_path, out_dir, output_name_template='tile_{}-{}.tif', grid_size=512):
+def grid_images_rasterio_sequential(in_path, out_dir, output_name_template='tile_{}-{}.tif', grid_size=512):
     """Combines get_tiles_for_threaded_map, map_threads, and write_by_window to write out tiles of an image
     Args:
         in_path (str): Path to a raster for which to read with raterio.open()

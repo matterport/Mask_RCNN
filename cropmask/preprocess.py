@@ -17,7 +17,7 @@ from rasterio import windows
 from multiprocessing.pool import ThreadPool
 from cropmask.label_prep import rio_bbox_to_polygon
 from cropmask.misc import parse_yaml, make_dirs
-from cropmask import grid, label_prep
+from cropmask import sequential_grid, label_prep
 
 random.seed(42)
 
@@ -219,10 +219,9 @@ class PreprocessWorkflow():
         appends a random unique id to each tif and label pair, appending string 'label' to the 
         mask.
         """
-        chip_img_paths = grid.grid_images_rasterio_controlled_threads(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size, MAX_THREADS=self.MAX_THREADS, CHUNK_SIZE=self.CHUNK_SIZE)
-        chip_label_paths = grid.grid_images_rasterio_controlled_threads(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size, MAX_THREADS=self.MAX_THREADS, CHUNK_SIZE=self.CHUNK_SIZE)
-        return (chip_img_paths, chip_label_paths)
-                
+        chip_img_paths = sequential_grid.grid_images_rasterio_sequential(self.stacked_path, self.GRIDDED_IMGS, output_name_template='tile_{}-{}.tif', grid_size=self.grid_size)
+        chip_label_paths = sequential_grid.grid_images_rasterio_sequential(self.rasterized_label_path, self.GRIDDED_LABELS, output_name_template='tile_{}-{}_label.tif', grid_size=self.grid_size)
+        return (chip_img_paths, chip_label_paths)      
                 
     def rm_mostly_empty(self, scene_path, label_path):
         """
