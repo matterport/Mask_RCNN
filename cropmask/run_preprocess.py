@@ -1,70 +1,35 @@
-import os
-import random
-import yaml
+from cropmask.preprocess import *
 
-random.seed(1)
+wflow = pp.PreprocessWorkflow("/home/ryan/work/CropMask_RCNN/cropmask/preprocess_config.yaml", 
+                                 "/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/unpacked_landsat_downloads/032031/LT050320312005082801T1-SC20190418222350/",
+                                 "/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/external/nebraska_pivots_projected.geojson")
 
 if __name__ == "__main__":
-    make_dirs()
-    reorder_images(params)
-    negative_buffer_and_small_filter(params)
-    grid_images(params)
-    open_labels(params)
-    move_img_to_folder(params)
-    connected_comp(params)
-    train_test_split(params)
-    print("preprocessing complete, ready to run model.")
-
+    
+    wflow.setup_dirs()
+    
+    band_indices = wflow.yaml_to_band_index()
+    
+    wflow.get_product_paths(band_list)
+    
+    wflow.load_and_stack_bands(product_list)
+    
+    wflow.stack_and_save_bands()
+    
+    wflow.negative_buffer_and_small_filter(-31, 100)
+    
+    img_paths, label_paths = wflow.grid_images()
+    
+    wflow.remove_mostly_empty(img_paths, label_paths)
+    
+    wflow.move_chips_to_folder()
+    
+    wflow.connected_components()
+    
+    wflow.train_test_split()
+    
     print("channel means, put these in model_configs.py subclass")
-    band_indices = yaml_to_band_index(params)
-    for i, v in enumerate(band_indices):
-        get_arr_channel_mean(i)
-def parse_yaml(input_file):
-    """Parse yaml file of configuration parameters."""
-    with open(input_file, "r") as yaml_file:
-        params = yaml.safe_load(yaml_file)
-    return params
-
-
-params = parse_yaml("preprocess_config.yaml")
-
-ROOT = params["dirs"]["root"]
-
-REGION = os.path.join(ROOT, params["dirs"]["region_name"])
-
-DATASET = os.path.join(REGION, params["dirs"]["dataset"])
-
-STACKED = os.path.join(DATASET, params["dirs"]["stacked"])
-
-TRAIN = os.path.join(DATASET, params["dirs"]["train"])
-
-TEST = os.path.join(DATASET, params["dirs"]["test"])
-
-GRIDDED_IMGS = os.path.join(DATASET, params["dirs"]["gridded_imgs"])
-
-GRIDDED_LABELS = os.path.join(DATASET, params["dirs"]["gridded_labels"])
-
-OPENED = os.path.join(DATASET, params["dirs"]["opened"])
-
-NEG_BUFFERED = os.path.join(DATASET, params["dirs"]["neg_buffered_labels"])
-
-RESULTS = os.path.join(
-    ROOT, params["dirs"]["results"], params["dirs"]["dataset"]
-)
-
-SOURCE_IMGS = os.path.join(ROOT, params["dirs"]["region_name"])
-
-SOURCE_LABELS = os.path.join(ROOT, params["dirs"]["region_labels"])
-
-DIRECTORY_LIST = [
-        REGION,
-        DATASET,
-        STACKED,
-        TRAIN,
-        TEST,
-        GRIDDED_IMGS,
-        GRIDDED_LABELS,
-        OPENED,
-        NEG_BUFFERED,
-        RESULTS,
-    ]
+    for i in band_indices:
+        print("Band index {} mean for normalization: ".format(i), get_arr_channel_mean(int(i)-1))
+              
+    print("preprocessing complete, ready to run model.")

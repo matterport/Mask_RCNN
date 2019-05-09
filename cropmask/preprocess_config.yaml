@@ -1,5 +1,5 @@
 dirs:
-    root: /mnt/point/
+    root: /mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/
     tmp: /home/ryan/work/tmp/ # rasterio write operations to vm disk are an order of magnitude faster than writing to mounted Azure File Store
     dataset: landsat-1024-cp # rename this based on the imagery and labels
     stacked: stacked

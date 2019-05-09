@@ -1,0 +1,19 @@
+        directory_list = wflow.setup_dirs()
+
+    band_list = wflow.yaml_to_band_index()
+
+        product_list = wflow.get_product_paths(band_list)
+
+        stacked_arr = wflow.load_and_stack_bands(product_list)
+
+        wflow.stack_and_save_bands()
+
+        wflow.negative_buffer_and_small_filter(-31, 100)
+
+        img_paths, label_paths = wflow.grid_images()
+
+        wflow.remove_mostly_empty(img_paths, label_paths)
+
+        wflow.move_chips_to_folder()
+
+wflow.connected_components()

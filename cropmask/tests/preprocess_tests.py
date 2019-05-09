@@ -6,8 +6,8 @@ import pytest
 @pytest.fixture
 def wflow():
     wflow = pp.PreprocessWorkflow("/home/ryan/work/CropMask_RCNN/cropmask/preprocess_config.yaml", 
-                                 "/mnt/point/western_nebraska_landsat_scenes/LT050320312005082801T1-SC20190418222350/",
-                                 "/mnt/point/external/nebraska_pivots_projected.geojson")
+                                 "/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/unpacked_landsat_downloads/032031/LT050320312005082801T1-SC20190418222350/",
+                                 "/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/external/nebraska_pivots_projected.geojson")
     return wflow
 
 def test_init(wflow):
@@ -16,7 +16,7 @@ def test_init(wflow):
     
 def test_make_dir():
     
-    directory_list = ["/mnt/point/pytest_dir"]
+    directory_list = ["/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/pytest_dir"]
     make_dirs(directory_list)
     try: 
         assert os.path.exists(directory_list[0])
@@ -48,7 +48,7 @@ def test_yaml_to_band_index(wflow):
         
 def test_list_products():
     
-    path = "/mnt/point/western_nebraska_landsat_scenes_pytest/LT050320312005011601T1-SC20190418222311/"
+    path = "/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/unpacked_landsat_downloads/032031/LT050320312005082801T1-SC20190418222350/"
     
     try: 
         product_list = os.listdir(path)
