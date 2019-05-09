@@ -2,32 +2,32 @@ account:
     account_name:
     account_key: 
     # generated from az login
-    tenant_id:
+    tenant_id: 
     subscription_id:
-    app_id:
+    app_id: 
     app_key:
     user: 
     passwd:
-    workspace_name:
-    resource_group:
-    storage_id: 
+    workspace_name: 
+    resource_group: 
+    perm_resource_group:
     location: 
-
-
-storage:
     storage_name:
+    resource_id: 
     storage_key: 
     vm_temp_path:
+
+storage:
+    wbd_gdb_path:
     share_name: 
     container: 
-    region_dir: regional_annotation_projects # all region data stored here, except for stuff external to landsat and annotations
-    region_name: western_nebraska # name of the new region to create with subdirs for landsat and annotations
-    fail_on_exist: True
+    region_dir: 
+    region_name: 
+    fail_on_exist:
 
 download:
     lsru_config: 
     product_list: ['source_metadata', 'sr', 'sr_evi', 'sr_ndmi', 'stats', 'pixel_qa']
-    wbd_gdb_path: /az-ml-container/external/WBD_National_GDB.gdb # http://prd-tnm.s3-website-us-west-2.amazonaws.com/?prefix=StagedProducts/Hydrography/WBD/National/GDB/
     huc_level: 6
     huc_id: 102100
     collection: LANDSAT_TM_C1 # format according to lsru strings, see help for usgs.search
@@ -38,6 +38,6 @@ download:
     month_end: 1
     day_end: 1
     max_results: 300
-    max_cloud_cover: 5
+    max_cloud_cover: 10
     path_row_list: ['032031']
 
