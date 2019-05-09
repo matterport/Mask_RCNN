@@ -269,8 +269,8 @@ class PreprocessWorkflow():
             os.mkdir(new_chip_path)
             os.mkdir(mask_path)
             old_chip_path = os.path.join(self.GRIDDED_IMGS, chip_id+'.tif')
-            os.rename(old_chip_path, os.path.join(new_chip_path, chip_id + ".tif")) # moves the chips   
-    
+            shutil.copyfile(old_chip_path, os.path.join(new_chip_path, chip_id + ".tif")) # moves the chips   
+            os.remove(old_chip_path)
     def connected_components(self):
         """
         Extracts individual instances into their own tif files. Saves them
@@ -329,4 +329,4 @@ class PreprocessWorkflow():
             nodata_value = 0 # best to do no data masking up front and set bad qa bands to 0 rather than assuming 0 is no data. This is assumed from looking at no data values at corners being equal to 0
             arr[arr == nodata_value] = np.nan
             means.append(np.nanmean(arr[:, :, channel]))
-        print(np.mean(means))
+        return np.mean(means)

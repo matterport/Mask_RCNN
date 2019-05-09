@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     print("channel means, put these in model_configs.py subclass")
     for i in band_list:
-        print("Band index {} mean for normalization: ".format(i), get_arr_channel_mean(int(i)-1))
+        print("Band index {} mean for normalization: ".format(i), wflow.get_arr_channel_mean(int(i)-1))
               
     print("preprocessing complete, ready to run model.")
     
