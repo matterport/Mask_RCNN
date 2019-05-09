@@ -134,13 +134,13 @@ make syncdown # copy any changes you made on the remote system over to your loca
 The Data Science VM might lack the Cuda Deep Neural Net framework. To install it download it from the [nVidia website](https://developer.nvidia.com/rdp/cudnn-download) (needs a free dev account) for your Cuda version (`nvcc --version`) and follow [this blogpost](https://aboustati.github.io/How-to-Setup-a-VM-in-Azure-for-Deep-Learning/) for the installation. You might need cUDNN 5.0.
 
 
-## Setup cropmask conda environment for Jupyter
+## How to setup cropmask conda environment for Jupyter if requirements change
 
 On the Azure VM do the following
 ```
 conda activate cropmask
-conda install nb_conda ipykernel
-python -m ipykernel install --user --name cropmask
+conda install nb_conda ipykernel # required for jupyter
+python -m ipykernel install --user --name cropmask # tells jupyter where to find env
 ```
 
 Now you can run `jupyter lab` or `jupyter notebook` and the environment will be accessible.
@@ -172,14 +172,4 @@ chown -R <your user account> /mnt/blobfusecache/
 blobfuse /images --tmp-path=/mnt/blobfusecache -o big_writes -o max_read=131072 -o max_write=131072 -o attr_timeout=240 -o fsname=blobfuse -o entry_timeout=240 -o negative_timeout=120 --config-file=/opt/blobfuse.cfg
 ```
 
-# The following does not work yet, waiting on a github issue with blobfuse
-to persist the mounting, add the following to `/etc/fstab`
-
-```
-# mounts the blob container at az-ml-container
-blobfuse /az-ml-container --tmp-path=/mnt/blobfusetmp -o big_writes -o max_read=131072 -o max_write=131072 -o attr_timeout=240 -o fsname=blobfuse -o entry_timeout=240 -o negative_timeout=120 --config-file
-=/opt/blobfuse.cfg fuse _netdev
-```
-
-# use the custom mount script in this folder after starting and sshing into the vm. requires /az-ml-container to already be a directory
-`bash mount.sh`
+# use the custom mount scripts after starting and sshing into the vm to connect the vm to storage. Terraform will mount the vms for you one time but if you start and stop the vms you will need to remount. From the Azure portal you can also try to use the connection script provided by clicking "Connect" on the file share, but this has failed in the past due to bugs on the Azure side of things.
