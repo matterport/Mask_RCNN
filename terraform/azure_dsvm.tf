@@ -75,7 +75,7 @@ resource "azurerm_resource_group" "ds" {
 
 resource "azurerm_virtual_network" "ds" {
   name                = "${var.vm_name}-network"
-  address_space       = ["10.0.0.0/16"]
+  address_space       = ["10.0.0.0/15"] # was 16 instead of 15
   location            = "${azurerm_resource_group.ds.location}"
   resource_group_name = "${azurerm_resource_group.ds.name}"
 }
@@ -84,7 +84,7 @@ resource "azurerm_subnet" "ds" {
   name                 = "${var.vm_name}-subnet"
   resource_group_name  = "${azurerm_resource_group.ds.name}"
   virtual_network_name = "${azurerm_virtual_network.ds.name}"
-  address_prefix       = "10.0.2.0/24"
+  address_prefix       = "10.0.2.0/23" # was 24 instead of 23
 }
 
 resource "azurerm_network_interface" "ds" {

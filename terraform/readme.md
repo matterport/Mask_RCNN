@@ -1,12 +1,21 @@
 # Azure Setup Instructions
-The following README and terraform scripts come from Andreas Offenhaeuser's [Automated dev workflow for using Data Science VM on Azure](https://medium.com/@an0xff/automated-dev-workflow-for-using-data-science-vm-on-azure-13c1a5b56f91). Before following the instructions below to provision an Azure cluster, you'll need an Azure account and [Azure CLI tools](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed on your local machine. Then run
+Portion of the following README and terraform scripts come from Andreas Offenhaeuser's excellent [Automated dev workflow for using Data Science VM on Azure](https://medium.com/@an0xff/automated-dev-workflow-for-using-data-science-vm-on-azure-13c1a5b56f91). Before following the instructions below to provision an Azure cluster, you'll need an Azure account and [Azure CLI tools](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed on your local machine. Then run
 
 ```sh
 # have your account username and password handy
 az login
 ```
 
-After following these instructions, you can run the configure.sh script manually once it has been uploaded to the cluster, to install extra packages that do not come with the Data Science VM, like MaskRCNN, the python geospatial stack, and [Landsat Surface Reflectance Utils](https://github.com/loicdtx/lsru). These packages will be installed to the `py36` conda environment on the Data Science VM, so you should use that environment/kernel when testing with Jupyter. You will also need to follow the instructions on the [lsru page](https://github.com/loicdtx/lsru) to provide credentials to order Landsat imagery. These credentials should be placed in the `work/` folder next to the azure config file. The WBD_GDB_National.gdb folder/geodatabase should also go in the `work` directory on the azure instance.
+Next, login to the portal and create a permanent storage account under it's own resource group, meaning a seperate resource group from what you choose for the resource group that is called by terraform (Otherwise you could end up deleting your storage with `terraform destroy`). Edit your azure_configs_template.yaml to populate all the variables necessary to set up a Machine Learning Workspace. The Machine Learning Workspace will use whatever existing resource group is specified for the `perm_resource_group` key in azure_configs.yaml. Rename the template and place azure_configs.yaml in your home directory. Then, from the repo root, run
+
+```sh
+python cropmask/azuresetup/create_workspace.py
+```
+Your workspace should be setup, allowing you to profile models, keep track of model versions, etc.
+
+Next, we will set up our VM infrstructure with terraform, which will also use the azure_configs.yaml as well as other files in the terraform folder to define what sort of vm or cluster we want to spin up. This infrastructure can be destroyed and created whenever, since the resource group that terraform references is seperate from the permanent resource group used by your ML workspace (which tracks your modeling history) and your storage (which contains model inputs, etc.).
+
+As a part of the terraform setup, extra packages will be installed into a conda environment called `cropmask`. It will include `mrcnn`, the python geospatial stack, and [Landsat Surface Reflectance Utils](https://github.com/loicdtx/lsru). You will also need to follow the instructions on the [lsru page](https://github.com/loicdtx/lsru) to provide credentials to order Landsat imagery. These credentials should be placed in the `work/` folder next to the azure config file.
 
 
 # manage deep learning VM with GPU on Azure ☁️
