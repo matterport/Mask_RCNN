@@ -1,4 +1,4 @@
-from mrcnn import utils
+from cropmask.mrcnn import utils
 import os
 import pandas as pd
 import skimage.io as skio

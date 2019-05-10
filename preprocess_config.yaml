@@ -1,0 +1,32 @@
+dirs:
+    root: /mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/
+    tmp: /home/ryan/work/tmp/ # rasterio write operations to vm disk are an order of magnitude faster than writing to mounted Azure File Store
+    dataset: landsat-1024-cp # rename this based on the imagery and labels
+    stacked: stacked
+    train: train
+    test: test
+    gridded_imgs: landsat_grid_imgs
+    gridded_labels: landsat_grid_labels
+    results: results
+    region_name: western_nebraska # should be the same as azure_configs used for downloading the order, where source image folders (unpacked tars) are located
+    region_labels: north_platte_landsat_tile_labels
+    neg_buffered_labels: neg_buffered_labels
+landsat_bands_to_include:
+    - blue: true
+    - green: true
+    - red: true
+    - near-IR : false
+image_vals:
+    dataset_name: "landsat-5"
+    grid_size: 512 # in pixel units
+    usable_thresh: .02 #image must have no more than this percentage of values that are zero from either clouds or no_data (tile edges)
+    split: .10 # the proportion of samples that will be used for testing
+label_vals:
+    ag_class_int: 3 # TO DO # if there are more than one classes, ag_class_int is the integer label for the class that will be negative buffered and size filtered'
+    neg_buffer: -30 # in meters, applied on vectors before they are rasterized to reduce spurious instance overlap
+    small_area_filter: 3600 # in area meters, removes fields with area less than 100 meters from labels 
+    kernel: 5 # square kernel size for erosion then dilation of raterized instance labels to reduce overlap
+processing:
+    CHUNK_SIZE: 10
+    MAX_PROCESSES: 100
+    MAX_THREADS: 10
