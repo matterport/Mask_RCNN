@@ -26,7 +26,7 @@ class PreprocessWorkflow():
     Worflow for loading and gridding a single satellite image and reference dataset of the same extent.
     """
     
-    def __init__(self, param_path, scene_dir_path, source_label_path):
+    def __init__(self, param_path, scene_dir_path='nopath/', source_label_path='nopath/'):
         params = parse_yaml(param_path)
         self.params = params
         self.source_label_path = source_label_path # if there is a referenc label
@@ -330,3 +330,39 @@ class PreprocessWorkflow():
             arr[arr == nodata_value] = np.nan
             means.append(np.nanmean(arr[:, :, channel]))
         return np.mean(means)
+
+    def run_single_scene(self):
+
+        start = time.time()
+
+        self.setup_dirs()
+    
+        band_list = self.yaml_to_band_index()
+        
+        product_list = self.get_product_paths(band_list)
+        
+        self.load_and_stack_bands(product_list)
+        
+        self.stack_and_save_bands()
+        
+        self.negative_buffer_and_small_filter(-31, 100)
+        
+        img_paths, label_paths = self.grid_images()
+        
+        self.remove_from_gridded(img_paths, label_paths)
+        
+        self.move_chips_to_folder()
+        
+        self.connected_components()
+        
+        self.train_test_split()
+        
+        print("channel means, put these in model_configs.py subclass")
+        for i in band_list:
+            print("Band index {} mean for normalization: ".format(i), self.get_arr_channel_mean(int(i)-1))
+                
+        print("preprocessing complete, ready to run model.")
+        
+        stop = time.time()
+        
+        print(stop-start, " seconds")

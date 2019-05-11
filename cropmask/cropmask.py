@@ -56,13 +56,16 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "models/mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+#contains paths as instance attributes
+wflow = PreprocessWorkflow(os.path.join(ROOT_DIR,"cropmask/preprocess_config.yaml"))
+
 
 ############################################################
 #  Training
 ############################################################
 
 
-def train(model, dataset_dir, subset):
+def train(model, dataset_dir, subset, config):
     """Train the model."""
     # Training dataset.
     dataset_train = datasets.ImageDataset()
@@ -333,9 +336,9 @@ if __name__ == "__main__":
         if args.command == "train":
             os.chdir(ROOT_DIR)
             print(os.getcwd(), "current working dir")
-            train(model, args.dataset, args.subset)
+            train(model, args.dataset, args.subset, config)
         elif args.command == "detect":
-            detect(model, args.dataset, args.subset)
+            detect(model, args.dataset, args.subset, config)
         else:
             print(
                 "'{}' is not recognized. "
