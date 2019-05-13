@@ -1340,6 +1340,11 @@ def load_image_gt(
         max_dim=config.IMAGE_MAX_DIM,
         mode=config.IMAGE_RESIZE_MODE,
     )
+    
+    if len(mask.shape) < 3:
+        print("Added axis to shape of: ", mask.shape)
+        mask = np.expand_dims(mask,2)
+    
     mask = utils.resize_mask(mask, scale, padding, crop)
 
     # Random horizontal flips.
@@ -1392,6 +1397,7 @@ def load_image_gt(
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
+    print("############Image ID {}, mask shape {} ################".format(image_id, mask.shape))
     _idx = np.sum(mask, axis=(0, 1)) > 0
     mask = mask[:, :, _idx]
     class_ids = class_ids[_idx]

@@ -72,6 +72,8 @@ class ImageDataset(utils.Dataset):
         m = skio.imread(os.path.join(tile_folder_path, 'mask',mask_name)).astype(np.bool)
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID, we return an array of ones
+        if len(m.shape) < 3:
+            np.expand_dims(m,2) # this conditional has had to be placed throughout to deal with images without labels. Need a better, less fragile way, could do this in the preprocess step.
         return m, np.ones([m.shape[-1]], dtype=np.int32)
 
     def image_reference(self, image_id):
