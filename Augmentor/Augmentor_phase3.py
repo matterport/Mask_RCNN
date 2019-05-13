@@ -142,7 +142,14 @@ def get_image_json_doc(orig_json, gt_image_path, new_id):
             return result
     return []
 
-def augment_reconstruct_json(dir_path, orig_json_path):
+def get_category_id(categories_map, color):
+    for category in categories_map:
+        if color[0] in category['colors']:
+            return category['id']
+    print('Error: can not find appropriate category id')
+    return -1
+
+def augment_reconstruct_json(dir_path, orig_json_path, categories_map):
     # dir_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/output_phase2/'
     # dir_path: directory containing IMG... and groundtruth...
     # orig_json_path = '/Users/orshemesh/Desktop/Project/augmented_leaves/origin/leaves.json'
@@ -192,7 +199,6 @@ def augment_reconstruct_json(dir_path, orig_json_path):
         'info': info
     }
 
-    category_id = categories[0]['id']
     # Create the annotations
     annotations = []
     images = []
@@ -209,6 +215,7 @@ def augment_reconstruct_json(dir_path, orig_json_path):
         has_annotation = False
         for color, sub_mask in sub_masks.items():
             # category_id = category_ids[image_id][color]
+            category_id = get_category_id(categories_map, color)
             annotation = create_sub_mask_annotation(sub_mask, image_id, category_id, annotation_id, is_crowd)
             if annotation != []:
                 annotations.append(annotation)

@@ -36,10 +36,10 @@ class AugmentHelper(object):
 
     def generate(self):
         # simon - todo: finish implementation
-        augment_create_mask_files(self.src_dataset_path, self.annotation_file_path, self.ground_truth_path)
+        categories_map = augment_create_mask_files(self.src_dataset_path, self.annotation_file_path, self.ground_truth_path)
         augment_perform_pipe(self.src_dataset_path, self.ground_truth_path, self.output_dataset_path)
         augment_batch_rename(self.output_dataset_path)
-        augment_reconstruct_json(self.output_dataset_path, self.annotation_file_path)
+        augment_reconstruct_json(self.output_dataset_path, self.annotation_file_path, categories_map)
         shutil.rmtree(self.ground_truth_path)   
         purge(self.output_dataset_path, "ground_truth")
 
