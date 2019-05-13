@@ -285,7 +285,7 @@ class PreprocessWorkflow():
             # for imgs with no instances, create empty mask
             if len(np.unique(blob_labels)) == 1:
                 mask_folder = os.path.join(self.TRAIN, chip_id, "mask")
-                skio.imsave(os.path.join(mask_folder, chip_id + "_0.tif"), blob_labels)
+                skio.imsave(os.path.join(mask_folder, chip_id + ".tif"), blob_labels)
             else:
                 # only run connected comp if there is at least one instance
                 label_list = label_prep.extract_labels(blob_labels)

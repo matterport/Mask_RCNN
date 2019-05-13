@@ -67,14 +67,12 @@ class ImageDataset(utils.Dataset):
         mask_dir = os.path.join(os.path.dirname(os.path.dirname(info["path"])), "mask")
 
         # Read mask files from image
-        mask = []
-        #can get rid of this for loop since we are reading in a stacked file
-        for f in next(os.walk(mask_dir))[2]:
-            if f.endswith(".tif"):
-                m = skio.imread(os.path.join(mask_dir, f)).astype(np.bool)
+        tile_folder_path = '/'.join(self.image_info[image_id]['path'].split('/')[:-2])
+        mask_name = os.listdir(os.path.join(tile_folder_path,'mask'))[0]
+        m = skio.imread(os.path.join(tile_folder_path, 'mask',mask_name)).astype(np.bool)
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID, we return an array of ones
-        return mask, np.ones([mask.shape[-1]], dtype=np.int32)
+        return m, np.ones([m.shape[-1]], dtype=np.int32)
 
     def image_reference(self, image_id):
         """Return the path of the image."""

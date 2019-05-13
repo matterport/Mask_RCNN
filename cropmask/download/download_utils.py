@@ -165,7 +165,7 @@ def azure_download_order(order, configs):
         time.sleep(600)
     order.download_all_complete_azure(
         configs["storage"]["container"],
-        configs["storage"]["region_name"]
+        configs["storage"]["region_name"],
         configs["storage"]["storage_name"],
         configs["storage"]["storage_key"],
     )

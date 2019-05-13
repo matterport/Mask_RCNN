@@ -11,7 +11,7 @@ temp/
 test/
 notebooks/aml_config/
 aml_config/
-
+models/*.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

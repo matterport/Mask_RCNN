@@ -5,8 +5,8 @@ import numpy as np
 #  Configurations
 ############################################################
 class LandsatConfig(Config):
-    """Configuration for training on worldview-2 imagery. 
-     Overrides values specific to WV2.
+    """Configuration for training on landsat imagery. 
+     Overrides values specific to Landsat center pivot imagery.
     
     Descriptive documentation for each attribute is at
     https://github.com/matterport/Mask_RCNN/blob/master/mrcnn/config.py
@@ -36,15 +36,15 @@ class LandsatConfig(Config):
     LEARNING_RATE = 0.0003
 
     # Image mean from inspect_data ipynb (preprocess.py differs for some reason, only slightly by 1os of digits or 1s of digits)
-    MEAN_PIXEL = np.array([705.89, 993.93, 1127.34])
+    MEAN_PIXEL = np.array([711.1, 995.51, 1097.56])
 
     # Give the configuration a recognizable name
-    NAME = "landsat-1024-cp"
+    NAME = "landsat-512-cp"
 
     # Batch size is 4 (GPUs * images/GPU).
     # Keras 2.1.6 works for multi-gpu but takes longer than single GPU currently
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 3
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # background + ag
@@ -65,7 +65,6 @@ class LandsatConfig(Config):
 
     # anchor side in pixels, determined using inspect_crop_data.ipynb. can specify more or less scales
     RPN_ANCHOR_SCALES = (32, 64, 128)  # for cp
-    # RPN_ANCHOR_SCALES = (20, 60, 100, 140) # for smallholder
 
     # Aim to allow ROI sampling to pick 33% positive ROIs. This is always 33% in inspect_data nb, unsure if that is accurate.
     TRAIN_ROIS_PER_IMAGE = 600
@@ -86,7 +85,7 @@ class LandsatConfig(Config):
 
     # reduces the max number of field instances
     # MAX_GT_INSTANCES = 29 # for smallholder determined using inspect_crop_data.ipynb
-    MAX_GT_INSTANCES = 203  # for cp determined using inspect_crop_data.ipynb
+    MAX_GT_INSTANCES = 195  # for cp determined using inspect_crop_data.ipynb
 
     # Max number of final detections per image
     DETECTION_MAX_INSTANCES = 400
