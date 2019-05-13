@@ -102,7 +102,7 @@ class LandsatConfig(Config):
 
     # If enabled, resizes instance masks to a smaller size to reduce
     # memory load. Recommended when using high-resolution images.
-    USE_MINI_MASK = True
+    USE_MINI_MASK = False
     MINI_MASK_SHAPE = (28, 28)  # (height, width) of the mini-mask
 
     # Loss weights for more precise optimization. It has been suggested that mrcnn_mask_loss should be weighted higher

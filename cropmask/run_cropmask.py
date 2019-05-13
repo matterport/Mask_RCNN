@@ -46,7 +46,7 @@ from imgaug import augmenters as iaa
 from cropmask.preprocess import PreprocessWorkflow
 from cropmask import datasets, model_configs
 from cropmask.mrcnn import model as modellib
-from cropmask.mrcnn import visualize
+from cropmask.mrcnn import visualize, utils
 
 # Path to trained weights file
 ROOT_DIR = "/home/ryan/work/CropMask_RCNN"
@@ -69,15 +69,19 @@ def train(model, dataset_dir, subset, config):
     """Train the model."""
     # Training dataset.
     dataset_train = datasets.ImageDataset()
+# close but not quite string manipulating. TODO remove hardcoding
+#     path_element_list = dataset_dir.split("/")
+#     split_dir = os.path.join('/'.join(path_element_list[:-2]),"results",path_element_list[-1])
+    split_dir="/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/results/landsat-1024-cp/"
     dataset_train.load_imagery(
-        dataset_dir, "train", image_source="landsat", class_name="agriculture"
+        dataset_dir, "train", image_source="landsat", class_name="agriculture", train_test_split_dir=split_dir
     )
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = datasets.ImageDataset()
     dataset_val.load_imagery(
-        dataset_dir, "test", image_source="landsat", class_name="agriculture"
+        dataset_dir, "test", image_source="landsat", class_name="agriculture", train_test_split_dir=split_dir
     )
     dataset_val.prepare()
 
