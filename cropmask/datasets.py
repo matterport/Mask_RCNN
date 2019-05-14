@@ -73,7 +73,7 @@ class ImageDataset(utils.Dataset):
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID, we return an array of ones
         if len(m.shape) < 3:
-            np.expand_dims(m,2) # this conditional has had to be placed throughout to deal with images without labels. Need a better, less fragile way, could do this in the preprocess step.
+            m = np.expand_dims(m,2) # this conditional has had to be placed throughout to deal with images without labels. Need a better, less fragile way, could do this in the preprocess step.
         return m, np.ones([m.shape[-1]], dtype=np.int32)
 
     def image_reference(self, image_id):

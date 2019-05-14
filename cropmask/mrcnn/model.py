@@ -1397,7 +1397,6 @@ def load_image_gt(
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
-    print("############Image ID {}, mask shape {} ################".format(image_id, mask.shape))
     _idx = np.sum(mask, axis=(0, 1)) > 0
     mask = mask[:, :, _idx]
     class_ids = class_ids[_idx]
