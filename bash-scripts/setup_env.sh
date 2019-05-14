@@ -1,5 +1,8 @@
 source ~/.bashrc
-/data/anaconda/envs/py35/bin/conda env create -f ~/work/$1/cropmask-env.yml
-/data/anaconda/envs/cropmask/bin/python -m ipykernel install --user --name cropmask
+conda update -n base -c defaults conda -y
+/data/anaconda/envs/py36/bin/conda env update -f ~/work/$1/cropmask-env.yml -y
 cd ~/work/$1/
-/data/anaconda/envs/cropmask/bin/python setup.py develop
+/data/anaconda/envs/py36/bin/python setup.py develop
+/data/anaconda/envs/py36/bin/pip uninstall tensorflow
+/data/anaconda/envs/py36/bin/conda install tensorflow-gpu
+/data/anaconda/envs/py36/bin/conda install tensorflow

@@ -16,7 +16,7 @@ except ImportError:
 
 install_reqs = ["Click"]
 setup(
-    name="cropmask",
+    name="py36",
     version="0.0.1",
     url="https://github.com/ecohydro/CropMask_RCNN",
     author="Ryan Avery",

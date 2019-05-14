@@ -1,4 +1,4 @@
-name: cropmask
+name: py36
 channels:
   - conda-forge
 dependencies:
