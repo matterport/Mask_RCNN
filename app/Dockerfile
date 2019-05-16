@@ -26,7 +26,7 @@ EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
 # installing environement, replaed 3 lines in ordiginal repo
-RUN apt_get update -y && apt-get install -y git-core
+RUN apt-get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
     && git clone https://github.com/ecohydro/CropMask_RCNN \
