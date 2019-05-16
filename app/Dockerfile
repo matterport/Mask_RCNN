@@ -26,11 +26,11 @@ EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
 # installing environement, replaed 3 lines in ordiginal repo
-RUN apt-get update && apt-get install git
+RUN apt_get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
     && git clone https://github.com/ecohydro/CropMask_RCNN \
-    && conda install -c conda-forge -n ai4e_py_api -f CropMask_RCNN/cropmask-env.yml \
+    && conda install -c conda-forge -n ai4e_py_api -f CropMask_RCNN/app/app-env.yml \
     && source activate ai4e_py_api \
     && python setup.py install
 

@@ -1,0 +1,27 @@
+channels:
+  - conda-forge
+dependencies:
+  # Core scientific python
+  - numpy
+  - matplotlib
+  - python=3.7
+  - pyqt
+  - seaborn
+  - xlrd # for excel sheets in pandas
+  - scipy
+  - scikit-learn
+  - scikit-image
+
+# Mask_RCNN requirements
+  - Pillow
+  - cython
+  - matplotlib
+  - scikit-image
+  - tensorflow-gpu>=1.3.0
+  - keras-gpu>=2.0.8
+  - opencv
+  - h5py
+
+  - pip:
+      # Utilities
+      - imgaug # for mrcnn
