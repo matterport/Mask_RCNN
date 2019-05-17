@@ -19,6 +19,7 @@ dependencies:
   - keras-gpu>=2.0.8
   - opencv
   - h5py
+  - setuptools
 
   - pip:
       # Utilities

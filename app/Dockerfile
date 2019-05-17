@@ -33,9 +33,9 @@ RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
 
 WORKDIR ~/CropMask_RCNN
     
-RUN conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
+RUN conda env update -f app/app-env.yml -n ai4e_py_api \
     && . activate ai4e_py_api \
-    && python ~/CropMask_RCNN/setup.py install
+    && python setup.py install
 
 # Note: supervisor.conf reflects the location and name of your api code.
 # If the default (./my_api/runserver.py) is renamed, you must change supervisor.conf
