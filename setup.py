@@ -12,7 +12,7 @@ import pkg_resources
 try:
     from setuptools import setup, find_packages
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, find_packages
 
 install_reqs = ["Click"]
 setup(
