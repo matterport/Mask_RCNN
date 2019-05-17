@@ -15,13 +15,13 @@ ENV PYTHONPATH="${PYTHONPATH}:/ai4e_api_tools"
 RUN ./ai4e_api_tools/requirements/install-api-hosting-reqs.sh
 
 # Install Azure Blob SDK
-# RUN ./ai4e_api_tools/requirements/install-azure-blob.sh
+RUN ./ai4e_api_tools/requirements/install-azure-blob.sh
 
 # Install Application Insights
 RUN ./ai4e_api_tools/requirements/install-appinsights.sh
 
 # Install Opencensus
-# RUN ./ai4e_api_tools/requirements/install-opencensus.sh
+RUN ./ai4e_api_tools/requirements/install-opencensus.sh
 EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
@@ -34,7 +34,8 @@ RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
 RUN conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
     && . activate ai4e_py_api \
     && cd ~/CropMask_RCNN \
-    && python setup.py install
+    && python setup.py install \
+    && cd -
 
 # Note: supervisor.conf reflects the location and name of your api code.
 # If the default (./my_api/runserver.py) is renamed, you must change supervisor.conf
