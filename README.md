@@ -240,5 +240,5 @@ A computer vision class project by HU Shiyu to apply the color pop effect on peo
 ### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
 ![GRASS GIS Image](assets/project_grass_gis.png)
 
-### [Detecting annotations from printed books](https://github.com/collectionslab/Omniscribe)
+### [Detecting annotations from printed books](https://github.com/collectionslab/Omniscribe/tree/master/proofOfConcept)
 ![Annotation Detected](assets/annotation_segmentation.png)
