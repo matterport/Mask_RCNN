@@ -74,6 +74,6 @@ HEALTHCHECK --interval=1m --timeout=3s --start-period=20s \
   CMD curl -f http://localhost/${API_PREFIX}/  || exit 1
 ENTRYPOINT [ "/startup.sh" ]
 # Use the following entrypoint to debug bridge issues.
-#ENTRYPOINT ["uwsgi", "--chdir", "/app/keras_iNat_api/", "--virtualenv", "/usr/local/envs/ai4e_py_api", "--http", "0.0.0.0:80", "--callable", "app", "--enable-threads", "--wsgi-file", "/app/tf_iNat_api/runserver.py", "--wsgi-disable-file-wrapper"]
+#ENTRYPOINT ["uwsgi", "--chdir", "/app/keras_iNat_api/", "--virtualenv", "/usr/local/envs/ai4e_py_api", "--http", "0.0.0.0:80", "--callable", "app", "--enable-threads", "--wsgi-file", "/app/keras_iNat_api/runserver.py", "--wsgi-disable-file-wrapper"]
 
        
