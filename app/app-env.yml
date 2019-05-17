@@ -1,3 +1,4 @@
+name: ai4e_py_api
 channels:
   - conda-forge
 dependencies:
@@ -6,10 +7,7 @@ dependencies:
   - matplotlib
   - python=3.7
   - pyqt
-  - seaborn
-  - xlrd # for excel sheets in pandas
   - scipy
-  - scikit-learn
   - scikit-image
 
 # Mask_RCNN requirements

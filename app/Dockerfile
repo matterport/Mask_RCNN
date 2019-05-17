@@ -29,10 +29,10 @@ EXPOSE 55678 50001
 RUN apt-get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
-    && git clone https://github.com/ecohydro/CropMask_RCNN \
-    && conda install -c conda-forge -n ai4e_py_api -f CropMask_RCNN/app/app-env.yml \
-    && source activate ai4e_py_api \
-    && python setup.py install
+    && git clone https://github.com/ecohydro/CropMask_RCNN ~/CropMask_RCNN \
+    && conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
+    && . activate ai4e_py_api \
+    && python ~/CropMask_RCNN/setup.py install
 
 # Note: supervisor.conf reflects the location and name of your api code.
 # If the default (./my_api/runserver.py) is renamed, you must change supervisor.conf
