@@ -15,13 +15,13 @@ ENV PYTHONPATH="${PYTHONPATH}:/ai4e_api_tools"
 RUN ./ai4e_api_tools/requirements/install-api-hosting-reqs.sh
 
 # Install Azure Blob SDK
-RUN ./ai4e_api_tools/requirements/install-azure-blob.sh
+# RUN ./ai4e_api_tools/requirements/install-azure-blob.sh
 
 # Install Application Insights
 RUN ./ai4e_api_tools/requirements/install-appinsights.sh
 
 # Install Opencensus
-RUN ./ai4e_api_tools/requirements/install-opencensus.sh
+# RUN ./ai4e_api_tools/requirements/install-opencensus.sh
 EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
@@ -30,11 +30,10 @@ RUN apt-get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
     && git clone https://github.com/ecohydro/CropMask_RCNN ~/CropMask_RCNN
-
-WORKDIR ~/CropMask_RCNN
     
-RUN conda env update -f app/app-env.yml -n ai4e_py_api \
+RUN conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
     && . activate ai4e_py_api \
+    && cd ~/CropMask_RCNN \
     && python setup.py install
 
 # Note: supervisor.conf reflects the location and name of your api code.
