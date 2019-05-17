@@ -29,9 +29,11 @@ EXPOSE 55678 50001
 RUN apt-get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
-    && git clone https://github.com/ecohydro/CropMask_RCNN ~/CropMask_RCNN \
-    && WORKDIR ~/CropMask_RCNN \
-    && conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
+    && git clone https://github.com/ecohydro/CropMask_RCNN ~/CropMask_RCNN
+
+WORKDIR ~/CropMask_RCNN
+    
+RUN conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
     && . activate ai4e_py_api \
     && python ~/CropMask_RCNN/setup.py install
 
