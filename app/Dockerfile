@@ -25,7 +25,7 @@ RUN ./ai4e_api_tools/requirements/install-opencensus.sh
 EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
-# installing environement, replaed 3 lines in ordiginal repo
+# installing environement, replaced 3 lines in original repo
 RUN apt-get update -y && apt-get install -y git-core
 
 RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
@@ -34,7 +34,7 @@ RUN echo "source activate ai4e_py_api" >> ~/.bashrc \
 RUN conda env update -f ~/CropMask_RCNN/app/app-env.yml -n ai4e_py_api \
     && . activate ai4e_py_api \
     && cd ~/CropMask_RCNN \
-    && python setup.py install \
+    && /usr/local/envs/ai4e_py_api/bin/python setup.py install \
     && cd -
 
 # Note: supervisor.conf reflects the location and name of your api code.
