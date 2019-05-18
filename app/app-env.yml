@@ -5,7 +5,6 @@ dependencies:
   # Core scientific python
   - numpy
   - matplotlib
-  - python=3.7
   - pyqt
   - scipy
   - scikit-image
