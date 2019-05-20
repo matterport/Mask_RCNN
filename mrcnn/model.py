@@ -1685,6 +1685,12 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                                              config.BACKBONE_STRIDES,
                                              config.RPN_ANCHOR_STRIDE)
 
+    #set random seed unique to worker 
+    pid = multiprocessing.current_process()._identity[0]
+    np.random.seed(pid)
+    random.seed(pid)
+
+
     # Keras requires a generator to run indefinitely.
     while True:
         try:
