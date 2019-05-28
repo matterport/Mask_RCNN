@@ -216,9 +216,6 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
 #  Mobilenet Graph
 ############################################################
 
-def relu6(x):
-    return K.relu(x, max_value=6)
-
 
 def correct_pad(inputs, kernel_size):
     """Returns a tuple for zero-padding for 2D convolution with downsampling.
@@ -243,16 +240,6 @@ def correct_pad(inputs, kernel_size):
 
     return ((correct[0] - adjust[0], correct[0]),
             (correct[1] - adjust[1], correct[1]))
-
-
-def preprocess_input(x, **kwargs):
-    """Preprocesses a numpy array encoding a batch of images.
-    # Arguments
-        x: a 4D numpy array consists of RGB values within [0, 255].
-    # Returns
-        Preprocessed array.
-    """
-    return imagenet_utils.preprocess_input(x, mode='tf', **kwargs)
 
 
 # This function is taken from the original tf repo.
@@ -292,7 +279,7 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
                                       epsilon=1e-3,
                                       momentum=0.999,
                                       name=prefix + 'expand_BN')(x)
-        x = KL.ReLU(max_value=6)(x)  #relu6(x) #KL.ReLU(6., name=prefix + 'expand_relu')(x)
+        x = KL.ReLU(max_value=6, name=prefix + 'expand_relu')(x)
     else:
         prefix = 'expanded_conv_'
 
@@ -311,7 +298,7 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
                                   momentum=0.999,
                                   name=prefix + 'depthwise_BN')(x)
 
-    x = KL.ReLU(max_value=6)(x) #relu6(x) #KL.ReLU(6., name=prefix + 'depthwise_relu')(x)
+    x = KL.ReLU(max_value=6, name=prefix + 'depthwise_relu')(x)
 
     # Project
     x = KL.Conv2D(pointwise_filters,
@@ -329,10 +316,11 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
         return KL.Add(name=prefix + 'add')([inputs, x])
     return x
 
+
 def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, train_bn=True):
     assert architecture in ["mobilenetv2"]
     channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    # Stage 1
+    
     first_block_filters = _make_divisible(32 * alpha, 8)
     x = KL.ZeroPadding2D(padding=correct_pad(img_input, 3),
                              name='Conv1_pad')(img_input)
@@ -346,7 +334,7 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                                   epsilon=1e-3,
                                   momentum=0.999,
                                   name='bn_Conv1')(x)
-    x = KL.ReLU(max_value=6)(x) #relu6(x) #KL.ReLU(6., name='Conv1_relu')(x)
+    x = KL.ReLU(max_value=6, name='Conv1_relu')(x)
 
     C1 = x = _inverted_res_block(x, filters=16, alpha=alpha, stride=1,
                             expansion=1, block_id=0)
@@ -383,10 +371,10 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                             expansion=6, block_id=13)
     x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
                             expansion=6, block_id=14)
-    C5 = x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
+    x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
                             expansion=6, block_id=15)
 
-    x = _inverted_res_block(x, filters=320, alpha=alpha, stride=1,
+    C5 = x = _inverted_res_block(x, filters=320, alpha=alpha, stride=1,
                             expansion=6, block_id=16)
 
     # no alpha applied to last conv as stated in the paper:
@@ -405,7 +393,7 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                                   epsilon=1e-3,
                                   momentum=0.999,
                                   name='Conv_1_bn')(x)
-    x = KL.ReLU(max_value=6)(x)#relu6(x) #KL.ReLU(6., name='out_relu')(x)
+    x = KL.ReLU(max_value=6, name='out_relu')(x)
 
     
     return [C1, C2, C3, C4, C5]
@@ -2341,10 +2329,10 @@ class MaskRCNN():
         if exclude:
             layers = filter(lambda l: l.name not in exclude, layers)
 
-        #if by_name:
-        #    saving.load_weights_from_hdf5_group_by_name(f, layers)
-        #else:
-        #    saving.load_weights_from_hdf5_group(f, layers)
+        if by_name:
+            saving.load_weights_from_hdf5_group_by_name(f, layers)
+        else:
+            saving.load_weights_from_hdf5_group(f, layers)
         if hasattr(f, 'close'):
             f.close()
 
@@ -2357,15 +2345,15 @@ class MaskRCNN():
         """
         from keras.utils.data_utils import get_file
         if self.config.BACKBONE == "mobilenetv2":
-            TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/JonathanCMitchell/mobilenet_v2_keras/' \
-					'releases/download/v1.1/'
-	    #'https://github.com/fchollet/deep-learning-models/'\
-            #                     'releases/download/v0.6/mobilenet_1_0_224_tf_no_top.h5'
-            weights_path = get_file(#'mobilenet_1_0_224_tf_no_top.h5',
-                                'mobilenet_v2_weights_tf_dim_ordering_tf_kernels_0.5_224_no_top.h5',
+            TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/JonathanCMitchell/mobilenet_v2_keras/'\
+                                    'releases/download/v1.1/'\
+                                    'mobilenet_v2_weights_tf_dim_ordering_tf_kernels_'\
+                                    '1.0_224_no_top.h5'
+            weights_path = get_file('mobilenet_v2_weights_tf_dim_ordering_tf_kernels_'\
+                                    '1.0_224_no_top.h5',
 				TF_WEIGHTS_PATH_NO_TOP,
                                 cache_subdir='models',
-                                md5_hash='725ccbd03d61d7ced5b5c4cd17e7d527')
+                                md5_hash='f1a68526548f7541cda07e19ba6c85f4')
         else:
             TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/'\
                                  'releases/download/v0.2/'\
