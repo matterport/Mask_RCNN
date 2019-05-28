@@ -374,7 +374,7 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
     x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
                             expansion=6, block_id=15)
 
-    C5 = x = _inverted_res_block(x, filters=320, alpha=alpha, stride=1,
+    x = _inverted_res_block(x, filters=320, alpha=alpha, stride=1,
                             expansion=6, block_id=16)
 
     # no alpha applied to last conv as stated in the paper:
@@ -389,12 +389,10 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                       kernel_size=1,
                       use_bias=False,
                       name='Conv_1')(x)
-    x = KL.BatchNormalization(axis=channel_axis,
+    C5 = x = KL.BatchNormalization(axis=channel_axis,
                                   epsilon=1e-3,
                                   momentum=0.999,
                                   name='Conv_1_bn')(x)
-    x = KL.ReLU(max_value=6, name='out_relu')(x)
-
     
     return [C1, C2, C3, C4, C5]
 
