@@ -652,7 +652,7 @@ def configure_backbone(config, backbone_name):
     backbone_name: User-supplied backbone name.
     """
 
-    supported_architectures = ["resnet50", "resnet101", "mobilenet224v1"]
+    supported_architectures = ["resnet50", "resnet101", "mobilenetv2"]
 
     # Configure backbone architecture
     if backbone_name.lower() in supported_architectures:
