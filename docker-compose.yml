@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+  notebook:
+    build:
+      context: .
+      dockerfile: ./DockerFile
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/home/jovyan/work
