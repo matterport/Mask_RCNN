@@ -2530,9 +2530,9 @@ class MaskRCNN():
             "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # From a specific Mobilenet stage and up
-            "5M+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "11M+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-            "13M+": r"(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "3M+": r"(block_5.*)|(block_6.*)|(block_7.*)|(block_8.*)|(block_9.*)|(block_10.*)|(block_11.*)|(block_12.*)|(block_13.*)|(block_14.*)|(block_15.*)|(block_16.*)|(Conv_1.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "4M+": r"(block_12.*)|(block_13.*)|(block_14.*)|(block_15.*)|(block_16.*)|(Conv_1.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "5M+": r"(Conv_1.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
 	    # All layers
             "all": ".*",
         }
