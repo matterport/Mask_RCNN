@@ -15,9 +15,9 @@ Start by cloning this repository and downloading the GDXray dataset.
 
 ```sh
 # Python 3.6
-python gdxray.py \
+python gdxray.py train \
 --dataset=~/data/GDXray \
---subset=Castings \
+--series=Castings \
 --model=mask_rcnn_coco.h5 \
 --logs=logs/gdxray \
 --download=True
@@ -27,10 +27,10 @@ python gdxray.py \
 
 ```sh
 # Python 3.6
-python gdxray.py \
+python gdxray.py evaluate \
 --evaluate=True \
 --dataset=~/data/GDXray \
---subset=Castings \
+--series=Castings \
 --logs=logs/gdxray
 ```
 
