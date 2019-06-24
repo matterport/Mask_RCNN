@@ -217,7 +217,7 @@ resource "null_resource" "ds" {
       "echo \"accountName $STORAGE_NAME\" > /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"accountKey $STORAGE_KEY\" >> /home/${var.admin_user}/work/blobfuse.cfg",
       "echo \"containerName $CONTAINER_NAME\" >> /home/${var.admin_user}/work/blobfuse.cfg",
-      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount-fileshare.sh $STORAGE_NAME $FILESHARE_NAME $ACCOUNT_KEY",
+      "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount-fileshare.sh $STORAGE_NAME $FILESHARE_NAME $STORAGE_KEY",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/mount-blobfuse.sh",
       "bash /home/${var.admin_user}/work/${var.repo_name}/bash-scripts/setup_env.sh ${var.repo_name}",
     ]
