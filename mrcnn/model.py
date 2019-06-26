@@ -213,7 +213,7 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
 
 
 ############################################################
-#  Mobilenet Graph
+#  MobilenetV2 Graph
 ############################################################
 
 
@@ -258,7 +258,7 @@ def _make_divisible(v, divisor, min_value=None):
     return new_v
 
 
-def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
+def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id, train_bn=True):
     channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     in_channels = K.int_shape(inputs)[channel_axis]
@@ -275,10 +275,10 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
                           use_bias=False,
                           activation=None,
                           name=prefix + 'expand')(x)
-        x = KL.BatchNormalization(axis=channel_axis,
-                                      epsilon=1e-3,
-                                      momentum=0.999,
-                                      name=prefix + 'expand_BN')(x)
+        x = BatchNorm(axis=channel_axis, 
+                        epsilon=1e-3, 
+                        momentum=0.999, 
+                        name=prefix)(x, training=train_bn)
         x = KL.ReLU(max_value=6, name=prefix + 'expand_relu')(x)
     else:
         prefix = 'expanded_conv_'
@@ -293,10 +293,11 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
                                use_bias=False,
                                padding='same' if stride == 1 else 'valid',
                                name=prefix + 'depthwise')(x)
-    x = KL.BatchNormalization(axis=channel_axis,
-                                  epsilon=1e-3,
-                                  momentum=0.999,
-                                  name=prefix + 'depthwise_BN')(x)
+
+    x = BatchNorm(axis=channel_axis,
+                    epsilon=1e-3,
+                    momentum=0.999,
+                    name=prefix + 'depthwise_BN')(x, training=train_bn)
 
     x = KL.ReLU(max_value=6, name=prefix + 'depthwise_relu')(x)
 
@@ -307,13 +308,17 @@ def _inverted_res_block(inputs, expansion, stride, alpha, filters, block_id):
                       use_bias=False,
                       activation=None,
                       name=prefix + 'project')(x)
-    x = KL.BatchNormalization(axis=channel_axis,
-                                  epsilon=1e-3,
-                                  momentum=0.999,
-                                  name=prefix + 'project_BN')(x)
+
+    x = BatchNorm(axis=channel_axis,
+                    epsilon=1e-3,
+                    momentum=0.999,
+                    name=prefix + 'project_BN')(x, training=train_bn)
 
     if in_channels == pointwise_filters and stride == 1:
         return KL.Add(name=prefix + 'add')([inputs, x])
+    
+    # TODO: test this
+    #x = KL.ReLU(max_value=6, name=prefix + 'depthwise_relu_2')(x)
     return x
 
 
@@ -330,52 +335,53 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                       padding='valid',
                       use_bias=False,
                       name='Conv1')(x)
-    x = KL.BatchNormalization(axis=channel_axis,
-                                  epsilon=1e-3,
-                                  momentum=0.999,
-                                  name='bn_Conv1')(x)
+    x = BatchNorm(axis=channel_axis,
+                    epsilon=1e-3,
+                    momentum=0.999,
+                    name='bn_Conv1')(x, training=train_bn)
+
     x = KL.ReLU(max_value=6, name='Conv1_relu')(x)
 
     C1 = x = _inverted_res_block(x, filters=16, alpha=alpha, stride=1,
-                            expansion=1, block_id=0)
+                            expansion=1, block_id=0, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=24, alpha=alpha, stride=2,
-                            expansion=6, block_id=1)
+                            expansion=6, block_id=1, train_bn=train_bn)
     C2 = x = _inverted_res_block(x, filters=24, alpha=alpha, stride=1,
-                            expansion=6, block_id=2)
+                            expansion=6, block_id=2, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=32, alpha=alpha, stride=2,
-                            expansion=6, block_id=3)
+                            expansion=6, block_id=3, train_bn=train_bn)
     x = _inverted_res_block(x, filters=32, alpha=alpha, stride=1,
-                            expansion=6, block_id=4)
+                            expansion=6, block_id=4, train_bn=train_bn)
     C3 = x = _inverted_res_block(x, filters=32, alpha=alpha, stride=1,
-                            expansion=6, block_id=5)
+                            expansion=6, block_id=5, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=64, alpha=alpha, stride=2,
-                            expansion=6, block_id=6)
+                            expansion=6, block_id=6, train_bn=train_bn)
     x = _inverted_res_block(x, filters=64, alpha=alpha, stride=1,
-                            expansion=6, block_id=7)
+                            expansion=6, block_id=7, train_bn=train_bn)
     x = _inverted_res_block(x, filters=64, alpha=alpha, stride=1,
-                            expansion=6, block_id=8)
+                            expansion=6, block_id=8, train_bn=train_bn)
     x = _inverted_res_block(x, filters=64, alpha=alpha, stride=1,
-                            expansion=6, block_id=9)
+                            expansion=6, block_id=9, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=96, alpha=alpha, stride=1,
-                            expansion=6, block_id=10)
+                            expansion=6, block_id=10, train_bn=train_bn)
     x = _inverted_res_block(x, filters=96, alpha=alpha, stride=1,
-                            expansion=6, block_id=11)
+                            expansion=6, block_id=11, train_bn=train_bn)
     C4 = x = _inverted_res_block(x, filters=96, alpha=alpha, stride=1,
-                            expansion=6, block_id=12)
+                            expansion=6, block_id=12, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=160, alpha=alpha, stride=2,
-                            expansion=6, block_id=13)
+                            expansion=6, block_id=13, train_bn=train_bn)
     x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
-                            expansion=6, block_id=14)
+                            expansion=6, block_id=14, train_bn=train_bn)
     x = _inverted_res_block(x, filters=160, alpha=alpha, stride=1,
-                            expansion=6, block_id=15)
+                            expansion=6, block_id=15, train_bn=train_bn)
 
     x = _inverted_res_block(x, filters=320, alpha=alpha, stride=1,
-                            expansion=6, block_id=16)
+                            expansion=6, block_id=16, train_bn=train_bn)
 
     # no alpha applied to last conv as stated in the paper:
     # if the width multiplier is greater than 1 we
@@ -389,11 +395,12 @@ def mobilenet_graph(img_input, architecture, alpha=1.0, depth_multiplier=1, trai
                       kernel_size=1,
                       use_bias=False,
                       name='Conv_1')(x)
-    C5 = x = KL.BatchNormalization(axis=channel_axis,
-                                  epsilon=1e-3,
-                                  momentum=0.999,
-                                  name='Conv_1_bn')(x)
-    
+   
+    C5 = x = BatchNorm(axis=channel_axis,
+                    epsilon=1e-3,
+                    momentum=0.999,
+                    name='Conv_1_bn')(x, training=train_bn)
+ 
     return [C1, C2, C3, C4, C5]
 
 
@@ -2099,10 +2106,7 @@ class MaskRCNN():
 
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
-        #print('C5', C5)
         P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c5p5')(C5)
-        #print('P5', P5)
-        #print('C4', C4)
         P4 = KL.Add(name="fpn_p4add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
             KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c4p4')(C4)])
@@ -2499,9 +2503,9 @@ class MaskRCNN():
             - One of these predefined values:
               heads: The RPN, classifier and mask heads of the network
               all: All the layers
-              3+: Train Resnet stage 3 and up
-              4+: Train Resnet stage 4 and up
-              5+: Train Resnet stage 5 and up
+              3+: Train stage 3 and up
+              4+: Train stage 4 and up
+              5+: Train stage 5 and up
         augmentation: Optional. An imgaug (https://github.com/aleju/imgaug)
             augmentation. For example, passing imgaug.augmenters.Fliplr(0.5)
             flips images right/left 50% of the time. You can pass complex
@@ -2738,6 +2742,8 @@ class MaskRCNN():
         # Run object detection
         detections, _, _, mrcnn_mask, _, _, _ =\
             self.keras_model.predict([molded_images, image_metas, anchors], verbose=0)
+        
+        #print('detections', detections)
         # Process detections
         results = []
         for i, image in enumerate(images):
@@ -3040,25 +3046,25 @@ def mold_image(images, config):
     mold_image_dict = {
         "resnet50": resnet_mold_image,
         "resnet101": resnet_mold_image,
-        "mobilenet224v1": mobilenet_mold_image
+        "mobilenet224v1": mobilenet_mold_image,
+        "mobilenetv2": mobilenet_mold_image
     }
 
     #if config.BACKBONE not in mold_image_dict:
     return resnet_mold_image(images, config)
     #return mold_image_dict[config.BACKBONE](images, config)
 
-
 def unmold_image(images, config):
     unmold_image_dict = {
         "resnet50": resnet_unmold_image,
         "resnet101": resnet_unmold_image,
-        "mobilenet224v1": mobilenet_unmold_image
+        "mobilenet224v1": mobilenet_unmold_image,
+        "mobilenetv2": mobilenet_unmold_image
     }
 
     #if config.BACKBONE not in unmold_image_dict:
     return resnet_unmold_image(images, config)
     #return unmold_image_dict[config.BACKBONE](images, config)
-
 
 ############################################################
 #  Miscellenous Graph Functions
