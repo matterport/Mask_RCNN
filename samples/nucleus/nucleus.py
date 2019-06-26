@@ -119,7 +119,7 @@ class NucleusConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0
 
     # Backbone network architecture
-    # Supported values are: resnet50, resnet101
+    # Supported values are: resnet50, resnet101, mobilenet224v1
     BACKBONE = "resnet50"
 
     # Input image resizing

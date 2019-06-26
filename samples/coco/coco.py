@@ -25,6 +25,13 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
     # Run COCO evaluatoin on the last model you trained
     python3 coco.py evaluate --dataset=/path/to/coco/ --model=last
+
+    # Train a MobileNet224v1 model starting from ImageNet weights
+    python3 coco.py train --dataset=/path/to/coco/ --model=imagenet --backbone=mobilenet224v1
+
+    # Continue training the last MobileNet224v1 model you trained
+    python3 coco.py train --dataset=/path/to/coco/ --model=last --backbone=mobilenet224v1
+
 """
 
 import os
@@ -78,7 +85,7 @@ class CocoConfig(Config):
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 1 #2
 
     # Uncomment to train on 8 GPUs (default is 1)
     # GPU_COUNT = 8
@@ -365,7 +372,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
 
         # Run detection
         t = time.time()
+        #print('image', image.shape)
         r = model.detect([image], verbose=0)[0]
+        print('r', r)
         t_prediction += (time.time() - t)
 
         # Convert results to COCO format
@@ -428,6 +437,15 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
+    parser.add_argument('--backbone', required=False,
+                        default="resnet50",
+                        metavar="<backbone>",
+                        help='Feature Pyramid Network backbone type')
+    parser.add_argument('--train_bn', required=False,
+                        default=False,
+                        metavar="<True|False>",
+                        help='Train batch norm layers (default=False)',
+                        type=bool)
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -435,6 +453,7 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
+    print("Backbone: ", args.backbone)
 
     # Configurations
     if args.command == "train":
@@ -445,9 +464,19 @@ if __name__ == '__main__':
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
-            DETECTION_MIN_CONFIDENCE = 0
+            DETECTION_MIN_CONFIDENCE = 0.00001
+
         config = InferenceConfig()
+        #config = CocoConfig()
+
+    utils.configure_backbone(config, args.backbone)
+
     config.display()
+
+
+    if args.train_bn:
+        config.TRAIN_BN = True
+
 
     # Create model
     if args.command == "train":
@@ -493,33 +522,39 @@ if __name__ == '__main__':
         # Right/Left flip 50% of the time
         augmentation = imgaug.augmenters.Fliplr(0.5)
 
-        # *** This training schedule is an example. Update to your needs ***
+        stage_2_layers = '4+'
+        
+        if config.BACKBONE == "mobilenetv2":
+            stage_2_layers = '4M+'
+            #config.LEARNING_RATE /= 10
 
+        # *** This training schedule is an example. Update to your needs ***
         # Training - Stage 1
         print("Training network heads")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
+                    learning_rate=config.LEARNING_RATE, #*10, #*100, #/100, #/10,
                     epochs=40,
                     layers='heads',
                     augmentation=augmentation)
 
+
         # Training - Stage 2
-        # Finetune layers from ResNet stage 4 and up
-        print("Fine tune Resnet stage 4 and up")
+        # Finetune layers from stage 4 and up
+        print("Fine tune stage 4 and up")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
+                    learning_rate=config.LEARNING_RATE,#*10, #/100, #/10,
                     epochs=120,
-                    layers='4+',
+                    layers=stage_2_layers,
                     augmentation=augmentation)
 
         # Training - Stage 3
         # Fine tune all layers
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
+                    learning_rate=config.LEARNING_RATE/10,# / 10, #1000, #0,
                     epochs=160,
                     layers='all',
-                    augmentation=augmentation)
+                    augmentation=augmentation) 
 
     elif args.command == "evaluate":
         # Validation dataset

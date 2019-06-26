@@ -300,6 +300,10 @@ if __name__ == '__main__':
     parser.add_argument('--video', required=False,
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
+    parser.add_argument('--backbone', required=False,
+                        default="resnet50",
+                        metavar="<backbone>",
+                        help='Feature Pyramid Network backbone type')
     args = parser.parse_args()
 
     # Validate arguments
@@ -312,6 +316,7 @@ if __name__ == '__main__':
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
+    print("Backbone: ", args.backbone)
 
     # Configurations
     if args.command == "train":
@@ -323,7 +328,11 @@ if __name__ == '__main__':
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
         config = InferenceConfig()
+
+    utils.configure_backbone(config, args.backbone)
+
     config.display()
+
 
     # Create model
     if args.command == "train":

@@ -11,6 +11,7 @@ The repository includes:
 * Jupyter notebooks to visualize the detection pipeline at every step
 * ParallelModel class for multi-GPU training
 * Evaluation on MS COCO metrics (AP)
+* Optional MobileNetV1 backbone for lightweight models
 * Example of training on your own dataset
 
 
@@ -95,15 +96,21 @@ python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=/path/to/wei
 # Continue training the last model you trained. This will find
 # the last trained weights in the model directory.
 python3 samples/coco/coco.py train --dataset=/path/to/coco/ --model=last
+
+# Continue training the last MobileNet224v1 model you trained
+python3 coco.py train --dataset=/path/to/coco/ --model=last --backbone=mobilenet224v1
 ```
 
 You can also run the COCO evaluation code with:
 ```
-# Run COCO evaluation on the last trained model
+# Run COCO evaluation on the last trained Resnet50 model
 python3 samples/coco/coco.py evaluate --dataset=/path/to/coco/ --model=last
+
+# Run COCO evaluation on the last trained Mobilenet224v1 model
+python3 samples/coco/coco.py evaluate --dataset=/path/to/coco/ --model=last --backbone=mobilenet224v1
 ```
 
-The training schedule, learning rate, and other parameters should be set in `samples/coco/coco.py`.
+The training schedule, learning rate, and other parameters should be set in `samples/coco/coco.py`. If you are using `mobile_mask_rcnn_coco.h5` weights for Mobilenet224v1, replace `mask_rcnn_coco.h5` with those weights.
 
 
 # Training on Your Own Dataset

@@ -25,7 +25,7 @@ from distutils.version import LooseVersion
 
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
-
+COCO_MOB_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mobile_mask_rcnn_coco.h5"
 
 ############################################################
 #  Bounding Boxes
@@ -643,6 +643,24 @@ def generate_pyramid_anchors(scales, ratios, feature_shapes, feature_strides,
 #  Miscellaneous
 ############################################################
 
+
+def configure_backbone(config, backbone_name):
+    """Set the config backbone to the requested architecture, or
+    raise an exception if not supported.
+
+    config: Model run configuration.
+    backbone_name: User-supplied backbone name.
+    """
+
+    supported_architectures = ["resnet50", "resnet101", "mobilenetv2"]
+
+    # Configure backbone architecture
+    if backbone_name.lower() in supported_architectures:
+        config.BACKBONE = backbone_name.lower()
+    else:
+        raise Exception("Unsupported backbone " + backbone_name)
+
+
 def trim_zeros(x):
     """It's common to have tensors larger than the available data and
     pad with zeros. This function removes rows that are all zeros.
@@ -837,14 +855,22 @@ def batch_slice(inputs, graph_fn, batch_size, names=None):
     return result
 
 
-def download_trained_weights(coco_model_path, verbose=1):
+def download_trained_weights(coco_model_path, verbose=1, backbone="resnet50"):
     """Download COCO trained weights from Releases.
 
     coco_model_path: local path of COCO trained weights
     """
+
+    if "resnet" in backbone:
+        download_url = COCO_MODEL_URL
+    elif "mobilenet" in backbone:
+        download_url = COCO_MOB_MODEL_URL
+    else:
+        raise Exception("Unsupported backbone " + backbone)
+
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
-    with urllib.request.urlopen(COCO_MODEL_URL) as resp, open(coco_model_path, 'wb') as out:
+    with urllib.request.urlopen(download_url) as resp, open(coco_model_path, 'wb') as out:
         shutil.copyfileobj(resp, out)
     if verbose > 0:
         print("... done downloading pretrained model!")
