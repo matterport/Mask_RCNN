@@ -21,9 +21,8 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     # Continue training the last model you trained
     python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=last
 
-    #TODO
-    # Run VOC evaluatoin on the last model you trained
-    python3 voc.py evaluate --dataset=/path/to/VOCdevkit/ --model=last
+    # Run VOC inference on the last model you trained
+    python3 voc.py inference --dataset=/path/to/VOCdevkit/ --model=last --year=2012 --limit=50
 """
 
 
@@ -40,11 +39,19 @@ import imgaug
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
+# Inference result directory
+RESULTS_DIR = os.path.abspath("./inference/")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
+from mrcnn import visualize
+
+import matplotlib
+# Agg backend runs without a display
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 DEFAULT_DATASET_YEAR = '2012'
@@ -110,7 +117,7 @@ class VocDataset(utils.Dataset):
         SegmentationClass = os.path.join(dataset_dir, voc_year, 'SegmentationClass')
         SegmentationObject = os.path.join(dataset_dir, voc_year, 'SegmentationObject')
 
-        # load classes of VOC, BG is initialed in parent clas.
+        # load classes of VOC, BG is initialed in parent class.
         for idx, class_name in enumerate(VOC_CLASSES[1:]):
             self.add_class("voc", idx + 1, class_name)
 
@@ -211,6 +218,45 @@ class VocDataset(utils.Dataset):
         return masks, classes_ids
 
 
+############################################################
+#  Inference
+############################################################
+
+def inference(model, dataset, limit):
+    """Run detection on images in the given directory."""
+
+    # Create directory
+    if not os.path.exists(RESULTS_DIR):
+        os.makedirs(RESULTS_DIR)
+    time_dir = "{:%Y%m%dT%H%M%S}".format(datetime.datetime.now())
+    time_dir = os.path.join(RESULTS_DIR, time_dir)
+    os.makedirs(time_dir)
+
+    # Load over images
+    for image_id in dataset.image_ids[:limit]:
+        # Load image and run detection
+        image = dataset.load_image(image_id)
+        # Detect objects
+        r = model.detect([image], verbose=0)[0]
+        # Encode image to RLE. Returns a string of multiple lines
+        source_id = dataset.image_info[image_id]["id"]
+        # Save image with masks
+        if len(r['class_ids']) > 0:
+            print('[*] {}th image has {} instance(s).'.format(image_id, len(r['class_ids'])))
+            visualize.display_instances(
+                image, r['rois'], r['masks'], r['class_ids'],
+                dataset.class_names, r['scores'],
+                show_bbox=False, show_mask=False,
+                title="Predictions")
+            plt.savefig("{}/{}.png".format(time_dir, dataset.image_info[image_id]["id"]))
+            plt.close()
+        else:
+            plt.imshow(image)
+            plt.savefig("{}/noinstance_{}.png".format(time_dir, dataset.image_info[image_id]["id"]))
+            print('[*] {}th image have no instance.'.format(image_id))
+            plt.close()
+
+
 if __name__ == '__main__':
     import argparse
 
@@ -219,7 +265,7 @@ if __name__ == '__main__':
         description='Train Mask R-CNN on PASCAL VOC.')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train' or 'evaluate' on PASCAL VOC")
+                        help="'train' or 'inference' on PASCAL VOC")
     parser.add_argument('--dataset', required=True,
                         metavar="/path/to/voc/",
                         help='Directory of the PASCAL VOC dataset')
@@ -331,14 +377,14 @@ if __name__ == '__main__':
                     layers='all',
                     augmentation=augmentation)
 
-    elif args.command == "evaluate":
-        print("evaluate have not been implemented")
+    elif args.command == "inference":
+        #print("evaluate have not been implemented")
         # Validation dataset
-        #dataset_val = VocDataset()
-        #voc = dataset_val.load_voc(args.dataset, "val", year=args.year)
-        #dataset_val.prepare()
-        #print("Running voc evaluation on {} images.".format(args.limit))
-        #evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
+        dataset_val = VocDataset()
+        voc = dataset_val.load_voc(args.dataset, "val", year=args.year)
+        dataset_val.prepare()
+        print("Running voc inference on {} images.".format(args.limit))
+        inference(model, dataset_val, int(args.limit))
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))
