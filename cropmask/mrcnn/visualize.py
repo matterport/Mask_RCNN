@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patches, lines
 from matplotlib.patches import Polygon
 import IPython.display
+from rasterio.plot import reshape_as_image
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -37,6 +38,9 @@ def normalize(arr):
     arr_max = np.max(arr)
     return arr / arr_max
 
+def norm_rgb(image):
+    """Takes and RGB ordered image and returns normalized array"""
+    return reshape_as_image(np.stack([normalize(image[:,:,0]),normalize(image[:,:,1]),normalize(image[:,:,2])]))
 
 def reorder_to_brg(image):
     """reorders wv2 bands ordered like RGBNRGN for off/onseason
@@ -641,7 +645,7 @@ def draw_boxes(
         brg_adap = exposure.equalize_adapthist(brg, clip_limit=0.0055)
         ax.imshow(brg_adap)
     else:
-        ax.imshow(masked_image.astype(np.uint8))
+        ax.imshow(norm_rgb(masked_image))
 
 
 def display_table(table):

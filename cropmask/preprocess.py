@@ -36,7 +36,6 @@ class PreprocessWorkflow():
          # the folder structure for the unique run
         self.ROOT = params['dirs']["root"]
         self.TMP = params['dirs']["tmp"]
-        assert os.path.exists(self.ROOT)
         self.DATASET = os.path.join(self.ROOT, params['dirs']["dataset"])
         self.STACKED = os.path.join(self.DATASET, params['dirs']["stacked"])
         self.TRAIN = os.path.join(self.DATASET, params['dirs']["train"])

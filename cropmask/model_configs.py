@@ -64,7 +64,7 @@ class LandsatConfig(Config):
     #     IMAGE_MIN_SCALE = 2.0
 
     # anchor side in pixels, determined using inspect_crop_data.ipynb. can specify more or less scales
-    RPN_ANCHOR_SCALES = (32, 64, 128)  # for cp
+    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)  # for cp
 
     # Aim to allow ROI sampling to pick 33% positive ROIs. This is always 33% in inspect_data nb, unsure if that is accurate.
     TRAIN_ROIS_PER_IMAGE = 600
@@ -125,6 +125,8 @@ class LandsatInferenceConfig(LandsatConfig):
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
     RPN_NMS_THRESHOLD = 0.7
+    #must be set to what pretrained resnet model expects, see https://github.com/matterport/Mask_RCNN/issues/1291
+    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
 
 
 class WV2Config(Config):
