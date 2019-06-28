@@ -11,6 +11,8 @@ Training on VOC Written by genausz(genausz@hotmail.com)
 -----------------------------------------------------------------------------------------
 Usage: import the module (see Jupyter notebooks for examples), or run from
        the command line as such:
+    # Train a model from coco weights.
+    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=coco --year=2012
 
     # Train a new model starting from ImageNet weights.
     python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=imagenet --year=2012
