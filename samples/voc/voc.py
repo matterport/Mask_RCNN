@@ -56,6 +56,8 @@ import matplotlib.pyplot as plt
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 DEFAULT_DATASET_YEAR = '2012'
 
+COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
 
 # VOC DATASET MASK MAP FUNCTION
 # Following codes are mapping each mask color(SegmentationClass) to ground truth index.
@@ -318,7 +320,9 @@ if __name__ == '__main__':
 
 
     # Select weights file to load
-    if args.model.lower() == "last":
+    if args.model.lower() == "coco":
+        model_path = COCO_WEIGHTS_PATH
+    elif args.model.lower() == "last":
         # Find last trained weights
         model_path = model.find_last()
     elif args.model.lower() == "imagenet":
@@ -328,8 +332,15 @@ if __name__ == '__main__':
         model_path = args.model
 
     # Load weights
-    print("Loading weights ", model_path)
-    model.load_weights(model_path, by_name=True)
+    if args.model.lower() == "coco":
+        # Exclude the last layers because they require a matching
+        # number of classes
+        model.load_weights(model_path, by_name=True, exclude=[
+            "mrcnn_class_logits", "mrcnn_bbox_fc",
+            "mrcnn_bbox", "mrcnn_mask"])
+    else:
+        print("Loading weights ", model_path)
+        model.load_weights(model_path, by_name=True)
 
 
     # Train or evaluate
