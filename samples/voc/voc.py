@@ -250,15 +250,16 @@ def inference(model, dataset, limit):
             visualize.display_instances(
                 image, r['rois'], r['masks'], r['class_ids'],
                 dataset.class_names, r['scores'],
-                show_bbox=False, show_mask=False,
+                show_bbox=True, show_mask=True,
                 title="Predictions")
-            plt.savefig("{}/{}.png".format(time_dir, dataset.image_info[image_id]["id"]))
+            plt.savefig("{}/{}".format(time_dir, dataset.image_info[image_id]["id"]))
             plt.close()
         else:
             plt.imshow(image)
-            plt.savefig("{}/noinstance_{}.png".format(time_dir, dataset.image_info[image_id]["id"]))
+            plt.savefig("{}/noinstance_{}".format(time_dir, dataset.image_info[image_id]["id"]))
             print('[*] {}th image have no instance.'.format(image_id))
             plt.close()
+
 
 
 if __name__ == '__main__':
@@ -270,7 +271,7 @@ if __name__ == '__main__':
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'inference' on PASCAL VOC")
-    parser.add_argument('--dataset', required=True,
+    parser.add_argument('--dataset', required=False,
                         metavar="/path/to/voc/",
                         help='Directory of the PASCAL VOC dataset')
     parser.add_argument('--year', required=False,
@@ -285,9 +286,10 @@ if __name__ == '__main__':
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--limit', required=False,
-                        default=500,
+                        default=10,
                         metavar="<image count>",
-                        help='Images to use for evaluation (default=500)')
+                        help='Images to use for evaluation (default=10)')
+
     # TODO
     '''
     parser.add_argument('--download', required=False,
@@ -400,5 +402,5 @@ if __name__ == '__main__':
         inference(model, dataset_val, int(args.limit))
     else:
         print("'{}' is not recognized. "
-              "Use 'train' or 'evaluate'".format(args.command))
+              "Use 'train' or 'inference'".format(args.command))
 
