@@ -239,3 +239,14 @@ A computer vision class project by HU Shiyu to apply the color pop effect on peo
 
 ### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
 ![GRASS GIS Image](assets/project_grass_gis.png)
+
+## Clevr
+python3 clevr.py train --dataset=/path/to/dataset --json=/path/to/CLEVR_scenes.json --weights=coco
+
+### Steps:
+1. Generate new images from https://github.com/rimamittal/clevr-dataset-gen. The code has been modified to generate masks as well. This can be run on a GPU(used colab).
+2. Run MaskRCNN on Clevr 
+
+### Results:
+![](assets/clevr-predictions2.png)
+![](assets/clevr-predictions.png)
