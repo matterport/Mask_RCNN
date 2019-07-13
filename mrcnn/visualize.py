@@ -83,7 +83,7 @@ def apply_mask(image, mask, color, alpha=0.5):
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
-                      show_mask=True, show_bbox=True,
+                      show_mask=True, show_bbox=False,
                       colors=None, captions=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
@@ -132,7 +132,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         if show_bbox:
             p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
                                 alpha=0.7, linestyle="dashed",
-                                edgecolor=color, facecolor='none')
+                                edgecolor="none", facecolor='none')
             ax.add_patch(p)
 
         # Label
@@ -140,11 +140,12 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             class_id = class_ids[i]
             score = scores[i] if scores is not None else None
             label = class_names[class_id]
+            x = random.randint(x1, (x1 + x2) // 2)
             caption = "{} {:.3f}".format(label, score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+#         ax.text(x1, y1 + 8, caption,
+#                 color='w', size=11, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -161,10 +162,11 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             # Subtract the padding and flip (y, x) to (x, y)
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
-            ax.add_patch(p)
-    ax.imshow(masked_image.astype(np.uint8))
-    if auto_show:
-        plt.show()
+#             ax.add_patch(p)
+#     ax.imshow(masked_image.astype(np.uint8))
+#     if auto_show:
+#         plt.show()
+        return mask
 
 
 def display_differences(image,
@@ -435,6 +437,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
             # If there are refined boxes, display captions on them
             if refined_boxes is not None:
                 y1, x1, y2, x2 = ry1, rx1, ry2, rx2
+            x = random.randint(x1, (x1 + x2) // 2)
             ax.text(x1, y1, caption, size=11, verticalalignment='top',
                     color='w', backgroundcolor="none",
                     bbox={'facecolor': color, 'alpha': 0.5,
