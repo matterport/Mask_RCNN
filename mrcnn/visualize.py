@@ -166,6 +166,57 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     if auto_show:
         plt.show()
 
+def getmask(image, boxes, masks, class_ids, class_names,class_names_selected,
+                      scores=None):
+    """
+    boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
+    masks: [height, width, num_instances]
+    class_ids: [num_instances]
+    class_names: list of class names of the dataset
+    class_names_selected:list of class names of the dataset that you want masks for.
+    scores: (optional) confidence scores for each box
+    title: (optional) Figure title
+    show_mask, show_bbox: To show masks and bounding boxes or not
+    figsize: (optional) the size of the image
+    colors: (optional) An array or colors to use with each object
+    captions: (optional) A list of strings to use as captions for each object
+    """
+    # Number of instances
+    N = boxes.shape[0]
+    colors = random_colors(N)
+    if not N:
+        print("\n*** No instances to display *** \n")
+    else:
+        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
+    # print("\nsxniahahaobc=======\n")
+    # If no axis is passed, create one and automatically call show()
+    height, width = image.shape[:2]
+    masked_image = image.astype(np.uint32).copy()
+    imgmasks=[]
+    boxespoints=[]
+    for i in range(N):
+        color = colors[0]
+        if class_names[class_ids[i]] not in class_names_selected:
+            continue
+        # Bounding box
+        if not np.any(boxes[i]):
+            # Skip this instance. Has no bbox. Likely lost in image cropping.
+            continue
+        y1, x1, y2, x2 = boxes[i]
+        boxespoints.append((y1, x1, y2, x2))
+        mask = masks[:, :, i]
+        masked_image = apply_mask(masked_image, mask, color)
+        # plt.imsave("mask"+str(i),mask)
+        # Mask Polygon
+        # Pad to ensure proper polygons for masks that touch image edges.
+        # padded_mask = np.zeros(
+        #     (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
+        # padded_mask[1:-1, 1:-1] = mask
+        imgmasks.append(mask)
+        #img masks contains list of mask 
+        #boxpoints contains list of boxes for the masks
+        #masked_image is the image wit mask applied on it
+    return imgmasks,boxespoints,masked_image
 
 def display_differences(image,
                         gt_box, gt_class_id, gt_mask,
