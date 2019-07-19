@@ -46,7 +46,8 @@ from imgaug import augmenters as iaa
 from cropmask.preprocess import PreprocessWorkflow
 from cropmask import datasets, model_configs
 from cropmask.mrcnn import model as modellib
-from cropmask.mrcnn import visualize, utils
+from cropmask.mrcnn import visualize
+import numpy as np
 
 # Path to trained weights file
 ROOT_DIR = "/home/ryan/work/CropMask_RCNN"
@@ -69,19 +70,15 @@ def train(model, dataset_dir, subset, config):
     """Train the model."""
     # Training dataset.
     dataset_train = datasets.ImageDataset()
-# close but not quite string manipulating. TODO remove hardcoding
-#     path_element_list = dataset_dir.split("/")
-#     split_dir = os.path.join('/'.join(path_element_list[:-2]),"results",path_element_list[-1])
-    split_dir="/mnt/azureml-filestore-896933ab-f4fd-42b2-a154-0abb35dfb0b0/results/landsat-1024-cp/"
     dataset_train.load_imagery(
-        dataset_dir, "train", image_source="landsat", class_name="agriculture", train_test_split_dir=split_dir
+        dataset_dir, "train", image_source="landsat", class_name="agriculture"
     )
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = datasets.ImageDataset()
     dataset_val.load_imagery(
-        dataset_dir, "test", image_source="landsat", class_name="agriculture", train_test_split_dir=split_dir
+        dataset_dir, "test", image_source="landsat", class_name="agriculture"
     )
     dataset_val.prepare()
 
@@ -177,21 +174,21 @@ def mask_to_rle(image_id, mask, scores):
 ############################################################
 
 
-def detect(model, dataset_dir, subset):
+def detect(model, dataset_dir, subset, wflow):
     """Run detection on images in the given directory."""
     print("Running on {}".format(dataset_dir))
 
     # Create directory
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
+    if not os.path.exists(wflow.RESULTS):
+        os.makedirs(wflow.RESULTS)
     submit_dir = "submit_{:%Y%m%dT%H%M%S}".format(datetime.datetime.now())
-    submit_dir = os.path.join(RESULTS_DIR, submit_dir)
+    submit_dir = os.path.join(wflow.RESULTS, submit_dir)
     os.makedirs(submit_dir)
 
     # Read dataset
     dataset = datasets.ImageDataset(3)
     dataset.load_imagery(
-        dataset_dir, subset, image_source="landsat", class_name="agriculture"
+        dataset_dir, subset, image_source="landsat", class_name="agriculture", train_test_split_dir=wflow.RESULTS
     )
     dataset.prepare()
     # Load over images
@@ -342,7 +339,7 @@ if __name__ == "__main__":
             print(os.getcwd(), "current working dir")
             train(model, args.dataset, args.subset, config)
         elif args.command == "detect":
-            detect(model, args.dataset, args.subset, config)
+            detect(model, args.dataset, args.subset, wflow)
         else:
             print(
                 "'{}' is not recognized. "
