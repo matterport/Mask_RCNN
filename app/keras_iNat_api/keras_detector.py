@@ -22,7 +22,7 @@ def load_model(checkpoint):
     """
     config = model_configs.LandsatInferenceConfig(3)
     print('keras_detector.py: Loading model weights...')
-    LOGS_DIR = "/mnt/azure_file_share/logs"
+    LOGS_DIR = "/app/keras_iNat_api/logs"
     model = modellib.MaskRCNN(mode="inference",
                               model_dir=LOGS_DIR,
                               config=config)
