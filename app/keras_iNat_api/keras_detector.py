@@ -62,9 +62,9 @@ def generate_detections(model, image):
     image_np = np.asarray(image, np.uint8)
     image_np = image_np[:, :, :3] # Remove the alpha channel
 
-    result = model.detect([image], verbose=1)
+    result = model.detect([image_np], verbose=1)
     r = result[0]
-    return r['rois'], r['class_ids'], r['scores'], r['masks'], image_np # these are lists of bboxes, scores etc
+    return r['rois'], r['class_ids'], r['scores'], r['masks'], image # these are lists of bboxes, scores etc
 
 
 # Rendering functions

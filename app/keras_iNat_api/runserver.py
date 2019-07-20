@@ -11,10 +11,11 @@ from os import getenv
 import uuid
 import sys
 import numpy as np
+import traceback
 
 print("Creating Application")
 
-ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg']
+ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg', 'image/tiff']
 blob_access_duration_hrs = 1
 
 app = Flask(__name__)
@@ -50,7 +51,7 @@ def process_request_data(request):
     request_processing_function = process_request_data, # This is the data process function that you created above.
     maximum_concurrent_requests = 5, # If the number of requests exceed this limit, a 503 is returned to the caller.
     content_types = ACCEPTED_CONTENT_TYPES,
-    content_max_length = 10000, # In bytes
+    content_max_length = 1000000000, # In bytes
     trace_name = 'post:detect')
 def detect(*args, **kwargs):
     print('runserver.py: detect() called, generating detections...')
@@ -94,7 +95,7 @@ def detect(*args, **kwargs):
         print('runserver.py: detect() finished.')
     except:
         log.log_exception(sys.exc_info()[0], taskId)
-        ai4e_service.api_task_manager.FailTask(taskId, 'failed: ' + str(sys.exc_info()[0]))
+        ai4e_service.api_task_manager.FailTask(taskId, 'failed: ' + str(sys.exc_info()[0])+'\n'+str(traceback.format_exc()))
 
 if __name__ == '__main__':
     app.run()
