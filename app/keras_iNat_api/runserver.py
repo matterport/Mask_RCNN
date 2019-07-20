@@ -15,7 +15,7 @@ import traceback
 
 print("Creating Application")
 
-ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg']
+ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg'. 'image/tiff']
 blob_access_duration_hrs = 1
 
 app = Flask(__name__)
@@ -46,7 +46,7 @@ def process_request_data(request):
     request_processing_function = process_request_data, # This is the data process function that you created above.
     maximum_concurrent_requests = 5, # If the number of requests exceed this limit, a 503 is returned to the caller.
     content_types = ACCEPTED_CONTENT_TYPES,
-    content_max_length = 1000000000, # In bytes
+    content_max_length = 10000000000, # In bytes
     trace_name = 'post:detect')
 def detect(*args, **kwargs):
     print('runserver.py: detect() called, generating detections...')
@@ -57,16 +57,17 @@ def detect(*args, **kwargs):
     ai4e_service.api_task_manager.UpdateTaskStatus(taskId, 'running - generate_detections')
 
     try:
-        image = keras_detector.open_image(image_bytes)
+        arr_for_detection, image_for_drawing = keras_detector.open_image(image_bytes)
+        ai4e_service.api_task_manager.UpdateTaskStatus(taskId, 'running - image opened, generating detections')
         #TO DO visualize masks
-        rois, clsses, scores, masks, image = keras_detector.generate_detections(image)
+        rois, clsses, scores, masks = keras_detector.generate_detections(arr_for_detection)
 
         ai4e_service.api_task_manager.UpdateTaskStatus(taskId, 'rendering boxes')
 
         # image is modified in place
         # here confidence_threshold is hardcoded, but you can ask that as a input from the request
         keras_detector.render_bounding_boxes(
-            rois, scores, clsses, image, confidence_threshold=0.5)
+            rois, scores, clsses, image_for_drawing, confidence_threshold=0.5)
 
         print('runserver.py: detect(), rendering and saving result image...')
         # save the PIL Image object to a ByteIO stream so that it can be written to blob storage
