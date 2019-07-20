@@ -15,7 +15,7 @@ import traceback
 
 print("Creating Application")
 
-ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg'. 'image/tiff']
+ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg', 'image/tiff']
 blob_access_duration_hrs = 1
 
 app = Flask(__name__)

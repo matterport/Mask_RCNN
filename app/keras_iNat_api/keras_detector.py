@@ -28,7 +28,7 @@ def open_image(image_bytes):
     #     image = image.convert(mode='RGB')
     # return image
 
-    arr = skio.imread(image_bytes)
+    arr = skio.imread(image_bytes, plugin='imageio')
     # returns the array for detection and the PIL img object for drawing since model trianed on flaot 32
     # and PIL can't read tiff (float32) and png and jpeg don't support float 32
     return arr , Image.fromarray(np.unint16(arr), mode='RGB')
