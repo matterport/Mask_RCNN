@@ -15,7 +15,7 @@ import traceback
 
 print("Creating Application")
 
-ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg', 'image/tiff']
+ACCEPTED_CONTENT_TYPES = ['image/png', 'application/octet-stream', 'image/jpeg']
 blob_access_duration_hrs = 1
 
 app = Flask(__name__)
@@ -27,11 +27,6 @@ log = AI4EAppInsights()
 # handles SIGTERM signals from AKS, etc., and handles concurrent requests.
 with app.app_context():
     ai4e_service = APIService(app, log)
-
-# Load the model
-# The model was copied to this location when the container was built; see ../Dockerfile
-model_path = '/app/keras_iNat_api/mask_rcnn_landsat-512-cp_0042.h5'
-model = keras_detector.load_model(model_path)
 
 # Define a function for processing request data, if appliciable.  This function loads data or files into
 # a dictionary for access in your API function.  We pass this function as a parameter to your API setup.
@@ -64,8 +59,7 @@ def detect(*args, **kwargs):
     try:
         image = keras_detector.open_image(image_bytes)
         #TO DO visualize masks
-        rois, clsses, scores, masks, image = keras_detector.generate_detections(
-            model, image)
+        rois, clsses, scores, masks, image = keras_detector.generate_detections(image)
 
         ai4e_service.api_task_manager.UpdateTaskStatus(taskId, 'rendering boxes')
 

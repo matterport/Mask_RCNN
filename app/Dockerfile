@@ -20,8 +20,6 @@ RUN ./ai4e_api_tools/requirements/install-azure-blob.sh
 # Install Application Insights
 RUN ./ai4e_api_tools/requirements/install-appinsights.sh
 
-# Install Opencensus
-RUN ./ai4e_api_tools/requirements/install-opencensus.sh
 EXPOSE 55678 50001
 
 # Now add our custom image commands ---------------------------------------------------
@@ -44,16 +42,12 @@ COPY ./supervisord.conf /etc/supervisord.conf
 COPY ./startup.sh /
 RUN chmod +x /startup.sh
 
-COPY ./LocalForwarder.config /lf/
-
 # Copy your API code
 COPY ./keras_iNat_api /app/keras_iNat_api/
 
 # Application Insights keys and trace configuration
 ENV APPINSIGHTS_INSTRUMENTATIONKEY= \
-    APPINSIGHTS_LIVEMETRICSSTREAMAUTHENTICATIONAPIKEY= \
-    LOCALAPPDATA=/app_insights_data \
-    OCAGENT_TRACE_EXPORTER_ENDPOINT=localhost:55678
+    TRACE_SAMPLING_RATE=1.0
 
 # The following variables will allow you to filter logs in AppInsights
 ENV SERVICE_OWNER=AI4E_PyTorch_Example \
@@ -75,5 +69,3 @@ HEALTHCHECK --interval=1m --timeout=3s --start-period=20s \
 ENTRYPOINT [ "/startup.sh" ]
 # Use the following entrypoint to debug bridge issues.
 #ENTRYPOINT ["uwsgi", "--chdir", "/app/keras_iNat_api/", "--virtualenv", "/usr/local/envs/ai4e_py_api", "--http", "0.0.0.0:80", "--callable", "app", "--enable-threads", "--wsgi-file", "/app/keras_iNat_api/runserver.py", "--wsgi-disable-file-wrapper"]
-
-       

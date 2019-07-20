@@ -7,9 +7,9 @@ import PIL.ImageFont as ImageFont
 #custom package for loading configs, model class and detection func
 from cropmask import model_configs
 from cropmask.mrcnn import model as modellib
+import tensorflow as tf
 
 # Core detection functions
-
 
 def load_model(checkpoint):
     """Load a detection model (i.e., create a graph) from a .pb file.
@@ -49,7 +49,7 @@ def open_image(image_bytes):
     return image
 
 
-def generate_detections(model, image):
+def generate_detections(image):
     """ Generates a set of bounding boxes with confidence and class prediction for one input image file.
 
     Args:
@@ -59,17 +59,29 @@ def generate_detections(model, image):
     Returns:
         boxes, scores, classes, and the image loaded from the input image_file - for one image
     """
+    config = model_configs.LandsatInferenceConfig(3)
+    print('keras_detector.py: Loading model weights...')
+    LOGS_DIR = "/app/keras_iNat_api/logs"
+    with tf.device("/cpu:0"):
+      model = modellib.MaskRCNN(mode="inference",
+                                model_dir=LOGS_DIR,
+                                config=config)
+    model_path = '/app/keras_iNat_api/mask_rcnn_landsat-512-cp_0042.h5'
+    model.load_weights(model_path, by_name=True)
+    print('keras_detector.py: Model weights loaded.')
+
+    # Load the model
+    # The model was copied to this location when the container was built; see ../Dockerfile
+    # model_path = '/app/keras_iNat_api/mask_rcnn_landsat-512-cp_0042.h5'
+    # model = load_model(model_path)
+
     image_np = np.asarray(image, np.uint8)
     image_np = image_np[:, :, :3] # Remove the alpha channel
-
     result = model.detect([image_np], verbose=1)
     r = result[0]
     return r['rois'], r['class_ids'], r['scores'], r['masks'], image # these are lists of bboxes, scores etc
 
-
 # Rendering functions
-
-
 def render_bounding_boxes(boxes, scores, classes, image, label_map={}, confidence_threshold=0.5):
     """Renders bounding boxes, label and confidence on an image if confidence is above the threshold.
 
