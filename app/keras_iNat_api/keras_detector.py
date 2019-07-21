@@ -9,6 +9,8 @@ from cropmask import model_configs
 from cropmask.mrcnn import model as modellib
 import tensorflow as tf
 import skimage.io as skio
+import rasterio as rio
+from rasterio.plot import reshape_as_image
 
 # Core detection functions
 
@@ -28,10 +30,11 @@ def open_image(image_bytes):
     #     image = image.convert(mode='RGB')
     # return image
 
-    arr = skio.imread(image_bytes, plugin='imageio')
+    img = rio.open(image_bytes)
+    arr = reshape_as_image(img.read())
     # returns the array for detection and the PIL img object for drawing since model trianed on flaot 32
     # and PIL can't read tiff (float32) and png and jpeg don't support float 32
-    return arr , Image.fromarray(np.unint16(arr), mode='RGB')
+    return arr, Image.fromarray(np.unint16(arr), mode='RGB')
 
 
 
