@@ -9,6 +9,7 @@ Written by Waleed Abdulla
 
 import sys
 import os
+import logging
 import math
 import random
 import numpy as np
@@ -378,6 +379,7 @@ class Dataset(object):
         """
         # Override this function to load a mask from your dataset.
         # Otherwise, it returns an empty mask.
+        logging.warning("You are using the default load_mask(), maybe you need to define your own one.")
         mask = np.empty([0, 0, 0])
         class_ids = np.empty([0], np.int32)
         return mask, class_ids

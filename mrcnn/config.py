@@ -129,7 +129,7 @@ class Config(object):
     # Minimum scaling ratio. Checked after MIN_IMAGE_DIM and can force further
     # up scaling. For example, if set to 2 then images are scaled up to double
     # the width and height, or more, even if MIN_IMAGE_DIM doesn't require it.
-    # Howver, in 'square' mode, it can be overruled by IMAGE_MAX_DIM.
+    # However, in 'square' mode, it can be overruled by IMAGE_MAX_DIM.
     IMAGE_MIN_SCALE = 0
     # Number of color channels per image. RGB = 3, grayscale = 1, RGB-D = 4
     # Changing this requires other changes in the code. See the WIKI for more
