@@ -2696,7 +2696,12 @@ class MaskRCNN():
             "all": ".*",
         }
         '''
-
+        layer_regex = {
+            # all layers but the backbone
+            "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            # All layers
+            "all": ".*",
+        }
         if self.config.BACKBONE in ["resnet50", "resnet101"]:
             # From a specific Resnet stage and up
             stage_regex = { "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
