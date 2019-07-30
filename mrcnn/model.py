@@ -1229,6 +1229,35 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
 
+def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, strides=(1, 1), block_id=1, train_bn=False):
+    """Similiar to the _depthwise_conv_block used in the Backbone,
+    but with each layer wrapped in a TimeDistributed layer,
+    used to build the computation graph of the mask head of the FPN.
+    """
+    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
+
+    # Depthwise
+    x = KL.TimeDistributed(KL.DepthwiseConv2D(
+                    (3, 3),
+                    padding='same',
+                    depth_multiplier=1,
+                    strides=strides,
+                    use_bias=False),
+                    name='mrcnn_mask_conv_dw_{}'.format(block_id))(inputs)
+    x = KL.TimeDistributed(BatchNorm(axis=channel_axis),
+                    name='mrcnn_mask_conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
+    x = KL.Activation(relu6, name='mrcnn_mask_conv_dw_{}_relu'.format(block_id))(x)
+    # Pointwise
+    x = KL.TimeDistributed(KL.Conv2D(pointwise_conv_filters,
+                    (1, 1),
+                    padding='same',
+                    use_bias=False,
+                    strides=(1, 1)),
+                    name='mrcnn_mask_conv_pw_{}'.format(block_id))(x)
+    x = KL.TimeDistributed(BatchNorm(
+                    axis=channel_axis),
+                    name='mrcnn_mask_conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
+    return KL.Activation(relu6, name='mrcnn_mask_conv_pw_{}_relu'.format(block_id))(x)
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
                          pool_size, num_classes, backbone, train_bn):
