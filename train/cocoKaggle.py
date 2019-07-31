@@ -109,6 +109,7 @@ class CocoDataset(utils.Dataset):
             self.auto_download(dataset_dir, subset, year)
 
         coco = COCO("{}/annotations_trainval2014/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
         image_dir = "{}/{}{}/{}{}".format(dataset_dir, subset, year,subset, year)
@@ -480,13 +481,13 @@ if __name__ == '__main__':
         dataset_train = CocoDataset()
         dataset_train.load_coco(args.dataset, "train", year=args.year, auto_download=args.download)
         if args.year in '2014':
-            dataset_train.load_coco('', "valminusminival", year=args.year, auto_download=args.download)
+            dataset_train.load_coco('.', "valminusminival", year=args.year, auto_download=args.download)
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = CocoDataset()
         val_type = "val" if args.year in '2017' else "minival"
-        dataset_val.load_coco('', val_type, year=args.year, auto_download=args.download)
+        dataset_val.load_coco('.', val_type, year=args.year, auto_download=args.download)
         dataset_val.prepare()
 
         # Image Augmentation
