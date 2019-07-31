@@ -158,11 +158,11 @@ class CocoDataset(utils.Dataset):
 
         # Setup paths and file names
         if dataType == "minival" or dataType == "valminusminival":
-            imgDir = "{}/{}{}".format(dataDir, "val", dataYear)
+            imgDir = "{}/{}{}/{}{}".format(dataDir, "val", dataYear)
             imgZipFile = "{}{}.zip".format(dataDir, "val", dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format("val", dataYear)
         else:
-            imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
+            imgDir = "{}/{}{}/{}{}".format(dataDir, dataType, dataYear)
             imgZipFile = "{}{}.zip".format(dataDir, dataType, dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
         # print("Image paths:"); print(imgDir); print(imgZipFile); print(imgURL)
