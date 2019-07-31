@@ -111,7 +111,7 @@ class CocoDataset(utils.Dataset):
         coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
-        image_dir = "{}/{}{}".format(dataset_dir, subset, year)
+        image_dir = "{}/{}{}/{}{}".format(dataset_dir, subset, year,subset, year)
 
         # Load all classes or a subset?
         if not class_ids:
@@ -157,11 +157,11 @@ class CocoDataset(utils.Dataset):
 
         # Setup paths and file names
         if dataType == "minival" or dataType == "valminusminival":
-            imgDir = "{}/{}{}/{}{}".format(dataDir, "val", dataYear,"val", dataYear)
+            imgDir = "{}/{}{}".format(dataDir, "val", dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, "val", dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format("val", dataYear)
         else:
-            imgDir = "{}/{}{}/{}{}".format(dataDir, dataType, dataYear,dataType, dataYear)
+            imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
             imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
             imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
         # print("Image paths:"); print(imgDir); print(imgZipFile); print(imgURL)
