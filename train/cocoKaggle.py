@@ -52,7 +52,7 @@ ROOT_DIR = os.path.abspath("../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.configMobileNetV1Kaggle import Config
+from mrcnn.configMobileNetV1 import Config
 from mrcnn import model as modellib, utils
 
 # Path to trained weights file
@@ -108,7 +108,7 @@ class CocoDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
-        coco = COCO("{}/captions/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
         image_dir = "{}/{}{}".format(dataset_dir, subset, year)
