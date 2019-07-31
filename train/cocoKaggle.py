@@ -484,10 +484,10 @@ if __name__ == '__main__':
         dataset_train.prepare()
 
         # Validation dataset
-        dataset_val = CocoDataset()
-        val_type = "val" if args.year in '2017' else "minival"
-        dataset_val.load_coco(args.dataset, val_type, year=args.year, auto_download=args.download)
-        dataset_val.prepare()
+        #dataset_val = CocoDataset()
+        #val_type = "val" if args.year in '2017' else "minival"
+        #dataset_val.load_coco(args.dataset, val_type, year=args.year, auto_download=args.download)
+        #dataset_val.prepare()
 
         # Image Augmentation
         # Right/Left flip 50% of the time
