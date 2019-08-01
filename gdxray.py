@@ -31,6 +31,7 @@ import os
 import math
 import time
 import scipy
+import random
 import numpy as np
 
 import zipfile
@@ -38,12 +39,13 @@ import urllib.request
 import shutil
 
 from PIL import Image
-from skimage import draw
+from skimage import draw, io
 from config import Config
 from preprocessing import prepare_welding
 import utils
 import model as modellib
 import numpy as np
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 # Root directory of the project
 ROOT_DIR = os.getcwd()
@@ -55,6 +57,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 BACKGROUND_CLASS = 0
 CASTING_DEFECT = 1
 WELDING_DEFECT = 2
+OBJECT_CLASSES = [BACKGROUND_CLASS, CASTING_DEFECT, WELDING_DEFECT]
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
@@ -465,6 +468,41 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
         t_prediction, t_prediction / len(image_ids)))
     print("Total time: ", time.time() - t_start)
 
+def evaluate_gdxray(model, dataset, eval_type="bbox", limit=0, image_ids=None):
+    """Runs GDXRay evaluation.
+    dataset: A Dataset object with valiadtion data
+    eval_type: "bbox" or "segm" for bounding box or segmentation evaluation
+    limit: if not 0, it's the number of images to use for evaluation
+    """
+    image_ids = image_ids or dataset.image_ids
+    random.shuffle(image_ids)
+
+    limit = int(limit)
+    num_processed = 0
+
+    APs = []
+    for image_id in image_ids:
+        # Load image
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset, config, image_id, use_mini_mask=False)
+
+        # Run object detection
+        results = model.detect([image], verbose=0)
+
+        # Compute AP
+        r = results[0]
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                              r['rois'], r['class_ids'], r['scores'], r['masks'])
+        print("Image", image_id, "AP:", AP)
+
+        num_processed += 1
+        APs.append(AP)
+        if limit and num_processed>limit:
+            break
+
+    return np.mean(APs)
+
 
 ############################################################
 #  Training
@@ -537,12 +575,12 @@ if __name__ == '__main__':
     else:
         model_path = args.model
 
-    # Load weights
-    print("Loading weights ", model_path)
-    model.load_weights(model_path, by_name=True, exclude=EXCLUDE_LAYER_WEIGHTS)
 
     # Train or evaluate
     if args.command == "train":
+        # Load weights
+        print("Loading weights ", model_path)
+        model.load_weights(model_path, by_name=True, exclude=EXCLUDE_LAYER_WEIGHTS)
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = XrayDataset()
@@ -580,12 +618,16 @@ if __name__ == '__main__':
                     layers='all')
 
     elif args.command == "evaluate":
+        # Load weights
+        print("Loading weights ", model_path)
+        model.load_weights(model_path, by_name=True)
         # Validation dataset
         dataset_val = XrayDataset()
-        coco = dataset_val.load_coco(args.dataset, "minival", year=args.year, return_coco=True, auto_download=args.download)
+        dataset_val.load_gdxray(args.dataset, "test", series=args.series, auto_download=args.download)
         dataset_val.prepare()
-        print("Running COCO evaluation on {} images.".format(args.limit))
-        evaluate_coco(model, dataset_val, coco, "bbox", limit=int(args.limit))
+        print("Running GDXray evaluation on {} images.".format(args.limit))
+        average_precision = evaluate_gdxray(model, dataset_val, limit=args.limit)
+        print("Got AP={} using {} images.".format(average_precision, args.limit))
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))

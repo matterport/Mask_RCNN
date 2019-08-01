@@ -8,8 +8,14 @@ M. Ferguson, R. Ak, S. Jeong and K. H. Law, "[Detection and Segmentation of Manu
 ![Instance Segmentation Sample](assets/detection.png)
 
 
-# Getting Started
+## Installation
 Start by cloning this repository and downloading the GDXray dataset.
+Next install the required packages:
+
+```sh
+conda env create -f environment.yml -n defect-detection
+conda activate defect-detection
+```
 
 ## Training on GDXray Casting Set
 
@@ -28,10 +34,11 @@ python gdxray.py train \
 ```sh
 # Python 3.6
 python gdxray.py evaluate \
---evaluate=True \
 --dataset=~/data/GDXray \
 --series=Castings \
---logs=logs/gdxray
+--logs=logs/gdxray \
+--model=~/path/to/trained/model \
+--limit=10 # Optionally limit the number of eval images
 ```
 
 ## Inspecting the Model
@@ -100,7 +107,14 @@ We found that smaller learning rates converge faster anyway so we go with that.
 * TensorFlow 1.6+
 * Keras 2.0.8+
 * Jupyter Notebook
-* Numpy, skimage, scipy, Pillow, cython, h5py
+* Numpy, skimage, scipy, OpenCV, Pillow, cython, h5py
+
+## Managing dependencies
+The build hash in not included in the dependencies, making it easier to install the environment on different platforms. To export the environment:
+
+```sh
+conda env export --no-builds | grep -v "prefix" > environment.yml
+```
 
 ## More examples
 Detection of casting defects in a jet engine blade:
