@@ -198,6 +198,9 @@ If you use Docker, the code has been verified to work on
 # Projects Using this Model
 If you extend this model to other datasets or build projects that use it, we'd love to hear from you.
 
+### [Bottle Segmentation Video](https://youtu.be/uUYR6IEm5VM?list=PLCK5Mm9zwPkEhwu2OOw2CgO5ikoLdR36l) and [Code](https://github.com/AISangam/Mask-RCNN-bottle-training) by AiSangam.
+[![Bottle Segmentation](assets/bottle_segmentation.png)](https://youtu.be/uUYR6IEm5VM?list=PLCK5Mm9zwPkEhwu2OOw2CgO5ikoLdR36l)
+
 ### [4K Video Demo](https://www.youtube.com/watch?v=OOT3UIXZztE) by Karol Majek.
 [![Mask RCNN on 4K Video](assets/4k_video.gif)](https://www.youtube.com/watch?v=OOT3UIXZztE)
 
