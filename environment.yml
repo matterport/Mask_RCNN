@@ -32,7 +32,7 @@ dependencies:
   - pyzmq
   - readline
   - scikit-image
-  - scipy
+  - scipy=1.1.0
   - setuptools
   - tensorboard
   - wheel
@@ -40,5 +40,5 @@ dependencies:
   - zlib
   - zstd
   - pip:
-    - opencv-python==4.1.0.25
+    - opencv-python==4.1
     - tensorflow-gpu==1.5
