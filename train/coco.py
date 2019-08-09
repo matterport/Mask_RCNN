@@ -52,8 +52,8 @@ ROOT_DIR = os.path.abspath("../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.configMobileNetV1 import Config
-from mrcnn import model as modellib, utils
+from mrcnn.configMobileNetV2 import Config
+from mrcnn import modelMob as modellib, utils
 
 # Path to trained weights file
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
