@@ -2535,7 +2535,7 @@ class MaskRCNN():
                                         TF_WEIGHTS_PATH_NO_TOP,
                                         cache_subdir='models',
                                         md5_hash='725ccbd03d61d7ced5b5c4cd17e7d527')
-            else self.config.BACKBONE == "mobilenetv2":
+            elif self.config.BACKBONE == "mobilenetv2":
                 TF_WEIGHTS_PATH  = 'https://github.com/JonathanCMitchell/mobilenet_v2_keras/'\
                                     'releases/download/v1.1/'\
                                     'mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_224_no_top.h5'
@@ -2551,7 +2551,7 @@ class MaskRCNN():
                                         TF_WEIGHTS_PATH,
                                         cache_subdir='models',
                                         md5_hash='03394917f9a9ea3362f46332a5b6a215')
-            else self.config.BACKBONE == "mobilenetv2":
+            elif self.config.BACKBONE == "mobilenetv2":
                 TF_WEIGHTS_PATH  = 'https://github.com/JonathanCMitchell/mobilenet_v2_keras/'\
                                     'releases/download/v1.1/'\
                                     'mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_224.h5'
