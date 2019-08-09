@@ -2501,7 +2501,7 @@ class MaskRCNN():
         # Update the log directory
         self.set_log_dir(filepath)
 
-    def get_imagenet_weights(self):
+    def get_imagenet_weights(self,no_top=True):
         """Downloads ImageNet trained weights from Keras.
         Returns path to weights file.
         """
