@@ -2506,7 +2506,7 @@ class MaskRCNN():
         Returns path to weights file.
         """
         from keras.utils.data_utils import get_file
-        assert self.config.BACKBONE in ["resnet50","mobilenetv1"]
+        assert self.config.BACKBONE in ["resnet50","mobilenetv1","mobilenetv2"]
         '''
         TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/'\
                                  'releases/download/v0.2/'\
