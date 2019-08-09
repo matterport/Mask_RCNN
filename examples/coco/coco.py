@@ -52,7 +52,8 @@ ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.config import Config
+#from mrcnn.config import Config
+from mrcnn.config import configMobileNetV2.py
 from mrcnn import model as modellib, utils
 
 # Path to trained weights file
@@ -102,7 +103,7 @@ class CocoConfig(Config):
     NUM_CLASSES = 1 + 80
 
     ## Backbone Architecture
-    BACKBONE = "mobilenetv1"
+    BACKBONE = "mobilenetv2"
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
 
     ## Resolution
