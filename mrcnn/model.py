@@ -1009,11 +1009,11 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
 #  Loss Functions
 ############################################################
 
-def smooth_l1_loss(y_true, y_pred):
+def smooth_l1_loss(y_true, y_pred, weights=1.0):
     """Implements Smooth-L1 loss.
     y_true and y_pred are typically: [N, 4], but could be any shape.
     """
-    diff = K.abs(y_true - y_pred)
+    diff = K.abs(y_true - y_pred) * weights
     less_than_one = K.cast(K.less(diff, 1.0), "float32")
     loss = (less_than_one * 0.5 * diff**2) + (1 - less_than_one) * (diff - 0.5)
     return loss
@@ -1074,7 +1074,7 @@ def rpn_bbox_loss_graph(config, target_bbox, rpn_match, rpn_bbox):
 
 
 def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
-                           active_class_ids):
+                           active_class_ids, class_weights):
     """Loss for the classifier head of Mask RCNN.
 
     target_class_ids: [batch, num_rois]. Integer class IDs. Uses zero
@@ -1093,23 +1093,30 @@ def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
     pred_class_ids = tf.argmax(pred_class_logits, axis=2)
     # TODO: Update this line to work with batch > 1. Right now it assumes all
     #       images in a batch have the same active_class_ids
-    pred_active = tf.gather(active_class_ids[0], pred_class_ids)
+    # pred_active = tf.gather(active_class_ids[0], pred_class_ids)
+    # TODO: Removed effects of pred_active to get it to work with class_weights
 
     # Loss
-    loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
-        labels=target_class_ids, logits=pred_class_logits)
+    sample_weights = tf.gather(class_weights, target_class_ids)
+    # loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
+    #     labels=target_class_ids, logits=pred_class_logits)
+    loss = tf.losses.sparse_softmax_cross_entropy(
+        labels=target_class_ids,
+        logits=pred_class_logits,
+        weights=sample_weights,
+        reduction=tf.losses.Reduction.SUM_OVER_NONZERO_WEIGHTS)
 
     # Erase losses of predictions of classes that are not in the active
     # classes of the image.
-    loss = loss * pred_active
+    # loss = loss * pred_active
 
     # Computer loss mean. Use only predictions that contribute
     # to the loss to get a correct mean.
-    loss = tf.reduce_sum(loss) / tf.reduce_sum(pred_active)
+    # loss = tf.reduce_sum(loss) / tf.reduce_sum(pred_active)
     return loss
 
 
-def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
+def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox, class_weights):
     """Loss for Mask R-CNN bounding box refinement.
 
     target_bbox: [batch, num_rois, (dy, dx, log(dh), log(dw))]
@@ -1127,20 +1134,23 @@ def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
     positive_roi_class_ids = tf.cast(
         tf.gather(target_class_ids, positive_roi_ix), tf.int64)
     indices = tf.stack([positive_roi_ix, positive_roi_class_ids], axis=1)
+    sample_weights = tf.reshape(
+        tf.gather(class_weights, positive_roi_class_ids), [-1, 1])
 
     # Gather the deltas (predicted and true) that contribute to loss
     target_bbox = tf.gather(target_bbox, positive_roi_ix)
     pred_bbox = tf.gather_nd(pred_bbox, indices)
 
     # Smooth-L1 Loss
-    loss = K.switch(tf.size(target_bbox) > 0,
-                    smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox),
+    loss = K.switch(tf.size(sample_weights) > 0,
+                    smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox,
+                        weights=sample_weights),
                     tf.constant(0.0))
     loss = K.mean(loss)
     return loss
 
 
-def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks):
+def mrcnn_mask_loss_graph(target_masks, target_class_ids, pred_masks, class_weights):
     """Mask binary cross-entropy loss for the masks head.
 
     target_masks: [batch, num_rois, height, width].
@@ -1856,6 +1866,11 @@ class MaskRCNN():
             shape=[None, None, config.IMAGE_SHAPE[2]], name="input_image")
         input_image_meta = KL.Input(shape=[config.IMAGE_META_SIZE],
                                     name="input_image_meta")
+        self.class_weights = tf.Variable(
+            tf.ones(config.NUM_CLASSES), trainable=False, dtype=tf.float32)
+        # A hack to get around Keras's bad support for constants
+        class_weights = KL.Lambda(
+            lambda x: self.class_weights, name="class_weights_layer")(input_image)
         if mode == "training":
             # RPN GT
             input_rpn_match = KL.Input(
@@ -2012,11 +2027,11 @@ class MaskRCNN():
             rpn_bbox_loss = KL.Lambda(lambda x: rpn_bbox_loss_graph(config, *x), name="rpn_bbox_loss")(
                 [input_rpn_bbox, input_rpn_match, rpn_bbox])
             class_loss = KL.Lambda(lambda x: mrcnn_class_loss_graph(*x), name="mrcnn_class_loss")(
-                [target_class_ids, mrcnn_class_logits, active_class_ids])
+                [target_class_ids, mrcnn_class_logits, active_class_ids, class_weights])
             bbox_loss = KL.Lambda(lambda x: mrcnn_bbox_loss_graph(*x), name="mrcnn_bbox_loss")(
-                [target_bbox, target_class_ids, mrcnn_bbox])
+                [target_bbox, target_class_ids, mrcnn_bbox, class_weights])
             mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
-                [target_mask, target_class_ids, mrcnn_mask])
+                [target_mask, target_class_ids, mrcnn_mask, class_weights])
 
             # Model
             inputs = [input_image, input_image_meta,
@@ -2716,6 +2731,19 @@ class MaskRCNN():
         for k, v in outputs_np.items():
             log(k, v)
         return outputs_np
+
+    def set_class_weights(self, class_weights):
+        """Sets the class weights which will multiplied to scale the MRCNN head losses.
+        
+        Args:
+            class_weights (array-like): A list or np.array of size [NUM_CLASSES] where
+                the value at that index indicates the loss scaling for that class index.
+                Note class 0 is background and should never take the value 0.
+        """
+        class_weights = np.asarray(class_weights)
+        assert class_weights.shape == (self.config.NUM_CLASSES,)
+        self.class_weights.assign(class_weights).op.run(session=K.get_session())
+
 
 
 ############################################################
