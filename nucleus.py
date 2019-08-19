@@ -44,7 +44,7 @@ import skimage.io
 from imgaug import augmenters as iaa
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("./")
+ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -55,8 +55,6 @@ from mrcnn import utils
 
 #Change to MobilenetV2
 from mrcnn.configMobileNetV1 import Config
-from mrcnn import modelMob as modellib
-
 from mrcnn import visualize
 
 # Path to trained weights file
@@ -111,7 +109,7 @@ class NucleusConfig(Config):
     NAME = "nucleus"
 
     # Adjust depending on your GPU memory
-    IMAGES_PER_GPU = 6
+    IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + nucleus
