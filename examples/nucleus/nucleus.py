@@ -54,9 +54,7 @@ from mrcnn import utils
 #from mrcnn import model as modellib
 
 #Change to MobilenetV2
-from mrcnn.config import configMobileNetV1
-from mrcnn import modelMob as modellib
-
+from mrcnn.configMobileNetV1 import Config
 from mrcnn import visualize
 
 # Path to trained weights file
