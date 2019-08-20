@@ -342,7 +342,7 @@ if __name__ == '__main__':
         if not os.path.exists(weights_path):
             utils.download_trained_weights(weights_path)
 
-    elif args.weights.lower() == "cocoMobV1":
+    elif args.weights.lower() == "cocomobv1":
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
         if not os.path.exists(weights_path):
