@@ -857,6 +857,7 @@ def download_trained_mobilenet_weights(coco_model_path, verbose=1):
     """
     if verbose > 0:
         print("Downloading pretrained model to " + coco_model_path + " ...")
+
     with urllib.request.urlopen(COCO_MODEL_Mobilenet_URL) as resp, open(coco_model_path, 'wb') as out:
         shutil.copyfileobj(resp, out)
     if verbose > 0:
