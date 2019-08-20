@@ -50,7 +50,7 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mobile_mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
+os.makedir(DEFAULT_LOGS_DIR)
 ############################################################
 #  Configurations
 ############################################################
@@ -340,8 +340,14 @@ if __name__ == '__main__':
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
         if not os.path.exists(weights_path):
+            utils.download_trained_weights(weights_path)
+
+    elif args.weights.lower() == "cocoMobV1":
+        weights_path = COCO_WEIGHTS_PATH
+        # Download weights file
+        if not os.path.exists(weights_path):
             #utils.download_trained_weights(weights_path)
-            download_trained_mobilenet_weights(weights_path)
+            utils.download_trained_mobilenet_weights(weights_path)
     elif args.weights.lower() == "last":
         # Find last trained weights
         weights_path = model.find_last()
