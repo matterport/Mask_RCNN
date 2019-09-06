@@ -5,7 +5,6 @@ Kaggle 2018 Data Science Bowl
 https://www.kaggle.com/c/data-science-bowl-2018/
 
 Licensed under the MIT License (see LICENSE for details)
-Written by Waleed Abdulla
 
 ------------------------------------------------------------
 
@@ -25,10 +24,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     python3 nucleus.py detect --dataset=/path/to/dataset --subset=train --weights=<last or /path/to/weights.h5>
 """
 
-# Set matplotlib backend
-# This has to be done before other importa that might
-# set it, but only if we're running in script mode
-# rather than being imported.
+# Set matplotlib backend to save instead of display images
 if __name__ == '__main__':
     import matplotlib
     # Agg backend runs without a display
@@ -79,14 +75,16 @@ class NucleusConfig(Config):
     NAME = "dsp_nuc"
 
     # Adjust depending on your GPU memory
-    IMAGES_PER_GPU = 2
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    batch_size = GPU_COUNT * IMAGES_PER_GPU
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + nucleus
 
     # Number of training and validation steps per epoch
-    STEPS_PER_EPOCH = 100
-    VALIDATION_STEPS =25
+    STEPS_PER_EPOCH = 50
+    VALIDATION_STEPS = 5
 
     # Don't exclude based on confidence. Since we have two classes
     # then 0.5 is the minimum anyway as it picks between nucleus and BG
@@ -97,20 +95,21 @@ class NucleusConfig(Config):
     BACKBONE = "resnet101"
 
     # Input image resizing
-    # Random crops of size 512x512
-    IMAGE_RESIZE_MODE = "square"
+    IMAGE_RESIZE_MODE = "crop"
+    # make sure images are of size 256*256
     IMAGE_MIN_DIM = 256
     IMAGE_MAX_DIM = 256
 
-    # Length of square anchor side in pixels
+
+    # Length of square anchor side in pixels, smaller for nucleus
     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
 
     # ROIs kept after non-maximum supression (training and inference)
-    POST_NMS_ROIS_TRAINING = 200
-    POST_NMS_ROIS_INFERENCE = 200
+    POST_NMS_ROIS_TRAINING = 1000
+    POST_NMS_ROIS_INFERENCE = 2000
 
     # How many anchors per image to use for RPN training
-    RPN_TRAIN_ANCHORS_PER_IMAGE = 300
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 256
 
     # Image mean (RGB)
     MEAN_PIXEL = np.array([43.53, 39.56, 48.22])
@@ -124,13 +123,19 @@ class NucleusConfig(Config):
     # enough positive proposals to fill this and keep a positive:negative
     # ratio of 1:3. You can increase the number of proposals by adjusting
     # the RPN NMS threshold.
-    TRAIN_ROIS_PER_IMAGE = 200
+    TRAIN_ROIS_PER_IMAGE = 128
 
     # Maximum number of ground truth instances to use in one image
-    MAX_GT_INSTANCES = 300
+    MAX_GT_INSTANCES = 200
 
     # Max number of final detections per image
-    DETECTION_MAX_INSTANCES = 300
+    DETECTION_MAX_INSTANCES = 400
+
+    # set optimization method
+    OPTIMIZER = "ADAM"
+
+    # Non-max suppression threshold to filter RPN proposals.
+    RPN_NMS_THRESHOLD = 0.9
 
 
 class NucleusInferenceConfig(NucleusConfig):
@@ -140,8 +145,8 @@ class NucleusInferenceConfig(NucleusConfig):
     # Don't resize imager for inferencing
     IMAGE_RESIZE_MODE = "pad64"
     # Non-max suppression threshold to filter RPN proposals.
-    # You can increase this during training to generate more propsals.
-    RPN_NMS_THRESHOLD = 0.9
+    # You can increase this during training to generate more proposals.
+    RPN_NMS_THRESHOLD = 0.7
 
 
 ############################################################
@@ -150,8 +155,7 @@ class NucleusInferenceConfig(NucleusConfig):
 
 class NucleusDataset(utils.Dataset):
 
-    def load_nucleus(self, dataset_dir, subset, validation_ids, image_ids):
-        print("Loading image dataset. \n")
+    def load_nucleus(self, dataset_dir, subset, all_image_ids):
         """Load a subset of the nuclei dataset.
 
         dataset_dir: Root directory of the dataset
@@ -164,18 +168,15 @@ class NucleusDataset(utils.Dataset):
         # Naming the dataset nucleus, and the class nucleus
         self.add_class("nucleus", 1, "nucleus")
 
-        # create path to image directory
-        image_dir = os.path.join(dataset_dir, "stage1_train")
-
         if subset == "val":
-            image_ids = validation_ids
+            # create path to image directory
+            image_dir = os.path.join(dataset_dir, "stage1_test")
         else:
-            # Get image ids from directory names
-            if subset == "train":
-                image_ids = training_ids
+            # create path to image directory
+            image_dir = os.path.join(dataset_dir, "stage1_train")
 
         # Add images
-        for image_id in image_ids:
+        for image_id in all_image_ids:
             self.add_image(
                 "nucleus",
                 image_id=image_id,
@@ -218,71 +219,36 @@ class NucleusDataset(utils.Dataset):
 #  Training
 ############################################################
 
-def train(model, dataset_dir, subset, validation_ids, training_ids):
+def train(model, dataset_dir, all_image_ids):
     print("Training the model. \n")
 
+    training_ids, validation_ids = train_test_split(all_image_ids,
+                                                    test_size=.30,
+                                                    shuffle=True)
     """Train the model."""
     # Training dataset.
     dataset_train = NucleusDataset()
-    dataset_train.load_nucleus(dataset_dir, subset, validation_ids, training_ids)
+    dataset_train.load_nucleus(dataset_dir, "train", training_ids)
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = NucleusDataset()
-    dataset_val.load_nucleus(dataset_dir, "val", validation_ids, training_ids)
+    dataset_val.load_nucleus(dataset_dir, "train", validation_ids)
     dataset_val.prepare()
 
-###TODO move image augmentation to pre-processing
-    # # Image augmentation
-    # # http://imgaug.readthedocs.io/en/latest/source/augmenters.html
-    # augmentation = iaa.SomeOf((0, 3), [
-    #     iaa.Fliplr(0.5),
-    #     iaa.Flipud(0.5),
-    #     iaa.AdditiveGaussianNoise(scale=0.2 * 255),
-    #     iaa.OneOf([iaa.Affine(rotate=45),
-    #               iaa.Affine(rotate=90),
-    #                iaa.Affine(rotate=180),
-    #                iaa.Affine(rotate=270)]),
-    #     iaa.Multiply((0.8, 1.5)),
-    #     iaa.GaussianBlur(sigma=(0.0, 5.0)),
-    #     iaa.Add(50, per_channel=True),
-    #     iaa.Sharpen(alpha=0.5),
-    #     iaa.Superpixels(p_replace=0.5, n_segments=64),
-    #     iaa.Invert(0.5)
-    # ], random_order=True)
-    #
-    # import os
-    # from scipy import misc
-    #
-    # images = ...
-    # seq = ...
-    #
-    # write_to_dir = "/tmp/images_aug"
-    # n_augs_per_image = 8 * 8
-    #
-    # for i, image in enumerate(images):
-    #     image_augs = seq.augment_images([image] * n_augs_per_image)
-    #     for j, image_aug in enumerate(image_augs):
-    #         misc.imsave(os.path.join(write_to_dir, "%06d_%02d.jpg" % (i, j)), image_aug)
-
-    # images = [image] * 64
-    # images_aug = seq.augment_images(images)
-    # for i, image_aug in enumerate(images_aug):
-    #     misc.imsave("image_%06d.jpg" % (i,), image_aug)
-
-   # adam optimization schedule
+   # train network heads
     model.train(dataset_train, dataset_val,
-                learning_rate=1e-4,
+                learning_rate=.001,
                 epochs=25,
-                layers='all')
+                layers='heads')
     model.train(dataset_train, dataset_val,
-                learning_rate=1e-5,
+                learning_rate=.0001,
                 epochs=50,
-                layers='all')
+                layers='4+')
     model.train(dataset_train, dataset_val,
-                learning_rate=1e-6,
+                learning_rate=.00001,
                 epochs=75,
-                layers='all')
+                layers='5+')
 
 
 ############################################################
@@ -290,7 +256,6 @@ def train(model, dataset_dir, subset, validation_ids, training_ids):
 ############################################################
 
 def rle_encode(mask):
-    print("RLE encoding masks. \n")
     """Encodes a mask in Run Length Encoding (RLE).
     Returns a string of space-separated values.
     """
@@ -307,7 +272,6 @@ def rle_encode(mask):
 
 
 def rle_decode(rle, shape):
-    print("Decoding RLE masks. \n")
     """Decodes an RLE encoded list of space separated
     numbers and returns a binary mask."""
     rle = list(map(int, rle.split()))
@@ -322,7 +286,6 @@ def rle_decode(rle, shape):
     # Reshape and transpose
     mask = mask.reshape([shape[1], shape[0]]).T
     return mask
-
 
 def mask_to_rle(image_id, mask, scores):
     print("Recording nuclues positions. \n")
@@ -352,14 +315,14 @@ def mask_to_rle(image_id, mask, scores):
 #  Detection
 ############################################################
 
-def detect(model, dataset_dir, subset):
+def detect(model, dataset_dir, subset, image_ids):
     print("Running Nucleus Detection. \n")
     """Run detection on images in the given directory."""
     print("Running on {}".format(dataset_dir))
 
     # Read dataset
     dataset = NucleusDataset()
-    dataset.load_nucleus(dataset_dir, subset, validation_ids, training_ids)
+    dataset.load_nucleus(dataset_dir, subset, image_ids)
     dataset.prepare()
     # Load over images
     run_results = []
@@ -378,7 +341,7 @@ def detect(model, dataset_dir, subset):
             dataset.class_names, r['scores'],
             show_bbox=False, show_mask=False,
             title="Predictions")
-        plt.savefig("{}/{}.png".format(submit_dir, dataset.image_info[image_id]["id"]))
+        plt.savefig("{}/{}.png".format(RESULTS_DIR, dataset.image_info[image_id]["id"]))
 
     # Save to csv file
     results = "ImageId,EncodedPixels\n" + "\n".join(run_results)
@@ -432,16 +395,13 @@ if __name__ == '__main__':
     # "val": use hard-coded list above
     # "train": use data from stage1_train minus the hard-coded list above
     # else: use the data from the specified sub-directory
-    assert args.subset in ["train", "val", "stage1_train", "stage1_test", "stage2_test"]
-    subset_dir = "stage1_train" if args.subset in ["train", "val"] else args.subset
+    assert args.subset in ["train", "val", "stage1_train", "stage1_test"]
+    subset_dir = "stage1_train" if args.subset in ["train", "stage1_train"] else "stage1_test"
 
     # create path to dataset image directory
     dataset_dir = os.path.join(os.path.abspath(args.dataset), subset_dir)
-
     all_image_ids = os.listdir(dataset_dir)
-    training_ids, validation_ids = train_test_split(all_image_ids,
-                                                    test_size=.30,
-                                                    shuffle=True)
+    num_images = len(all_image_ids)
 
     # Load config and instantiate model
     if args.command == "train":
@@ -481,10 +441,10 @@ if __name__ == '__main__':
     if args.command == "train":
         import time
         start = time.time()
-        train(model, args.dataset, args.subset, validation_ids, training_ids)
+        train(model, args.dataset, all_image_ids)
         print('Elapsed time', round((time.time() - start) / 60, 1), 'minutes')
     elif args.command == "detect":
-        detect(model, args.dataset, args.subset)
+        detect(model, args.dataset, all_image_ids)
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'detect'".format(args.command))
