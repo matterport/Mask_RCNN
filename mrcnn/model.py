@@ -2512,7 +2512,7 @@ class MaskRCNN():
                                         TF_WEIGHTS_PATH_NO_TOP,
                                         cache_subdir='models',
                                         md5_hash='725ccbd03d61d7ced5b5c4cd17e7d527')
-            else self.config.BACKBONE == "resnet101":
+            elif self.config.BACKBONE == "resnet101":
                 TF_WEIGHTS_PATH_NO_TOP ='https://github.com/keras-team/keras-applications/'\
                                         'releases/download/resnet/'\
                                         'resnet101_weights_tf_dim_ordering_tf_kernels_notop.h5'
