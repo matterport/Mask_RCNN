@@ -1,143 +1,144 @@
 ### See https://github.com/aleju/imgaug and http://imgaug.readthedocs.io/en/latest/index.html
-import imgaug
 from imgaug import augmenters as iaa
 import numpy as np
-import glob
 import imageio
 import os
 import argparse
-import shutil
-import re
 
-NUMBER_OF_IMAGE_CHANNELS = 3
-NUMBER_OF_MASK_CHANNELS = 1
-
-MASK_PIXEL_THRESHOLD = 0.8  # at least this proportion of the mask must be preserved in the augmentation
-
-#
-# source activate py35
-# nohup python -u augmentation.py -id /data/dkpun-data/augmentor/input -od /data/vein/augmented/12-jun-ratio-20-1 -na 20 > ../augmentation.log &
+# python3.6 augment.py -id /path/to/img/folder -od /path_to_output_dir > ./augmentation.log &
 #
 parser = argparse.ArgumentParser(description='Create an augmented data set.')
 parser.add_argument('-id', '--input_dir', type=str, help='Base directory of the images to be augmented.', required=True)
 parser.add_argument('-od', '--output_dir', type=str, help='Base directory of the output.', required=True)
-parser.add_argument('-na', '--number_of_augmented_images_per_original', type=int, default=1,
-                    help='Minimum number of augmented image/mask pairs to produce for each input image/mask pair.',
-                    required=False)
-parser.add_argument('--augment_colour', dest='augment_colour', action='store_true', help='Apply colour augmentation')
-parser.add_argument('--no-augment_colour', dest='augment_colour', action='store_false',
-                    help='Do not apply colour augmentation')
-parser.set_defaults(augment_colour=True)
 args = parser.parse_args()
 
-# pull out list of image folder names
+# store images and related masks as dictionary
+img_dict = {}
 
-image_file_list = []
-mask_file_list = []
-for x in os.listdir(args.input_dir):
-    img_folder = os.path.join(os.path.abspath(args.input_dir), x, "images")
-    for file in os.listdir(img_folder):
-        if file.endswith(".png"):
-            image_file_list.append(file)
-    mask_folder = os.path.join(os.path.abspath(args.input_dir), x, "masks")
-    for file in os.listdir(mask_folder):
-        if file.endswith(".png"):
-            mask_file_list.append(file)
+for image_name in os.listdir(args.input_dir):
 
-# counter to make sure we have at least x augs per image
-total_images_output = 0
+    # get abs path to image
+    img = "{}.png".format(os.path.join(os.path.abspath(args.input_dir), image_name, "images", image_name))
+
+   # create list of mask files for image
+    mask_file_list = []
+    mask_folder = os.path.join(os.path.abspath(args.input_dir), image_name, "masks")
+    for mask in os.listdir(mask_folder):
+        mask_path = os.path.join(os.path.abspath(mask_folder), mask)
+        mask_file_list.append(mask_path)
+
+    img_dict[image_name] = {
+        "image":img,
+        "masks":mask_file_list
+    }
+
 
 # create the augmentation sequences
-affine_seq = iaa.Sequential([
-    iaa.Fliplr(0.5),  # horizontally flip 50% of the images
-    iaa.Flipud(0.5),
-    iaa.Affine(rotate=(-45, 45))  # rotate images between -45 and +45 degrees
-], random_order=True)
+rotators = iaa.SomeOf((1,3), [
+    iaa.Fliplr(1),  # flip horiozontally
+    iaa.Flipud(1),  # Flip/mirror input images vertically
+    iaa.Rot90(1)
+    ], random_order=True)
 
-no_rotation_affine_seq = iaa.Sequential([
-    iaa.Fliplr(0.5),  # horizontally flip 50% of the images
-    iaa.Flipud(0.5)
-], random_order=True)
-
-colour_seq = iaa.Sequential([
-    iaa.ContrastNormalization((0.9, 1.1), per_channel=0.5),
-    # normalize contrast by a factor of 0.5 to 1.5, sampled randomly per image and for 50% of all images also independently per channel
-    iaa.Multiply((0.9, 1.1), per_channel=0.5),
-    # multiply 50% of all images with a random value between 0.5 and 1.5 and multiply the remaining 50% channel-wise, i.e. sample one multiplier independently per channel
-    iaa.Add((-5, 5), per_channel=0.5)
-    # add random values between -40 and 40 to images. In 50% of all images the values differ per channel (3 sampled value). In the other 50% of all images the value is the same for all channels
+transformers = iaa.SomeOf((1, 3), [
+    iaa.Superpixels(p_replace=0.5, n_segments=64),  # create superpixel representation
+    iaa.GaussianBlur(sigma=(0.0, 5.0)),
+    iaa.AverageBlur(k=(2, 7)), # blur image using local means with kernel sizes between 2 and 7
+    iaa.MedianBlur(k=(3, 11)), # blur image using local medians with kernel sizes between 2 and 7
+    iaa.ElasticTransformation(alpha=(0, 5.0), sigma=0.25), # distort pixels
+    # either change the brightness of the whole image (sometimes
+    # per channel) or change the brightness of subareas
+    iaa.OneOf([
+        iaa.Multiply((0.5, 1.5), per_channel=0.5),
+        iaa.FrequencyNoiseAlpha(
+            exponent=(-4, 0),
+            first=iaa.Multiply((0.5, 1.5), per_channel=True),
+            second=iaa.ContrastNormalization((0.5, 2.0))
+        )
+    ])
 ], random_order=True)
 
 # go through all the images and create a set of augmented images and masks for each
-for idx in image_file_list:
+for key, val in img_dict.items():
 
-    augmented_images = []
-    augmented_masks = []
+    img = val["image"]
+    masks = val["masks"]
+    base_masks = []
 
-    base_name = idx.split(".")[0]
+    # read in images and masks
+    base_image = np.array(imageio.imread(img).astype(np.uint8))
+    for mask in masks:
+        out_mask = imageio.imread(mask).astype(np.uint8)
+        base_masks.append(out_mask)
 
-    base_image = imageio.imread(base_name).astype(np.uint8)
-    raise SystemExit("winning")
-    base_mask = imageio.imread(mask_file_list[idx]).astype(np.uint8)
+    # loop through and rotate each image three times
+    counter = 0
+    while counter < 4:
 
-    base_mask_pixel_count = np.count_nonzero(base_mask)
+        # create transforms to image and masks
+        rotator = rotators.to_deterministic()  # set same random augmentation for img and masks
+        images_aug = rotator.augment_image(base_image) # rotate image
+        masks_aug = rotator.augment_images(base_masks) # rotate matching masks
 
-    number_of_augmented_images_per_original = args.number_of_augmented_images_per_original
-    if re.search('class_Pure_Quartz_Carbonate', base_name):
-        number_of_augmented_images_per_original = number_of_augmented_images_per_original * 2
+        # update counter
+        counter += 1
 
-    images_list = []
-    masks_list = []
-    for i in range(number_of_augmented_images_per_original):
-        images_list.append(base_image)
-        masks_list.append(base_mask)
+        # create output directories
+        output_dir = "{}/{}_rot{}".format(args.output_dir, key, counter)
+        out_img_dir = "{}/{}".format(output_dir, "images")
+        out_mask_dir = "{}/{}".format(output_dir, "masks")
 
-    # convert the image lists to an array of images as expected by imgaug
-    images = np.stack(images_list, axis=0)
-    masks = np.stack(masks_list, axis=0)
+        # Create results directories
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
-    # write out the un-augmented image/mask pair
-    print("writing out the un-augmented image/mask pair")
-    output_base_name = "{}_orig{}".format(os.path.splitext(base_name)[0], os.path.splitext(base_name)[1])
-    imageio.imwrite("{}/{}".format(augmented_images_directory, output_base_name), base_image)
-    imageio.imwrite("{}/{}".format(augmented_masks_directory, output_base_name), base_mask)
-    total_images_output += 1
+        if not os.path.exists(out_img_dir):
+            os.makedirs(out_img_dir)
 
-    number_of_augmentations_for_this_image = 0
-    number_of_retries = 0
+        if not os.path.exists(out_mask_dir):
+            os.makedirs(out_mask_dir)
 
-    while number_of_augmentations_for_this_image < number_of_augmented_images_per_original:
-        # Convert the stochastic sequence of augmenters to a deterministic one.
-        # The deterministic sequence will always apply the exactly same effects to the images.
-        if number_of_retries == 0:
-            affine_det = affine_seq.to_deterministic()  # call this for each batch again, NOT only once at the start
-            images_aug = affine_det.augment_images(images)
-            masks_aug = affine_det.augment_images(masks)
-        else:
-            affine_det = no_rotation_affine_seq.to_deterministic()  # call this for each batch again, NOT only once at the start
-            images_aug = affine_det.augment_images(images)
-            masks_aug = affine_det.augment_images(masks)
+        # save augmented image
+        img_out = "{}/{}_rot{}.png".format(out_img_dir, key, counter)
+        imageio.imwrite(img_out, images_aug)
 
-        # apply the colour augmentations to the images but not the masks
-        if args.augment_colour == True:
-            images_aug = colour_seq.augment_images(images_aug)
+        for i, mask in enumerate(masks_aug):
+            mask_out = "{}/{}_rot{}_{}.png".format(out_mask_dir, key, counter, i)
+            imageio.imwrite(mask_out, masks_aug[i])
 
-        # now write out the augmented image/mask pair
-        print("writing out the augmented image/mask pair")
-        for i in range(len(images_aug)):
-            if np.count_nonzero(masks_aug[i]) > (base_mask_pixel_count * MASK_PIXEL_THRESHOLD):
-                output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0],
-                                                         number_of_augmentations_for_this_image,
-                                                         os.path.splitext(base_name)[1])
-                imageio.imwrite("{}/{}".format(augmented_images_directory, output_base_name), images_aug[i])
-                imageio.imwrite("{}/{}".format(augmented_masks_directory, output_base_name), masks_aug[i])
-                number_of_augmentations_for_this_image += 1
-                if number_of_augmentations_for_this_image == number_of_augmented_images_per_original:
-                    break
-            else:
-                print("discarding image/mask pair {} - insufficient label".format(i + 1))
-        print("completed {} augmentations for this image.".format(number_of_augmentations_for_this_image))
-        number_of_retries += 1
-    total_images_output += number_of_augmentations_for_this_image
+    # loop through and augment each image three times, leaving masks untouched
+    counter2 = 0
+    while counter2 < 4:
 
-print("augmented set of {} images generated from {} input images".format(total_images_output, len(image_file_list)))
+        # create transforms to image and masks
+        augmentor = transformers.to_deterministic()  # set same random augmentation for img
+        images_aug = augmentor.augment_image(base_image)
+
+        # update counter
+        counter2 += 1
+
+        # create output directories
+        output_dir2 = "{}/{}_aug{}".format(args.output_dir, key, counter2)
+        out_img_dir2 = "{}/{}".format(output_dir2, "images")
+        out_mask_dir2 = "{}/{}".format(output_dir2, "masks")
+
+        # Create results directories
+        if not os.path.exists(output_dir2):
+            os.makedirs(output_dir2)
+
+        if not os.path.exists(out_img_dir2):
+            os.makedirs(out_img_dir2)
+
+        if not os.path.exists(out_mask_dir2):
+            os.makedirs(out_mask_dir2)
+
+        # save augmented image
+        img_out = "{}/{}_aug{}.png".format(out_img_dir2, key, counter2)
+        imageio.imwrite(img_out, images_aug)
+
+        for i, mask in enumerate(base_masks):
+            mask_out = "{}/{}_aug{}_{}.png".format(out_mask_dir2, key, counter2, i)
+            imageio.imwrite(mask_out, base_masks[i])
+
+
+
