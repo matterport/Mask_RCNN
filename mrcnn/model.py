@@ -1400,7 +1400,7 @@ def rpn_bbox_loss_graph(config, target_bbox, rpn_match, rpn_bbox):
                                    config.IMAGES_PER_GPU)
 
     loss = smooth_l1_loss(target_bbox, rpn_bbox)
-    
+
     loss = K.switch(tf.size(loss) > 0, K.mean(loss), tf.constant(0.0))
     return loss
 
@@ -2512,6 +2512,14 @@ class MaskRCNN():
                                         TF_WEIGHTS_PATH_NO_TOP,
                                         cache_subdir='models',
                                         md5_hash='725ccbd03d61d7ced5b5c4cd17e7d527')
+            else self.config.BACKBONE == "resnet101":
+                TF_WEIGHTS_PATH_NO_TOP ='https://github.com/keras-team/keras-applications/'\
+                                        'releases/download/resnet/'\
+                                        'resnet101_weights_tf_dim_ordering_tf_kernels_notop.h5'
+                weights_path = get_file('resnet101_tf_no_top.h5',
+                                        TF_WEIGHTS_PATH_NO_TOP,
+                                        cache_subdir='models',
+                                        md5_hash='f1aeb4b969a6efcfb50fad2f0c20cfc5')
         else:
             if self.config.BACKBONE == "mobilenetv1":
                 TF_WEIGHTS_PATH  = 'https://github.com/fchollet/deep-learning-models/'\
