@@ -90,7 +90,7 @@ class Config(object):
 
     # How many anchors per image to use for RPN training
     RPN_TRAIN_ANCHORS_PER_IMAGE = 256
-    
+
     # ROIs kept after tf.nn.top_k and before non-maximum suppression
     PRE_NMS_LIMIT = 6000
 
@@ -209,6 +209,9 @@ class Config(object):
 
     # Gradient norm clipping
     GRADIENT_CLIP_NORM = 5.0
+
+    # # ModelCheckpoint to save the model for each epoch
+    save_best_only = False
 
     def __init__(self):
         """Set values of computed attributes."""
