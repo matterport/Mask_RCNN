@@ -24,7 +24,8 @@ import warnings
 from distutils.version import LooseVersion
 
 # URL from which to download the latest COCO trained weights
-COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
+# This was a really problem for me, because it's not working directly, I don't know why?!
+COCO_MODEL_URL = "http://link.zhihu.com/?target=https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
 
 
 ############################################################
