@@ -29,6 +29,11 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+bin/
+etc/
+man/
+share/
+pyvenv.cfg
 
 # Installer logs
 pip-log.txt
