@@ -31,7 +31,7 @@ Here `${DATA_DIR}` is the root/parent directory for the dataset which will be pa
 ## Apply Driveable Area Filter
 Apply on an image:
 
-```bash
+```shell
 python3 driving_area.py detect --weights=/path/to/mask_rcnn/mask_rcnn_driveable.h5 --image=<file name or URL>
 ```
 
