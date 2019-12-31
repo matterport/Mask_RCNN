@@ -42,7 +42,6 @@ def test_training(tmpdir, model_data):
     model_path = model.find_last()
     # Load trained weights
     model.load_weights(model_path, by_name=True)
-    #image_id = random.choice(dataset_val.image_ids)
     original_image, image_meta, gt_class_id, gt_bbox, gt_mask = \
         modellib.load_image_gt(dataset_val, config,
                                0, use_mini_mask=False)
@@ -50,7 +49,7 @@ def test_training(tmpdir, model_data):
     results = model.detect([original_image], verbose=0)
     r = results[0]
 
-    assert (gt_class_id == r['class_ids']).all()
+    assert gt_class_id == r['class_ids']
 
 
 class FixShapesDataset(ShapesDataset):
