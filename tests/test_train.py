@@ -15,12 +15,12 @@ def test_training(tmpdir, model_data):
     config = UnittestTrainConfig()
     # Training dataset
     dataset_train = ShapesDataset()
-    dataset_train.load_shapes(20, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+    dataset_train.load_shapes(500, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = ShapesDataset()
-    dataset_val.load_shapes(10, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
+    dataset_val.load_shapes(50, config.IMAGE_SHAPE[0], config.IMAGE_SHAPE[1])
     dataset_val.prepare()
     model = modellib.MaskRCNN(mode="training", config=config,
                               model_dir=tmpdir)
@@ -50,12 +50,7 @@ def test_training(tmpdir, model_data):
     results = model.detect([original_image], verbose=0)
     r = results[0]
 
-    print("a")
-    # log("original_image", original_image)
-    # log("image_meta", image_meta)
-    # log("gt_class_id", gt_class_id)
-    # log("gt_bbox", gt_bbox)
-    # log("gt_mask", gt_mask)
+    assert (gt_class_id == r['class_ids']).all()
 
 
 class FixShapesDataset(ShapesDataset):
