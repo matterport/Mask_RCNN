@@ -237,5 +237,9 @@ A computer vision class project by HU Shiyu to apply the color pop effect on peo
 ### [Mapping Challenge](https://github.com/crowdAI/crowdai-mapping-challenge-mask-rcnn): Convert satellite imagery to maps for use by humanitarian organisations.
 ![Mapping Challenge](assets/mapping_challenge.png)
 
+### [Urban water inlet features detection from EagleView aerial imagery](https://towardsdatascience.com/urban-water-inlet-features-detection-from-eagleview-aerial-imagery-using-mask-r-cnn-keras-arcgis-fd3f2ae062bf) A promising deep learning practice.
+![Urban water inlet features dection](assets/waterinlet.png)
+
 ### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
 ![GRASS GIS Image](assets/project_grass_gis.png)
+
