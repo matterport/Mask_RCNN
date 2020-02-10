@@ -40,7 +40,7 @@ import cv2
 import imgaug
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../../")
+ROOT_DIR = os.path.abspath("Mask_RCNN")
 # Inference result directory
 RESULTS_DIR = os.path.abspath("./inference/")
 
@@ -70,8 +70,8 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
-VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
-               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+VOC_CLASSES = ['background', 'M', 'almond', 'apple', 'mango',
+               'uva', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
 
@@ -94,9 +94,13 @@ def voc_label_indices(colormap, colormap2label):
 class VocConfig(Config):
     NAME = "voc"
 
-    IMAGE_PER_GPU = 2
+    IMAGE_PER_GPU = 8
 
     NUM_CLASSES = 1 + 20 # VOC 2012 have 20 classes. "1" is for background.
+
+    BACKBONE = "resnet50"
+
+    STEPS_PER_EPOCH = 500
 
 class InferenceConfig(VocConfig):
     # Set batch size to 1 since we'll be running inference on
@@ -115,7 +119,7 @@ class VocDataset(utils.Dataset):
         """
 
         voc_year = 'VOC' + year
-        Segmentation = os.path.join(dataset_dir, voc_year, 'ImageSets', 'Segmentation')
+        Segmentation = os.path.join(dataset_dir, voc_year, 'ImageSets', 'Main')
         JPEGImages = os.path.join(dataset_dir, voc_year, 'JPEGImages')
         Annotations = os.path.join(dataset_dir, voc_year, 'Annotations')
         SegmentationClass = os.path.join(dataset_dir, voc_year, 'SegmentationClass')
@@ -396,7 +400,7 @@ if __name__ == '__main__':
         #print("evaluate have not been implemented")
         # Validation dataset
         dataset_val = VocDataset()
-        voc = dataset_val.load_voc(args.dataset, "val", year=args.year)
+        voc = dataset_val.load_voc(args.dataset, "test", year=args.year)
         dataset_val.prepare()
         print("Running voc inference on {} images.".format(args.limit))
         inference(model, dataset_val, int(args.limit))
