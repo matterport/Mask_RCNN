@@ -38,6 +38,7 @@ import skimage.draw
 from bs4 import BeautifulSoup as bs
 import cv2
 import imgaug
+from xml.etree import ElementTree
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("Mask_RCNN")
@@ -180,6 +181,35 @@ class VocDataset(utils.Dataset):
         if image.shape[-1] == 4:
             image = image[..., :3]
         return image
+
+    def extract_boxes(self, annotation_file):
+        """
+        Load a file and extract its respecive bounding boxes.
+        annotation_file: annotation file from the image
+
+        Return:
+        boxes: a list of the annotation's bounding boxes
+        width: the image's width
+        height: the image's height
+        """
+
+        tree = ElementTree.parse(annotation_file)
+        root = tree.getroot()
+        
+        boxes = list()
+        for box in root.findall('.//bndbox'):
+            xmin = float(box.find('xmin').text)
+            ymin = float(box.find('ymin').text)
+            xmax = float(box.find('xmax').text)
+            ymax = float(box.find('ymax').text)
+            coors = [xmin, ymin, xmin, ymax]
+            boxes.append(coors)
+
+        width = int(root.find('.//size/width').text)
+        height = int(root.find('.//size/height').text)
+
+        return boxes, width, height
+
 
     def load_class_label(self, image_id):
         '''Mapping SegmentationClass image's color to indice of ground truth 
