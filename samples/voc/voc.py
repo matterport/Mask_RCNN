@@ -99,7 +99,7 @@ class VocConfig(Config):
 
     IMAGE_PER_GPU = 8
 
-    NUM_CLASSES = 1 + 20 # VOC 2012 have 20 classes. "1" is for background.
+    NUM_CLASSES = 1 + 1  # Custom VOC formatted folder has 1 class. "1" is for background.
 
     BACKBONE = "resnet50"
 
