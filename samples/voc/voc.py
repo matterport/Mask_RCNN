@@ -76,12 +76,14 @@ VOC_CLASSES = ['background', 'M', 'almond', 'apple', 'mango',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
 
+
 def build_colormap2label():
     """Build a RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
     return colormap2label
+
 
 def voc_label_indices(colormap, colormap2label):
     """Map a RGB color to a label."""
@@ -102,6 +104,7 @@ class VocConfig(Config):
     BACKBONE = "resnet50"
 
     STEPS_PER_EPOCH = 500
+
 
 class InferenceConfig(VocConfig):
     # Set batch size to 1 since we'll be running inference on
@@ -160,7 +163,7 @@ class VocDataset(utils.Dataset):
 
         tree = ElementTree.parse(annotation_file)
         root = tree.getroot()
-        
+
         boxes = list()
         for box in root.findall('.//bndbox'):
             xmin = float(box.find('xmin').text)
@@ -228,17 +231,20 @@ def inference(model, dataset, limit):
         source_id = dataset.image_info[image_id]["id"]
         # Save image with masks
         if len(r['class_ids']) > 0:
-            print('[*] {}th image has {} instance(s).'.format(image_id, len(r['class_ids'])))
+            print('[*] {}th image has {} instance(s).'.format(image_id,
+                                                              len(r['class_ids'])))
             visualize.display_instances(
                 image, r['rois'], r['masks'], r['class_ids'],
                 dataset.class_names, r['scores'],
                 show_bbox=True, show_mask=True,
                 title="Predictions")
-            plt.savefig("{}/{}".format(time_dir, dataset.image_info[image_id]["id"]))
+            plt.savefig("{}/{}".format(time_dir,
+                                       dataset.image_info[image_id]["id"]))
             plt.close()
         else:
             plt.imshow(image)
-            plt.savefig("{}/noinstance_{}".format(time_dir, dataset.image_info[image_id]["id"]))
+            plt.savefig("{}/noinstance_{}".format(time_dir,
+                                                  dataset.image_info[image_id]["id"]))
             print('[*] {}th image have no instance.'.format(image_id))
             plt.close()
 
@@ -273,13 +279,13 @@ if __name__ == '__main__':
                         help='Images to use for evaluation (default=10)')
 
     # TODO
-    '''
+    """
     parser.add_argument('--download', required=False,
                         default=False,
                         metavar="<True|False>",
                         help='Automatically download and unzip PASCAL VOC files (default=False)',
                         type=bool)
-    '''
+    """
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -287,7 +293,6 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     #print("Auto Download: ", args.download)
-
 
     # Configurations
     if args.command == "train":
@@ -303,7 +308,6 @@ if __name__ == '__main__':
     else:
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
-
 
     # Select weights file to load
     if args.model.lower() == "coco":
@@ -327,7 +331,6 @@ if __name__ == '__main__':
     else:
         print("Loading weights ", model_path)
         model.load_weights(model_path, by_name=True)
-
 
     # Train or evaluate
     if args.command == "train":
@@ -385,4 +388,3 @@ if __name__ == '__main__':
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'inference'".format(args.command))
-
