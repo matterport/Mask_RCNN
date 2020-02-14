@@ -135,10 +135,10 @@ class VocDataset(utils.Dataset):
 
         boxes = list()
         for box in root.findall('.//bndbox'):
-            xmin = float(box.find('xmin').text)
-            ymin = float(box.find('ymin').text)
-            xmax = float(box.find('xmax').text)
-            ymax = float(box.find('ymax').text)
+            xmin = int(box.find('xmin').text)
+            ymin = int(box.find('ymin').text)
+            xmax = int(box.find('xmax').text)
+            ymax = int(box.find('ymax').text)
             coors = [xmin, ymin, xmin, ymax]
             boxes.append(coors)
 
