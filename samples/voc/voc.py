@@ -112,27 +112,25 @@ class InferenceConfig(VocConfig):
 
 
 class VocDataset(utils.Dataset):
-    def load_voc(self, dataset_dir, trainval, year='2012'):
-        """Load a voc_year of the VOC dataset.
-        dataset_dir: The root directory of the VOC dataset, example: '/mnt/disk1/VOCdevkit'
+    def load_voc(self, dataset_dir, trainval, class_name):
+        """
+        Load a folder with VOC format.
+        dataset_dir: The root directory of the VOC dataset,
         trainval: 'train' or 'val' for Training or Validation
         year: '2007' or '2012' for VOC dataset
         """
 
-        voc_year = 'VOC' + year
-        Segmentation = os.path.join(dataset_dir, voc_year, 'ImageSets', 'Main')
-        JPEGImages = os.path.join(dataset_dir, voc_year, 'JPEGImages')
-        Annotations = os.path.join(dataset_dir, voc_year, 'Annotations')
-        SegmentationClass = os.path.join(dataset_dir, voc_year, 'SegmentationClass')
-        SegmentationObject = os.path.join(dataset_dir, voc_year, 'SegmentationObject')
+        # voc_year = 'VOC' + year It is nor required
 
-        # load classes of VOC, BG is initialed in parent class.
-        for idx, class_name in enumerate(VOC_CLASSES[1:]):
-            self.add_class("voc", idx + 1, class_name)
+        self.class_name = class_name
+
+        Main = os.path.join(dataset_dir, 'ImageSets', 'Main')
+        JPEGImages = os.path.join(dataset_dir, 'JPEGImages')
+        Annotations = os.path.join(dataset_dir, 'Annotations')
 
         assert trainval in ['train', 'val']
-        # read segmentation annotation file
-        annotation_file = os.path.join(Segmentation, trainval + '.txt')
+        # read annotation file
+        annotation_file = os.path.join(Main, trainval + '.txt')
         image_ids = []
         with open(annotation_file) as f:
             image_id_list = [line.strip() for line in f]
@@ -140,47 +138,14 @@ class VocDataset(utils.Dataset):
 
         for image_id in image_ids:
             image_file_name = '{}.jpg'.format(image_id)
-            mask_file_name = '{}.png'.format(image_id)
             xml_file_name = '{}.xml'.format(image_id)
             image_path = os.path.join(JPEGImages, image_file_name)
+            annotation_path = os.path.join(Annotations, xml_file_name)
 
-            # Parse Annotations XML File
-            with open(os.path.join(Annotations, xml_file_name)) as f:
-                soup = bs(f, 'xml')
-            objects = soup.find_all('object')
-            image_contains_class_flag = False
-            for obj in objects:
-                class_name = obj.find('name').text
-                if class_name in VOC_CLASSES:
-                    image_contains_class_flag = True
-                    continue
-            if image_contains_class_flag:
-                class_mask_path = os.path.join(SegmentationClass, mask_file_name)
-                object_mask_path = os.path.join(SegmentationObject, mask_file_name)
-                self.add_image("voc",
-                                image_id=image_file_name,
-                                path=image_path,
-                                class_mask_path=class_mask_path,
-                                object_mask_path=object_mask_path)
-
-
-
-    def load_raw_mask(self, image_id, class_or_object):
-        '''load two kinds of mask of VOC dataset.
-        image_id: id of mask
-        class_or_object: 'class_mask' or 'object_mask' for SegmentationClass or SegmentationObject
-
-        Returns:
-        image: numpy of mask image.
-        '''
-        assert class_or_object in ['class_mask', 'object_mask']
-        image = skimage.io.imread(self.image_info[image_id][class_or_object+'_path'])
-        if image.ndim != 3:
-            image = skimage.color.gray2rgb(image)
-        # If has an alpha channel, remove it for consistency
-        if image.shape[-1] == 4:
-            image = image[..., :3]
-        return image
+            self.add_image('voc',
+                           image_id=image_file_name,
+                           path=image_path,
+                           annotation=annotation_path)
 
     def extract_boxes(self, annotation_file):
         """
