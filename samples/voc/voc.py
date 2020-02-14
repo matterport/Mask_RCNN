@@ -12,19 +12,19 @@ Training on VOC Written by genausz(genausz@hotmail.com)
 Usage: import the module (see Jupyter notebooks for examples), or run from
        the command line as such:
     # Train a model from coco weights.
-    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=coco --year=2012
+    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=coco --class-name=CLASS
 
     # Train a new model starting from ImageNet weights.
-    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=imagenet --year=2012
+    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=imagenet --class-name=CLASS
 
     # Continue training a model that you had trained earlier
-    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=/path/to/weights.h5  --year=2012
+    python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=/path/to/weights.h5  --class-name=CLASS
 
     # Continue training the last model you trained
     python3 voc.py train --dataset=/path/to/VOCdevkit/ --model=last
 
     # Run VOC inference on the last model you trained
-    python3 voc.py inference --dataset=/path/to/VOCdevkit/ --model=last --year=2012 --limit=50
+    python3 voc.py inference --dataset=/path/to/VOCdevkit/ --model=last --class-name=CLASS --limit=50
 """
 
 
@@ -95,6 +95,7 @@ class VocDataset(utils.Dataset):
         # voc_year = 'VOC' + year It is nor required
 
         self.class_name = class_name
+        self.add_class('voc', 1, class_name)
 
         Main = os.path.join(dataset_dir, 'ImageSets', 'Main')
         JPEGImages = os.path.join(dataset_dir, 'JPEGImages')
@@ -350,7 +351,7 @@ if __name__ == '__main__':
         #print("evaluate have not been implemented")
         # Validation dataset
         dataset_val = VocDataset()
-        voc = dataset_val.load_voc(args.dataset, "test", year=args.year)
+        voc = dataset_val.load_voc(args.dataset, "test", class_name=args.class_name)
         dataset_val.prepare()
         print("Running voc inference on {} images.".format(args.limit))
         inference(model, dataset_val, int(args.limit))
