@@ -92,8 +92,6 @@ class VocDataset(utils.Dataset):
         year: '2007' or '2012' for VOC dataset
         """
 
-        # voc_year = 'VOC' + year It is nor required
-
         self.class_name = class_name
         self.add_class('voc', 1, class_name)
 
