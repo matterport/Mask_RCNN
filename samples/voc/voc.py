@@ -62,38 +62,6 @@ DEFAULT_DATASET_YEAR = '2012'
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 
-# VOC DATASET MASK MAP FUNCTION
-# Following codes are mapping each mask color(SegmentationClass) to ground truth index.
-# - reference: https://d2l.ai/chapter_computer-vision/semantic-segmentation-and-dataset.html
-VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
-                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
-                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
-                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
-                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
-                [0, 64, 128]]
-VOC_CLASSES = ['background', 'M', 'almond', 'apple', 'mango',
-               'uva', 'bus', 'car', 'cat', 'chair', 'cow',
-               'diningtable', 'dog', 'horse', 'motorbike', 'person',
-               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
-
-
-def build_colormap2label():
-    """Build a RGB color to label mapping for segmentation."""
-    colormap2label = np.zeros(256 ** 3)
-    for i, colormap in enumerate(VOC_COLORMAP):
-        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
-    return colormap2label
-
-
-def voc_label_indices(colormap, colormap2label):
-    """Map a RGB color to a label."""
-    colormap = colormap.astype('int32')
-    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
-           + colormap[:, :, 2])
-    return colormap2label[idx]
-# VOC DATASET MASK MAP FUNCTION
-
-
 class VocConfig(Config):
     NAME = "voc"
 
