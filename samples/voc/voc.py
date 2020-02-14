@@ -262,10 +262,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/voc/",
                         help='Directory of the PASCAL VOC dataset')
-    parser.add_argument('--year', required=False,
-                        default=DEFAULT_DATASET_YEAR,
-                        metavar="<year>",
-                        help='Year of the PASCAL VOC dataset (2007 or 2012) (default=2012)')
+    parser.add_argument('--class-name',
+                        metavar="<class-name>",
+                        help='The class of the VOC formatted dataset')
     parser.add_argument('--model', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'voc'")
@@ -290,7 +289,7 @@ if __name__ == '__main__':
     print("Command: ", args.command)
     print("Model: ", args.model)
     print("Dataset: ", args.dataset)
-    print("Year: ", args.year)
+    print("Class: ", args.class_name)
     print("Logs: ", args.logs)
     #print("Auto Download: ", args.download)
 
@@ -337,12 +336,13 @@ if __name__ == '__main__':
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = VocDataset()
-        dataset_train.load_voc(args.dataset, "train", year=args.year)
+        dataset_train.load_voc(args.dataset, "train",
+                               class_name=args.class_name)
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = VocDataset()
-        dataset_val.load_voc(args.dataset, "val", year=args.year)
+        dataset_val.load_voc(args.dataset, "val", class_name=args.class_name)
         dataset_val.prepare()
 
         # Image Augmentation
