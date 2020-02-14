@@ -175,50 +175,33 @@ class VocDataset(utils.Dataset):
 
         return boxes, width, height
 
-
-    def load_class_label(self, image_id):
-        '''Mapping SegmentationClass image's color to indice of ground truth 
-        image_id: id of mask
-        Return:
-        class_label: [height, width] matrix contains values form 0 to 20
-        '''
-        raw_mask = self.load_raw_mask(image_id, 'class_mask')
-        class_label = voc_label_indices(raw_mask, build_colormap2label())
-        return class_label
-
     def load_mask(self, image_id):
-        '''Mapping annotation images to real Masks(MRCNN needed)
+        """
+        Mapping annotation images to real Masks(MRCNN needed)
         image_id: id of mask
         Returns:
         masks: A bool array of shape [height, width, instance count] with
             one mask per instance.
         class_ids: a 1D array of class IDs of the instance masks.
-        '''
-        class_label = self.load_class_label(image_id)
-        instance_mask = self.load_raw_mask(image_id, 'object_mask')
-        max_indice = int(np.max(class_label))
+        """
 
-        instance_label = []
-        instance_class = []
-        for i in range(1, max_indice+1):
-            if not np.any(class_label==i):
-                continue
-            gt_indice = i
-            object_filter = class_label == i
-            object_filter = object_filter.astype(np.uint8)
-            object_filter = np.dstack((object_filter,object_filter,object_filter))
-            filtered = np.multiply(object_filter, instance_mask)
-            gray = cv2.cvtColor(filtered, cv2.COLOR_RGB2GRAY)
-            max_gray = np.max(gray)
-            for sub_index in range(1, max_gray+1):
-                if not np.any(gray==sub_index):
-                    continue
-                instance_filter = gray == sub_index
-                instance_label += [instance_filter]
-                instance_class += [gt_indice]
-        masks = np.asarray(instance_label).transpose((1,2,0))
-        classes_ids = np.asarray(instance_class)
-        return masks, classes_ids
+        info = self.image_info[image_id]
+        path = info['annotation']
+
+        boxes, w, h = self.extract_boxes(path)
+
+        masks = np.zeros([h, w, len(boxes)], dtype='uint8')
+
+        class_ids = list()
+
+        for i in range(len(boxes)):
+            box = boxes[i]
+            row_s, row_e = box[1], box[3]
+            col_s, col_e = box[0], box[2]
+            masks[row_s:row_e, col_s:col_e, i] = 1
+            class_ids.append(self.class_names.index(self.class_name))
+
+        return masks, np.asarray(class_ids, dtype='int32')
 
 
 ############################################################
