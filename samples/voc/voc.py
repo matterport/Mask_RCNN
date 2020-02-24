@@ -79,7 +79,7 @@ class InferenceConfig(VocConfig):
     # Set batch size to 1 since we'll be running inference on
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
+    IMAGES_PER_GPU = 8
     DETECTION_MIN_CONFIDENCE = 0
 
 
@@ -99,7 +99,7 @@ class VocDataset(utils.Dataset):
         JPEGImages = os.path.join(dataset_dir, 'JPEGImages')
         Annotations = os.path.join(dataset_dir, 'Annotations')
 
-        assert trainval in ['train', 'val']
+        assert trainval in ['train', 'val', 'test']
         # read annotation file
         annotation_file = os.path.join(Main, trainval + '.txt')
         image_ids = []
@@ -216,6 +216,41 @@ def inference(model, dataset, limit):
             print('[*] {}th image have no instance.'.format(image_id))
             plt.close()
 
+
+def evaluate(model, dataset):
+    # Compute VOC-Style mAP @ IoU=0.3
+    APs = []
+    F1 = []
+    start = datetime.datetime.now()
+
+    for image_id in dataset_val.image_ids:
+        # Load image and ground truth data
+        image, image_meta, gt_class_id, gt_bbox, gt_mask =\
+            modellib.load_image_gt(dataset, InferenceConfig,
+                                   image_id, use_mini_mask=False)
+        molded_images = np.expand_dims(
+            modellib.mold_image(image, InferenceConfig), 0)
+        # Run object detection
+        results = model.detect([image], verbose=0)
+        r = results[0]
+        # Compute AP
+        AP, precisions, recalls, overlaps =\
+            utils.compute_ap(gt_bbox, gt_class_id, gt_mask,
+                             r["rois"], r["class_ids"], r["scores"], r['masks'], 0.3)
+
+        # Compute F1
+        F1_classes = []
+        for precision, recall in precisions, recalls:
+            F1_classes.append(2*((precision*recall)/(precision+recall)))
+
+        APs.append(AP)
+        F1.append(F1_classes)
+
+    final = datetime.datetime.now() - start
+    print("Inference time in seconds: ", final)
+    print("Inference time in hours: ", final/(60*60))
+    print("mAP: ", np.mean(APs))
+    print("mF1: ", F1)
 
 
 if __name__ == '__main__':
@@ -349,10 +384,21 @@ if __name__ == '__main__':
         #print("evaluate have not been implemented")
         # Validation dataset
         dataset_val = VocDataset()
-        voc = dataset_val.load_voc(args.dataset, "test", class_name=args.class_name)
+        voc = dataset_val.load_voc(
+            args.dataset, "test", class_name=args.class_name)
         dataset_val.prepare()
         print("Running voc inference on {} images.".format(args.limit))
         inference(model, dataset_val, int(args.limit))
+
+    elif args.command == "test":
+        dataset_test = VocConfig()
+        dataset_test.load_voc(args.dataset, "test", class_name=args.class_name)
+        dataset_test.prepare()
+
+        print("Testing model with {} testing dataset".format(args.class_name))
+
+        evaluate(model, dataset_test)
+
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'inference'".format(args.command))
