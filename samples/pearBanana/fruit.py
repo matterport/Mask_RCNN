@@ -61,15 +61,19 @@ class BalloonConfig(Config):
     # Give the configuration a recognizable name
     NAME = "fruit"
 
+    # NUMBER OF GPUs to use. When using only a CPU, this needs to be set to 1.
+    GPU_COUNT = 1
+
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + balloon
+    NUM_CLASSES = 1 + 2  # Background + banana + pear
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 50
+    STEPS_PER_EPOCH = 100
+    VALIDATION_STEPS = 40
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -212,7 +216,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=10,
+                epochs=30,
                 layers='heads')
 
 
