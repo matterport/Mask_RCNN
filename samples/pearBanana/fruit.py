@@ -72,8 +72,8 @@ class BalloonConfig(Config):
     NUM_CLASSES = 1 + 2  # Background + banana + pear
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
-    VALIDATION_STEPS = 20
+    STEPS_PER_EPOCH = 500
+    VALIDATION_STEPS = 30
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -120,6 +120,7 @@ class BalloonDataset(utils.Dataset):
         # The VIA tool saves images in the JSON even if they don't have any
         # annotations. Skip unannotated images.
         annotations = [a for a in annotations if a['regions']]
+        print("the length of annotations is:-----------",len(annotations),"------------------")
 
         # Add images
         for a in annotations:
@@ -128,19 +129,19 @@ class BalloonDataset(utils.Dataset):
             # shape_attributes (see json format above)
             # The if condition is needed to support VIA versions 1.x and 2.x.
             if type(a['regions']) is dict:
-                print("--------------------checked VIA is Dict---------------")
+                # print("--------------------checked VIA is Dict---------------")
                 polygons = [r['shape_attributes'] for r in a['regions'].values()]
                 name = [r['region_attributes']['name'] for r in a['regions'].values()]
                 name_dict = {"banana": 1, "pear": 2}
                 name_id = [name_dict[a] for a in name]
-                print("for this image, classified as: -----------------", name_id, "---------------------")
+                # print("for this image, classified as: -----------------", name_id, "---------------------")
             else:
-                print("--------------------checked VIA is list---------------")
+                # print("--------------------checked VIA is list---------------")
                 polygons = [r['shape_attributes'] for r in a['regions']]
                 name = [r['region_attributes']['name'] for r in a['regions']]
                 name_dict = {"banana": 1, "pear": 2}
                 name_id = [name_dict[a] for a in name]
-                print("for this image, classified as: -----------------", name_id, "---------------------")
+                # print("for this image, classified as: -----------------", name_id, "---------------------")
 
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
@@ -156,6 +157,7 @@ class BalloonDataset(utils.Dataset):
                 class_id=name_id,
                 width=width, height=height,
                 polygons=polygons)
+        print("!!!!!!load image into annotation finished!!!!!")
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -216,7 +218,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=10,
+                epochs=2,
                 layers='heads')
 
 
