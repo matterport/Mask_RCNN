@@ -221,11 +221,11 @@ def train(model):
                 epochs=2,
                 layers='heads')
 
-    # print("Training all layers")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
-    #             epochs=6,
-    #             layers='all')
+    print("Training all layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=4,
+                layers='all')
 
 
 def color_splash(image, mask):
