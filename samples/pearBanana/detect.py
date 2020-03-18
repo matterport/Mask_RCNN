@@ -37,7 +37,15 @@ class InferenceConfig(fruit.BalloonConfig):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
 
-    DETECTION_MIN_CONFIDENCE = 0.7
+    POST_NMS_ROIS_INFERENCE = 2000
+
+    # Non-max suppression threshold to filter RPN proposals.
+    # You can increase this during training to generate more propsals.
+    RPN_NMS_THRESHOLD = 0.7
+
+    # Minimum probability value to accept a detected instance
+    # ROIs below this threshold are skipped
+    DETECTION_MIN_CONFIDENCE = 0.6
 
 config = InferenceConfig()
 config.display()

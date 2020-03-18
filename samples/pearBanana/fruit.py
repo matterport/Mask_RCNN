@@ -71,12 +71,22 @@ class BalloonConfig(Config):
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + banana + pear
 
+    # Image mean (RGB)
+    MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
+
+    # Non-max suppression threshold to filter RPN proposals.
+    # You can increase this during training to generate more propsals.
+    RPN_NMS_THRESHOLD = 0.9
+
+    # Minimum probability value to accept a detected instance
+    # ROIs below this threshold are skipped
+    DETECTION_MIN_CONFIDENCE = 0.7
+
+    MAX_GT_INSTANCES = 200
+
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 500
     VALIDATION_STEPS = 35
-
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
 
 
 ############################################################
