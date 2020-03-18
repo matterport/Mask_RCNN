@@ -73,7 +73,7 @@ class BalloonConfig(Config):
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 500
-    VALIDATION_STEPS = 30
+    VALIDATION_STEPS = 35
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -220,6 +220,12 @@ def train(model):
                 learning_rate=config.LEARNING_RATE,
                 epochs=2,
                 layers='heads')
+
+    print("Training all layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=4,
+                layers='all')
 
 
 def color_splash(image, mask):
