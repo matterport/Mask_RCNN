@@ -68,6 +68,11 @@ class BalloonConfig(Config):
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 1
 
+    # Backbone network architecture
+    # Supported values are: resnet50, resnet101
+    BACKBONE = "resnet101"
+    # BACKBONE = "resnet50"
+
     # Number of classes (including background)
     NUM_CLASSES = 1 + 2  # Background + banana + pear
 
@@ -87,6 +92,12 @@ class BalloonConfig(Config):
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 300
     VALIDATION_STEPS = 30
+
+    # Weight decay regularization
+    # affect L2 strength and is a good way of preventing overfitting.
+    # try 0.01, 0.005 and 0.001 first, then try more precisely.
+
+    WEIGHT_DECAY = 0.0001
 
 
 ############################################################
@@ -231,9 +242,20 @@ def train(model):
                 epochs=20,
                 layers='heads')
 
-    print("Training all layers")
+    #MULTIPLE STAGE to help converge easier, since we have limited dataset
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    print("Fine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
+                epochs=30,
+                layers='4+')
+
+    # Training - Stage 3
+    # Fine tune all layers
+    print("Training all layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/10,
                 epochs=40,
                 layers='all')
 
