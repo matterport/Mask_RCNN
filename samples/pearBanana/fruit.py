@@ -86,7 +86,7 @@ class BalloonConfig(Config):
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 500
-    VALIDATION_STEPS = 35
+    VALIDATION_STEPS = 500
 
 
 ############################################################
