@@ -85,8 +85,8 @@ class BalloonConfig(Config):
     MAX_GT_INSTANCES = 200
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 500
-    VALIDATION_STEPS = 500
+    STEPS_PER_EPOCH = 300
+    VALIDATION_STEPS = 30
 
 
 ############################################################
@@ -228,13 +228,13 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=2,
+                epochs=20,
                 layers='heads')
 
     print("Training all layers")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=4,
+                epochs=40,
                 layers='all')
 
 
