@@ -130,6 +130,13 @@ class BalloonConfig(Config):
     STEPS_PER_EPOCH = 300
     VALIDATION_STEPS = 30
 
+    # Learning rate and momentum
+    # The Mask RCNN paper uses lr=0.02, but on TensorFlow it causes
+    # weights to explode. Likely due to differences in optimizer
+    # implementation.
+    LEARNING_RATE = 0.001
+    LEARNING_MOMENTUM = 0.9
+
     # Weight decay regularization
     # affect L2 strength and is a good way of preventing overfitting.
     # try 0.01, 0.005 and 0.001 first, then try more precisely.
@@ -307,8 +314,8 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
+                epochs=4,
                 augmentation=augmentation,
-                epochs=20,
                 layers='heads')
 
     # #MULTIPLE STAGE to help converge easier, since we have limited dataset
@@ -316,7 +323,7 @@ def train(model):
     # # Finetune layers from ResNet stage 4 and up
     # print("Fine tune Resnet stage 4 and up")
     # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE,
+    #             learning_rate=config.LEARNING_RATE/10,
     #             epochs=30,
     #             layers='4+')
     #
@@ -324,7 +331,7 @@ def train(model):
     # # Fine tune all layers
     # print("Training all layers")
     # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/10,
+    #             learning_rate=config.LEARNING_RATE/100,
     #             epochs=40,
     #             layers='all')
 

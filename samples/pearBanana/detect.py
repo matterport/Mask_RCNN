@@ -26,7 +26,7 @@ import fruit
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
 # Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "logs/fruit20200319T1352/mask_rcnn_fruit_0004.h5")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "logs/fruit20200320T1939/mask_rcnn_fruit_0004.h5")
 
 # Directory of images to run detection on
 IMAGE_DIR = os.path.join(ROOT_DIR, "datasets/fruit/test")
@@ -51,7 +51,7 @@ class InferenceConfig(fruit.BalloonConfig):
 
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
-    DETECTION_MIN_CONFIDENCE = 0.5
+    DETECTION_MIN_CONFIDENCE = 0.6
 
     # Max number of final detections
     DETECTION_MAX_INSTANCES = 200
