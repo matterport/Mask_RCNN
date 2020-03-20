@@ -111,6 +111,7 @@ class BalloonConfig(Config):
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.7
 
+    # Maximum number of ground truth instances to use in one image
     MAX_GT_INSTANCES = 200
 
     # Number of training steps per epoch

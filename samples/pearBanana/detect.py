@@ -43,7 +43,7 @@ class InferenceConfig(fruit.BalloonConfig):
     # How every, the detection speed will be slowed dramatically
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
-    IMAGE_MAX_DIM = 1600 # was 1024
+    IMAGE_MAX_DIM = 1920 # was 1024
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
@@ -52,6 +52,9 @@ class InferenceConfig(fruit.BalloonConfig):
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.5
+
+    # Max number of final detections
+    DETECTION_MAX_INSTANCES = 200
 
 config = InferenceConfig()
 config.display()

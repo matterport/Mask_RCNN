@@ -3,7 +3,7 @@ logs/
 *.h5
 results/
 temp/
-test/
+# test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
