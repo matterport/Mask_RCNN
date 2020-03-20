@@ -33,6 +33,7 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
+from imgaug import augmenters as iaa
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -271,6 +272,32 @@ def train(model):
     dataset_val.load_fruit(args.dataset, "val")
     dataset_val.prepare()
 
+    # default augmentation
+    # augmentation = iaa.Sometimes(0.5, [
+    #     iaa.Fliplr(0.5),
+    #     iaa.GaussianBlur(sigma=(0.0, 5.0))
+    # ])
+
+    # key to handle overfitting on a small training dataset is augmentation
+    augmentation = iaa.Sometimes(.667, iaa.Sequential([
+        iaa.Fliplr(0.5),  # horizontal flips
+        # iaa.Crop(percent=(0, 0.1)),  # random crops
+        # Small gaussian blur with random sigma between 0 and 0.25.
+        # But we only blur about 50% of all images.
+        iaa.Sometimes(0.5,
+                      iaa.GaussianBlur(sigma=(0, 0.25))
+                      ),
+        # Strengthen or weaken the contrast in each image.
+        iaa.ContrastNormalization((0.75, 1.5)),
+        # Make some images brighter and some darker.
+        # In 20% of all cases, we sample the multiplier once per channel,
+        # which can end up changing the color of the images.
+        iaa.Multiply((0.8, 1.2)),
+        iaa.OneOf([iaa.Affine(rotate=90),
+                   iaa.Affine(rotate=180),
+                   iaa.Affine(rotate=270)])
+    ], random_order=True))  # apply augmenters in random order
+
     # *** This training schedule is an example. Update to your needs ***
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
@@ -281,6 +308,7 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
+                augmentation=augmentation,
                 epochs=20,
                 layers='heads')
 
