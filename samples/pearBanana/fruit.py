@@ -103,15 +103,26 @@ class BalloonConfig(Config):
     # Image mean (RGB)
     MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
 
+    # Number of ROIs per image to feed to classifier/mask heads
+    # The Mask RCNN paper uses 512 but often the RPN doesn't generate
+    # enough positive proposals to fill this and keep a positive:negative
+    # ratio of 1:3. You can increase the number of proposals by adjusting
+    # the RPN NMS threshold.
+    TRAIN_ROIS_PER_IMAGE = 512 # was 200
+
     # Non-max suppression threshold to filter RPN proposals.
-    # You can increase this during training to generate more propsals.
-    RPN_NMS_THRESHOLD = 0.9
+    # You can increase this during training to generate more proposals.
+    RPN_NMS_THRESHOLD = 0.7 # default
+
+    # How many anchors per image to use for RPN training
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 320 # was 256
 
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.7
 
     # Maximum number of ground truth instances to use in one image
+    # don't think an identify-able image can hold >200 fruit instances
     MAX_GT_INSTANCES = 200
 
     # Number of training steps per epoch
@@ -123,6 +134,9 @@ class BalloonConfig(Config):
     # try 0.01, 0.005 and 0.001 first, then try more precisely.
 
     WEIGHT_DECAY = 0.0001
+
+    # Max number of final detections
+    DETECTION_MAX_INSTANCES = 200
 
 
 ############################################################
@@ -261,28 +275,31 @@ def train(model):
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
+
+    # we hav limited training data, so train the classifier only might be a gud idea
+    # this ensure we keep the good coco weights untouched
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=20,
                 layers='heads')
 
-    #MULTIPLE STAGE to help converge easier, since we have limited dataset
-    # Training - Stage 2
-    # Finetune layers from ResNet stage 4 and up
-    print("Fine tune Resnet stage 4 and up")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=30,
-                layers='4+')
-
-    # Training - Stage 3
-    # Fine tune all layers
-    print("Training all layers")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE/10,
-                epochs=40,
-                layers='all')
+    # #MULTIPLE STAGE to help converge easier, since we have limited dataset
+    # # Training - Stage 2
+    # # Finetune layers from ResNet stage 4 and up
+    # print("Fine tune Resnet stage 4 and up")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=30,
+    #             layers='4+')
+    #
+    # # Training - Stage 3
+    # # Fine tune all layers
+    # print("Training all layers")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE/10,
+    #             epochs=40,
+    #             layers='all')
 
 
 def color_splash(image, mask):
