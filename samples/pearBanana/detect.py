@@ -39,6 +39,12 @@ class InferenceConfig(fruit.BalloonConfig):
 
     POST_NMS_ROIS_INFERENCE = 2000
 
+    # proved->the higher the image quality, the better the detection accuracy will be increased
+    # How every, the detection speed will be slowed dramatically
+    IMAGE_RESIZE_MODE = "square"
+    IMAGE_MIN_DIM = 800
+    IMAGE_MAX_DIM = 1600 # was 1024
+
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
     RPN_NMS_THRESHOLD = 0.7
