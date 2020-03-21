@@ -55,7 +55,7 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 ############################################################
 
 
-class BalloonConfig(Config):
+class FruitConfig(Config):
     """Configuration for training on the toy  dataset.
     Derives from the base Config class and overrides some values.
     """
@@ -151,10 +151,10 @@ class BalloonConfig(Config):
 #  Dataset
 ############################################################
 
-class BalloonDataset(utils.Dataset):
+class FruitDataset(utils.Dataset):
 
     def load_fruit(self, dataset_dir, subset):
-        """Load a subset of the Balloon dataset.
+        """Load a subset of the Fruit dataset.
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
@@ -234,7 +234,7 @@ class BalloonDataset(utils.Dataset):
             one mask per instance.
         class_ids: a 1D array of class IDs of the instance masks.
         """
-        # If not a balloon dataset image, delegate to parent class.
+        # If not a Fruit dataset image, delegate to parent class.
         image_info = self.image_info[image_id]
         if image_info["source"] != "fruit":
             return super(self.__class__, self).load_mask(image_id)
@@ -270,12 +270,12 @@ class BalloonDataset(utils.Dataset):
 def train(model):
     """Train the model."""
     # Training dataset.
-    dataset_train = BalloonDataset()
+    dataset_train = FruitDataset()
     dataset_train.load_fruit(args.dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = BalloonDataset()
+    dataset_val = FruitDataset()
     dataset_val.load_fruit(args.dataset, "val")
     dataset_val.prepare()
 
@@ -421,13 +421,13 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN to detect balloons.')
+        description='Train Mask R-CNN to detect Fruit.')
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'splash'")
     parser.add_argument('--dataset', required=False,
-                        metavar="/path/to/balloon/dataset/",
-                        help='Directory of the Balloon dataset')
+                        metavar="/path/to/Fruit/dataset/",
+                        help='Directory of the Fruit dataset')
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
@@ -456,13 +456,32 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = BalloonConfig()
+        config = FruitConfig()
     else:
-        class InferenceConfig(BalloonConfig):
+        class InferenceConfig(FruitConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
+
+            POST_NMS_ROIS_INFERENCE = 2000
+
+            # proved->the higher the image quality, the better the detection accuracy will be increased
+            # How every, the detection speed will be slowed dramatically
+            IMAGE_RESIZE_MODE = "square"
+            IMAGE_MIN_DIM = 800
+            IMAGE_MAX_DIM = 1920  # was 1024
+
+            # Non-max suppression threshold to filter RPN proposals.
+            # You can increase this during training to generate more propsals.
+            RPN_NMS_THRESHOLD = 0.7
+
+            # Minimum probability value to accept a detected instance
+            # ROIs below this threshold are skipped
+            DETECTION_MIN_CONFIDENCE = 0.6
+
+            # Max number of final detections
+            DETECTION_MAX_INSTANCES = 200
         config = InferenceConfig()
     config.display()
 
