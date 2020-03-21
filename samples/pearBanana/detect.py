@@ -26,12 +26,12 @@ import fruit
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
 # Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "logs/fruit20200320T1939/mask_rcnn_fruit_0004.h5")
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "logs/fruit20200321T1228/mask_rcnn_fruit_0006.h5")
 
 # Directory of images to run detection on
 IMAGE_DIR = os.path.join(ROOT_DIR, "datasets/fruit/test")
 
-class InferenceConfig(fruit.BalloonConfig):
+class InferenceConfig(fruit.FruitConfig):
     # Set batch size to 1 since we'll be running inference on
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
@@ -43,7 +43,7 @@ class InferenceConfig(fruit.BalloonConfig):
     # How every, the detection speed will be slowed dramatically
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
-    IMAGE_MAX_DIM = 1920 # was 1024
+    IMAGE_MAX_DIM = 2560 # was 1024
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
