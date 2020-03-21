@@ -317,27 +317,27 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=6,
+                epochs=20,
                 augmentation=augmentation,
                 layers='heads')
 
-    # # Training - Stage 2
-    # # Finetune layers from ResNet stage 4 and up
-    # print("Fine tune Resnet stage 4 and up")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/10,
-    #             epochs=30,
-    #             augmentation=augmentation,
-    #             layers='4+')
-    #
-    # # Training - Stage 3
-    # # Fine tune all layers
-    # print("Training all layers")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=40,
-    #             augmentation=augmentation,
-    #             layers='all')
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    print("Fine tune Resnet stage 4 and up")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/10,
+                epochs=30,
+                augmentation=augmentation,
+                layers='4+')
+
+    # Training - Stage 3
+    # Fine tune all layers
+    print("Training all layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/100,
+                epochs=40,
+                augmentation=augmentation,
+                layers='all')
 
 
 def color_splash(image, mask):
@@ -470,7 +470,7 @@ if __name__ == '__main__':
             # How every, the detection speed will be slowed dramatically
             IMAGE_RESIZE_MODE = "square"
             IMAGE_MIN_DIM = 800
-            IMAGE_MAX_DIM = 4480  # was 1024,
+            IMAGE_MAX_DIM = 3520  # was 1024,
             # for 3692*5000 images: 2560 can pass, 3520pass, 3840pass[memory warning *2],4160 pass[warning*8]
             # MAX----4480 pass[many warnings]----MAX, 4800 FAILED
 
