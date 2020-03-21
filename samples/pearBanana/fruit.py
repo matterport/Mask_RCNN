@@ -99,7 +99,7 @@ class FruitConfig(Config):
     #         IMAGE_MAX_DIM is not used in this mode.
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
-    IMAGE_MAX_DIM = 1280 # was 1024, need to see which size should be chosen to balance benchmark
+    IMAGE_MAX_DIM = 1600 # was 1024, need to see which size should be chosen to balance benchmark
 
     # Image mean (RGB)
     MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
