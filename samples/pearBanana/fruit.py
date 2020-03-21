@@ -309,31 +309,35 @@ def train(model):
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
 
-    # we hav limited training data, so train the classifier only might be a gud idea
+    # MULTIPLE STAGE to help converge easier, since we have limited dataset
+
+    # we have limited training data, so train the classifier only might be a gud idea
     # this ensure we keep the good coco weights untouched
+    # Training - Stage 1
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=4,
+                epochs=20,
                 augmentation=augmentation,
                 layers='heads')
 
-    # #MULTIPLE STAGE to help converge easier, since we have limited dataset
-    # # Training - Stage 2
-    # # Finetune layers from ResNet stage 4 and up
-    # print("Fine tune Resnet stage 4 and up")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/10,
-    #             epochs=30,
-    #             layers='4+')
-    #
-    # # Training - Stage 3
-    # # Fine tune all layers
-    # print("Training all layers")
-    # model.train(dataset_train, dataset_val,
-    #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=40,
-    #             layers='all')
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    print("Fine tune Resnet stage 4 and up")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/10,
+                epochs=30,
+                augmentation=augmentation,
+                layers='4+')
+
+    # Training - Stage 3
+    # Fine tune all layers
+    print("Training all layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/100,
+                epochs=40,
+                augmentation=augmentation,
+                layers='all')
 
 
 def color_splash(image, mask):
