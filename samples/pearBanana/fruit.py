@@ -71,7 +71,7 @@ class FruitConfig(Config):
 
     # Backbone network architecture
     # Supported values are: resnet50, resnet101
-    BACKBONE = "resnet101"
+    BACKBONE = "resnet101" # used for head
     # BACKBONE = "resnet50"
 
     # Number of classes (including background)
@@ -99,7 +99,7 @@ class FruitConfig(Config):
     #         IMAGE_MAX_DIM is not used in this mode.
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
-    IMAGE_MAX_DIM = 1600 # was 1024, need to see which size should be chosen to balance benchmark
+    IMAGE_MAX_DIM = 1600 # 1600 for heads, 1280 for 3+, need to see which size should be chosen to balance benchmark
 
     # Image mean (RGB)
     MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
@@ -109,14 +109,17 @@ class FruitConfig(Config):
     # enough positive proposals to fill this and keep a positive:negative
     # ratio of 1:3. You can increase the number of proposals by adjusting
     # the RPN NMS threshold.
-    TRAIN_ROIS_PER_IMAGE = 512 # was 200
+    TRAIN_ROIS_PER_IMAGE = 512 # 512 for heads. 200 for 3+
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more proposals.
     RPN_NMS_THRESHOLD = 0.7 # default
 
+    # ROIs kept after non-maximum suppression (training and inference)
+    POST_NMS_ROIS_TRAINING = 2000  # 2000 for heads
+
     # How many anchors per image to use for RPN training
-    RPN_TRAIN_ANCHORS_PER_IMAGE = 320 # was 256
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 320 # 320 for heads
 
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
@@ -124,7 +127,7 @@ class FruitConfig(Config):
 
     # Maximum number of ground truth instances to use in one image
     # don't think an identify-able image can hold >200 fruit instances
-    MAX_GT_INSTANCES = 200
+    MAX_GT_INSTANCES = 120 # was 200 for heads
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 300
@@ -317,25 +320,25 @@ def train(model):
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=25,
+                epochs=10,
                 augmentation=augmentation,
                 layers='heads')
 
     # # Training - Stage 2
-    # # Finetune layers from ResNet stage 4 and up
-    # print("Fine tune Resnet stage 4 and up")
+    # # Finetune layers from ResNet stage 3 and up
+    # print("Fine tune Resnet stage 3 and up")
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE/10,
-    #             epochs=35,
+    #             epochs=42,
     #             augmentation=augmentation,
-    #             layers='4+')
+    #             layers='3+')
     #
     # # Training - Stage 3
     # # Fine tune all layers
     # print("Training all layers")
     # model.train(dataset_train, dataset_val,
     #             learning_rate=config.LEARNING_RATE/100,
-    #             epochs=45,
+    #             epochs=34,
     #             augmentation=augmentation,
     #             layers='all')
 
