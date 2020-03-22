@@ -28,7 +28,11 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 """
 
 
-
+import matplotlib.pyplot as plt
+import matplotlib
+from mrcnn import visualize
+from mrcnn import model as modellib, utils
+from mrcnn.config import Config
 import os
 import sys
 import json
@@ -47,14 +51,9 @@ RESULTS_DIR = os.path.abspath("./inference/")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
-from mrcnn.config import Config
-from mrcnn import model as modellib, utils
-from mrcnn import visualize
 
-import matplotlib
 # Agg backend runs without a display
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 DEFAULT_DATASET_YEAR = '2012'
@@ -84,7 +83,7 @@ class InferenceConfig(VocConfig):
 
 
 class VocDataset(utils.Dataset):
-    def load_voc(self, dataset_dir, trainval, class_name):
+    def load_voc(self, dataset_dir, image_extension, trainval, class_name):
         """
         Load a folder with VOC format.
         dataset_dir: The root directory of the VOC dataset,
@@ -108,7 +107,7 @@ class VocDataset(utils.Dataset):
             image_ids += image_id_list
 
         for image_id in image_ids:
-            image_file_name = '{}.jpg'.format(image_id)
+            image_file_name = '{}.{}'.format(image_id, image_extension)
             xml_file_name = '{}.xml'.format(image_id)
             image_path = os.path.join(JPEGImages, image_file_name)
             annotation_path = os.path.join(Annotations, xml_file_name)
@@ -265,6 +264,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/voc/",
                         help='Directory of the PASCAL VOC dataset')
+    parser.add_argument('--image-extension', required=False,
+                        default='.jpg',
+                        help='Dataset image files extension')
     parser.add_argument('--class-name',
                         metavar="<class-name>",
                         help='The class of the VOC formatted dataset')
@@ -339,13 +341,14 @@ if __name__ == '__main__':
         # Training dataset. Use the training set and 35K from the
         # validation set, as as in the Mask RCNN paper.
         dataset_train = VocDataset()
-        dataset_train.load_voc(args.dataset, "train",
+        dataset_train.load_voc(args.dataset, args.image_extension, "train",
                                class_name=args.class_name)
         dataset_train.prepare()
 
         # Validation dataset
         dataset_val = VocDataset()
-        dataset_val.load_voc(args.dataset, "val", class_name=args.class_name)
+        dataset_val.load_voc(args.dataset, args.image_extension,
+                             "val", class_name=args.class_name)
         dataset_val.prepare()
 
         # Image Augmentation
@@ -385,14 +388,15 @@ if __name__ == '__main__':
         # Validation dataset
         dataset_val = VocDataset()
         voc = dataset_val.load_voc(
-            args.dataset, "test", class_name=args.class_name)
+            args.dataset, args.image_extension, "test", class_name=args.class_name)
         dataset_val.prepare()
         print("Running voc inference on {} images.".format(args.limit))
         inference(model, dataset_val, int(args.limit))
 
     elif args.command == "test":
         dataset_test = VocConfig()
-        dataset_test.load_voc(args.dataset, "test", class_name=args.class_name)
+        dataset_test.load_voc(args.dataset, args.image_extension,
+                              "test", class_name=args.class_name)
         dataset_test.prepare()
 
         print("Testing model with {} testing dataset".format(args.class_name))
