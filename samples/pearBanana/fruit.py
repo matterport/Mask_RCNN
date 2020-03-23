@@ -109,17 +109,17 @@ class FruitConfig(Config):
     # enough positive proposals to fill this and keep a positive:negative
     # ratio of 1:3. You can increase the number of proposals by adjusting
     # the RPN NMS threshold.
-    TRAIN_ROIS_PER_IMAGE = 200 # 512 for heads. 200 for 4+
+    TRAIN_ROIS_PER_IMAGE = 200 # 512 for heads. 200 for 4+ & all
 
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more proposals.
     RPN_NMS_THRESHOLD = 0.7 # default
 
     # ROIs kept after non-maximum suppression (training and inference)
-    POST_NMS_ROIS_TRAINING = 2000  # 2000 for heads
+    POST_NMS_ROIS_TRAINING = 2000  # 2000 for heads,4+ & all
 
     # How many anchors per image to use for RPN training
-    RPN_TRAIN_ANCHORS_PER_IMAGE = 256 # 320 for heads,256 for 3+
+    RPN_TRAIN_ANCHORS_PER_IMAGE = 256 # 320 for heads,256 for 3+ & all
 
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
@@ -127,7 +127,7 @@ class FruitConfig(Config):
 
     # Maximum number of ground truth instances to use in one image
     # don't think an identify-able image can hold >200 fruit instances
-    MAX_GT_INSTANCES = 100 # was 200 for head
+    MAX_GT_INSTANCES = 100 # was 200 for head, 150 for 4+, 100 for all
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 300
