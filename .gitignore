@@ -1,10 +1,10 @@
 # Data files and directories common in repo root
-datasets
+#datasets
 logs/
 *.h5
 results/
 temp/
-# test/
+#test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
