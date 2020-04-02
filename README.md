@@ -1,7 +1,7 @@
 # Detection and Segmentation of Manufacturing Defects using X-Ray Images
 
 This project uses the  [Mask R-CNN](https://arxiv.org/abs/1703.06870) framework to automatically detect casting defects in X-Ray images.
-The defect detection system is trained and tested on the [GDXray dataset](dmery.ing.puc.cl/index.php/material/gdxray/). For more details, read our paper:
+The defect detection system is trained and tested on the [GDXray dataset](https://domingomery.ing.puc.cl/material/gdxray/). For more details, read our paper:
 
 M. Ferguson, R. Ak, S. Jeong and K. H. Law, "[Detection and Segmentation of Manufacturing Defects with Convolutional Neural Networks and Transfer Learning](https://arxiv.org/pdf/1808.02518.pdf)", Smart and Sustainable Manufacturing Systems. 2018.
 
@@ -16,6 +16,10 @@ Next install the required packages:
 conda env create -f environment.yml -n defect-detection
 conda activate defect-detection
 ```
+
+## Dataset
+The model is trained using the GDXray dataset. We added segmentation masks to the original dataset using a semi-automated process. The first set of masks were generated automatically assuming that the casting defects were elliptical. The full dataset, along with these elliptical masks are available from Google Drive:
+https://drive.google.com/drive/folders/1OaWO8hO8RM_XYGSJaIhq8u97hPOGPsfS?usp=sharing
 
 ## Training on GDXray Casting Set
 
