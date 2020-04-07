@@ -78,7 +78,7 @@ def compute_backbone_shapes(config, image_shape):
         return config.COMPUTE_BACKBONE_SHAPE(image_shape)
 
     # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101"]
+    assert config.BACKBONE in ["resnet18", "resnet50", "resnet101"]
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
             int(math.ceil(image_shape[1] / stride))]
@@ -126,6 +126,53 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
     return x
 
+def conv_block_resnet18(input_tensor, kernel_size, filters, stage, block,
+               strides=(2, 2), use_bias=True, train_bn=True):
+    nb_filter1, nb_filter2 = filters
+
+    conv_name_base = 'res' + str(stage) + block + '_branch'
+    bn_name_base = 'bn' + str(stage) + block + '_branch'
+    x = KL.Conv2D(nb_filter1, (kernel_size, kernel_size), strides=strides, padding='same',
+                  name=conv_name_base + '2a', use_bias=use_bias)(input_tensor)
+    x = BatchNorm(name=bn_name_base + '2a')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+
+    x = KL.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same',
+                  name=conv_name_base + '2b', use_bias=use_bias)(x)
+    x = BatchNorm(name=bn_name_base + '2b')(x, training=train_bn)
+    x = KL.Add()([x, input_tensor])
+    x = KL.Activation('relu')(x)
+    return x
+
+def conv_block_first_resnet18(input_tensor, kernel_size, filters, stage, block,
+               strides=(2, 2), use_bias=True, train_bn=True):
+    nb_filter1, nb_filter2 = filters
+    conv_name_base = 'res' + str(stage) + block + '_branch'
+    bn_name_base = 'bn' + str(stage) + block + '_branch'
+
+    in_channel = input_tensor.get_shape().as_list()[-1]
+    if in_channel == nb_filter1:
+        if strides == 1:
+            shortcut = tf.identity(input_tensor)
+        else:
+            shortcut = tf.nn.max_pool(input_tensor, [1, strides[0], strides[0], 1], [1, strides, strides, 1], 'VALID')
+    else:
+        shortcut = KL.Conv2D(nb_filter1, (1, 1), strides=strides,  padding='same',
+                  name=conv_name_base + '1', use_bias=use_bias)(input_tensor)
+
+    x = KL.Conv2D(nb_filter1, (kernel_size, kernel_size), strides=strides, padding='same',
+                  name=conv_name_base + '2a', use_bias=use_bias)(input_tensor)
+    x = BatchNorm(name=bn_name_base + '2a')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+
+    x = KL.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same',
+                  name=conv_name_base + '2b', use_bias=use_bias)(x)
+    x = BatchNorm(name=bn_name_base + '2b')(x, training=train_bn)
+
+    x = KL.Add()([x, shortcut])
+    x = KL.Activation('relu')(x)
+
+    return x
 
 def conv_block(input_tensor, kernel_size, filters, stage, block,
                strides=(2, 2), use_bias=True, train_bn=True):
@@ -170,11 +217,11 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
 
 def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     """Build a ResNet graph.
-        architecture: Can be resnet50 or resnet101
+        architecture: Can be resnet18, resnet50, or resnet101
         stage5: Boolean. If False, stage5 of the network is not created
         train_bn: Boolean. Train or freeze Batch Norm layers
     """
-    assert architecture in ["resnet50", "resnet101"]
+    assert architecture in ["resnet18", "resnet50", "resnet101"]
     # Stage 1
     x = KL.ZeroPadding2D((3, 3))(input_image)
     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
@@ -182,27 +229,57 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     x = KL.Activation('relu')(x)
     C1 = x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
     # Stage 2
-    x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1), train_bn=train_bn)
-    x = identity_block(x, 3, [64, 64, 256], stage=2, block='b', train_bn=train_bn)
-    C2 = x = identity_block(x, 3, [64, 64, 256], stage=2, block='c', train_bn=train_bn)
-    # Stage 3
-    x = conv_block(x, 3, [128, 128, 512], stage=3, block='a', train_bn=train_bn)
-    x = identity_block(x, 3, [128, 128, 512], stage=3, block='b', train_bn=train_bn)
-    x = identity_block(x, 3, [128, 128, 512], stage=3, block='c', train_bn=train_bn)
-    C3 = x = identity_block(x, 3, [128, 128, 512], stage=3, block='d', train_bn=train_bn)
-    # Stage 4
-    x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a', train_bn=train_bn)
-    block_count = {"resnet50": 5, "resnet101": 22}[architecture]
-    for i in range(block_count):
-        x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i), train_bn=train_bn)
-    C4 = x
-    # Stage 5
-    if stage5:
-        x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
-        x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
-        C5 = x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
+    if architecture == 'resnet18':
+        # Stage 2
+        x = conv_block_resnet18(x, 3, [64, 64], stage=2, block='a', strides=(1, 1), train_bn=train_bn)
+        x = conv_block_resnet18(x, 3, [64, 64], stage=2, block='b', strides=(1, 1), train_bn=train_bn)
+        C2 = x
+
+        # Stage 3
+        x = conv_block_first_resnet18(x, kernel_size=3, filters=[128, 128],  strides=(2, 2),
+                                      stage=3, block='a', train_bn=train_bn)
+        filters = x.get_shape().as_list()[-1]
+        x = conv_block_resnet18(x, kernel_size=3, filters=[filters, filters],  strides=(1, 1),
+                                stage=3, block='b', train_bn=train_bn)
+        C3 = x
+
+        # Stage 4
+        x = conv_block_first_resnet18(x, kernel_size=3, filters=[256, 256],  strides=(2, 2),
+                                      stage=4, block='a', train_bn=train_bn)
+        # filters = x.get_shape().as_list()[-1]
+        x = conv_block_resnet18(x, kernel_size=3, filters=[256, 256],  strides=(1, 1),
+                                stage=4, block='b', train_bn=train_bn)
+
+        C4 = x
+        x = conv_block_first_resnet18(x, kernel_size=3, filters=[512, 512],  strides=(2, 2),
+                                      stage=5, block='a', train_bn=train_bn)
+        # filters = x.get_shape().as_list()[-1]
+        x = conv_block_resnet18(x, kernel_size=3, filters=[512, 512],  strides=(1, 1),
+                                stage=5, block='b', train_bn=train_bn)
+        C5 = x
+
     else:
-        C5 = None
+        x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1), train_bn=train_bn)
+        x = identity_block(x, 3, [64, 64, 256], stage=2, block='b', train_bn=train_bn)
+        C2 = x = identity_block(x, 3, [64, 64, 256], stage=2, block='c', train_bn=train_bn)
+        # Stage 3
+        x = conv_block(x, 3, [128, 128, 512], stage=3, block='a', train_bn=train_bn)
+        x = identity_block(x, 3, [128, 128, 512], stage=3, block='b', train_bn=train_bn)
+        x = identity_block(x, 3, [128, 128, 512], stage=3, block='c', train_bn=train_bn)
+        C3 = x = identity_block(x, 3, [128, 128, 512], stage=3, block='d', train_bn=train_bn)
+        # Stage 4
+        x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a', train_bn=train_bn)
+        block_count = {"resnet50": 5, "resnet101": 22}[architecture]
+        for i in range(block_count):
+            x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i), train_bn=train_bn)
+        C4 = x
+        # Stage 5
+        if stage5:
+            x = conv_block(x, 3, [512, 512, 2048], stage=5, block='a', train_bn=train_bn)
+            x = identity_block(x, 3, [512, 512, 2048], stage=5, block='b', train_bn=train_bn)
+            C5 = x = identity_block(x, 3, [512, 512, 2048], stage=5, block='c', train_bn=train_bn)
+        else:
+            C5 = None
     return [C1, C2, C3, C4, C5]
 
 
