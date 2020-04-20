@@ -44,7 +44,8 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 if not os.path.exists(COCO_MODEL_PATH):
     utils.download_trained_weights(COCO_MODEL_PATH)
 
-data_dir = '/media/ianormy/Storage/Data/datasets/manipulator'
+#data_dir = '/media/ianormy/Storage/Data/datasets/manipulator'
+data_dir = '/home/ianormy/data/datasets/manipulator'
 
 train_data_dir = os.path.join(os.path.join(data_dir, 'train'), 'images')
 train_quad_labels = [e for e in os.scandir(train_data_dir)]
@@ -73,24 +74,10 @@ class ManipulatorConfig(Config):
     IMAGE_MIN_DIM = 1024
     IMAGE_MAX_DIM = 1024
 
-    # Use smaller anchors because our image and objects are small
-    RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)  # anchor side in pixels
-
-    # Reduce training ROIs per image because the images are small and have
-    # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 32
-
-    # training steps
-    STEPS_PER_EPOCH = 100
-
-    # validation steps since the epoch is small
-    VALIDATION_STEPS = 25
-
-    DETECTION_MIN_CONFIDENCE = 0
-
-    MAX_GT_INSTANCES = 200
-
-    DETECTION_MAX_INSTANCES = 1
+    # Image mean (RGB)
+    MEAN_PIXEL = np.array([113.0, 113.0, 113.0])
+    
+    USE_MINI_MASK = False
     
 config = ManipulatorConfig()
 config.display()
