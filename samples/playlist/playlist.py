@@ -61,7 +61,7 @@ class PlaylistConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + playlist
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 702
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
