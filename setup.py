@@ -1,4 +1,4 @@
-#nsml nsml/default_ml
+#nsml: nsml/default_ml:cuda9_torch1.0
 """
 The build/compilations setup
 
