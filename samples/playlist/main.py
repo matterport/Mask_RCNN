@@ -392,6 +392,9 @@ if __name__ == '__main__':
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
+    parser.add_argument('--session', required=True,
+                        metavar="NSML session name",
+                        help="Session name of NSML (e.g. <NSML id>/<dataset>/<session #>")
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
@@ -405,7 +408,7 @@ if __name__ == '__main__':
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
     elif args.command == "splash":
-        assert args.image, "Provide --image apply color splash"
+        assert args.image, "Provide --image to apply color splash"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -431,6 +434,9 @@ if __name__ == '__main__':
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
 
+    # bind NSML's save(), load(), infer() to the model
+    bind_model(model)
+
     # Select weights file to load
     if args.weights.lower() == "coco":
         weights_path = COCO_WEIGHTS_PATH
@@ -444,6 +450,8 @@ if __name__ == '__main__':
         # Start from ImageNet trained weights
         weights_path = model.get_imagenet_weights()
     else:
+        assert args.session, "Provide --session to load model"
+        session = args.session
         weights_path = args.weights
 
     # Load weights
@@ -455,9 +463,7 @@ if __name__ == '__main__':
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
     else:
-        model.load_weights(weights_path, by_name=True, exclude=[
-            "mrcnn_class_logits", "mrcnn_bbox_fc",
-            "mrcnn_bbox", "mrcnn_mask"])
+        nsml.load(checkpoint=weights_path, session=session)
 
     # Train or evaluate
     if args.command == "train":
