@@ -1,0 +1,11 @@
+assets/
+build/
+dist/
+images/
+logs/*
+mask_rcnn.egg-info/
+samples/balloon/
+samples/coco/
+samples/nucleus/
+samples/shapes/
+samples/demo.ipynb
