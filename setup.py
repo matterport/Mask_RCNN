@@ -1,3 +1,4 @@
+#nsml nsml/default_ml
 """
 The build/compilations setup
 
@@ -39,7 +40,7 @@ setup(
     author_email='waleed.abdulla@gmail.com',
     license='MIT',
     description='Mask R-CNN for object detection and instance segmentation',
-    packages=["mrcnn"],
+    # packages=["mrcnn"],
     install_requires=install_reqs,
     include_package_data=True,
     python_requires='>=3.4',
