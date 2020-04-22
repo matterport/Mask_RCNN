@@ -176,6 +176,18 @@ class NSMLSaveCallback(ModelCheckpoint):
                 nsml.save(filepath)
 
 
+def bind_model(model):
+    def save(filename, **kwargs):
+        model.keras_model.save_weights(filename, overwrite=True)
+
+    def load(filename):
+        model.load_weights(filepath=filename, by_name=True)
+
+    def infer(image_url):
+        print(image_url)
+
+    nsml.bind(save=save, load=load, infer=infer)
+
 ############################################################
 #  Dataset
 ############################################################
