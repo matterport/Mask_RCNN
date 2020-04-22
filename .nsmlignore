@@ -1,6 +1,7 @@
 assets/
 build/
 dist/
+datasets/
 images/
 logs/*
 mask_rcnn.egg-info/
@@ -9,3 +10,4 @@ samples/coco/
 samples/nucleus/
 samples/shapes/
 samples/demo.ipynb
+*.h5
