@@ -303,7 +303,24 @@ def train(model):
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=30,
-                layers='heads')
+                layers='heads',
+                custom_callbacks=[
+                    NSMLReportCallback(),
+                    NSMLSaveCallback(
+                        name='head',
+                        filepath='',
+                        save_weights_only=True,
+                        save_best_only=False,
+                        monitor='val_mrcnn_mask_loss',
+                    ),
+                    NSMLSaveCallback(
+                        name='head',
+                        filepath='',
+                        save_weights_only=True,
+                        save_best_only=True,
+                        monitor='val_mrcnn_mask_loss',
+                    )
+                ])
 
 
 def color_splash(image, mask):
