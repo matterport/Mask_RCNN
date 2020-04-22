@@ -68,8 +68,9 @@ class PlaylistConfig(Config):
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 702
 
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
+    # Don't exclude based on confidence. Since we have two classes
+    # then 0.5 is the minimum anyway as it picks between human and BG
+    DETECTION_MIN_CONFIDENCE = 0
 
     # Input image resizing
     # Generally, use the "square" resizing mode for training and predicting
@@ -94,6 +95,17 @@ class PlaylistConfig(Config):
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 512
     IMAGE_MAX_DIM = 4096
+
+
+class PlaylistInferenceConfig(Config):
+    # Set batch size to 1 to run one image at a time
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    # Don't resize image for inferencing
+    IMAGE_RESIZE_MODE = "pad64"
+    # Non-max suppression threshold to filter RPN proposals.
+    # You can increase this during training to generate more proposals.
+    RPN_NMS_THRESHOLD = 0.7
 
 
 ############################################################
