@@ -24,7 +24,6 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
-from keras.callbacks import Callback, ModelCheckpoint
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -41,9 +40,11 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
+# for NSML
+import warnings
 import nsml
 from nsml import DATASET_PATH
-
+from keras.callbacks import Callback, ModelCheckpoint
 
 ############################################################
 #  Configurations
@@ -106,6 +107,73 @@ class PlaylistInferenceConfig(Config):
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more proposals.
     RPN_NMS_THRESHOLD = 0.7
+
+
+############################################################
+#  Dataset
+############################################################
+
+class NSMLReportCallback(Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        super().on_epoch_end(epoch, logs)
+        nsml.report(
+            step=epoch,
+            epoch=epoch,
+            epoch_total=epoch,
+            loss=logs.get('loss'),
+            rpn_class_loss=logs.get('rpn_class_loss'),
+            rpn_bbox_loss=logs.get('rpn_bbox_loss'),
+            mrcnn_class_loss=logs.get('mrcnn_class_loss'),
+            mrcnn_bbox_loss=logs.get('mrcnn_bbox_loss'),
+            mrcnn_mask_loss=logs.get('mrcnn_mask_loss'),
+            val_loss=logs.get('val_loss'),
+            val_rpn_class_loss=logs.get('val_rpn_class_loss'),
+            val_rpn_bbox_loss=logs.get('val_rpn_bbox_loss'),
+            val_mrcnn_class_loss=logs.get('val_mrcnn_class_loss'),
+            val_mrcnn_bbox_loss=logs.get('val_mrcnn_bbox_loss'),
+            val_mrcnn_mask_loss=logs.get('val_mrcnn_mask_loss'),
+        )
+
+
+class NSMLSaveCallback(ModelCheckpoint):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = name
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        self.epochs_since_last_save += 1
+
+        filepath = f'{self.name}_{epoch}'
+        nsml.save(filepath)
+
+        if self.epochs_since_last_save >= self.period:
+            self.epochs_since_last_save = 0
+            if self.save_best_only:
+                current = logs.get(self.monitor)
+                if current is None:
+                    warnings.warn(
+                        'Can save best model only with %s available, '
+                        'skipping.' % (self.monitor), RuntimeWarning)
+                else:
+                    if self.monitor_op(current, self.best):
+                        filepath = '{}_best'.format(self.name)
+                        if self.verbose > 0:
+                            print('\nEpoch %05d: %s improved from %0.5f to %0.5f,'
+                                  ' saving model to '
+                                  % (epoch + 1, self.monitor, self.best,
+                                     current))
+                        self.best = current
+                        nsml.save(filepath)
+                    else:
+                        if self.verbose > 0:
+                            print('\nEpoch %05d: %s did not improve from %0.5f' %
+                                  (epoch + 1, self.monitor, self.best))
+            else:
+                filepath = f'{self.name}_last'
+                if self.verbose > 0:
+                    print('\nEpoch %05d: saving model to ' % (epoch + 1))
+                nsml.save(filepath)
 
 
 ############################################################
