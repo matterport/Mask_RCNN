@@ -21,17 +21,24 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 import os
 import sys
 import json
-import datetime
 import numpy as np
 import skimage.draw
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath("../../")
+ROOT_DIR = os.path.abspath('./')
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
+from mrcnn.utils import extract_bboxes
+from mrcnn.visualize import display_instances
+
+# for NSML
+import warnings
+import nsml
+from nsml import DATASET_PATH
+from keras.callbacks import Callback, ModelCheckpoint
 
 # Path to trained weights file
 COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
@@ -39,12 +46,6 @@ COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-
-# for NSML
-import warnings
-import nsml
-from nsml import DATASET_PATH
-from keras.callbacks import Callback, ModelCheckpoint
 
 ############################################################
 #  Configurations
@@ -59,6 +60,9 @@ class PlaylistConfig(Config):
     # Give the configuration a recognizable name
     NAME = "playlist"
 
+    # NUMBER OF GPUs to use. When using only a CPU, this needs to be set to 1.
+    GPU_COUNT = 1
+
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 2
@@ -67,7 +71,7 @@ class PlaylistConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + playlist
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 702
+    STEPS_PER_EPOCH = 697
 
     # Don't exclude based on confidence. Since we have two classes
     # then 0.5 is the minimum anyway as it picks between human and BG
@@ -93,9 +97,9 @@ class PlaylistConfig(Config):
     #         on IMAGE_MIN_DIM and IMAGE_MIN_SCALE, then picks a random crop of
     #         size IMAGE_MIN_DIM x IMAGE_MIN_DIM. Can be used in training only.
     #         IMAGE_MAX_DIM is not used in this mode.
-    IMAGE_RESIZE_MODE = "square"
-    IMAGE_MIN_DIM = 512
-    IMAGE_MAX_DIM = 4096
+    # IMAGE_RESIZE_MODE = "square"
+    # IMAGE_MIN_DIM = 512
+    # IMAGE_MAX_DIM = 4096
 
 
 class PlaylistInferenceConfig(Config):
@@ -136,57 +140,123 @@ class NSMLReportCallback(Callback):
 
 
 class NSMLSaveCallback(ModelCheckpoint):
-    def __init__(self, name, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.name = name
+    def __init__(self, filepath, monitor='val_loss', verbose=0,
+                 save_best_only=False, save_weights_only=False,
+                 mode='auto', period=1):
+        super(NSMLSaveCallback, self).__init__(filepath, monitor=monitor, verbose=verbose,
+                                               save_best_only=save_best_only,
+                                               save_weights_only=save_weights_only,
+                                               mode=mode,
+                                               period=period)
 
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         self.epochs_since_last_save += 1
-
-        filepath = f'{self.name}_{epoch}'
-        nsml.save(filepath)
-
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
+            filepath = self.filepath.format(epoch=epoch + 1, **logs)
+            print('Save weights file to:', filepath)
             if self.save_best_only:
                 current = logs.get(self.monitor)
                 if current is None:
-                    warnings.warn(
-                        'Can save best model only with %s available, '
-                        'skipping.' % (self.monitor), RuntimeWarning)
+                    warnings.warn('Can save best model only with %s available, '
+                                  'skipping.' % (self.monitor), RuntimeWarning)
                 else:
                     if self.monitor_op(current, self.best):
-                        filepath = '{}_best'.format(self.name)
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f,'
-                                  ' saving model to '
+                                  ' saving model to %s'
                                   % (epoch + 1, self.monitor, self.best,
-                                     current))
+                                     current, filepath))
                         self.best = current
-                        nsml.save(filepath)
+                        if self.save_weights_only:
+                            self.model.save_weights(filepath, overwrite=True)
+                        else:
+                            self.model.save(filepath, overwrite=True)
                     else:
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s did not improve from %0.5f' %
                                   (epoch + 1, self.monitor, self.best))
             else:
-                filepath = f'{self.name}_last'
                 if self.verbose > 0:
-                    print('\nEpoch %05d: saving model to ' % (epoch + 1))
-                nsml.save(filepath)
+                    print('\nEpoch %05d: saving model to %s' % (epoch + 1, filepath))
+                if self.save_weights_only:
+                    self.model.save_weights(filepath, overwrite=True)
+                else:
+                    self.model.save(filepath, overwrite=True)
 
 
-def bind_model(model):
-    def save(filename, **kwargs):
-        model.keras_model.save_weights(filename, overwrite=True)
+# class NSMLSaveCallback(ModelCheckpoint):
+#     def __init__(self, filepath, monitor='val_loss', verbose=0,
+#                  save_best_only=False, save_weights_only=False,
+#                  mode='auto', period=1):
+#         super(ModelCheckpoint, self).__init__()
+#         self.monitor = monitor
+#         self.verbose = verbose
+#         self.filepath = filepath
+#         self.save_best_only = save_best_only
+#         self.save_weights_only = save_weights_only
+#         self.period = period
+#         self.epochs_since_last_save = 0
+#
+#         if mode not in ['auto', 'min', 'max']:
+#             warnings.warn('ModelCheckpoint mode %s is unknown, '
+#                           'fallback to auto mode.' % (mode),
+#                           RuntimeWarning)
+#             mode = 'auto'
+#
+#         if mode == 'min':
+#             self.monitor_op = np.less
+#             self.best = np.Inf
+#         elif mode == 'max':
+#             self.monitor_op = np.greater
+#             self.best = -np.Inf
+#         else:
+#             if 'acc' in self.monitor or self.monitor.startswith('fmeasure'):
+#                 self.monitor_op = np.greater
+#                 self.best = -np.Inf
+#             else:
+#                 self.monitor_op = np.less
+#                 self.best = np.Inf
+#
+#     def on_epoch_end(self, epoch, logs=None):
+#         logs = logs or {}
+#         self.epochs_since_last_save += 1
+#         if self.epochs_since_last_save >= self.period:
+#             self.epochs_since_last_save = 0
+#             filepath = self.filepath.format(epoch=epoch + 1, **logs)
+#             print('Save model file to ', filepath)
+#             if self.save_best_only:
+#                 current = logs.get(self.monitor)
+#                 if current is None:
+#                     warnings.warn('Can save best model only with %s available, '
+#                                   'skipping.' % (self.monitor), RuntimeWarning)
+#                 else:
+#                     if self.monitor_op(current, self.best):
+#                         if self.verbose > 0:
+#                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f,'
+#                                   ' saving model to %s'
+#                                   % (epoch + 1, self.monitor, self.best,
+#                                      current, filepath))
+#                         self.best = current
+#                         if self.save_weights_only:
+#                             self.model.save_weights(filepath, overwrite=True)
+#                         else:
+#                             # self.model.save(filepath, overwrite=True)
+#                             nsml.save(checkpoint=filepath, overwrite=True)
+#                     else:
+#                         if self.verbose > 0:
+#                             print('\nEpoch %05d: %s did not improve from %0.5f' %
+#                                   (epoch + 1, self.monitor, self.best))
+#             else:
+#                 if self.verbose > 0:
+#                     print('\nEpoch %05d: saving model to %s' % (epoch + 1, filepath))
+#                 if self.save_weights_only:
+#                     self.model.save_weights(filepath, overwrite=True)
+#                 else:
+#                     # self.model.save(filepath, overwrite=True)
+#                     nsml.save(checkpoint=filepath)
 
-    def load(filename):
-        model.load_weights(filepath=filename, by_name=True)
-
-    def infer(image_url):
-        print(image_url)
-
-    nsml.bind(save=save, load=load, infer=infer)
 
 ############################################################
 #  Dataset
@@ -278,6 +348,9 @@ class PlaylistDataset(utils.Dataset):
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
             rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
+            # prevent one of polygon points from being out of image
+            rr[rr > mask.shape[0] - 1] = mask.shape[0] - 1
+            cc[cc > mask.shape[1] - 1] = mask.shape[1] - 1
             mask[rr, cc, i] = 1
 
         # Return mask, and array of class IDs of each instance. Since we have
@@ -319,41 +392,12 @@ def train(model):
                 custom_callbacks=[
                     NSMLReportCallback(),
                     NSMLSaveCallback(
-                        name='head',
-                        filepath='',
+                        filepath=os.path.join(DEFAULT_LOGS_DIR, 'playlist_{epoch:04d}.h5'),
                         save_weights_only=True,
                         save_best_only=False,
                         monitor='val_mrcnn_mask_loss',
-                    ),
-                    NSMLSaveCallback(
-                        name='head',
-                        filepath='',
-                        save_weights_only=True,
-                        save_best_only=True,
-                        monitor='val_mrcnn_mask_loss',
                     )
                 ])
-
-
-def color_splash(image, mask):
-    """
-    Apply color splash effect.
-    image: RGB image [height, width, 3]
-    mask: instance segmentation mask [height, width, instance count]
-
-    Returns result image.
-    """
-    # Make a grayscale copy of the image. The grayscale copy still
-    # has 3 RGB channels, though.
-    gray = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
-    # Copy color pixels from the original color image where mask is set
-    if mask.shape[-1] > 0:
-        # We're treating all instances as one, so collapse the mask into one layer
-        mask = (np.sum(mask, -1, keepdims=True) >= 1)
-        splash = np.where(mask, image, gray).astype(np.uint8)
-    else:
-        splash = gray.astype(np.uint8)
-    return splash
 
 
 def detect_and_color_splash(model, image_path=None):
@@ -363,14 +407,13 @@ def detect_and_color_splash(model, image_path=None):
         print("Running on {}".format(args.image))
         # Read image
         image = skimage.io.imread(args.image)
+        # remove alpha channel from image
+        image = image[:, :, :3]
+
         # Detect objects
         r = model.detect([image], verbose=1)[0]
-        # Color splash
-        splash = color_splash(image, r['masks'])
-        # Save output
-        file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-        skimage.io.imsave(file_name, splash)
-    print("Saved to ", file_name)
+        bbox = extract_bboxes(r['masks'])
+        display_instances(image, bbox, r['masks'], r['class_ids'], ['background', 'playlist'])
 
 
 ############################################################
@@ -392,9 +435,6 @@ if __name__ == '__main__':
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
-    parser.add_argument('--session', required=True,
-                        metavar="NSML session name",
-                        help="Session name of NSML (e.g. <NSML id>/<dataset>/<session #>")
     parser.add_argument('--logs', required=False,
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
@@ -403,6 +443,9 @@ if __name__ == '__main__':
                         metavar="path or URL to image",
                         help='Image to apply the color splash effect on')
     args = parser.parse_args()
+
+    if not args.dataset:
+        args.dataset = os.path.join(DATASET_PATH, 'train')
 
     # Validate arguments
     if args.command == "train":
@@ -434,9 +477,6 @@ if __name__ == '__main__':
         model = modellib.MaskRCNN(mode="inference", config=config,
                                   model_dir=args.logs)
 
-    # bind NSML's save(), load(), infer() to the model
-    bind_model(model)
-
     # Select weights file to load
     if args.weights.lower() == "coco":
         weights_path = COCO_WEIGHTS_PATH
@@ -450,8 +490,6 @@ if __name__ == '__main__':
         # Start from ImageNet trained weights
         weights_path = model.get_imagenet_weights()
     else:
-        assert args.session, "Provide --session to load model"
-        session = args.session
         weights_path = args.weights
 
     # Load weights
@@ -463,14 +501,13 @@ if __name__ == '__main__':
             "mrcnn_class_logits", "mrcnn_bbox_fc",
             "mrcnn_bbox", "mrcnn_mask"])
     else:
-        nsml.load(checkpoint=weights_path, session=session)
+        model.load_weights(weights_path, by_name=True)
 
     # Train or evaluate
     if args.command == "train":
         train(model)
     elif args.command == "splash":
-        detect_and_color_splash(model, image_path=args.image,
-                                video_path=args.video)
+        detect_and_color_splash(model, image_path=args.image)
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'splash'".format(args.command))
