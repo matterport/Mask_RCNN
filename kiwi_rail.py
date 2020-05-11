@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+# change this to make each class were interested in a specific color
+# ie cows near track is red, cow not near track is orange etc
+
 def random_colors(N):
     # initialise the random number with a seed
     # get the same color for each frame
@@ -9,6 +12,7 @@ def random_colors(N):
     colors = [tuple(255 * np.random.rand(3)) for _ in range(N)]
     return colors
 
+# apply mask to image passed in
 
 def apply_mask(image, mask, color, aplha=0.5):
     # apply the mask to the image, loop over the RGB colors
@@ -21,6 +25,8 @@ def apply_mask(image, mask, color, aplha=0.5):
             image[:, :, n]
         )
     return image
+
+
 
 def display_instances(image, boxes, masks, ids, names, scores):
     # how many instances do we have
@@ -65,6 +71,11 @@ def display_instances(image, boxes, masks, ids, names, scores):
     return image
 
 # testing file if run directly wont run if imported
+# this code allows for a stand alone run using python kiwi_rail.py
+# it is intended for testing camera input and to see frame rate achived
+# this code allows us an easy place to accesss the frame and mask data for
+# passing to other python modules
+
 if __name__ == '__main__':
     import os
     import sys
@@ -121,6 +132,8 @@ class_names = [
 
 # initialise capture device
 capture = cv2.VideoCapture(0)
+
+# set the result ouput window dimentions
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
