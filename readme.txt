@@ -7,12 +7,24 @@ python kiwi_rail.py
 
 #how to branch
 
-# checkout the branch you would like to create a branch from
+# create a branch called training from master
+
+# checkout master
+git checkout master
+
+# create a branch called training from master
+git checkout -b training master
+
+# switch to training branch
 git checkout training
 
-# create a branch from the training branch
-git checkout -b Gaurang-Training
+# create a branch called melika from training branch
+git checkout -b melika training
 
-# switch to Gaurange-Training branch
+master -> |
+           training -> |
+                       melika # write code here
+                       then stage, message, commit, push
+
 
 
