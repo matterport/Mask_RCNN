@@ -82,9 +82,9 @@ if __name__ == '__main__':
     import random
     import math
     import time
-    import coco
-    import utils
-    import model as modellib
+    from samples.coco import coco
+    from mrcnn import utils
+    from mrcnn import model as modellib
 
 # get location of weights file
     ROOT_DIR =os.getcwd()
@@ -139,7 +139,7 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 # while loop
 
-while True
+while True:
     ret, frame = capture.read()
     results = model.detect([frame], verbose=0)
     # get the first thing in the results array
