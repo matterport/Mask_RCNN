@@ -146,7 +146,7 @@ Use this bibtex to cite this repository:
 ```
 @misc{matterport_maskrcnn_2017,
   title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
-  author={Abdulla, Waleed},
+  author={Waleed Abdulla},
   year={2017},
   publisher={Github},
   journal={GitHub repository},
@@ -179,11 +179,11 @@ If you use Docker, the code has been verified to work on
 
 
 ## Installation
-1. Install dependencies
+1. Clone this repository
+2. Install dependencies
    ```bash
    pip3 install -r requirements.txt
    ```
-2. Clone this repository
 3. Run setup from the repository root directory
     ```bash
     python3 setup.py install
@@ -217,8 +217,25 @@ Code is in the `samples/nucleus` directory.
 ### [Detection and Segmentation for Surgery Robots](https://github.com/SUYEgit/Surgery-Robot-Detection-Segmentation) by the NUS Control & Mechatronics Lab.
 ![Surgery Robot Detection and Segmentation](https://github.com/SUYEgit/Surgery-Robot-Detection-Segmentation/raw/master/assets/video.gif)
 
+### [Reconstructing 3D buildings from aerial LiDAR](https://medium.com/geoai/reconstructing-3d-buildings-from-aerial-lidar-with-ai-details-6a81cb3079c0)
+A proof of concept project by [Esri](https://www.esri.com/), in collaboration with Nvidia and Miami-Dade County. Along with a great write up and code by Dmitry Kudinov, Daniel Hedges, and Omar Maher.
+![3D Building Reconstruction](assets/project_3dbuildings.png)
+
+### [Usiigaci: Label-free Cell Tracking in Phase Contrast Microscopy](https://github.com/oist/usiigaci)
+A project from Japan to automatically track cells in a microfluidics platform. Paper is pending, but the source code is released.
+
+![](assets/project_usiigaci1.gif) ![](assets/project_usiigaci2.gif)
+
+### [Characterization of Arctic Ice-Wedge Polygons in Very High Spatial Resolution Aerial Imagery](http://www.mdpi.com/2072-4292/10/9/1487)
+Research project to understand the complex processes between degradations in the Arctic and climate change. By Weixing Zhang, Chandi Witharana, Anna Liljedahl, and Mikhail Kanevskiy.
+![image](assets/project_ice_wedge_polygons.png)
+
+### [Mask-RCNN Shiny](https://github.com/huuuuusy/Mask-RCNN-Shiny)
+A computer vision class project by HU Shiyu to apply the color pop effect on people with beautiful results.
+![](assets/project_shiny1.jpg)
+
 ### [Mapping Challenge](https://github.com/crowdAI/crowdai-mapping-challenge-mask-rcnn): Convert satellite imagery to maps for use by humanitarian organisations.
 ![Mapping Challenge](assets/mapping_challenge.png)
 
 ### [GRASS GIS Addon](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn) to generate vector masks from geospatial imagery. Based on a [Master's thesis](https://github.com/ctu-geoforall-lab-projects/dp-pesek-2018) by Ondřej Pešek.
-![GRASS GIS Image](https://github.com/ctu-geoforall-lab/i.ann.maskrcnn/raw/master/samples/out3.png)
+![GRASS GIS Image](assets/project_grass_gis.png)
