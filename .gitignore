@@ -56,3 +56,4 @@ pip-delete-this-directory.txt
 .venv
 venv/
 ENV/
+cocoapi/
