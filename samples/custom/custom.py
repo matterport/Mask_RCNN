@@ -5,6 +5,7 @@ Train on the toy Balloon dataset and implement color splash effect.
 Copyright (c) 2018 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
+Edited for general application by Soumya Yadav (Psoumyadav@gmail.com)
 
 ------------------------------------------------------------
 
@@ -66,7 +67,7 @@ class CustomConfig(Config):
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 2  # Background + number of classes
+    NUM_CLASSES = 1 + 2  # Background + number of classes (Here, 2)
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
