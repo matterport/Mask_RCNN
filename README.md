@@ -1,3 +1,24 @@
+# MaskRCNN custom dataset module
+
+This is a repository based on Matterport Masrcnn repository for the application of custom MaskRCNN to custom datasets/application like weed detection, day to day object detection etc.
+If you like this work please consider giving it a star. It helps me to track down the progress. 
+
+For citation:
+
+```
+@misc{Soumya_Maskrcnn_2020,
+  title={Mask R-CNN for custom object detection and instance segmentation on Keras and TensorFlow},
+  author={Soumya Yadav},
+  year={2020},
+  publisher={Github},
+  journal={GitHub repository},
+  howpublished={\url{https://github.com/soumyaiitkgp/Mask_RCNN/}},
+}
+```
+
+If you like to know more about MaskRCNN, please consider visiting Matterport's MaskRCNN repository. Below are the details:
+
+
 # Mask R-CNN for Object Detection and Segmentation
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
