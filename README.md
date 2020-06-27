@@ -1,6 +1,6 @@
 # MaskRCNN custom dataset module
 
-This is a repository based on Matterport Masrcnn repository for the application of custom MaskRCNN to custom datasets/application like weed detection, day to day object detection etc.
+This is a repository based on Matterport Masrcnn repository for the application of custom MaskRCNN to custom datasets/application like weed detection, day to day object detection etc. Find the module in the folder 'sample/custom'.
 If you like this work please consider giving it a star. It helps me to track down the progress. 
 
 For citation:
