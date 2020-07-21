@@ -363,6 +363,7 @@ class Dataset(object):
         # If has an alpha channel, remove it for consistency
         if image.shape[-1] == 4:
             image = image[..., :3]
+        image = image.astype(np.float32)
         return image
 
     def load_mask(self, image_id):

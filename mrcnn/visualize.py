@@ -50,7 +50,7 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         plt.subplot(rows, cols, i)
         plt.title(title, fontsize=9)
         plt.axis('off')
-        plt.imshow(image.astype(np.uint8), cmap=cmap,
+        plt.imshow(image, cmap=cmap,
                    norm=norm, interpolation=interpolation)
         i += 1
     plt.show()
@@ -120,7 +120,9 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.axis('off')
     ax.set_title(title)
 
-    masked_image = image.astype(np.uint32).copy()
+    ax.imshow(image[:,:,0],cmap='gray',vmax=np.percentile(image,99))
+    masked_image = np.zeros(image.copy().shape)#.astype(np.uint32).copy()
+
     for i in range(N):
         color = colors[i]
 
@@ -130,8 +132,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             continue
         y1, x1, y2, x2 = boxes[i]
         if show_bbox:
-            p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
-                                alpha=0.7, linestyle="dashed",
+            p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=1,
+                                alpha=1, linestyle=":",
                                 edgecolor=color, facecolor='none')
             ax.add_patch(p)
 
@@ -140,11 +142,12 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             class_id = class_ids[i]
             score = scores[i] if scores is not None else None
             label = class_names[class_id]
-            caption = "{} {:.3f}".format(label, score) if score else label
+            #caption = "{} {:.3f}".format(label, score) if score else label
+            caption = "{:.2f}".format(score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+        ax.text(x1+6, y1 + 12, caption, alpha=1,
+                color='r', size=10, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -162,7 +165,14 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
-    ax.imshow(masked_image.astype(np.uint8))
+        
+    #ax.imshow(masked_image[:,:,0],cmap='Greys')
+    
+    #ax.imshow(image[:,:,0])#.astype(np.uint8)
+    #import matplotlib
+    #print(matplotlib.rcParams['ps.fonttype'])
+    #print(matplotlib.rcParams['pdf.fonttype'])
+    #plt.savefig('/home/nel/Code/VolPy/Mask_RCNN/results/inference_fish1_2.pdf')
     if auto_show:
         plt.show()
 
@@ -358,7 +368,7 @@ def plot_overlaps(gt_class_ids, pred_class_ids, pred_scores,
 
 def draw_boxes(image, boxes=None, refined_boxes=None,
                masks=None, captions=None, visibilities=None,
-               title="", ax=None):
+               title="", ax=None, cmap=None, vmax=None):
     """Draw bounding boxes and segmentation masks with different
     customizations.
 
@@ -390,7 +400,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
     ax.axis('off')
 
     ax.set_title(title)
-
+    ax.imshow(image[:,:,0], cmap=cmap, vmax=vmax)
     masked_image = image.astype(np.uint32).copy()
     for i in range(N):
         # Box visibility
@@ -455,7 +465,7 @@ def draw_boxes(image, boxes=None, refined_boxes=None,
                 verts = np.fliplr(verts) - 1
                 p = Polygon(verts, facecolor="none", edgecolor=color)
                 ax.add_patch(p)
-    ax.imshow(masked_image.astype(np.uint8))
+    #ax.imshow(masked_image[:,:,0])#.astype(np.uint8)
 
 
 def display_table(table):
