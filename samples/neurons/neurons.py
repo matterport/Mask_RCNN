@@ -59,7 +59,7 @@ class NeuronsConfig(Config):
     NAME = "neurons"
 
     # Adjust depending on your GPU memory
-    IMAGES_PER_GPU = 4
+    IMAGES_PER_GPU = 6
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + 1  # Background + nucleus
@@ -71,7 +71,7 @@ class NeuronsConfig(Config):
     
     # Don't exclude based on confidence. Since we have two classes
     # then 0.5 is the minimum anyway as it picks between nucleus and BG
-    DETECTION_MIN_CONFIDENCE = 0
+    DETECTION_MIN_CONFIDENCE = 0.5
 
     # Backbone network architecture
     # Supported values are: resnet50, resnet101
@@ -112,13 +112,13 @@ class NeuronsConfig(Config):
     # enough positive proposals to fill this and keep a positive:negative
     # ratio of 1:3. You can increase the number of proposals by adjusting
     # the RPN NMS threshold.
-    TRAIN_ROIS_PER_IMAGE = 400
+    TRAIN_ROIS_PER_IMAGE = 200
 
     # Maximum number of ground truth instances to use in one image
-    MAX_GT_INSTANCES = 150
+    MAX_GT_INSTANCES = 50
 
     # Max number of final detections per image
-    DETECTION_MAX_INSTANCES = 150
+    DETECTION_MAX_INSTANCES = 50
     
     WEIGHT_DECAY = 0.0001
     
@@ -157,7 +157,7 @@ class NeuronsDataset(utils.Dataset):
         # }
         # We mostly care about the x and y coordinates of each region
         # Note: In VIA 2.0, regions was changed from a dict to a list.
-        """
+        
         group = [i for i in sorted(os.listdir(dataset_dir)) if 'mask' not in i]
         for a in group:
             fname = dataset_dir + '/' + a
@@ -188,6 +188,7 @@ class NeuronsDataset(utils.Dataset):
                 path=image_path,
                 width=width, height=height,
                 masks=masks)
+        """
        
 
     def load_mask(self, image_id):
@@ -202,7 +203,7 @@ class NeuronsDataset(utils.Dataset):
         if image_info["source"] != "neurons":
             return super(self.__class__, self).load_mask(image_id)
 
-        """
+        
         # Convert polygons to a bitmap mask of shape
         # [height, width, instance_count]
         info = self.image_info[image_id]
@@ -212,10 +213,11 @@ class NeuronsDataset(utils.Dataset):
             # Get indexes of pixels inside the polygon and set them to 1
             rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
             mask[rr, cc, i] = 1
-        """
         
+        """
         info = self.image_info[image_id]
         mask = info['masks']
+        """
         # Return mask, and array of class IDs of each instance. Since we have
         # one class ID only, we return an array of 1s
         return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
