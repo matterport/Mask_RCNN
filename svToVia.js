@@ -1,10 +1,12 @@
 const path = require("path");
 const fs = require("fs");
 
-const datasetBaseFolder = path.join(__dirname, "vehicle_dataset/Vehicles");
-console.log(datasetBaseFolder);
-const svAnnotationsFolder = path.join(datasetBaseFolder, "testfiles/ann");
-const svImagesFolder = path.join(datasetBaseFolder, "testfiles/img");
+const svDatasetBaseFolder = path.join(__dirname, "vehicle_dataset/Vehicles");
+const datasetBaseFolder = path.join(__dirname, "dataset");
+
+console.log(svDatasetBaseFolder);
+const svAnnotationsFolder = path.join(svDatasetBaseFolder, "testfiles/ann");
+const svImagesFolder = path.join(svDatasetBaseFolder, "testfiles/img");
 
 const annotationFiles = fs.readdirSync(svAnnotationsFolder).sort();
 const imageFiles = fs.readdirSync(svImagesFolder).sort();
@@ -19,6 +21,8 @@ prepare("val", trainDataSize - 1, valDataSize);
 function prepare(stage, startIndex, size) {
     const viaRegionData = {};
     console.log("Prepare", stage, startIndex, size);
+    try {fs.mkdirSync(path.join(datasetBaseFolder, stage));}
+    catch(error) { console.log("Directory Exists")}
     annotationFiles.slice(startIndex, startIndex + size).forEach(annotationFile => {
         const annotation = JSON.parse(fs.readFileSync(path.join(svAnnotationsFolder, annotationFile), "utf-8"));
         console.log(annotationFile);
@@ -45,8 +49,7 @@ function prepare(stage, startIndex, size) {
         fs.copyFileSync(path.join(svImagesFolder, annotationForVia.filename), path.join(datasetBaseFolder, stage, annotationForVia.filename));
         viaRegionData[annotationForVia.filename + annotationForVia.size] = annotationForVia;
     });
-    try {fs.mkdirSync(path.join(datasetBaseFolder, stage));}
-    catch(error) { console.log("Directory Exists")}
+
     fs.writeFileSync(path.join(datasetBaseFolder, stage, "via_region_data.json"), JSON.stringify(viaRegionData, null, 4));
 }
 
