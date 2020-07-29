@@ -1,0 +1,11 @@
+{
+    "classes": [
+        {
+            "title": "vehicle",
+            "shape": "polygon",
+            "color": "#3900E6",
+            "geometry_config": {}
+        }
+    ],
+    "tags": []
+}
