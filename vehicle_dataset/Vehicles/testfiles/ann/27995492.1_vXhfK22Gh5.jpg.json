@@ -1,0 +1,124 @@
+{
+    "description": "",
+    "tags": [
+        {
+            "id": 84918517,
+            "tagId": 28281395,
+            "name": "train",
+            "value": null,
+            "labelerLogin": "richhosek",
+            "createdAt": "2020-07-30T13:05:24.124Z",
+            "updatedAt": "2020-07-30T13:05:24.124Z"
+        }
+    ],
+    "size": {
+        "height": 584,
+        "width": 762
+    },
+    "objects": [
+        {
+            "id": 494578182,
+            "classId": 1654311,
+            "description": "",
+            "geometryType": "rectangle",
+            "labelerLogin": "richhosek",
+            "createdAt": "2020-07-30T13:05:24.125Z",
+            "updatedAt": "2020-07-30T13:05:24.125Z",
+            "tags": [],
+            "classTitle": "bg",
+            "points": {
+                "exterior": [
+                    [
+                        0,
+                        0
+                    ],
+                    [
+                        761,
+                        583
+                    ]
+                ],
+                "interior": []
+            }
+        },
+        {
+            "id": 494578181,
+            "classId": 1654309,
+            "description": "",
+            "geometryType": "polygon",
+            "labelerLogin": "richhosek",
+            "createdAt": "2020-07-29T16:30:57.815Z",
+            "updatedAt": "2020-07-29T16:32:06.244Z",
+            "tags": [],
+            "classTitle": "vehicle",
+            "points": {
+                "exterior": [
+                    [
+                        65,
+                        172
+                    ],
+                    [
+                        154,
+                        157
+                    ],
+                    [
+                        163,
+                        141
+                    ],
+                    [
+                        191,
+                        139
+                    ],
+                    [
+                        245,
+                        134
+                    ],
+                    [
+                        283,
+                        130
+                    ],
+                    [
+                        319,
+                        130
+                    ],
+                    [
+                        357,
+                        129
+                    ],
+                    [
+                        395,
+                        136
+                    ],
+                    [
+                        431,
+                        152
+                    ],
+                    [
+                        459,
+                        172
+                    ],
+                    [
+                        498,
+                        198
+                    ],
+                    [
+                        508,
+                        196
+                    ],
+                    [
+                        607,
+                        220
+                    ],
+                    [
+                        605,
+                        220
+                    ],
+                    [
+                        658,
+                        235
+                    ]
+                ],
+                "interior": []
+            }
+        }
+    ]
+}
