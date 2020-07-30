@@ -39,8 +39,8 @@ function prepare(stage, startIndex, size) {
                 "0": {
                     shape_attributes: {
                         name: "polygon",
-                        all_points_x: annotation.objects[0].points.exterior.map(point => point[0]),
-                        all_points_y: annotation.objects[0].points.exterior.map(point => point[1])
+                        all_points_x: annotation.objects[1].points.exterior.map(point => point[0]),
+                        all_points_y: annotation.objects[1].points.exterior.map(point => point[1])
                     },
                     region_attributes: {}
                 }
