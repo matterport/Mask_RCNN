@@ -1,3 +1,29 @@
+# MaskRCNN custom dataset module
+
+This is a repository based on Matterport Maskrcnn repository for the application of custom MaskRCNN to custom datasets/application like weed detection, day to day object detection etc. Find the module in the folder ['samples/custom'](https://github.com/soumyaiitkgp/Mask_RCNN/tree/master/samples/custom).
+If you like this work please consider giving it a star. It helps me to track down the progress. 
+
+# Update
+*** An updated version is created [Here](https://github.com/soumyaiitkgp/Custom_MaskRCNN)*** 
+
+[Here](https://medium.com/@psoumyadav/a-simple-guide-to-maskrcnn-custom-dataset-implementation-27f7eab381f2) is the detailed step by step approach guide. 
+
+For citation:
+
+```
+@misc{Soumya_Maskrcnn_2020,
+  title={Mask R-CNN for custom object detection and instance segmentation on Keras and TensorFlow},
+  author={Soumya Yadav},
+  year={2020},
+  publisher={Github},
+  journal={GitHub repository},
+  howpublished={\url{https://github.com/soumyaiitkgp/Mask_RCNN/}},
+}
+```
+
+If you like to know more about MaskRCNN, please consider visiting Matterport's MaskRCNN repository. Below are the details:
+
+
 # Mask R-CNN for Object Detection and Segmentation
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
@@ -122,7 +148,7 @@ the code of the model. It also supports loading multiple datasets at the
 same time, which is useful if the objects you want to detect are not 
 all available in one dataset. 
 
-See examples in `samples/shapes/train_shapes.ipynb`, `samples/coco/coco.py`, `samples/balloon/balloon.py`, and `samples/nucleus/nucleus.py`.
+See examples in `samples/shapes/train_shapes.ipynb`, `samples/coco/coco.py`, `samples/balloon/balloon.py`, `samples/nucleus/nucleus.py` and `samples/custom/custom.py`.
 
 ## Differences from the Official Paper
 This implementation follows the Mask RCNN paper for the most part, but there are a few cases where we deviated in favor of code simplicity and generalization. These are some of the differences we're aware of. If you encounter other differences, please do let us know.
