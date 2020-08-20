@@ -183,11 +183,27 @@ class AngioDataset(utils.Dataset):
         class_ids = np.array(class_ids, dtype=np.int32)
         return mask, class_ids
 
+    def load_image(self, image_id):
+        """
+            Overides original load_image function to load the specified image and return a [H,W,1] Numpy array.
+        """
+        # Load image
+        image = skimage.io.imread(self.image_info[image_id]['path'])
+        
+        #Convert all to grayscale for consistency.
+        image = np.expand_dims(skimage.color.rgb2gray(image), -1)
+
+        return image
+
 class AngioConfig(Config):
 
     NAME = 'angio2020'
 
     IMAGES_PER_GPU = 1
+
+    IMAGE_CHANNEL_COUNT = 1
+
+    MEAN_PIXEL = np.array([116.8])
 
     NUM_CLASSES = 1 + 1  # Background + artery
 
@@ -198,13 +214,16 @@ class AngioConfig(Config):
 
     BACKBONE = 'resnet101' 
 
-    IMAGE_MIN_DIM = 512
-    RPN_ANCHOR_SCALES = (32, 64, 128)
-    # RPN_ANCHOR_RATIOS = [0.5, 1, 2, 3]
-    # MINI_MASK_SHAPE = (100, 100)
+    IMAGE_MAX_DIM = 320
 
-mode = 'eval'
-last = True
+    MAX_GT_INSTANCES = 20
+
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
+    RPN_ANCHOR_RATIOS = [0.5, 1, 2, 3]
+    MINI_MASK_SHAPE = (100, 100)
+
+mode = 'train'
+last = False
 datasetdir = 'A:/'
 
 if mode == 'train':
@@ -239,7 +258,7 @@ elif mode == 'inference' or mode == 'eval':
 
 
 print("Loading weights ", weights_path)
-model.load_weights(weights_path, by_name=True)
+model.load_weights(weights_path, by_name=True, exclude=['conv1'])
 
 if mode == 'inference':
     class_names = ['BG', 'artery']
