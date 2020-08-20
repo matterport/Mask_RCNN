@@ -54,6 +54,7 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
                    norm=norm, interpolation=interpolation)
         i += 1
     plt.show()
+    plt.savefig('E:\MaskRCNNTest\Mask_RCNN\sample.png')
 
 
 def random_colors(N, bright=True):
@@ -165,6 +166,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
         plt.show()
+    
+    plt.savefig('E:\MaskRCNNTest\Mask_RCNN\sample1.png')
 
 
 def display_differences(image,

@@ -22,6 +22,7 @@ import keras.backend as K
 import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
+print(keras.__version__)
 
 from mrcnn import utils
 
@@ -29,7 +30,9 @@ from mrcnn import utils
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+from classification_models.keras import Classifiers
 
+ResNet18, preprocess_input = Classifiers.get('resnet18')
 
 ############################################################
 #  Utility Functions
@@ -59,13 +62,29 @@ class BatchNorm(KL.BatchNormalization):
     as linear layer.
     """
     def call(self, inputs, training=None):
-        """
+        """ 
         Note about training values:
             None: Train BN layers. This is the normal mode
             False: Freeze BN layers. Good when batch size is small
             True: (don't use). Set layer in training mode even when making inferences
         """
         return super(self.__class__, self).call(inputs, training=training)
+
+def compute_mobilenet_shapes(config=None, image_shape=None):
+    strides = [4, 8, 16, 32, 64]
+    return np.array(
+        [[int(math.ceil(image_shape[0] / stride)), 
+            int(math.ceil(image_shape[1] / stride))] 
+            for stride in strides]
+    )
+
+def compute_resnet18_shapes(image_shape):
+    strides = [4, 8, 16, 32, 64]
+    return np.array(
+        [[int(math.ceil(image_shape[0] / stride)), 
+            int(math.ceil(image_shape[1] / stride))] 
+            for stride in strides]
+    )
 
 
 def compute_backbone_shapes(config, image_shape):
@@ -75,7 +94,7 @@ def compute_backbone_shapes(config, image_shape):
         [N, (height, width)]. Where N is the number of stages
     """
     if callable(config.BACKBONE):
-        return config.COMPUTE_BACKBONE_SHAPE(image_shape)
+        return config.COMPUTE_BACKBONE_SHAPE(image_shape=image_shape)
 
     # Currently supports ResNet only
     assert config.BACKBONE in ["resnet50", "resnet101"]
@@ -167,6 +186,34 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
     return x
 
+def mobilenet(config=None, input_image=None):
+    # loads a pretrained mobilenetv2 from keras
+    mobilenet = keras.applications.MobileNetV2(input_tensor=input_image, alpha=1.0, include_top=False, weights='imagenet')
+
+    #get outputs for FPN
+    output_names = ['expanded_conv_project_BN', 'block_2_add', 'block_5_add', 'block_12_add', 'block_15_add']
+    tensor_list = []
+    for name in output_names:
+        layer = mobilenet.get_layer(name=name)
+        tensor_list.append(layer.output)
+
+    print(tensor_list)
+    return tensor_list
+
+def resnet18(input_image):
+    # loads model
+    model = ResNet18(input_tensor=input_image, weights='imagenet', include_top=False)
+    model.summary()
+
+        #get outputs for FPN
+    output_names = ['conv0', 'add_2', 'add_4', 'add_6', 'add_8']
+    tensor_list = []
+    for name in output_names:
+        layer = model.get_layer(name=name)
+        tensor_list.append(layer.output)
+
+    print(tensor_list)
+    return tensor_list
 
 def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     """Build a ResNet graph.
@@ -1894,8 +1941,7 @@ class MaskRCNN():
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
         if callable(config.BACKBONE):
-            _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
-                                                train_bn=config.TRAIN_BN)
+            _, C2, C3, C4, C5 = config.BACKBONE(input_image=input_image)
         else:
             _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
                                              stage5=True, train_bn=config.TRAIN_BN)
