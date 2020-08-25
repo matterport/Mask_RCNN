@@ -10,16 +10,11 @@ import time
 from pycocotools.cocoeval import COCOeval
 from pycocotools.coco import COCO
 
-ROOT_DIR = os.path.abspath("./")
-
-# Import Mask RCNN
-sys.path.append(ROOT_DIR) 
-
-from mrcnn.config import Config
-from mrcnn import model as modellib, utils
+from mrcnn import utils
 from mrcnn import visualize
 import json
 
+<<<<<<< HEAD
 """Arrange resutls to match COCO specs in http://cocodataset.org/#format
 """
 def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
@@ -103,6 +98,8 @@ def evaluate_coco(model, dataset, data, eval_type="bbox", limit=0, image_ids=Non
 
 
 
+=======
+>>>>>>> 55e3eb8e2f70958126214ffc51d2e51e82fd2ce2
 class AngioDataset(utils.Dataset):
 
     def fetchAnnotations(self, image_id, annotations):
@@ -183,17 +180,18 @@ class AngioDataset(utils.Dataset):
         class_ids = np.array(class_ids, dtype=np.int32)
         return mask, class_ids
 
+    """
+        Overides original load_image function to load the specified image and return a [H,W,1] Numpy array.
+    """
     def load_image(self, image_id):
-        """
-            Overides original load_image function to load the specified image and return a [H,W,1] Numpy array.
-        """
         # Load image
         image = skimage.io.imread(self.image_info[image_id]['path'])
         
-        #Convert all to grayscale for consistency.
+        #Convert all to grayscale and expand depth dimension for consistency.
         image = np.expand_dims(skimage.color.rgb2gray(image), -1)
 
         return image
+<<<<<<< HEAD
 
 class AngioConfig(Config):
 
@@ -347,3 +345,5 @@ elif mode == 'train':
                 epochs=100,
                 layers='all',
                 augmentation=augmentation)
+=======
+>>>>>>> 55e3eb8e2f70958126214ffc51d2e51e82fd2ce2
