@@ -76,8 +76,8 @@ def evaluate_coco(model, dataset, data, eval_type="bbox", limit=0, image_ids=Non
         t_prediction += (time.time() - t)
 
         class_names = ['BG', 'artery']
-        visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
-                            class_names, r['scores'])
+        # visualize.display_instances(, r['rois'], r['masks'], r['class_ids'], 
+        #                     class_names, r['scores'])
 
         # Convert results to COCO format
         # Cast masks to uint8 because COCO tools errors out on bool
@@ -203,7 +203,7 @@ class AngioConfig(Config):
 
     IMAGE_CHANNEL_COUNT = 1
 
-    MEAN_PIXEL = np.array([116.8])
+    MEAN_PIXEL = np.array([100.0])
 
     NUM_CLASSES = 1 + 1  # Background + artery
 
@@ -214,16 +214,16 @@ class AngioConfig(Config):
 
     BACKBONE = 'resnet101' 
 
-    IMAGE_MAX_DIM = 320
+    IMAGE_MAX_DIM = 512
 
-    MAX_GT_INSTANCES = 20
+    MAX_GT_INSTANCES = 100
 
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     RPN_ANCHOR_RATIOS = [0.5, 1, 2, 3]
-    MINI_MASK_SHAPE = (100, 100)
+    MINI_MASK_SHAPE = (56, 56)
 
-mode = 'train'
-last = False
+mode = 'inference'
+last = True
 datasetdir = 'A:/'
 
 if mode == 'train':
@@ -269,30 +269,33 @@ if mode == 'inference':
 
     for name in file_names:
         if name.split('.')[-1] == 'jpeg':
-            
-            # load image
-            image = skimage.io.imread(os.path.join(IMAGE_DIR, name))
 
-            # converts image to rgb if it is grayscale
-            if image.ndim != 3:
-                image = skimage.color.gray2rgb(image)
+            # Load image
+            image = skimage.io.imread(os.path.join(IMAGE_DIR, name))
+            
+            #Convert all to grayscale for consistency. This image is used for prediction
+            pred_image = np.expand_dims(skimage.color.rgb2gray(image), -1)
+            print(pred_image)
+
+            # converts image to rgb for visualisation
+            vis_image = skimage.color.gray2rgb(image)
             
             # Run detection
-            results = model.detect([image], verbose=1)
+            results = model.detect([pred_image], verbose=1)
             # Visualize results
             r = results[0]
-            print(r['masks'].max())
-            visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
+            # print(r['masks'].max())
+            visualize.display_instances(vis_image, r['rois'], r['masks'], r['class_ids'], 
                                         class_names, r['scores'])
 elif mode == 'eval':
     dataset_val = AngioDataset()
-    dataset_val.load_angio(datasetdir, 'val')
+    dataset_val.load_angio(datasetdir, 'train')
     dataset_val.prepare()
 
     #load angio data in coco format as coco object
-    data = COCO(datasetdir +  'data_val.json')
+    data = COCO(datasetdir +  'data_train.json')
 
-    evaluate_coco(model, dataset_val, data, "segm")
+    evaluate_coco(model, dataset_val, data, "bbox")
 
 elif mode == 'train':
     # train dataset
