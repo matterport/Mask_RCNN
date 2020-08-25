@@ -22,7 +22,7 @@ from mrcnn import visualize
 from angiodataset import AngioDataset
 import json
 
-<<<<<<< HEAD
+
 """Arrange resutls to match COCO specs in http://cocodataset.org/#format
 """
 def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
