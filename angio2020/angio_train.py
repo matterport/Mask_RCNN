@@ -139,10 +139,8 @@ class AngioConfig(Config):
 
     IMAGE_MAX_DIM = 512
 
-    MAX_GT_INSTANCES = 100
-
-    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
-    RPN_ANCHOR_RATIOS = [0.5, 1, 2, 3]
+    RPN_ANCHOR_SCALES = (32, 64, 128)
+    RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
 #Constants
@@ -251,14 +249,15 @@ if __name__ == '__main__':
 
                 # converts image to rgb if it is grayscale
                 if image.ndim != 3:
-                    image = skimage.color.gray2rgb(image)
+                    pred_image = skimage.color.gray2rgb(image)
+                    image = np.expand_dims(image, -1)
                 
                 # Run detection
                 results = model.detect([image], verbose=1)
                 # Visualize results
                 r = results[0]
                 print(r['masks'].max())
-                visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
+                visualize.display_instances(pred_image, r['rois'], r['masks'], r['class_ids'], 
                                             class_names, r['scores'])
     elif mode == 'eval':
         dataset_val = AngioDataset()
