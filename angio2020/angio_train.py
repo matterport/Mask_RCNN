@@ -130,16 +130,17 @@ class AngioConfig(Config):
 
     NUM_CLASSES = 1 + 1  # Background + artery
 
-    STEPS_PER_EPOCH = 1500
-    VALIDATION_STEPS = 300
+    STEPS_PER_EPOCH = 1000
+    VALIDATION_STEPS = 200
 
     DETECTION_MIN_CONFIDENCE = 0.7
 
     BACKBONE = 'resnet101' 
 
     IMAGE_MAX_DIM = 512
+    IMAGE_MIN_DIM = 512
 
-    RPN_ANCHOR_SCALES = (32, 64, 128)
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
