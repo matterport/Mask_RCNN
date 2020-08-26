@@ -126,7 +126,7 @@ class AngioConfig(Config):
 
     IMAGE_CHANNEL_COUNT = 1
 
-    MEAN_PIXEL = np.array([100.0])
+    MEAN_PIXEL = np.array([129.8])
 
     NUM_CLASSES = 1 + 1  # Background + artery
 
@@ -233,7 +233,10 @@ if __name__ == '__main__':
 
 
     print("Loading weights ", weights_path)
-    model.load_weights(weights_path, by_name=True, exclude=['conv1'])
+    if mode == 'train':
+        model.load_weights(weights_path, by_name=True, exclude=['conv1'])
+    else:
+        model.load_weights(weights_path, by_name=True)
 
     if mode == 'inference':
         class_names = ['BG', 'artery']
@@ -241,24 +244,31 @@ if __name__ == '__main__':
         # Load a random image from the images folder
         file_names = next(os.walk(IMAGE_DIR))[2]
 
+        mean = 0
+        cnt = 0
+
         for name in file_names:
             if name.split('.')[-1] == 'jpeg':
                 
                 # load image
-                image = skimage.io.imread(os.path.join(IMAGE_DIR, name))
+                pred_image = skimage.io.imread(os.path.join(IMAGE_DIR, name))
 
                 # converts image to rgb if it is grayscale
-                if image.ndim != 3:
-                    pred_image = skimage.color.gray2rgb(image)
-                    image = np.expand_dims(image, -1)
+                if pred_image.ndim != 3:
+                    image = skimage.color.gray2rgb(pred_image)
+                    pred_image = np.expand_dims(pred_image, -1)
                 
+                mean += np.mean(pred_image)
+                cnt += 1
                 # Run detection
-                results = model.detect([image], verbose=1)
+                results = model.detect([pred_image], verbose=1)
                 # Visualize results
                 r = results[0]
-                print(r['masks'].max())
-                visualize.display_instances(pred_image, r['rois'], r['masks'], r['class_ids'], 
+                visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
                                             class_names, r['scores'])
+        
+        print(mean / cnt)
+                                            
     elif mode == 'eval':
         dataset_val = AngioDataset()
         dataset_val.load_angio(datasetdir, eval_data)
