@@ -2843,7 +2843,6 @@ def mold_image(images, config):
     colors in RGB order.
     """
     image = images.astype(np.float32) - config.MEAN_PIXEL
-    print(image)
     return image
 
 

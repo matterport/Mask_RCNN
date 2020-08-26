@@ -268,7 +268,7 @@ if __name__ == '__main__':
                 visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
                                             class_names, r['scores'])
         
-        print(mean / cnt)
+        # print(mean / cnt)
                                             
     elif mode == 'eval':
         dataset_val = AngioDataset()
