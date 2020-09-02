@@ -204,7 +204,7 @@ if __name__ == '__main__':
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
             IMAGES_PER_GPU = 1
-            DETECTION_MIN_CONFIDENCE = 0.3
+            DETECTION_MIN_CONFIDENCE = 0.05
             BACKBONE = 'resnet101'
 
             # BACKBONE = modellib.mobilenet
@@ -261,7 +261,7 @@ if __name__ == '__main__':
                 # Visualize results
                 r = results[0]
                 visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
-                                            class_names, r['scores'])
+                                            class_names, r['scores'], title=name.split('.')[0])
         
         # print(mean / cnt)
                                             
