@@ -144,6 +144,8 @@ class AngioConfig(Config):
     RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
+    LEARNING_RATE = 0.001
+
 #Constants
 
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
@@ -308,20 +310,29 @@ if __name__ == '__main__':
                     layers='heads',
                     augmentation=augmentation)
 
-        # # Training - Stage 2
-        # # Finetune layers from ResNet stage 4 and up
+        # Training - Stage 2
+        # Finetune layers from ResNet stage 3 and up
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE,
+                    learning_rate=config.LEARNING_RATE / 10,
                     epochs=60,
-                    layers='4+',
+                    layers='3+',
                     augmentation=augmentation)
 
         # Training - Stage 3
-        # Fine tune all layers
+        # Finetune layers from ResNet stage 4 and up
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=150,
+                    learning_rate=config.LEARNING_RATE * 3 / 100,
+                    epochs=80,
+                    layers='4+',
+                    augmentation=augmentation)
+
+        # Training - Stage 4
+        # Finetune all layers
+        print("Fine tune all layers")
+        model.train(dataset_train, dataset_val,
+                    learning_rate=config.LEARNING_RATE / 100,
+                    epochs=120,
                     layers='all',
                     augmentation=augmentation)
