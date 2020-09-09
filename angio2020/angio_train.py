@@ -316,7 +316,7 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=70,
-                    layers='3+',
+                    layers='5+',
                     augmentation=augmentation)
 
         # Training - Stage 3
