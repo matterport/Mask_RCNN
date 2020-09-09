@@ -216,12 +216,14 @@ if __name__ == '__main__':
 
     config.display()
 
+    exclude = []
     # create model and load weights
     if mode =='train':
         model = modellib.MaskRCNN(mode="training", config=config, model_dir=args.logs)
         if not args.model:
             weights_path = model.find_last()
         elif args.model == 'imagenet':
+            exclude = ['conv1']
             weights_path =  model.get_imagenet_weights()
         else:
             weights_path = args.model
@@ -236,7 +238,7 @@ if __name__ == '__main__':
 
 
     print("Loading weights ", weights_path)
-    model.load_weights(weights_path, by_name=True)
+    model.load_weights(weights_path, by_name=True, exclude=exclude)
 
     if mode == 'inference':
         class_names = ['BG', 'artery']
@@ -314,7 +316,7 @@ if __name__ == '__main__':
         # Finetune layers from ResNet stage 3 and up
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE * 3 / 100,
+                    learning_rate=config.LEARNING_RATE / 10,
                     epochs=70,
                     layers='5+',
                     augmentation=augmentation)
