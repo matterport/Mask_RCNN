@@ -142,7 +142,7 @@ class AngioConfig(Config):
     IMAGE_MAX_DIM = 512
     IMAGE_MIN_DIM = 512
 
-    RPN_ANCHOR_SCALES = (32, 64, 128)
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
@@ -330,7 +330,7 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=60,
-                    layers='4+',
+                    layers='5+',
                     augmentation=augmentation)
 
         # Training - Stage 4
