@@ -16,6 +16,8 @@ ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR) 
 print(ROOT_DIR)
 
+COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
+
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 from mrcnn import visualize
@@ -140,7 +142,7 @@ class AngioConfig(Config):
     IMAGE_MAX_DIM = 512
     IMAGE_MIN_DIM = 512
 
-    RPN_ANCHOR_SCALES = (32, 64, 128)
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
@@ -225,14 +227,15 @@ if __name__ == '__main__':
         elif args.model == 'imagenet':
             exclude = ['conv1']
             weights_path =  model.get_imagenet_weights()
+        elif args.model == 'coco':
+            exclude = ['conv1']
+            weights_path = COCO_MODEL_PATH 
         else:
             weights_path = args.model
     elif mode == 'inference' or mode == 'eval':
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
         if not args.model:
             weights_path = model.find_last()
-        elif args.model == 'imagenet':
-            weights_path =  model.get_imagenet_weights()
         else:
             weights_path = args.model
 
@@ -327,7 +330,7 @@ if __name__ == '__main__':
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=60,
-                    layers='4+',
+                    layers='5+',
                     augmentation=augmentation)
 
         # Training - Stage 4
