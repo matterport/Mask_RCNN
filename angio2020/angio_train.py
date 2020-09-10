@@ -140,7 +140,7 @@ class AngioConfig(Config):
     IMAGE_MAX_DIM = 512
     IMAGE_MIN_DIM = 512
 
-    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
+    RPN_ANCHOR_SCALES = (32, 64, 128)
     RPN_ANCHOR_RATIOS = [0.5, 1, 2]
     MINI_MASK_SHAPE = (56, 56)
 
@@ -312,21 +312,21 @@ if __name__ == '__main__':
                     layers='heads',
                     augmentation=augmentation)
 
-        # Training - Stage 2
-        # Finetune layers from ResNet stage 3 and up
-        print("Fine tune Resnet stage 4 and up")
-        model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=70,
-                    layers='5+',
-                    augmentation=augmentation)
+        # # Training - Stage 2
+        # # Finetune layers from ResNet stage 3 and up
+        # print("Fine tune Resnet stage 4 and up")
+        # model.train(dataset_train, dataset_val,
+        #             learning_rate=config.LEARNING_RATE / 10,
+        #             epochs=70,
+        #             layers='5+',
+        #             augmentation=augmentation)
 
         # Training - Stage 3
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE * 3 / 100,
-                    epochs=90,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=60,
                     layers='4+',
                     augmentation=augmentation)
 
@@ -335,6 +335,6 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 100,
-                    epochs=130,
+                    epochs=100,
                     layers='all',
                     augmentation=augmentation)
