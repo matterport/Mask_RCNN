@@ -311,7 +311,7 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=20,
+                    epochs=40,
                     layers='heads',
                     augmentation=augmentation)
 
@@ -328,16 +328,16 @@ if __name__ == '__main__':
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 10,
-                    epochs=60,
-                    layers='5+',
+                    learning_rate=config.LEARNING_RATE,
+                    epochs=120,
+                    layers='4+',
                     augmentation=augmentation)
 
         # Training - Stage 4
         # Finetune all layers
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
-                    learning_rate=config.LEARNING_RATE / 100,
-                    epochs=100,
+                    learning_rate=config.LEARNING_RATE / 10,
+                    epochs=160,
                     layers='all',
                     augmentation=augmentation)
