@@ -228,7 +228,7 @@ if __name__ == '__main__':
             exclude = ['conv1']
             weights_path =  model.get_imagenet_weights()
         elif args.model == 'coco':
-            exclude = ['conv1', 'mrcnn_bbox_fc', 'mrcnn_class_logits', 'mrcnn_mask']
+            exclude = ['mrcnn_bbox_fc', 'mrcnn_class_logits', 'mrcnn_mask']
             weights_path = COCO_MODEL_PATH 
         else:
             weights_path = args.model
@@ -326,11 +326,18 @@ if __name__ == '__main__':
 
         # Training - Stage 3
         # Finetune layers from ResNet stage 4 and up
-        print("Fine tune all layers")
+        print("Fine tune 4+")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=120,
+                    epochs=80,
                     layers='4+',
+                    augmentation=augmentation)
+
+        print("Fine tune 3+")
+        model.train(dataset_train, dataset_val,
+                    learning_rate=config.LEARNING_RATE * 3 / 10,
+                    epochs=120,
+                    layers='3+',
                     augmentation=augmentation)
 
         # Training - Stage 4
