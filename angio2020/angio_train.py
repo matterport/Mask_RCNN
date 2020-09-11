@@ -326,11 +326,18 @@ if __name__ == '__main__':
 
         # Training - Stage 3
         # Finetune layers from ResNet stage 4 and up
-        print("Fine tune all layers")
+        print("Fine tune 4+")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=120,
+                    epochs=80,
                     layers='4+',
+                    augmentation=augmentation)
+
+        print("Fine tune 3+")
+        model.train(dataset_train, dataset_val,
+                    learning_rate=config.LEARNING_RATE * 3 / 10,
+                    epochs=120,
+                    layers='3+',
                     augmentation=augmentation)
 
         # Training - Stage 4
