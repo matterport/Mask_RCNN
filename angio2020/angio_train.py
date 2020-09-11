@@ -228,7 +228,7 @@ if __name__ == '__main__':
             exclude = ['conv1']
             weights_path =  model.get_imagenet_weights()
         elif args.model == 'coco':
-            exclude = ['conv1', 'mrcnn_bbox_fc', 'mrcnn_class_logits', 'mrcnn_mask']
+            exclude = ['mrcnn_bbox_fc', 'mrcnn_class_logits', 'mrcnn_mask']
             weights_path = COCO_MODEL_PATH 
         else:
             weights_path = args.model
