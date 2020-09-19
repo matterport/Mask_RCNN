@@ -1231,32 +1231,31 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
     # This requires the imgaug lib (https://github.com/aleju/imgaug)
     if augmentation:
         import imgaug
-
-        # Augmenters that are safe to apply to masks
-        # Some, such as Affine, have settings that make them unsafe, so always
-        # test your augmentation on masks
-        MASK_AUGMENTERS = ["Sequential", "SomeOf", "OneOf", "Sometimes",
-                           "Fliplr", "Flipud", "CropAndPad",
-                           "Affine", "PiecewiseAffine"]
-
-        def hook(images, augmenter, parents, default):
-            """Determines which augmenters to apply to masks."""
-            return augmenter.__class__.__name__ in MASK_AUGMENTERS
-
         # Store shapes before augmentation to compare
         image_shape = image.shape
         mask_shape = mask.shape
-        # Make augmenters deterministic to apply similarly to images and masks
-        det = augmentation.to_deterministic()
-        image = det.augment_image(image)
-        # Change mask to np.uint8 because imgaug doesn't support np.bool
-        mask = det.augment_image(mask.astype(np.uint8),
-                                 hooks=imgaug.HooksImages(activator=hook))
+        # Convert instance mask to segmentation map
+        idxmask = np.argmax(mask, axis=2) + 1
+        idxmask[~np.any(mask, axis=2)] = 0 # add background
+        segmap = imgaug.augmentables.segmaps.SegmentationMapsOnImage(
+            idxmask.astype(np.int32), shape=image_shape)
+        segmap_shape = segmap.shape
+        # # Make augmenters deterministic to apply similarly to images and masks
+        # det = augmentation.to_deterministic()
+        # image = det.augment_image(image)
+        # segmap = det.augment_segmentation_maps(segmap)
+        augmented = augmentation.augment_batch_(imgaug.augmentables.batches.UnnormalizedBatch(
+            images=[image], segmentation_maps=[segmap]))
+        image = augmented.images_aug[0]
+        segmap = augmented.segmentation_maps_aug[0]
         # Verify that shapes didn't change
         assert image.shape == image_shape, "Augmentation shouldn't change image size"
-        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
+        assert segmap.shape == segmap_shape, "Augmentation shouldn't change segmap size"
         # Change mask back to bool
+        mask = np.eye(mask_shape[2])[segmap.get_arr() - 1]
+        mask *= np.expand_dims(segmap.get_arr() > 0, axis=2) # del background
         mask = mask.astype(np.bool)
+        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
