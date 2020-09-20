@@ -1235,8 +1235,11 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         image_shape = image.shape
         mask_shape = mask.shape
         # Convert instance mask to segmentation map
-        idxmask = np.argmax(mask, axis=2) + 1
-        idxmask[~np.any(mask, axis=2)] = 0 # add background
+        if mask.size == 0:
+            idxmask = np.zeros(image_shape[:2])
+        else:
+            idxmask = np.argmax(mask, axis=2) + 1
+            idxmask[~np.any(mask, axis=2)] = 0 # add background
         segmap = imgaug.augmentables.segmaps.SegmentationMapsOnImage(
             idxmask.astype(np.int32), shape=image_shape)
         segmap_shape = segmap.shape
@@ -1251,11 +1254,12 @@ def load_image_gt(dataset, config, image_id, augment=False, augmentation=None,
         # Verify that shapes didn't change
         assert image.shape == image_shape, "Augmentation shouldn't change image size"
         assert segmap.shape == segmap_shape, "Augmentation shouldn't change segmap size"
-        # Change mask back to bool
-        mask = np.eye(mask_shape[2])[segmap.get_arr() - 1]
-        mask *= np.expand_dims(segmap.get_arr() > 0, axis=2) # del background
-        mask = mask.astype(np.bool)
-        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
+        if mask.size > 0:
+            # Change mask back to bool
+            mask = np.eye(mask_shape[2])[segmap.get_arr() - 1]
+            mask *= np.expand_dims(segmap.get_arr() > 0, axis=2) # del background
+            mask = mask.astype(np.bool)
+            assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
 
     # Note that some boxes might be all zeros if the corresponding mask got cropped out.
     # and here is to filter them out
