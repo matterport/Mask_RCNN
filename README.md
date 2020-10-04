@@ -29,10 +29,10 @@ It includes code to run object detection and instance segmentation on arbitrary 
 * [inspect_data.ipynb](samples/coco/inspect_data.ipynb). This notebook visualizes the different pre-processing steps
 to prepare the training data.
 
-* [inspect_model.ipynb](samples/coco/inspect_model.ipynb) This notebook goes in depth into the steps performed to detect and segment objects. It provides visualizations of every step of the pipeline.
+* [inspect_model.ipynb](samples/coco/inspect_model.ipynb) This notebook goes in-depth into the steps performed to detect and segment objects. It provides visualizations of every step of the pipeline.
 
 * [inspect_weights.ipynb](samples/coco/inspect_weights.ipynb)
-This notebooks inspects the weights of a trained model and looks for anomalies and odd patterns.
+This notebook inspects the weights of a trained model and looks for anomalies and odd patterns.
 
 
 # Step by Step Detection
@@ -70,7 +70,7 @@ TensorBoard is another great debugging and visualization tool. The model is conf
 
 ![](assets/detection_tensorboard.png)
 
-## 6. Composing the different pieces into a final result
+## 7. Composing the different pieces into a final result
 
 ![](assets/detection_final.png)
 
@@ -127,8 +127,8 @@ See examples in `samples/shapes/train_shapes.ipynb`, `samples/coco/coco.py`, `sa
 ## Differences from the Official Paper
 This implementation follows the Mask RCNN paper for the most part, but there are a few cases where we deviated in favor of code simplicity and generalization. These are some of the differences we're aware of. If you encounter other differences, please do let us know.
 
-* **Image Resizing:** To support training multiple images per batch we resize all images to the same size. For example, 1024x1024px on MS COCO. We preserve the aspect ratio, so if an image is not square we pad it with zeros. In the paper the resizing is done such that the smallest side is 800px and the largest is trimmed at 1000px.
-* **Bounding Boxes**: Some datasets provide bounding boxes and some provide masks only. To support training on multiple datasets we opted to ignore the bounding boxes that come with the dataset and generate them on the fly instead. We pick the smallest box that encapsulates all the pixels of the mask as the bounding box. This simplifies the implementation and also makes it easy to apply image augmentations that would otherwise be harder to apply to bounding boxes, such as image rotation.
+* **Image Resizing:** To support training multiple images per batch we resize all images to the same size. For example, 1024x1024px on MS COCO. We preserve the aspect ratio, so if an image is not square we pad it with zeros. In the paper, the resizing is done such that the smallest side is 800px and the largest is trimmed at 1000px.
+* **Bounding Boxes**: Some datasets provide bounding boxes and some provide masks only. To support training on multiple datasets we opted to ignore the bounding boxes that come with the dataset and generate them on the fly instead. We pick the smallest box that encapsulates all the pixels of the mask as the bounding box. This simplifies the implementation and also makes it easy to apply image augmentations that would otherwise be harder to apply on bounding boxes, such as image rotation.
 
     To validate this approach, we compared our computed bounding boxes to those provided by the COCO dataset.
 We found that ~2% of bounding boxes differed by 1px or more, ~0.05% differed by 5px or more, 
@@ -155,7 +155,7 @@ Use this bibtex to cite this repository:
 ```
 
 ## Contributing
-Contributions to this repository are welcome. Examples of things you can contribute:
+Contributions to this repository are welcome. Examples of things you can contribute with:
 * Speed Improvements. Like re-writing some Python code in TensorFlow or Cython.
 * Training on other datasets.
 * Accuracy Improvements.
@@ -164,7 +164,7 @@ Contributions to this repository are welcome. Examples of things you can contrib
 You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
 
 ## Requirements
-Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.txt`.
+Python 3.4, TensorFlow 1.3, Keras 2.0.8, and other common packages listed in `requirements.txt`.
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
@@ -180,16 +180,16 @@ If you use Docker, the code has been verified to work on
 
 ## Installation
 1. Clone this repository
-2. Install dependencies
+1. Install dependencies
    ```bash
    pip3 install -r requirements.txt
    ```
-3. Run setup from the repository root directory
+1. Run setup from the repository root directory
     ```bash
     python3 setup.py install
     ``` 
-3. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
-4. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
+1. Download pre-trained COCO weights (mask_rcnn_coco.h5) from the [releases page](https://github.com/matterport/Mask_RCNN/releases).
+1. (Optional) To train or test on MS COCO install `pycocotools` from one of these repos. They are forks of the original pycocotools with fixes for Python3 and Windows (the official repo doesn't seem to be active anymore).
 
     * Linux: https://github.com/waleedka/coco
     * Windows: https://github.com/philferriere/cocoapi.
