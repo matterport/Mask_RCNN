@@ -34,7 +34,14 @@ def toBinMaskRle(img=None, path=None, threshold=10):
 
 def createJsonAnnotations(data_path, subset):
     # list of categories for the dataset
-    categories = [{'id' : 1, 'name' : 'artery'}]
+    categories = [{'id' : 1, 'name' : 'lad'}, {'id' : 2, 'name' : 'diagonal'}, {'id' : 3, 'name' : 'lcx1'}, {'id' : 4, 'name' : 'lcx2'}, {'id' : 5, 'name' : 'distal'}]
+    category_to_id = {
+        'lad' : 1,
+        'diagonal' : 2,
+        'lcx1' : 3,
+        'lcx2' : 4,
+        'distal' : 5
+    }
     # list of annotations
     annotations = []
     #list of images
@@ -51,6 +58,11 @@ def createJsonAnnotations(data_path, subset):
             # iterate through all the masks
             for f in item.iterdir():
                 # get rle and add to list of annotations
+                print(f.name)
+                category =  f.name.split('_')[-1][:-4]
+                if category in ['mask1', 'mask2', 'mask3', 'mask']:
+                    continue
+                category_id = category_to_id[category]
                 id_cnt += 1
                 rle = toBinMaskRle(path=str(f))
                 area = int(maskUtils.area(rle))
@@ -61,7 +73,7 @@ def createJsonAnnotations(data_path, subset):
                     'segmentation': rle,
                     'area': area,
                     'bbox': bbox,
-                    'category_id' : 1,
+                    'category_id' : category_id,
                     'image_id' : image_id,
                 })
             
@@ -87,15 +99,14 @@ def createJsonAnnotations(data_path, subset):
         'images' : images
     }
 
-    print(jsonFile)
-
-    with open( data_path + '/data_{}.json'.format(subset), 'w', encoding='utf-8') as f:
+    with open(data_path + '/data_{}.json'.format(subset), 'w', encoding='utf-8') as f:
         json.dump(jsonFile, f, ensure_ascii=False, indent=4)
 
 
 
 createJsonAnnotations('A:/train', 'train')
 createJsonAnnotations('A:/val', 'val')
+createJsonAnnotations('A:/test', 'test')
 
 # rle = jpgToBinMaskRle(image_path)
 # print(rle)
