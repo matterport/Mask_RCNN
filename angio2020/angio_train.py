@@ -93,7 +93,7 @@ def evaluate_coco(model, dataset, data, eval_type="bbox", limit=0, image_ids=Non
         r = model.detect([image], verbose=0)[0]
         t_prediction += (time.time() - t)
 
-        class_names = ['BG', 'artery']
+        class_names = ['BG', 'lad', 'diagonal', 'lcx1', 'lcx2', 'distal']
         # visualize.display_instances(, r['rois'], r['masks'], r['class_ids'], 
         #                     class_names, r['scores'])
 
@@ -130,7 +130,7 @@ class AngioConfig(Config):
 
     MEAN_PIXEL = np.array([129.8])
 
-    NUM_CLASSES = 1 + 1  # Background + artery
+    NUM_CLASSES = 1 + 5  # Background + rest
 
     STEPS_PER_EPOCH = 1000
     VALIDATION_STEPS = 200
@@ -315,7 +315,7 @@ if __name__ == '__main__':
                     layers='heads',
                     augmentation=augmentation)
 
-        # Training - Stage 2
+        # Training - Stage 2 
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune 4+")
         model.train(dataset_train, dataset_val,
