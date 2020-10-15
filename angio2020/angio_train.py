@@ -140,8 +140,8 @@ class AngioConfig(Config):
 
     NUM_CLASSES = 1 + 5  # Background + rest
 
-    STEPS_PER_EPOCH = 1000
-    VALIDATION_STEPS = 200
+    STEPS_PER_EPOCH = 16432
+    VALIDATION_STEPS = 3287
 
     DETECTION_MIN_CONFIDENCE = 0.7
 
