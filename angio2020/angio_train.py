@@ -133,7 +133,7 @@ class AngioConfig(Config):
     NUM_CLASSES = 1 + 5  # Background + rest
 
     STEPS_PER_EPOCH = 16432
-    VALIDATION_STEPS = 3287
+    VALIDATION_STEPS = 317
 
     DETECTION_MIN_CONFIDENCE = 0.7
 
@@ -336,6 +336,6 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=180,
+                    epochs=160,
                     layers='all',
                     augmentation=augmentation)

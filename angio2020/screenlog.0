@@ -1,0 +1,4 @@
+  File "angio_train.py", line 281
+    data = COCO(datasetdir +  f'data_{eval_data}.json')
+                                                     ^
+SyntaxError: invalid syntax
