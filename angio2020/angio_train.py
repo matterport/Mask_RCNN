@@ -320,7 +320,7 @@ if __name__ == '__main__':
         print("Fine tune 4+")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=120,
+                    epochs=80,
                     layers='4+',
                     augmentation=augmentation)
 
