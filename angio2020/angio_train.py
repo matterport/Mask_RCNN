@@ -133,7 +133,7 @@ class AngioConfig(Config):
     NUM_CLASSES = 1 + 5  # Background + rest
 
     STEPS_PER_EPOCH = 16432
-    VALIDATION_STEPS = 3287
+    VALIDATION_STEPS = 317
 
     DETECTION_MIN_CONFIDENCE = 0.7
 
@@ -244,7 +244,7 @@ if __name__ == '__main__':
     model.load_weights(weights_path, by_name=True, exclude=exclude)
 
     if mode == 'inference':
-        class_names = ['BG', 'artery']
+        class_names = ['BG', 'lad', 'diagonal', 'lcx1', 'lcx2', 'distal']
 
         # Load a random image from the images folder
         file_names = next(os.walk(IMAGE_DIR))[2]
@@ -320,7 +320,7 @@ if __name__ == '__main__':
         print("Fine tune 4+")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=120,
+                    epochs=80,
                     layers='4+',
                     augmentation=augmentation)
 
