@@ -336,6 +336,6 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=180,
+                    epochs=160,
                     layers='all',
                     augmentation=augmentation)
