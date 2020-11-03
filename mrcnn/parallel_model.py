@@ -69,7 +69,7 @@ class ParallelModel(KM.Model):
         # Run the model call() on each GPU to place the ops there
         for i in range(self.gpu_count):
             with tf.device('/gpu:%d' % i):
-                with tf.name_scope('tower_%d' % i):
+                with tf.compat.v1.name_scope('tower_%d' % i):
                     # Run a slice of inputs through this replica
                     zipped_inputs = zip(self.inner_model.input_names,
                                         self.inner_model.inputs)
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         # Reset default graph. Keras leaves old ops in the graph,
         # which are ignored for execution but clutter graph
         # visualization in TensorBoard.
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
         inputs = KL.Input(shape=x_train.shape[1:], name="input_image")
         x = KL.Conv2D(32, (3, 3), activation='relu', padding="same",
