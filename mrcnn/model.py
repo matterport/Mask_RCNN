@@ -22,6 +22,11 @@ import keras.backend as K
 import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
+import tensorflow as tf
+
+# For callback mAP
+from keras.callbacks import Callback
+from mrcnn.utils import Dataset
 
 from mrcnn import utils
 
@@ -697,7 +702,12 @@ def refine_detections_graph(rois, probs, deltas, window, config):
         coordinates are normalized.
     """
     # Class IDs per ROI
-    class_ids = tf.argmax(probs, axis=1, output_type=tf.int32)
+    #class_ids = tf.argmax(probs, axis=1, output_type=tf.int32)
+    # Class IDs per ROI
+    if config.NUM_CLASSES == 2:
+        class_ids = tf.ones_like(probs[:, 0], dtype=tf.int32)
+    else:
+        class_ids = tf.argmax(probs, axis=1, output_type=tf.int32)
     # Class probability of the top class of each ROI
     indices = tf.stack([tf.range(probs.shape[0]), class_ids], axis=1)
     class_scores = tf.gather_nd(probs, indices)
@@ -954,7 +964,7 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
-                         pool_size, num_classes, train_bn=True):
+                         pool_size, num_classes, num_deconv_layers, train_bn=True):
     """Builds the computation graph of the mask head of Feature Pyramid Network.
 
     rois: [batch, num_rois, (y1, x1, y2, x2)] Proposal boxes in normalized
@@ -964,9 +974,14 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     image_meta: [batch, (meta data)] Image details. See compose_image_meta()
     pool_size: The width of the square feature map generated from ROI Pooling.
     num_classes: number of classes, which determines the depth of the results
+    num_deconv_layers: The number of Conv2DTranspose layers.
+                       In the paper of Mask R-CNN(Ch. 3 - Network Architecture),
+                       it only has one deconv layer.
+                       Adding additional deconv layers increases output mask resolution,
+                       and it is an extra feature not described in the paper.
     train_bn: Boolean. Train or freeze Batch Norm layers
 
-    Returns: Masks [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, NUM_CLASSES]
+    Returns: Masks [batch, num_rois, MASK_SHAPE[0], MASK_SHAPE[1], NUM_CLASSES]
     """
     # ROI Pooling
     # Shape: [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, channels]
@@ -1000,23 +1015,53 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
 
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
+    
+    for i in range(1, num_deconv_layers):
+        x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
+                               name="mrcnn_mask_deconv" + str(i + 1))(x)
+        
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
                            name="mrcnn_mask")(x)
     return x
-
 
 ############################################################
 #  Loss Functions
 ############################################################
 
-def smooth_l1_loss(y_true, y_pred):
+def smooth_l1_loss(y_true, y_pred, config):
     """Implements Smooth-L1 loss.
     y_true and y_pred are typically: [N, 4], but could be any shape.
     """
     diff = K.abs(y_true - y_pred)
     less_than_one = K.cast(K.less(diff, 1.0), "float32")
     loss = (less_than_one * 0.5 * diff**2) + (1 - less_than_one) * (diff - 0.5)
-    return loss
+    
+    return loss 
+
+def weighted_smooth_l1_loss(y_true, y_pred, config):
+    """Implements Smooth-L1 loss. Increase weight for small bubbles.
+    y_true and y_pred are typically: [N, 4], but could be any shape.
+    """
+    loss = 0
+    diff = K.abs(y_true - y_pred)
+    weight = weight_cus(y_true, config)
+    for x in range(4):
+        diff_w = diff[:,x]*weight 
+        less_than_one = K.cast(K.less(diff_w, 1.0), "float32")
+        loss += (less_than_one * 0.5 * diff_w**2) + (1 - less_than_one) * (diff_w - 0.5)
+    #print(format(weight))
+    
+    return loss/4
+
+def weight_cus(y_true, config):
+    weight = ((10**y_true[:,2])**2 + (10**y_true[:,3])**2)**(1/2)
+    weight = config.MEAN_SIZE/(weight)
+    with tf.compat.v1.Session():
+        weight = tf.where(tf.math.is_nan(weight), tf.zeros_like(weight), weight)
+    weight = ((weight - config.MEAN_SIZE/config.MAX_SIZE)/(config.MEAN_SIZE/config.MIN_SIZE - config.MEAN_SIZE/config.MAX_SIZE) - 0.5)
+    weight = tf.clip_by_value(weight, 0, 0.3)
+    weight = weight/config.WEIGHT_WIDTH + 1
+    return weight
 
 
 def rpn_class_loss_graph(rpn_match, rpn_class_logits):
@@ -1067,9 +1112,11 @@ def rpn_bbox_loss_graph(config, target_bbox, rpn_match, rpn_bbox):
     target_bbox = batch_pack_graph(target_bbox, batch_counts,
                                    config.IMAGES_PER_GPU)
 
-    loss = smooth_l1_loss(target_bbox, rpn_bbox)
+    loss = weighted_smooth_l1_loss(target_bbox, rpn_bbox, config)
+    #print(loss.shape)
     
     loss = K.switch(tf.size(loss) > 0, K.mean(loss), tf.constant(0.0))
+    #print(loss.shape)
     return loss
 
 
@@ -1109,7 +1156,7 @@ def mrcnn_class_loss_graph(target_class_ids, pred_class_logits,
     return loss
 
 
-def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
+def mrcnn_bbox_loss_graph(config, target_bbox, target_class_ids, pred_bbox):
     """Loss for Mask R-CNN bounding box refinement.
 
     target_bbox: [batch, num_rois, (dy, dx, log(dh), log(dw))]
@@ -1134,7 +1181,7 @@ def mrcnn_bbox_loss_graph(target_bbox, target_class_ids, pred_bbox):
 
     # Smooth-L1 Loss
     loss = K.switch(tf.size(target_bbox) > 0,
-                    smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox),
+                    weighted_smooth_l1_loss(y_true=target_bbox, y_pred=pred_bbox, config=config),
                     tf.constant(0.0))
     loss = K.mean(loss)
     return loss
@@ -1684,6 +1731,11 @@ def data_generator(dataset, config, shuffle=True, augment=False, augmentation=No
                                              backbone_shapes,
                                              config.BACKBONE_STRIDES,
                                              config.RPN_ANCHOR_STRIDE)
+    #set random seed unique to worker 
+    pid = multiprocessing.current_process()._identity[0]
+    np.random.seed(pid)
+    random.seed(pid)
+    
 
     # Keras requires a generator to run indefinitely.
     while True:
@@ -2001,6 +2053,7 @@ class MaskRCNN():
                                               input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
+                                              config.NUM_DECONV_LAYERS,
                                               train_bn=config.TRAIN_BN)
 
             # TODO: clean up (use tf.identify if necessary)
@@ -2013,7 +2066,7 @@ class MaskRCNN():
                 [input_rpn_bbox, input_rpn_match, rpn_bbox])
             class_loss = KL.Lambda(lambda x: mrcnn_class_loss_graph(*x), name="mrcnn_class_loss")(
                 [target_class_ids, mrcnn_class_logits, active_class_ids])
-            bbox_loss = KL.Lambda(lambda x: mrcnn_bbox_loss_graph(*x), name="mrcnn_bbox_loss")(
+            bbox_loss = KL.Lambda(lambda x: mrcnn_bbox_loss_graph(config, *x), name="mrcnn_bbox_loss")(
                 [target_bbox, target_class_ids, mrcnn_bbox])
             mask_loss = KL.Lambda(lambda x: mrcnn_mask_loss_graph(*x), name="mrcnn_mask_loss")(
                 [target_mask, target_class_ids, mrcnn_mask])
@@ -2049,6 +2102,7 @@ class MaskRCNN():
                                               input_image_meta,
                                               config.MASK_POOL_SIZE,
                                               config.NUM_CLASSES,
+                                              config.NUM_DECONV_LAYERS,
                                               train_bn=config.TRAIN_BN)
 
             model = KM.Model([input_image, input_image_meta, input_anchors],
@@ -2150,13 +2204,13 @@ class MaskRCNN():
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
 
-    def compile(self, learning_rate, momentum):
+    def compile(self, learning_rate, beta_1, beta_2):
         """Gets the model ready for training. Adds losses, regularization, and
         metrics. Then calls the Keras compile() function.
         """
         # Optimizer object
-        optimizer = keras.optimizers.SGD(
-            lr=learning_rate, momentum=momentum,
+        optimizer = keras.optimizers.Adam(
+            lr=learning_rate, beta_1=beta_1, beta_2=beta_2,
             clipnorm=self.config.GRADIENT_CLIP_NORM)
         # Add Losses
         # First, clear previously set losses to avoid duplication
@@ -2185,7 +2239,8 @@ class MaskRCNN():
         # Compile
         self.keras_model.compile(
             optimizer=optimizer,
-            loss=[None] * len(self.keras_model.outputs))
+            loss=[None] * len(self.keras_model.outputs),
+            metrics=['accuracy', 'calculate_mAP'])
 
         # Add metrics for losses
         for name in loss_names:
@@ -2340,7 +2395,7 @@ class MaskRCNN():
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0, write_graph=True, write_images=False),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                            verbose=0, save_weights_only=True, mode='auto', period=1),
         ]
 
         # Add custom callbacks to the list
@@ -2351,7 +2406,7 @@ class MaskRCNN():
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)
-        self.compile(learning_rate, self.config.LEARNING_MOMENTUM)
+        self.compile(learning_rate, self.config.BETA_1, self.config.BETA_2)
 
         # Work-around for Windows: Keras fails on Windows when using
         # multiprocessing workers. See discussion here:
@@ -2866,3 +2921,107 @@ def denorm_boxes_graph(boxes, shape):
     scale = tf.concat([h, w, h, w], axis=-1) - tf.constant(1.0)
     shift = tf.constant([0., 0., 1., 1.])
     return tf.cast(tf.round(tf.multiply(boxes, scale) + shift), tf.int32)
+
+
+
+############################################################
+#  Custom Callbacks
+############################################################
+
+class MeanAveragePrecisionCallback(Callback):
+    def __init__(self, train_model: MaskRCNN, inference_model: MaskRCNN, dataset: Dataset,
+                 calculate_at_every_X_epoch: int = 3, dataset_limit: int = None,
+                 verbose: int = 1):
+        super().__init__()
+        self.train_model = train_model
+        self.inference_model = inference_model
+        self.dataset = dataset
+        self.calculate_at_every_X_epoch = calculate_at_every_X_epoch
+        self.dataset_limit = len(self.dataset.image_ids)
+        if dataset_limit is not None:
+            self.dataset_limit = dataset_limit
+        self.dataset_image_ids = self.dataset.image_ids.copy()
+
+        if inference_model.config.BATCH_SIZE != 1:
+            raise ValueError("This callback only works with the bacth size of 1")
+
+        self._verbose_print = print if verbose > 0 else lambda *a, **k: None
+
+    def on_epoch_end(self, epoch, logs=None):
+        if epoch > 0 and epoch % self.calculate_at_every_X_epoch == 0:
+            self._verbose_print("Calculating mAP...")
+            self._load_weights_for_model()
+
+            mAPs = self._calculate_mean_average_precision(0.5)
+            mAP_50 = np.mean(mAPs)
+            mAPs = self._calculate_mean_average_precision(0.75)
+            mAP_75 = np.mean(mAPs)
+            mAPs = self._calculate_mean_average_precision(0.90)
+            mAP_90 = np.mean(mAPs)
+            [mAP_sm, mAP_me, mAP_la] = self._calculate_mean_average_precision_size()
+
+            if logs is not None:
+                logs["val_mAP_50"] = mAP_50
+                logs["val_mAP_75"] = mAP_75
+                logs["val_mAP_90"] = mAP_90
+                logs["val_mAP_small"] = mAP_sm
+                logs["val_mAP_medium"] = mAP_me
+                logs["val_mAP_large"] = mAP_la
+
+            self._verbose_print("mAP(50, 75, 90) at epoch {0} is: {1}, {2}, {3}".format(epoch, mAP_50, mAP_75, mAP_90))
+            self._verbose_print("mAP(small, medium, large) at epoch {0} is: {1}, {2}, {3}".format(epoch, mAP_sm, mAP_me, mAP_la))
+
+        super().on_epoch_end(epoch, logs)
+
+    def _load_weights_for_model(self):
+        last_weights_path = self.train_model.find_last()
+        self._verbose_print("Loaded weights for the inference model (last checkpoint of the train model): {0}".format(
+            last_weights_path))
+        self.inference_model.load_weights(last_weights_path,
+                                          by_name=True)
+
+    def _calculate_mean_average_precision(self, iou_threshold):
+        mAPs = []
+
+        # Use a random subset of the data when a limit is defined
+        np.random.shuffle(self.dataset_image_ids)
+
+        for image_id in self.dataset_image_ids[:self.dataset_limit]:
+            image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(self.dataset, self.inference_model.config,
+                                                                             image_id, use_mini_mask=False)
+            #results = self.inference_model.detect(image, verbose=0)
+            # Run object detection
+            results = self.inference_model.detect_molded(image[np.newaxis], image_meta[np.newaxis], verbose=0)
+            r = results[0]
+            # Compute mAP - VOC uses IoU 0.5
+            AP, _, _, _ = utils.compute_ap(gt_bbox, gt_class_id, gt_mask, r["rois"],
+                                           r["class_ids"], r["scores"], r['masks'],iou_threshold)
+            mAPs.append(AP)
+
+        return np.array(mAPs)
+    
+    def _calculate_mean_average_precision_size (self):
+        mAPs = []
+
+        # Use a random subset of the data when a limit is defined
+        np.random.shuffle(self.dataset_image_ids)
+
+        for image_id in self.dataset_image_ids[:self.dataset_limit]:
+            image, image_meta, gt_class_id, gt_bbox, gt_mask = load_image_gt(self.dataset, self.inference_model.config,
+                                                                             image_id, use_mini_mask=False)
+            #results = self.inference_model.detect(image, verbose=0)
+            # Run object detection
+            results = self.inference_model.detect_molded(image[np.newaxis], image_meta[np.newaxis], verbose=0)
+            r = results[0]
+            # Compute mAP 
+            AP = utils.compute_ap_size(gt_bbox, gt_class_id, gt_mask, r["rois"],
+                                           r["class_ids"], r["scores"], r['masks'],verbose=0)
+            mAPs.append(AP)
+            
+        mAP = np.array(mAPs)
+        with tf.compat.v1.Session():
+            mAP = tf.where(mAP == -1, tf.fill(mAP.shape, np.nan), mAP)
+            mAP = mAP.eval()
+        mAP = np.nanmean(mAP,axis = 0)     
+
+        return mAP

@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
 import IPython.display
+import tensorflow as tf
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -42,18 +43,24 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
     norm: Optional. A Normalize instance to map values to colors.
     interpolation: Optional. Image interpolation to use for display.
     """
+    vmin = 0
+    vmax = 100
     titles = titles if titles is not None else [""] * len(images)
     rows = len(images) // cols + 1
-    plt.figure(figsize=(14, 14 * rows // cols))
+    fig = plt.figure(figsize=(14*3, 14*3 * rows // cols))
+    #my_dpi = 96
+    #fig = plt.figure(figsize=(images[0].shape[1]/my_dpi, images[0].shape[0]/my_dpi), dpi=my_dpi)
     i = 1
     for image, title in zip(images, titles):
         plt.subplot(rows, cols, i)
         plt.title(title, fontsize=9)
         plt.axis('off')
         plt.imshow(image.astype(np.uint8), cmap=cmap,
-                   norm=norm, interpolation=interpolation)
-        i += 1
+                   norm=norm, interpolation=interpolation, vmin=vmin, vmax=vmax)
+        i += 1    
+    plt.colorbar()
     plt.show()
+    return fig
 
 
 def random_colors(N, bright=True):
@@ -84,7 +91,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
-                      colors=None, captions=None):
+                      colors=None, captions=None, linewidth=2.5):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -134,7 +141,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                                 alpha=0.7, linestyle="dashed",
                                 edgecolor=color, facecolor='none')
             ax.add_patch(p)
-
+        """
         # Label
         if not captions:
             class_id = class_ids[i]
@@ -145,6 +152,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             caption = captions[i]
         ax.text(x1, y1 + 8, caption,
                 color='w', size=11, backgroundcolor="none")
+        """
 
         # Mask
         mask = masks[:, :, i]
@@ -160,7 +168,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         for verts in contours:
             # Subtract the padding and flip (y, x) to (x, y)
             verts = np.fliplr(verts) - 1
-            p = Polygon(verts, facecolor="none", edgecolor=color)
+            p = Polygon(verts, facecolor="none", edgecolor=color, linewidth=linewidth)
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
@@ -203,7 +211,71 @@ def display_differences(image,
         show_bbox=show_box, show_mask=show_mask,
         colors=colors, captions=captions,
         title=title)
+    
+    
+def display_IoU(image,
+                        gt_box, gt_class_id, gt_mask,
+                        pred_box, pred_class_id, pred_score, pred_mask,
+                        class_names, title="", ax=None,
+                        show_mask=True, show_box=True,
+                        iou_threshold=0.5, score_threshold=0.8, colors=None):
+    """Display prediction instances depending on IoU threshold."""
+    # Match predictions to ground truth
+    gt_match, pred_match, overlaps = utils.compute_matches(
+        gt_box, gt_class_id, gt_mask,
+        pred_box, pred_class_id, pred_score, pred_mask,
+        iou_threshold=iou_threshold, score_threshold=score_threshold)
+    # Find pred_box iou<=iou_threshold
+    overlaps = np.max(overlaps, axis=1)
+    ind = np.where(overlaps>=iou_threshold)
+    ind = np.array(ind)
+    ind = ind.flatten()
+    pred_box1 = pred_box[ind,:]
+    pred_class_id1 = pred_class_id[ind]
+    pred_score1 = pred_score[ind]
+    pred_mask1 = pred_mask[:,:,ind]
+    colors = colors*len(pred_score)
 
+    # Display
+    display_instances(
+        image,
+        pred_box1, pred_mask1, pred_class_id1,
+        class_names, pred_score1, ax=ax,
+        show_bbox=show_box, show_mask=show_mask,
+        colors=colors)
+    
+    
+def display_IoU_one_im(image,
+                        gt_box, gt_class_id, gt_mask,
+                        pred_box, pred_class_id, pred_score, pred_mask,
+                        class_names, title="", ax=None,
+                        show_mask=True, show_box=True,
+                        iou_threshold=0.5, score_threshold=0.8, colors=None):
+    """Display prediction instances depending on IoU threshold in one image."""
+    # Match predictions to ground truth
+    gt_match, pred_match, overlaps = utils.compute_matches(
+        gt_box, gt_class_id, gt_mask,
+        pred_box, pred_class_id, pred_score, pred_mask,
+        iou_threshold=iou_threshold, score_threshold=score_threshold)
+    # Find pred_box iou<=iou_threshold
+    overlaps = np.max(overlaps, axis=1)
+    colors = np.tile(np.array([1, 0, 0, 1]),(len(overlaps),1))
+    color_map = np.array([[0, 0.3, 1, 1], [1, 0, 1, 1], [0, 1, 1, 1]]) 
+    iouRng = np.array([[0, 0.5], [0.5, 0.75], [0.75, 1]])
+    for i in range(3):
+        ind = np.where(np.logical_and(overlaps>=iouRng[i][0], overlaps<iouRng[i][1]))
+        ind = np.array(ind)
+        ind = ind.flatten()
+        colors[ind,:] = color_map[i-1,:]
+
+    # Display
+    display_instances(
+        image,
+        pred_box, pred_mask, pred_class_id,
+        class_names, pred_score, ax=ax,
+        show_bbox=show_box, show_mask=show_mask,
+        colors=list(colors))
+    
 
 def draw_rois(image, rois, refined_rois, mask, class_ids, class_names, limit=10):
     """
@@ -279,11 +351,11 @@ def draw_box(image, box, color):
     return image
 
 
-def display_top_masks(image, mask, class_ids, class_names, limit=4):
+def display_top_masks(image, mask, class_ids, scores, class_names, limit=4, cmap="Blues_r"):
     """Display the given image and the top few class masks."""
     to_display = []
     titles = []
-    to_display.append(image)
+    #to_display.append(image)
     titles.append("H x W={}x{}".format(image.shape[0], image.shape[1]))
     # Pick top prominent classes in this image
     unique_class_ids = np.unique(class_ids)
@@ -296,10 +368,15 @@ def display_top_masks(image, mask, class_ids, class_names, limit=4):
         class_id = top_ids[i] if i < len(top_ids) else -1
         # Pull masks of instances belonging to the same class.
         m = mask[:, :, np.where(class_ids == class_id)[0]]
-        m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
+        #m = np.sum(m * np.arange(1, m.shape[-1] + 1), -1)
+        mm = np.sum(m,axis=(0,1))
+        m = np.sum(m*mm, -1)
         to_display.append(m)
         titles.append(class_names[class_id] if class_id != -1 else "-")
-    display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r")
+    #display_images(to_display, titles=titles, cols=limit + 1, cmap="Blues_r")
+    fig = to_display[0]
+    #fig = display_images(to_display, cols=limit + 1, cmap=cmap)
+    return fig
 
 
 def plot_precision_recall(AP, precisions, recalls):

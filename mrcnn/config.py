@@ -96,7 +96,7 @@ class Config(object):
 
     # ROIs kept after non-maximum suppression (training and inference)
     POST_NMS_ROIS_TRAINING = 2000
-    POST_NMS_ROIS_INFERENCE = 1000
+    POST_NMS_ROIS_INFERENCE = 2000
 
     # If enabled, resizes instance masks to a smaller size to reduce
     # memory load. Recommended when using high-resolution images.
@@ -136,7 +136,7 @@ class Config(object):
     # details: https://github.com/matterport/Mask_RCNN/wiki
     IMAGE_CHANNEL_COUNT = 3
 
-    # Image mean (RGB)
+    # Image mean (RGB), Average of each channel based on imagenet.
     MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
 
     # Number of ROIs per image to feed to classifier/mask heads
@@ -180,6 +180,8 @@ class Config(object):
     # implementation.
     LEARNING_RATE = 0.001
     LEARNING_MOMENTUM = 0.9
+    BETA_1 = 0.9
+    BETA_2 = 0.999    
 
     # Weight decay regularization
     WEIGHT_DECAY = 0.0001
@@ -226,6 +228,14 @@ class Config(object):
         # Image meta data length
         # See compose_image_meta() for details
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+        
+        # Number of Conv2DTranspose layers in build_fpn_mask_graph
+        assert self.MASK_SHAPE[0] == self.MASK_SHAPE[1], "Only support square mask currently!"
+        num_deconv_layers = np.log2(self.MASK_SHAPE[0] / self.MASK_POOL_SIZE)
+        # make sure num_deconv_layers is a positive integer
+        assert num_deconv_layers == int(num_deconv_layers) and num_deconv_layers >= 1, \
+            "MASK_SHAPE[0] should be MASK_POOL_SIZE*(2**n), where n>=1"
+        self.NUM_DECONV_LAYERS = int(num_deconv_layers)
 
     def display(self):
         """Display Configuration values."""

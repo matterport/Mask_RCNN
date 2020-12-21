@@ -774,6 +774,66 @@ def compute_ap_range(gt_box, gt_class_id, gt_mask,
             iou_thresholds[0], iou_thresholds[-1], AP))
     return AP
 
+def compute_ap_size(gt_box, gt_class_id, gt_mask,
+                     pred_box, pred_class_id, pred_score, pred_mask,
+                     verbose=1):
+    """Compute AP over a range or IoU thresholds for each size range. Default range is 0.5-0.95."""
+    # Default is 0.5 to 0.95 with increments of 0.05
+    iou_thresholds = np.arange(0.5, 1.0, 0.05)
+    
+    # Compute AP over range of IoU thresholds
+    APs = []
+    for iou_threshold in iou_thresholds:     
+        # Get matches and overlaps
+        gt_match, pred_match, overlaps = compute_matches(
+            gt_box, gt_class_id, gt_mask,
+            pred_box, pred_class_id, pred_score, pred_mask,
+            iou_threshold)
+        
+        AP = np.zeros(3)
+        areaRng = np.array([[0 ** 2, 20 ** 2], [20 ** 2, 35** 2], [35 ** 2, 1e5 ** 2]])
+        for i in range(3):
+            gt_mask_area = np.sum(gt_mask, axis= (0,1))
+            pred_mask_area = np.sum(pred_mask, axis= (0,1))
+            ind_size_gt = np.where(np.logical_and(gt_mask_area>=areaRng[i][0], gt_mask_area<areaRng[i][1]))
+            ind_size_gt = np.array(ind_size_gt)
+            ind_size_gt = ind_size_gt.flatten()
+            ind_size_pred = gt_match[ind_size_gt]
+            ind_size_pred = np.array(ind_size_pred)
+            ind_size_pred = ind_size_pred.astype(int)
+            if len(ind_size_pred)*len(ind_size_gt): 
+                gt_box1 = gt_box[ind_size_gt,:]
+                pred_box1 = pred_box[ind_size_pred,:]
+                gt_class_id1 = gt_class_id[ind_size_gt]
+                pred_class_id1 = pred_class_id[ind_size_pred]
+                gt_mask1 = gt_mask[:,:,ind_size_gt]
+                pred_score1 = pred_score[ind_size_pred]
+                pred_mask1 = pred_mask[:,:,ind_size_pred]
+                AP[i], _, _, _ = compute_ap(gt_box1, gt_class_id1, gt_mask1,
+                                            pred_box1, pred_class_id1, pred_score1, pred_mask1,
+                                            iou_threshold)
+            else:
+                AP[i] = -1
+        
+            if verbose:
+                print("AP @ {:.2f}<= area <{:.2f}:\t {:.3f}".format(areaRng[i][0], areaRng[i][1], AP[i]))
+                
+        APs.append(AP)
+        
+    mAP = np.array(APs)
+    sess = tf.InteractiveSession()
+    mAP = tf.where(mAP == -1, tf.fill(mAP.shape, np.nan), mAP)
+    mAP = mAP.eval()
+    sess.close()
+    mAP = np.nanmean(mAP,axis = 0)  
+    
+    if verbose:
+        print("AP small: {:.2f}   AP medium: {:.2f}   AP large: {:.2f}".format(
+            mAP[0], mAP[1], mAP[2]))
+        
+    return mAP
+
+
 
 def compute_recall(pred_boxes, gt_boxes, iou):
     """Compute the recall at the given IoU threshold. It's an indication
