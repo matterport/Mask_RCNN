@@ -32,6 +32,10 @@ This code was tested on the below environment.
 - Keras 2.2.5 and other common packages listed in `requirements.txt`.
 
 
+## Preparing the input
+Prepare 3-channel jpg for testing (same for the video).
+
+
 ## How to test your own bubble image/video
 1. Clone this repository
 1. Install dependencies
