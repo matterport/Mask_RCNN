@@ -1,11 +1,12 @@
 """
 Mask R-CNN
-Train on the toy Balloon dataset and implement color splash effect.
+Train on the bubble dataset and show color mask.
 
 Copyright (c) 2018 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
-
+------------------------------------------------------------
+2020. 12. Modified by Yewon Kim
 ------------------------------------------------------------
 
 Usage: import the module (see Jupyter notebooks for examples), or run from
@@ -106,9 +107,7 @@ class BubbleConfig(Config):
     BACKBONE = "resnet101"
     
     # Length of square anchor side in pixels
-    #RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)
     RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)
-    #RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
 
     # Input image resizing
     # Generally, use the "square" resizing mode for training and predicting
@@ -145,10 +144,7 @@ class BubbleConfig(Config):
     IMAGE_CHANNEL_COUNT = 3
     
     # Image mean (RGB), Average of each channel based on imagenet.
-    #MEAN_PIXEL = np.array([180.5, 180.5, 180.5])
     MEAN_PIXEL = np.array([0, 0, 0])
-    #MEAN_PIXEL = np.array([125, 125, 125])
-    #MEAN_PIXEL = np.array([178.07, 178.07, 178.07])
     
     # How many anchors per image to use for RPN training
     RPN_TRAIN_ANCHORS_PER_IMAGE = 500
@@ -317,13 +313,6 @@ def train(model):
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
-    
-    #print("Training network heads")
-    #model.train(dataset_train, dataset_val,
-    #            learning_rate=config.LEARNING_RATE,
-    #            epochs=30,
-    #            augmentation=augmentation,
-    #            layers='heads') #all
     
     model.train(dataset_train, dataset_val,
                 #learning_rate=config.LEARNING_RATE/10,
