@@ -9,6 +9,7 @@ Written by Waleed Abdulla
 
 import sys
 import os
+import logging
 import math
 import random
 import numpy as np
@@ -20,6 +21,7 @@ import skimage.transform
 import urllib.request
 import shutil
 import warnings
+from distutils.version import LooseVersion
 
 # URL from which to download the latest COCO trained weights
 COCO_MODEL_URL = "https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5"
@@ -101,8 +103,8 @@ def compute_overlaps_masks(masks1, masks2):
     """
     
     # If either set of masks is empty return empty result
-    if masks1.shape[0] == 0 or masks2.shape[0] == 0:
-        return np.zeros((masks1.shape[0], masks2.shape[-1]))
+    if masks1.shape[-1] == 0 or masks2.shape[-1] == 0:
+        return np.zeros((masks1.shape[-1], masks2.shape[-1]))
     # flatten masks and compute their areas
     masks1 = np.reshape(masks1 > .5, (-1, masks1.shape[-1])).astype(np.float32)
     masks2 = np.reshape(masks2 > .5, (-1, masks2.shape[-1])).astype(np.float32)
@@ -339,17 +341,6 @@ class Dataset(object):
         assert info['source'] == source
         return info['id']
 
-    def append_data(self, class_info, image_info):
-        self.external_to_class_id = {}
-        for i, c in enumerate(self.class_info):
-            for ds, id in c["map"]:
-                self.external_to_class_id[ds + str(id)] = i
-
-        # Map external image IDs to internal ones.
-        self.external_to_image_id = {}
-        for i, info in enumerate(self.image_info):
-            self.external_to_image_id[info["ds"] + str(info["id"])] = i
-
     @property
     def image_ids(self):
         return self._image_ids
@@ -388,6 +379,7 @@ class Dataset(object):
         """
         # Override this function to load a mask from your dataset.
         # Otherwise, it returns an empty mask.
+        logging.warning("You are using the default load_mask(), maybe you need to define your own one.")
         mask = np.empty([0, 0, 0])
         class_ids = np.empty([0], np.int32)
         return mask, class_ids
@@ -452,9 +444,8 @@ def resize_image(image, min_dim=None, max_dim=None, min_scale=None, mode="square
 
     # Resize image using bilinear interpolation
     if scale != 1:
-        image = skimage.transform.resize(
-            image, (round(h * scale), round(w * scale)),
-            order=1, mode="constant", preserve_range=True)
+        image = resize(image, (round(h * scale), round(w * scale)),
+                       preserve_range=True)
 
     # Need padding or cropping?
     if mode == "square":
@@ -538,7 +529,7 @@ def minimize_mask(bbox, mask, mini_shape):
         if m.size == 0:
             raise Exception("Invalid bounding box with area of zero")
         # Resize with bilinear interpolation
-        m = skimage.transform.resize(m, mini_shape, order=1, mode="constant")
+        m = resize(m, mini_shape)
         mini_mask[:, :, i] = np.around(m).astype(np.bool)
     return mini_mask
 
@@ -556,7 +547,7 @@ def expand_mask(bbox, mini_mask, image_shape):
         h = y2 - y1
         w = x2 - x1
         # Resize with bilinear interpolation
-        m = skimage.transform.resize(m, (h, w), order=1, mode="constant")
+        m = resize(m, (h, w))
         mask[y1:y2, x1:x2, i] = np.around(m).astype(np.bool)
     return mask
 
@@ -576,7 +567,7 @@ def unmold_mask(mask, bbox, image_shape):
     """
     threshold = 0.5
     y1, x1, y2, x2 = bbox
-    mask = skimage.transform.resize(mask, (y2 - y1, x2 - x1), order=1, mode="constant")
+    mask = resize(mask, (y2 - y1, x2 - x1))
     mask = np.where(mask >= threshold, 1, 0).astype(np.bool)
 
     # Put the mask in the right location.
@@ -705,7 +696,7 @@ def compute_matches(gt_boxes, gt_class_ids, gt_masks,
         # 3. Find the match
         for j in sorted_ixs:
             # If ground truth box is already matched, go to next one
-            if gt_match[j] > 0:
+            if gt_match[j] > -1:
                 continue
             # If we reach IoU smaller than the threshold, end the loop
             iou = overlaps[i, j]
@@ -891,3 +882,27 @@ def denorm_boxes(boxes, shape):
     scale = np.array([h - 1, w - 1, h - 1, w - 1])
     shift = np.array([0, 0, 1, 1])
     return np.around(np.multiply(boxes, scale) + shift).astype(np.int32)
+
+
+def resize(image, output_shape, order=1, mode='constant', cval=0, clip=True,
+           preserve_range=False, anti_aliasing=False, anti_aliasing_sigma=None):
+    """A wrapper for Scikit-Image resize().
+
+    Scikit-Image generates warnings on every call to resize() if it doesn't
+    receive the right parameters. The right parameters depend on the version
+    of skimage. This solves the problem by using different parameters per
+    version. And it provides a central place to control resizing defaults.
+    """
+    if LooseVersion(skimage.__version__) >= LooseVersion("0.14"):
+        # New in 0.14: anti_aliasing. Default it to False for backward
+        # compatibility with skimage 0.13.
+        return skimage.transform.resize(
+            image, output_shape,
+            order=order, mode=mode, cval=cval, clip=clip,
+            preserve_range=preserve_range, anti_aliasing=anti_aliasing,
+            anti_aliasing_sigma=anti_aliasing_sigma)
+    else:
+        return skimage.transform.resize(
+            image, output_shape,
+            order=order, mode=mode, cval=cval, clip=clip,
+            preserve_range=preserve_range)

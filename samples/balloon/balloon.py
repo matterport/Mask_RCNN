@@ -94,7 +94,7 @@ class BalloonDataset(utils.Dataset):
         dataset_dir = os.path.join(dataset_dir, subset)
 
         # Load annotations
-        # VGG Image Annotator saves each image in the form:
+        # VGG Image Annotator (up to version 1.6) saves each image in the form:
         # { 'filename': '28503151_5b5b7ec140_b.jpg',
         #   'regions': {
         #       '0': {
@@ -108,6 +108,7 @@ class BalloonDataset(utils.Dataset):
         #   'size': 100202
         # }
         # We mostly care about the x and y coordinates of each region
+        # Note: In VIA 2.0, regions was changed from a dict to a list.
         annotations = json.load(open(os.path.join(dataset_dir, "via_region_data.json")))
         annotations = list(annotations.values())  # don't need the dict keys
 
@@ -118,9 +119,13 @@ class BalloonDataset(utils.Dataset):
         # Add images
         for a in annotations:
             # Get the x, y coordinaets of points of the polygons that make up
-            # the outline of each object instance. There are stores in the
+            # the outline of each object instance. These are stores in the
             # shape_attributes (see json format above)
-            polygons = [r['shape_attributes'] for r in a['regions'].values()]
+            # The if condition is needed to support VIA versions 1.x and 2.x.
+            if type(a['regions']) is dict:
+                polygons = [r['shape_attributes'] for r in a['regions'].values()]
+            else:
+                polygons = [r['shape_attributes'] for r in a['regions']] 
 
             # load_mask() needs the image size to convert polygons to masks.
             # Unfortunately, VIA doesn't include it in JSON, so we must read
