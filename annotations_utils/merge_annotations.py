@@ -114,4 +114,4 @@ if __name__ == '__main__':
         merged_anno, merged_original_filenames = merge_annotation(merged_anno, merged_original_filenames, second_anno,
                                                                   second_folder)
 
-    json.dump(remove_images_without_anno(merged_anno), open(args.result_file, "w"))
+    json.dump(remove_images_without_anno(merged_anno), open(args.result_file, "w+"))
