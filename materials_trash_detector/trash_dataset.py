@@ -116,7 +116,7 @@ class TrashDataset(utils.Dataset):
         Convert annotation which can be polygons, uncompressed RLE to RLE.
         :return: binary mask (numpy 2D array)
         """
-        segm = [ann['segmentation']]
+        segm = ann['segmentation']
         if isinstance(segm, list):
             # polygon -- a single object might consist of multiple parts
             # we merge all parts into one mask rle code
