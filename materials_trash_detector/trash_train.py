@@ -25,8 +25,8 @@ from pycocotools import mask as maskUtils
 
 
 from mrcnn import model as modellib, utils
-from trash_config import TrashConfig
-from trash_dataset import TrashDataset
+from materials_trash_detector.trash_config import TrashConfig
+from materials_trash_detector.trash_dataset import TrashDataset
 
 
 # Directory to save logs and model checkpoints, if not provided
