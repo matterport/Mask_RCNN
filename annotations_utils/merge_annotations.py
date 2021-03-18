@@ -48,6 +48,11 @@ def merge_annotation(merged_anno, merged_original_filenames, second_anno, second
 
         # Change filename to include folder
         img['file_name'] = '/'.join([second_folder, img['file_name']])
+
+        old_img_id = int(img['id'])
+        img['id'] = int(img['id']) + merged_anno_len_img
+        merged_anno['images'].append(img)
+
         # Check if filename was already present for possible duplicates
         # else add the filename to the set
         if img['file_name'] in merged_original_filenames:
@@ -59,9 +64,7 @@ def merge_annotation(merged_anno, merged_original_filenames, second_anno, second
         if int(img['id']) not in second_anno_annotations:
             merged_anno['info']['missing_annotations'].append(img['file_name'])
 
-        old_img_id = int(img['id'])
-        img['id'] = int(img['id']) + merged_anno_len_img
-        merged_anno['images'].append(img)
+
 
         for anno in second_anno['annotations']:
             if anno['image_id'] == old_img_id:
@@ -106,11 +109,13 @@ if __name__ == '__main__':
     print("Results: ", args.result_file)
 
     anno_paths = args.annotations.split(",")
+    print("Current Annotation: " + anno_paths[0])
 
     first_anno, first_folder = load_annotations(anno_paths[0])
     merged_anno, merged_original_filenames = create_merge_annotation(first_anno, first_folder)
 
     for a in anno_paths[1:]:
+        print("Current Annotation: " + a)
         second_anno, second_folder = load_annotations(a)
         merged_anno, merged_original_filenames = merge_annotation(merged_anno, merged_original_filenames, second_anno,
                                                                   second_folder)
