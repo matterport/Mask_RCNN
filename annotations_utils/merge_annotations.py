@@ -59,18 +59,19 @@ def merge_annotation(merged_anno, merged_original_filenames, second_anno, second
         if int(img['id']) not in second_anno_annotations:
             merged_anno['info']['missing_annotations'].append(img['file_name'])
 
+        old_img_id = int(img['id'])
         img['id'] = int(img['id']) + merged_anno_len_img
         merged_anno['images'].append(img)
 
-    # Merge annotations
-    for anno in second_anno['annotations']:
-        # Increment IDs
-        anno['id'] = int(anno['id']) + merged_anno_len_anno
-        anno['image_id'] = str(int(anno['image_id']) + merged_anno_len_img)
+        for anno in second_anno['annotations']:
+            if anno['image_id'] == old_img_id:
+                # Increment IDs
+                anno['id'] = int(anno['id']) + merged_anno_len_anno
+                anno['image_id'] = img['id']
 
-        # Map category name to same ID
-        anno['category_id'] = merged_anno_mapping_categories[second_anno_mapping[anno['category_id']]]
-        merged_anno['annotations'].append(anno)
+                # Map category name to same ID
+                anno['category_id'] = merged_anno_mapping_categories[second_anno_mapping[anno['category_id']]]
+                merged_anno['annotations'].append(anno)
 
     return merged_anno, merged_original_filenames
 
