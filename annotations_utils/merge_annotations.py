@@ -61,10 +61,8 @@ def merge_annotation(merged_anno, merged_original_filenames, second_anno, second
             merged_original_filenames.add(img['file_name'])
 
         # Check if annotation is missing
-        if int(img['id']) not in second_anno_annotations:
+        if int(old_img_id) not in second_anno_annotations:
             merged_anno['info']['missing_annotations'].append(img['file_name'])
-
-
 
         for anno in second_anno['annotations']:
             if anno['image_id'] == old_img_id:
