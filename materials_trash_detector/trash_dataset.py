@@ -21,7 +21,6 @@ import numpy as np
 from pycocotools.coco import COCO
 from pycocotools import mask as maskUtils
 
-
 from mrcnn import model as modellib, utils
 
 
@@ -33,7 +32,7 @@ class TrashDataset(utils.Dataset):
     def load_trash(self, data_dir, anno_file):
         print("Loading Trash Data:" + str(data_dir) + " " + str(anno_file))
         trash = COCO(os.path.join(data_dir, anno_file))
-        
+
         # Add classes
         class_ids = sorted(trash.getCatIds())
         for i in class_ids:
@@ -49,9 +48,8 @@ class TrashDataset(utils.Dataset):
                 width=trash.imgs[i]["width"],
                 height=trash.imgs[i]["height"],
                 annotations=[a for a in trash.loadAnns(trash.getAnnIds()) if a['image_id'] == str(i)])
-        
+
         return trash
-   
 
     def load_mask(self, image_id):
         """Load instance masks for the given image.
@@ -139,4 +137,3 @@ class TrashDataset(utils.Dataset):
         rle = self.annToRLE(ann, height, width)
         m = maskUtils.decode(rle)
         return m
-
