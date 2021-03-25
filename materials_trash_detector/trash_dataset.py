@@ -29,8 +29,9 @@ from mrcnn import model as modellib, utils
 ############################################################
 
 class TrashDataset(utils.Dataset):
+
     def load_trash(self, data_dir, anno_file):
-        print("Loading Trash Data:" + str(data_dir) + " " + str(anno_file))
+        print("Loading Trash Data:" + str(data_dir) + "" + str(anno_file))
         trash = COCO(os.path.join(data_dir, anno_file))
 
         # Add classes
