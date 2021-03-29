@@ -99,7 +99,7 @@ class TrashDataset(utils.Dataset):
                     class_ids.append(class_id)
 
         # Pack instance masks into an array
-        if class_ids:
+        if len(class_ids) > 0:
             mask = np.stack(instance_masks, axis=2).astype(np.bool)
             class_ids = np.array(class_ids, dtype=np.int32)
             return mask, class_ids
