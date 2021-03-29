@@ -101,9 +101,9 @@ class TrashDataset(utils.Dataset):
             mask = np.stack(instance_masks, axis=2).astype(np.bool)
             class_ids = np.array(class_ids, dtype=np.int32)
             return mask, class_ids
-        else:
+        #else:
             # Call super class to return an empty mask
-            return super(TrashDataset, self).load_mask(image_id)
+            #return super(TrashDataset, self).load_mask(image_id)
 
     def image_reference(self, image_id):
         """Return a link to the image in the trash Website."""
