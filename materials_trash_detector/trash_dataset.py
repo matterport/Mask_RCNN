@@ -43,12 +43,16 @@ class TrashDataset(utils.Dataset):
         image_ids = list(trash.imgs.keys())
 
         for i in image_ids:
+            current_annotation = []
+            for a in trash.loadAnns(trash.getAnnIds()):
+                if a["image_id"] == i:
+                    current_annotation = a
             self.add_image(
                 "trash", image_id=i,
                 path=os.path.join(data_dir, trash.imgs[i]['file_name']),
                 width=trash.imgs[i]["width"],
                 height=trash.imgs[i]["height"],
-                annotations=[a for a in trash.loadAnns(trash.getAnnIds()) if a['image_id'] == str(i)])
+                annotations=current_annotation)  # annotations=[a for a in trash.loadAnns(trash.getAnnIds()) if a['image_id'] == str(i)]
 
         return trash
 
@@ -68,19 +72,19 @@ class TrashDataset(utils.Dataset):
 
         instance_masks = []
         class_ids = []
-        annotations = self.image_info[image_id]["annotations"]
+        annotation = self.image_info[image_id]["annotations"]
         # Build mask of shape [height, width, instance_count] and list
         # of class IDs that correspond to each channel of the mask.
-        for annotation in annotations:
-            class_id = self.map_source_class_id(
-                "trash.{}".format(annotation['category_id']))
-            if class_id:
-                m = self.annToMask(annotation, image_info["height"],
-                                   image_info["width"])
-                # Some objects are so small that they're less than 1 pixel area
-                # and end up rounded out. Skip those objects.
-                if m.max() < 1:
-                    continue
+        # for annotation in annotations:
+        class_id = self.map_source_class_id(
+            "trash.{}".format(annotation["category_id"]))
+        if class_id:
+            m = self.annToMask(annotation, image_info["height"],
+                               image_info["width"])
+            # Some objects are so small that they're less than 1 pixel area
+            # and end up rounded out. Skip those objects.
+            if m.max() > 1:
+                # continue
                 # Is it a crowd? If so, use a negative class ID.
                 if annotation['iscrowd']:
                     # Use negative class ID for crowds
