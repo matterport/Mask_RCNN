@@ -11,6 +11,7 @@ import os
 import sys
 import time
 import numpy as np
+import json
 
 # Download and install the Python coco tools from https://github.com/waleedka/coco
 # That's a fork from the original https://github.com/pdollar/coco with a bug
@@ -72,38 +73,39 @@ class TrashDataset(utils.Dataset):
 
         instance_masks = []
         class_ids = []
-        annotation = self.image_info[image_id]["annotations"]
-        # Build mask of shape [height, width, instance_count] and list
-        # of class IDs that correspond to each channel of the mask.
-        # for annotation in annotations:
-        class_id = self.map_source_class_id(
-            "trash.{}".format(annotation["category_id"]))
-        if class_id:
-            m = self.annToMask(annotation, image_info["height"],
-                               image_info["width"])
-            # Some objects are so small that they're less than 1 pixel area
-            # and end up rounded out. Skip those objects.
-            if m.max() > 1:
-                # continue
-                # Is it a crowd? If so, use a negative class ID.
-                if annotation['iscrowd']:
-                    # Use negative class ID for crowds
-                    class_id *= -1
-                    # For crowd masks, annToMask() sometimes returns a mask
-                    # smaller than the given dimensions. If so, resize it.
-                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
-                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
-                instance_masks.append(m)
-                class_ids.append(class_id)
+        annotation = image_info["annotations"]
+        if len(annotation) > 0:
+            # Build mask of shape [height, width, instance_count] and list
+            # of class IDs that correspond to each channel of the mask.
+            # for annotation in annotations:
+            class_id = self.map_source_class_id(
+                "trash.{}".format(annotation["category_id"]))
+            if class_id:
+                m = self.annToMask(annotation, image_info["height"],
+                                   image_info["width"])
+                # Some objects are so small that they're less than 1 pixel area
+                # and end up rounded out. Skip those objects.
+                if m.max() > 0:
+                    # continue
+                    # Is it a crowd? If so, use a negative class ID.
+                    if annotation['iscrowd']:
+                        # Use negative class ID for crowds
+                        class_id *= -1
+                        # For crowd masks, annToMask() sometimes returns a mask
+                        # smaller than the given dimensions. If so, resize it.
+                        if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
+                            m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                    instance_masks.append(m)
+                    class_ids.append(class_id)
 
         # Pack instance masks into an array
         if class_ids:
             mask = np.stack(instance_masks, axis=2).astype(np.bool)
             class_ids = np.array(class_ids, dtype=np.int32)
             return mask, class_ids
-        #else:
+        else:
             # Call super class to return an empty mask
-            #return super(TrashDataset, self).load_mask(image_id)
+            return super(TrashDataset, self).load_mask(image_id)
 
     def image_reference(self, image_id):
         """Return a link to the image in the trash Website."""
@@ -113,7 +115,8 @@ class TrashDataset(utils.Dataset):
         else:
             super(TrashDataset, self).image_reference(image_id)
 
-    # The following two functions are from pycocotools with a few changes.
+    ######################################################################
+    #### The following two functions are from pycocotools with a few changes.
 
     def annToRLE(self, ann, height, width):
         """
