@@ -210,6 +210,10 @@ class Config(object):
     # Gradient norm clipping
     GRADIENT_CLIP_NORM = 5.0
 
+    # TODO enabling multiprocessing is causing keras fit to hang
+    # setting default to false
+    USE_MULTIPROCESSING = False
+
     def __init__(self):
         """Set values of computed attributes."""
         # Effective batch size
@@ -227,10 +231,14 @@ class Config(object):
         # See compose_image_meta() for details
         self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
 
+    def to_dict(self):
+        return {a: getattr(self, a)
+                for a in sorted(dir(self))
+                if not a.startswith("__") and not callable(getattr(self, a))}
+
     def display(self):
         """Display Configuration values."""
         print("\nConfigurations:")
-        for a in dir(self):
-            if not a.startswith("__") and not callable(getattr(self, a)):
-                print("{:30} {}".format(a, getattr(self, a)))
+        for key, val in self.to_dict().items():
+            print(f"{key:30} {val}")
         print("\n")
