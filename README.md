@@ -25,6 +25,14 @@ Please follow the instructions on the relevant notebooks for the training, predi
 
 # Citation
 ```
+@article{mohanty2020deep, 
+title={Deep Learning for Understanding Satellite Imagery: An Experimental Survey}, 
+author={Mohanty, Sharada Prasanna and Czakon, Jakub and Kaczmarek, Kamil A and Pyskir, Andrzej and Tarasiewicz, Piotr and Kunwar, Saket and Rohrbach, Janick and Luo, Dave and Prasad, Manjunath and Fleer, Sascha and others}, 
+journal={Frontiers in Artificial Intelligence}, 
+volume={3}, 
+year={2020}, 
+publisher={Frontiers Media SA}}
+
 @misc{crowdAIMappingChallengeBaseline2018,
   author = {Mohanty, Sharada Prasanna},
   title = {CrowdAI Mapping Challenge 2018 : Baseline with Mask RCNN},
