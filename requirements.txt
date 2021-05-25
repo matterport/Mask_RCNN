@@ -7,7 +7,7 @@ scikit-image
 tensorflow==1.15.5
 keras==2.3.1
 opencv-python
-h5py
+h5py<3.0.0
 imgaug
 astor
 imantics
