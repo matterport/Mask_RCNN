@@ -2280,10 +2280,10 @@ class MaskRCNN():
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
         epochs: Number of training epochs. Note that previous training epochs
-                are considered to be done already, so this actually determines
+                are considered to be done alreay, so this actually determines
                 the epochs to train in total rather than in this particaular
                 call.
-        layers: Allows selecting which layers to train. It can be:
+        layers: Allows selecting wich layers to train. It can be:
             - A regular expression to match layer names to train
             - One of these predefined values:
               heads: The RPN, classifier and mask heads of the network
@@ -2339,7 +2339,7 @@ class MaskRCNN():
         # Callbacks
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=1.0, write_graph=True, write_images=False),
+                                        histogram_freq=0, write_graph=True, write_images=False),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
         ]
