@@ -241,4 +241,4 @@ A computer vision class project by HU Shiyu to apply the color pop effect on peo
 ![GRASS GIS Image](assets/project_grass_gis.png)
 
 ### [Global Wheat Detection](https://www.kaggle.com/ipythonx/keras-global-wheat-detection-with-mask-rcnn/notebook): Detection of wheat heads by Mohammed Innat.
-![Global Wheat Detection](assets/a.png) ![Global Wheat Detection](assets/b.png)
+![Global Wheat Detection](assets/uio.png)![Global Wheat Detection](assets/b.png)
