@@ -9,9 +9,9 @@ The current work deals with recognizing emotions from facial expressions of cart
 * The repository includes:
 
     * Source code of Cartoon face segmentaion using Mask-RCNN.
-    * Dataset used to train Mask-RCNN model [Cartoon Dataset](https://github.com/Shubhi3199/Mask_RCNN/releases/tag/v1)
-    * Pre-trained weights of the trained Cartoon Mask-RCNN model.
-    * Jupyter notebooks to visualize the detection pipeline at every step. [Refer here for the Code](https://github.com/Shubhi3199/Mask_RCNN/tree/cartoon_segmentaion/samples/characters)
+    * Dataset used to train Mask-RCNN model. [Cartoon Dataset](https://github.com/Shubhi3199/Mask_RCNN/releases/tag/v1)
+    * Pre-trained weights of the trained Cartoon Mask-RCNN model. [Releases](https://github.com/Shubhi3199/Mask_RCNN/releases/tag/v1)
+    * Jupyter notebooks to visualize the detection pipeline at every step. [Refer Code here](https://github.com/Shubhi3199/Mask_RCNN/tree/cartoon_segmentaion/samples/characters)
  
  
 <h2 align = "center"> Proposed Workflow </h2>
