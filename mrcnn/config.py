@@ -6,6 +6,7 @@ Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
+import math
 
 import numpy as np
 
@@ -123,9 +124,11 @@ class Config(object):
     #         on IMAGE_MIN_DIM and IMAGE_MIN_SCALE, then picks a random crop of
     #         size IMAGE_MIN_DIM x IMAGE_MIN_DIM. Can be used in training only.
     #         IMAGE_MAX_DIM is not used in this mode.
-    IMAGE_RESIZE_MODE = "square"
+    # IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
-    IMAGE_MAX_DIM = 1024
+    IMAGE_MAX_DIM = 1280
+    # IMAGE_MAX_DIM = 2048
+    IMAGE_PADDING = True 
     # Minimum scaling ratio. Checked after MIN_IMAGE_DIM and can force further
     # up scaling. For example, if set to 2 then images are scaled up to double
     # the width and height, or more, even if MIN_IMAGE_DIM doesn't require it.
@@ -211,26 +214,45 @@ class Config(object):
     GRADIENT_CLIP_NORM = 5.0
 
     def __init__(self):
-        """Set values of computed attributes."""
-        # Effective batch size
-        self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+      """Set values of computed attributes."""
+      # Effective batch size
+      self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
 
-        # Input image size
-        if self.IMAGE_RESIZE_MODE == "crop":
-            self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
-                self.IMAGE_CHANNEL_COUNT])
-        else:
-            self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM,
-                self.IMAGE_CHANNEL_COUNT])
+      # Input image size
+      self.IMAGE_SHAPE = np.array(
+          [self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM, 3])
 
-        # Image meta data length
-        # See compose_image_meta() for details
-        self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+      # Compute backbone size from input image size
+      self.BACKBONE_SHAPES = np.array(
+          [[int(math.ceil(self.IMAGE_SHAPE[0] / stride)),
+            int(math.ceil(self.IMAGE_SHAPE[1] / stride))]
+            for stride in self.BACKBONE_STRIDES])
+
+    # def __init__(self):
+    #     """Set values of computed attributes."""
+    #     # Effective batch size
+    #     self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
+
+    #     # Input image size
+    #     if self.IMAGE_RESIZE_MODE == "crop":
+    #         self.IMAGE_SHAPE = np.array([self.IMAGE_MIN_DIM, self.IMAGE_MIN_DIM,
+    #             self.IMAGE_CHANNEL_COUNT])
+    #     else:
+    #         self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM,
+    #             self.IMAGE_CHANNEL_COUNT])
+
+    #     # Image meta data length
+    #     # See compose_image_meta() for details
+    #     self.IMAGE_META_SIZE = 1 + 3 + 3 + 4 + 1 + self.NUM_CLASSES
+
+    def to_dict(self):
+        return {a: getattr(self, a)
+                for a in sorted(dir(self))
+                if not a.startswith("__") and not callable(getattr(self, a))}
 
     def display(self):
         """Display Configuration values."""
         print("\nConfigurations:")
-        for a in dir(self):
-            if not a.startswith("__") and not callable(getattr(self, a)):
-                print("{:30} {}".format(a, getattr(self, a)))
+        for key, val in self.to_dict().items():
+            print(f"{key:30} {val}")
         print("\n")
