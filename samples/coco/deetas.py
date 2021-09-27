@@ -47,6 +47,7 @@ import zipfile
 import urllib.request
 import shutil
 
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 
@@ -61,7 +62,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
-DEFAULT_DATASET_YEAR = "2017"
+DEFAULT_DATASET_YEAR = ""
 
 ############################################################
 #  Configurations
@@ -99,10 +100,10 @@ class Deetas_Config(Config):
     IMAGES_PER_GPU = 2
 
     # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
+    GPU_COUNT = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 25  # COCO has 80 classes
+    NUM_CLASSES = 1 + 25  # Deetas has 25 classes
 
 
 ############################################################
@@ -126,10 +127,13 @@ class CocoDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
-        coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        # coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
+        coco = COCO("{}/annotations/seg_train.json".format(dataset_dir)) # annotation path
+        
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
-        image_dir = "{}/{}{}".format(dataset_dir, subset, year)
+        image_dir = "{}/images".format(dataset_dir)
+        print("\n\ncheck line\n\n")
 
         # Load all classes or a subset?
         if not class_ids:
@@ -456,9 +460,9 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoConfig()
+        config = Deetas_Config()
     else:
-        class InferenceConfig(CocoConfig):
+        class InferenceConfig(Deetas_Config):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
