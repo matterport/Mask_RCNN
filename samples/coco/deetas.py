@@ -128,9 +128,9 @@ class CocoDataset(utils.Dataset):
             self.auto_download(dataset_dir, subset, year)
 
         # coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
-        coco = COCO("{}/annotations/seg_{}.json".format(dataset_dir, subset)) # annotation path
+        coco = COCO("{}/json_obj/seg_{}.json".format(dataset_dir, subset)) # annotation path
         
-        image_dir = "{}/images".format(dataset_dir)
+        image_dir = "{}/image".format(dataset_dir)
         print("\n\ncheck line\n\n")
 
         # Load all classes or a subset?
@@ -456,6 +456,9 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
 
+    start_time = time.time()
+    print("\n\n\n", "start_time :", start_time, "\n\n\n")
+
     # Configurations
     if args.command == "train":
         config = Deetas_Config()
@@ -548,3 +551,7 @@ if __name__ == '__main__':
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'evaluate'".format(args.command))
+
+    end_time = time.time()
+    elp_time = end_time - start_time
+    print("\n\n\n", "elp_time :", elp_time, "\n\n\n")

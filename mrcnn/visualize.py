@@ -73,17 +73,20 @@ def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
     """
     for c in range(3):
+        # mask = np.where(mask == True, 1, mask)
+        # mask = np.where(mask == False, 0, mask)
         image[:, :, c] = np.where(mask == 1,
-                                  image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c] * 255,
+                                  image[:, :, c] * (1 - alpha) + alpha * color[c] * 255,
                                   image[:, :, c])
+
+    # return image.astype(np.uint8)
     return image
 
 
 def display_instances(image, boxes, masks, class_ids, class_names,
                       scores=None, title="",
                       figsize=(16, 16), ax=None,
-                      show_mask=True, show_bbox=True,
+                      show_mask=True, show_bbox=False,
                       colors=None, captions=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
@@ -98,12 +101,17 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     captions: (optional) A list of strings to use as captions for each object
     """
     # Number of instances
+    print("show_mask", show_mask)
+    print("show_bbox", show_bbox)
     N = boxes.shape[0]
     if not N:
         print("\n*** No instances to display *** \n")
     else:
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
+    # plt.imread(image)
+    # exit()
+    
     # If no axis is passed, create one and automatically call show()
     auto_show = False
     if not ax:
@@ -143,8 +151,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             caption = "{} {:.3f}".format(label, score) if score else label
         else:
             caption = captions[i]
-        ax.text(x1, y1 + 8, caption,
-                color='w', size=11, backgroundcolor="none")
+        ax.text(x1, y1 + 8, caption, color='w', size=11, backgroundcolor="none")
 
         # Mask
         mask = masks[:, :, i]
@@ -162,9 +169,14 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             verts = np.fliplr(verts) - 1
             p = Polygon(verts, facecolor="none", edgecolor=color)
             ax.add_patch(p)
+
+        masked_image
+
+    # return masked_image.astype(np.uint8)
+
     ax.imshow(masked_image.astype(np.uint8))
-    if auto_show:
-        plt.show()
+    # if auto_show:
+    #     plt.show()
 
 
 def display_differences(image,
