@@ -1,3 +1,7 @@
+#custimizing
+output_maeng/
+!output_maeng/*/.keep
+
 # Data files and directories common in repo root
 datasets/
 logs/
