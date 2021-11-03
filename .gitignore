@@ -1,8 +1,8 @@
 #custimizing
 output_maeng/detection/*
 !output_maeng/detection/.keep
-output_maeng/model/*
-!output_maeng/model/.keep
+output_maeng/logs/*
+!output_maeng/logs/.keep
 output_maeng/record_print/*
 !output_maeng/record_print/.keep
 
