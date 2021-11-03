@@ -1,6 +1,6 @@
 #custimizing
-output_maeng/
-!output_maeng/*/.keep
+output_maeng/*
+!output_maeng/detection/.keep
 
 # Data files and directories common in repo root
 datasets/
