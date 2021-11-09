@@ -47,6 +47,7 @@ import zipfile
 import urllib.request
 import shutil
 
+from PIL import Image
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -129,32 +130,56 @@ class CocoDataset(utils.Dataset):
             self.auto_download(dataset_dir, subset, year)
 
         # coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
-        coco = COCO("{}/json_obj/seg_{}.json".format(dataset_dir, subset)) # annotation path
-        
-        image_dir = "{}/image".format(dataset_dir)
-        print("\n\ncheck line\n\n")
 
-        # Load all classes or a subset?
+        ### annotation path
+        annotation_path = "{}/json_obj/seg_{}.json".format(dataset_dir, subset)
+        coco = COCO(annotation_path)
+        # coco = COCO("{}/back_up/json_obj/seg_{}.json".format(dataset_dir, subset))
+
+        print("****************************************************************************")
+        print("compare raw :", "/home/dblab/maeng_space/dataset/deetas/data_21_10_21/json_obj")
+        print("annotation path :", annotation_path, "\n")
+        
+        
+        ### image root path
+        image_dir = "{}/image".format(dataset_dir)
+
+        print("****************************************************************************")
+        print("compare raw :", "/home/dblab/maeng_space/dataset/deetas/data_21_10_21/image")
+        print("image_root_path :", image_dir, "\n")
+
+        ### Load all classes or a subset?
         if not class_ids:
-            # All classes
+            ### All classes
             class_ids = sorted(coco.getCatIds())
 
-        # All images or a subset?
+        ### All images or a subset?
         if class_ids:
             image_ids = []
             for id in class_ids:
                 image_ids.extend(list(coco.getImgIds(catIds=[id])))
-            # Remove duplicates
+            ### Remove duplicates
             image_ids = list(set(image_ids))
         else:
-            # All images
+            ### All images
             image_ids = list(coco.imgs.keys())
 
-        # Add classes
+        ### Add classes
         for i in class_ids:
             self.add_class("coco", i, coco.loadCats(i)[0]["name"])
 
-        # Add images
+        ### Add images
+        print("****************************************************************************")
+        # test_path = os.path.join(image_dir, coco.imgs[407]['file_name'])
+        # print(test_path)
+        # image = Image.open(test_path)
+        # print(image)
+
+        # print(image_ids)
+        # print(len(image_ids))
+        # print(type(image_ids))
+        # print(type(image_ids[0]))
+        
         for i in image_ids:
             self.add_image(
                 "coco", image_id=i,
@@ -166,77 +191,6 @@ class CocoDataset(utils.Dataset):
         if return_coco:
             return coco
 
-    def auto_download(self, dataDir, dataType, dataYear):
-        """Download the COCO dataset/annotations if requested.
-        dataDir: The root directory of the COCO dataset.
-        dataType: What to load (train, val, minival, valminusminival)
-        dataYear: What dataset year to load (2014, 2017) as a string, not an integer
-        Note:
-            For 2014, use "train", "val", "minival", or "valminusminival"
-            For 2017, only "train" and "val" annotations are available
-        """
-
-        # Setup paths and file names
-        if dataType == "minival" or dataType == "valminusminival":
-            imgDir = "{}/{}{}".format(dataDir, "val", dataYear)
-            imgZipFile = "{}/{}{}.zip".format(dataDir, "val", dataYear)
-            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format("val", dataYear)
-        else:
-            imgDir = "{}/{}{}".format(dataDir, dataType, dataYear)
-            imgZipFile = "{}/{}{}.zip".format(dataDir, dataType, dataYear)
-            imgURL = "http://images.cocodataset.org/zips/{}{}.zip".format(dataType, dataYear)
-        # print("Image paths:"); print(imgDir); print(imgZipFile); print(imgURL)
-
-        # Create main folder if it doesn't exist yet
-        if not os.path.exists(dataDir):
-            os.makedirs(dataDir)
-
-        # Download images if not available locally
-        if not os.path.exists(imgDir):
-            os.makedirs(imgDir)
-            print("Downloading images to " + imgZipFile + " ...")
-            with urllib.request.urlopen(imgURL) as resp, open(imgZipFile, 'wb') as out:
-                shutil.copyfileobj(resp, out)
-            print("... done downloading.")
-            print("Unzipping " + imgZipFile)
-            with zipfile.ZipFile(imgZipFile, "r") as zip_ref:
-                zip_ref.extractall(dataDir)
-            print("... done unzipping")
-        print("Will use images in " + imgDir)
-
-        # Setup annotations data paths
-        annDir = "{}/annotations".format(dataDir)
-        if dataType == "minival":
-            annZipFile = "{}/instances_minival2014.json.zip".format(dataDir)
-            annFile = "{}/instances_minival2014.json".format(annDir)
-            annURL = "https://dl.dropboxusercontent.com/s/o43o90bna78omob/instances_minival2014.json.zip?dl=0"
-            unZipDir = annDir
-        elif dataType == "valminusminival":
-            annZipFile = "{}/instances_valminusminival2014.json.zip".format(dataDir)
-            annFile = "{}/instances_valminusminival2014.json".format(annDir)
-            annURL = "https://dl.dropboxusercontent.com/s/s3tw5zcg7395368/instances_valminusminival2014.json.zip?dl=0"
-            unZipDir = annDir
-        else:
-            annZipFile = "{}/annotations_trainval{}.zip".format(dataDir, dataYear)
-            annFile = "{}/instances_{}{}.json".format(annDir, dataType, dataYear)
-            annURL = "http://images.cocodataset.org/annotations/annotations_trainval{}.zip".format(dataYear)
-            unZipDir = dataDir
-        # print("Annotations paths:"); print(annDir); print(annFile); print(annZipFile); print(annURL)
-
-        # Download annotations if not available locally
-        if not os.path.exists(annDir):
-            os.makedirs(annDir)
-        if not os.path.exists(annFile):
-            if not os.path.exists(annZipFile):
-                print("Downloading zipped annotations to " + annZipFile + " ...")
-                with urllib.request.urlopen(annURL) as resp, open(annZipFile, 'wb') as out:
-                    shutil.copyfileobj(resp, out)
-                print("... done downloading.")
-            print("Unzipping " + annZipFile)
-            with zipfile.ZipFile(annZipFile, "r") as zip_ref:
-                zip_ref.extractall(unZipDir)
-            print("... done unzipping")
-        print("Will use annotations in " + annFile)
 
     def load_mask(self, image_id):
         """Load instance masks for the given image.
