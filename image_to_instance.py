@@ -1,22 +1,6 @@
 from mrcnn import visualize
 
 import os
-
-# def main():
-#     path_images ="../../../dataset/deetas"
-#     image_single_path = ""
-#     visualize.display_images(image_single_path)
-    
-
-# def load_data(image_root_path):
-#     image_path_list = os.listdir(image_root_path)
-#     for img_path in image_path_list:
-#         img_path
-
-# main()
-
-
-import os
 import sys
 import time
 import numpy as np
@@ -57,9 +41,9 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 DEFAULT_LOGS_DIR = os.path.join(CURRENT_DIR, "output_maeng/logs")
 DEFAULT_DATASET_YEAR = ""
 
-############################################################
+########################################################################################################################
 #  Configurations
-############################################################
+########################################################################################################################
 
 
 class Deetas_Config(Config):
@@ -81,9 +65,9 @@ class Deetas_Config(Config):
     NUM_CLASSES = 1 + 25  # Deetas has 25 classes
 
 
-############################################################
+########################################################################################################################
 #  Dataset
-############################################################
+########################################################################################################################
 
 class Deetas_Dataset(utils.Dataset):
     def load_deetas(self, dataset_dir, subset, class_ids=None,
@@ -221,9 +205,9 @@ class Deetas_Dataset(utils.Dataset):
         return m
 
 
-############################################################
+########################################################################################################################
 #  COCO Evaluation
-############################################################
+########################################################################################################################
 
 def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
     """Arrange resutls to match COCO specs in http://cocodataset.org/#format
@@ -348,9 +332,9 @@ def generate_mask(model, dataset_class, deetas_data, eval_type="bbox", limit=0, 
     print("Total time: ", time.time() - t_start)
 
 
-############################################################
+########################################################################################################################
 #  Training
-############################################################
+########################################################################################################################
 
 
 if __name__ == '__main__':

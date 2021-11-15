@@ -19,7 +19,7 @@ import numpy as np
 
 
 import tensorflow as tf
-import tensorflow_addons as tfa
+# import tensorflow_addons as tfa
 import tqdm
 
 import keras
@@ -28,7 +28,7 @@ import keras.layers as KL
 import keras.engine as KE
 import keras.models as KM
 
-import tensorflow_addon
+# import tensorflow_addon
 
 from mrcnn import utils
 
@@ -2351,7 +2351,7 @@ class MaskRCNN():
         ]
 
         # Add custom callbacks to the list
-        custom_callbacks = tfa.callbacks.TQDMProgressBar()
+        # custom_callbacks = tfa.callbacks.TQDMProgressBar()
         if custom_callbacks:
             callbacks += custom_callbacks
 
