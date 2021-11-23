@@ -1,10 +1,7 @@
-#custimizing
-output_maeng/detection/*
-!output_maeng/detection/.keep
-output_maeng/logs/*
-!output_maeng/logs/.keep
-output_maeng/record_print/*
-!output_maeng/record_print/.keep
+# custimizing
+output_maeng/detection/
+output_maeng/logs/
+output_maeng/print_log/
 
 
 
