@@ -52,6 +52,7 @@ from PIL import Image
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 CURRENT_DIR = os.path.abspath("./")
+OUTPUT_DIR = '/home/dblab/maeng_space/output_submodule/object_detector/Mask_RCNN'
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -63,7 +64,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(CURRENT_DIR, "output_maeng/logs")
+DEFAULT_LOGS_DIR = os.path.join(OUTPUT_DIR, "logs")
 DEFAULT_DATASET_YEAR = ""
 
 ############################################################
@@ -132,20 +133,20 @@ class CocoDataset(utils.Dataset):
         # coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
 
         ### annotation path
-        annotation_path = "{}/json_obj/seg_{}.json".format(dataset_dir, subset)
+        # annotation_path = "{}/json_obj/seg_{}.json".format(dataset_dir, subset)
+        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/seg_{}.json".format(subset)
         coco = COCO(annotation_path)
         # coco = COCO("{}/back_up/json_obj/seg_{}.json".format(dataset_dir, subset))
 
         print("****************************************************************************")
-        print("compare raw :", "/home/dblab/maeng_space/dataset/deetas/data_21_10_21/json_obj")
         print("annotation path :", annotation_path, "\n")
         
         
         ### image root path
-        image_dir = "{}/image".format(dataset_dir)
+        # image_dir = "{}/image".format(dataset_dir)
+        image_dir = '/home/dblab/maeng_space/dataset/deetas/data_21_11_10/image'
 
         print("****************************************************************************")
-        print("compare raw :", "/home/dblab/maeng_space/dataset/deetas/data_21_10_21/image")
         print("image_root_path :", image_dir, "\n")
 
         ### Load all classes or a subset?
