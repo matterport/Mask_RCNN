@@ -67,29 +67,9 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 DEFAULT_LOGS_DIR = os.path.join(OUTPUT_DIR, "logs")
 DEFAULT_DATASET_YEAR = ""
 
-############################################################
+###################################################################################################################
 #  Configurations
-############################################################
-
-
-class CocoConfig(Config):
-    """Configuration for training on MS COCO.
-    Derives from the base Config class and overrides values specific
-    to the COCO dataset.
-    """
-    # Give the configuration a recognizable name
-    NAME = "coco"
-
-    # We use a GPU with 12GB memory, which can fit two images.
-    # Adjust down if you use a smaller GPU.
-    IMAGES_PER_GPU = 2
-
-    # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
-
-    # Number of classes (including background)
-    NUM_CLASSES = 1 + 80  # COCO has 80 classes
-
+###################################################################################################################
 class Deetas_Config(Config):
     """Configuration for training on MS COCO.
     Derives from the base Config class and overrides values specific
@@ -106,13 +86,12 @@ class Deetas_Config(Config):
     GPU_COUNT = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 25  # Deetas has 25 classes
+    NUM_CLASSES = 2 + 1  # Deetas has 25 classes with background
 
 
-############################################################
+###################################################################################################################
 #  Dataset
-############################################################
-
+###################################################################################################################
 class CocoDataset(utils.Dataset):
     def load_coco(self, dataset_dir, subset, year=DEFAULT_DATASET_YEAR, class_ids=None,
                   class_map=None, return_coco=False, auto_download=False):
@@ -127,32 +106,27 @@ class CocoDataset(utils.Dataset):
         auto_download: Automatically download and unzip MS-COCO images and annotations
         """
 
-        if auto_download is True:
-            self.auto_download(dataset_dir, subset, year)
-
-        # coco = COCO("{}/annotations/instances_{}{}.json".format(dataset_dir, subset, year))
-
-        ### annotation path
-        # annotation_path = "{}/json_obj/seg_{}.json".format(dataset_dir, subset)
-        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/seg_{}.json".format(subset)
-        coco = COCO(annotation_path)
-        # coco = COCO("{}/back_up/json_obj/seg_{}.json".format(dataset_dir, subset))
-
         print("****************************************************************************")
-        print("annotation path :", annotation_path, "\n")
+        print("load_data module :", "\n")
         
+        ### annotation path
+        # annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/on_off_{}.json".format(subset)
+        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/on_off_{}.json".format(subset)
+        coco = COCO(annotation_path)
+        print("annotation path :", annotation_path, "\n")
         
         ### image root path
         # image_dir = "{}/image".format(dataset_dir)
         image_dir = '/home/dblab/maeng_space/dataset/deetas/data_21_11_10/image'
 
         print("****************************************************************************")
-        print("image_root_path :", image_dir, "\n")
+        print("image_root_path :", image_dir, "\n",)
 
         ### Load all classes or a subset?
         if not class_ids:
             ### All classes
             class_ids = sorted(coco.getCatIds())
+            print("class_ids :", class_ids, "\n",)
 
         ### All images or a subset?
         if class_ids:
@@ -164,13 +138,18 @@ class CocoDataset(utils.Dataset):
         else:
             ### All images
             image_ids = list(coco.imgs.keys())
+            # print(image_ids)
+            # exit()
 
         ### Add classes
         for i in class_ids:
             self.add_class("coco", i, coco.loadCats(i)[0]["name"])
 
+        # print(image_ids)
+        # exit()
+
         ### Add images
-        print("****************************************************************************")
+        
         # test_path = os.path.join(image_dir, coco.imgs[407]['file_name'])
         # print(test_path)
         # image = Image.open(test_path)
@@ -284,10 +263,9 @@ class CocoDataset(utils.Dataset):
         return m
 
 
-############################################################
+###################################################################################################################
 #  COCO Evaluation
-############################################################
-
+###################################################################################################################
 def build_coco_results(dataset, image_ids, rois, class_ids, scores, masks):
     """Arrange resutls to match COCO specs in http://cocodataset.org/#format
     """
@@ -367,11 +345,9 @@ def evaluate_coco(model, dataset, coco, eval_type="bbox", limit=0, image_ids=Non
     print("Total time: ", time.time() - t_start)
 
 
-############################################################
+###################################################################################################################
 #  Training
-############################################################
-
-
+###################################################################################################################
 if __name__ == '__main__':
     import argparse
 
@@ -475,8 +451,8 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    # epochs=40,
-                    epochs=30,
+                    epochs=40,
+                    # epochs=30,
                     layers='heads',
                     augmentation=augmentation)
 
@@ -485,8 +461,8 @@ if __name__ == '__main__':
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    # epochs=120,
-                    epochs=90,
+                    epochs=120,
+                    # epochs=90,
                     layers='4+',
                     augmentation=augmentation)
 
@@ -495,8 +471,8 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    # epochs=160,
-                    epochs=120,
+                    epochs=160,
+                    # epochs=120,
                     layers='all',
                     augmentation=augmentation)
 
@@ -514,3 +490,8 @@ if __name__ == '__main__':
     end_time = time.time()
     elp_time = end_time - start_time
     print("\n\n\n", "elp_time :", elp_time, "\n\n\n")
+
+
+###################################################################################################################
+# end
+###################################################################################################################
