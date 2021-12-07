@@ -86,7 +86,7 @@ class Deetas_Config(Config):
     GPU_COUNT = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 25 + 1  # Deetas has 25 classes with background
+    NUM_CLASSES = 2 + 1  # Deetas has 25 classes with background
 
 
 ###################################################################################################################
@@ -111,13 +111,13 @@ class CocoDataset(utils.Dataset):
         
         ### annotation path
         # annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/on_off_{}.json".format(subset)
-        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_12_02/json_obj/seg_{}.json".format(subset)
+        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/on_off_{}.json".format(subset)
         coco = COCO(annotation_path)
         print("annotation path :", annotation_path, "\n")
         
         ### image root path
         # image_dir = "{}/image".format(dataset_dir)
-        image_dir = '/home/dblab/maeng_space/dataset/deetas/image_integrated'
+        image_dir = '/home/dblab/maeng_space/dataset/deetas/data_21_11_10/image'
 
         print("****************************************************************************")
         print("image_root_path :", image_dir, "\n",)
