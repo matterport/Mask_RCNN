@@ -86,7 +86,7 @@ class Deetas_Config(Config):
     GPU_COUNT = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 2 + 1  # Deetas has 25 classes with background
+    NUM_CLASSES = 38 + 1  # Deetas has 38 +status classes with background
 
 
 ###################################################################################################################
@@ -111,7 +111,7 @@ class CocoDataset(utils.Dataset):
         
         ### annotation path
         # annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_11_10/json_obj/on_off_{}.json".format(subset)
-        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_12_02/json_obj/on_off_{}.json".format(subset)
+        annotation_path = "/home/dblab/maeng_space/output_submodule/deetas/data_21_12_02/json_obj/status_{}.json".format(subset)
         coco = COCO(annotation_path)
         print("annotation path :", annotation_path, "\n")
         
@@ -138,8 +138,6 @@ class CocoDataset(utils.Dataset):
         else:
             ### All images
             image_ids = list(coco.imgs.keys())
-            # print(image_ids)
-            # exit()
 
         ### Add classes
         for i in class_ids:
