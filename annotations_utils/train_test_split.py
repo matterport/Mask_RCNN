@@ -8,8 +8,10 @@ import copy
 
 parser = argparse.ArgumentParser(description='User args')
 parser.add_argument('--dataset_dir', required=True, help='Path to dataset annotations')
-parser.add_argument('--test_percentage', type=int, default=10, required=False, help='Percentage of images used for the testing set')
-parser.add_argument('--val_percentage', type=int, default=10, required=False, help='Percentage of images used for the validation set')
+parser.add_argument('--test_percentage', type=int, default=10, required=False,
+                    help='Percentage of images used for the testing set')
+parser.add_argument('--val_percentage', type=int, default=10, required=False,
+                    help='Percentage of images used for the validation set')
 parser.add_argument('--nr_trials', type=int, default=10, required=False, help='Number of splits')
 
 args = parser.parse_args()
@@ -21,13 +23,12 @@ with open(ann_input_path, 'r') as f:
     dataset = json.loads(f.read())
 
 anns = dataset['annotations']
-#scene_anns = dataset['scene_annotations']
+# scene_anns = dataset['scene_annotations']
 imgs = dataset['images']
 nr_images = len(imgs)
 
-nr_testing_images = int(nr_images*args.test_percentage*0.01+0.5)
-nr_nontraining_images = int(nr_images*(args.test_percentage+args.val_percentage)*0.01+0.5)
-
+nr_testing_images = int(nr_images * args.test_percentage * 0.01 + 0.5)
+nr_nontraining_images = int(nr_images * (args.test_percentage + args.val_percentage) * 0.01 + 0.5)
 
 for i in range(args.nr_trials):
     random.shuffle(imgs)
@@ -37,14 +38,14 @@ for i in range(args.nr_trials):
         'info': None,
         'images': [],
         'annotations': [],
-        #'scene_annotations': [],
+        # 'scene_annotations': [],
         'licenses': [],
         'categories': [],
-        #'scene_categories': [],
+        # 'scene_categories': [],
     }
-    train_set['info'] =  dataset['info']
+    train_set['info'] = dataset['info']
     train_set['categories'] = dataset['categories']
-    #train_set['scene_categories'] = dataset['scene_categories']
+    # train_set['scene_categories'] = dataset['scene_categories']
 
     val_set = copy.deepcopy(train_set)
     test_set = copy.deepcopy(train_set)
@@ -54,7 +55,7 @@ for i in range(args.nr_trials):
     train_set['images'] = imgs[nr_nontraining_images:nr_images]
 
     # Aux Image Ids to split annotations
-    test_img_ids, val_img_ids, train_img_ids = [],[],[]
+    test_img_ids, val_img_ids, train_img_ids = [], [], []
     for img in test_set['images']:
         test_img_ids.append(img['id'])
 
@@ -83,9 +84,9 @@ for i in range(args.nr_trials):
     #         train_set['scene_annotations'].append(ann)
 
     # Write dataset splits
-    ann_train_out_path = args.dataset_dir + '/' + 'annotations_' + str(i) +'_train.json'
-    ann_val_out_path   = args.dataset_dir + '/' + 'annotations_' + str(i) + '_val.json'
-    ann_test_out_path  = args.dataset_dir + '/' + 'annotations_' + str(i) + '_test.json'
+    ann_train_out_path = args.dataset_dir + '/' + 'annotations_' + str(i) + '_train.json'
+    ann_val_out_path = args.dataset_dir + '/' + 'annotations_' + str(i) + '_val.json'
+    ann_test_out_path = args.dataset_dir + '/' + 'annotations_' + str(i) + '_test.json'
 
     with open(ann_train_out_path, 'w+') as f:
         f.write(json.dumps(train_set))

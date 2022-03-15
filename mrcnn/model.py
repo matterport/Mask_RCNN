@@ -601,7 +601,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     # Remove the extra dimension from masks.
     masks = tf.squeeze(masks, axis=3)
 
-    # Threshold mask pixels at 0.5 to have GT masks be 0 or 1 to use with
+    # Thresehold mask pixels at 0.5 to hav GT masks be 0 or 1 to use with
     # binary cross entropy loss.
     masks = tf.round(masks)
 
