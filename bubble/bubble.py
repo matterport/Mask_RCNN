@@ -1,12 +1,12 @@
 """
 Mask R-CNN
-Train on the bubble dataset and show color mask.
+Train on the toy Balloon dataset and implement color splash effect.
 
 Copyright (c) 2018 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 ------------------------------------------------------------
-2020. 12. Modified by Yewon Kim
+Modified by Yewon Kim (2022/3)
 ------------------------------------------------------------
 
 Usage: import the module (see Jupyter notebooks for examples), or run from
@@ -20,12 +20,13 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
 
     # Train a new model starting from ImageNet weights
     python3 bubble.py train --dataset=/path/to/bubble/dataset --weights=imagenet
+    
+    # Processing masks and bubble information for series of images
+    python3 bubble.py detect --weights=/path/to/weights/file.h5 --image=<URL or path to file> --results=/path/to/results
+    --folder_num_start=starting folder --folder_num=# of folders --confidence=0.99
 
     # Apply color splash to an image
-    python3 bubble.py splash --weights=/path/to/weights/file.h5 --image=<URL or path to file>
-
-    # Apply color splash to video using the last weights you trained
-    python3 bubble.py splash --weights=last --video=<URL or path to file>
+    python3 bubble.py splash --weights=/path/to/weights/file.h5 --image=<URL or path to file> 
 """
 
 import os
@@ -34,6 +35,8 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
+from skimage import img_as_uint
+from skimage.measure import label, regionprops
 import cv2
 from imgaug import augmenters as iaa
 import matplotlib.pyplot as plt
@@ -61,7 +64,7 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "bubble/logs")
 
 # Results directory
 # Save submission files here
-RESULTS_DIR = os.path.join(ROOT_DIR, "results/")
+RESULTS_DIR = os.path.join(ROOT_DIR, "results/bubble/")
 
 ############################################################
 #  Configurations
@@ -185,7 +188,7 @@ class BubbleConfig(Config):
     }
     
     # Skip detections with < 60% confidence
-    DETECTION_MIN_CONFIDENCE = 0.8
+    DETECTION_MIN_CONFIDENCE = 0.6
     
     # Bubble mean size to normalize weight
     MEAN_SIZE = 47.0
@@ -208,7 +211,6 @@ class BubbleInferenceConfig(BubbleConfig):
 class _InfConfig(BubbleConfig):
     IMAGES_PER_GPU = 1
     GPU_COUNT = 1
-    #DETECTION_MIN_CONFIDENCE = 0.0
     IMAGE_RESIZE_MODE = "pad64"
     IMAGE_MIN_DIM = 320
     
@@ -296,7 +298,6 @@ def train(model):
         iaa.Add((-40, 40)),
         iaa.AdditiveGaussianNoise(scale=(0, 0.2*255)),
         iaa.Multiply((0.25, 1)),
-        #iaa.Cutout(nb_iterations=(20, 50), size=0.03, fill_mode="constant", cval=255),
         iaa.MedianBlur(k=(3, 15)),
         iaa.SigmoidContrast(gain=(5, 10), cutoff=(0.1, 0.6)),
         iaa.Sharpen(alpha=(0.0, 1.0), lightness=(0.75, 1.1)),
@@ -315,7 +316,6 @@ def train(model):
     # no need to train all layers, just the heads should do it.
     
     model.train(dataset_train, dataset_val,
-                #learning_rate=config.LEARNING_RATE/10,
                 learning_rate=config.LEARNING_RATE/10,
                 epochs=10,
                 augmentation=augmentation,
@@ -323,17 +323,15 @@ def train(model):
                 custom_callbacks=[mean_average_precision_callback])
     
     model.train(dataset_train, dataset_val,
-                #learning_rate=config.LEARNING_RATE/10,
                 learning_rate=config.LEARNING_RATE/100,
-                epochs=20,#20
+                epochs=20,
                 augmentation=augmentation,
                 layers='5+',
                 custom_callbacks=[mean_average_precision_callback])
     
     model.train(dataset_train, dataset_val,
-                #learning_rate=config.LEARNING_RATE/10,
                 learning_rate=config.LEARNING_RATE/1000,
-                epochs=30,#20
+                epochs=30,
                 augmentation=augmentation,
                 layers='5+',
                 custom_callbacks=[mean_average_precision_callback])
@@ -360,34 +358,84 @@ def color_splash(image, mask):
     return splash
     
 
-def color_mask(image, mask, ids, scr, names, mymap):
-    """Apply color splash effect.
-    image: RGB image [height, width, 3]
-    mask: instance segmentation mask [height, width, instance count]
-    Returns result image.
+def detect(model, image_path=None, result_path=RESULTS_DIR):
+    """Processing PNG masks and bubble information txt file for series of images
     """
-    im = visualize.display_top_masks(image, mask, ids, scr, names, limit=1, cmap = mymap)
-    #print(im.tolist())
-    #im2 = np.clip(im/2800, 0, 1)
-    im2 = np.clip(im/2400, 0, 1)
-    rgba_img = mymap((im2*255).astype(np.uint8))
-    splash = np.delete(rgba_img, 3, 2)
-    splash = (splash*255).astype(np.uint8)
-   
-    return splash
+    assert image_path
 
+    # Create directory
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)     
+    
+    for FN in range(int(args.folder_num_start), int(args.folder_num_start)+int(args.folder_num)):
+        IMAGE_PATH = args.image + "_%03i"%(FN+1) 
+        print("Running on {}".format(IMAGE_PATH))
+        # Create results directory
+        IMAGE_PATH_results = os.path.join(result_path, os.path.basename(IMAGE_PATH)) 
+        if not os.path.exists(IMAGE_PATH_results):
+            os.makedirs(IMAGE_PATH_results)   
+        
+        # Image list for current folder
+        files = os.listdir(IMAGE_PATH)
+        
+        for file in files:
+            # make sure file is an image
+            if file.endswith(('.jpg', '.png', '.tif')): 
+                img_path = os.path.join(IMAGE_PATH, file)
+         
+                # Read image
+                image = skimage.io.imread(img_path)
+        
+                # 3 channel jpg?? 
+                if image.ndim == 2:
+                    image = cv2.merge((image,image,image))
+        
+                # Detect objects
+                a = datetime.datetime.now()
+                r = model.detect([image], verbose=1)[0]
+                b = datetime.datetime.now()
+                c = b-a
+                print('detection time = ', c.total_seconds())
+        
+                # Create results directory
+                img_path_results = os.path.join(IMAGE_PATH_results, file.rsplit('.')[0])
+                if not os.path.exists(img_path_results):
+                    os.makedirs(img_path_results)
+                
+                # Save PNG masks & calculating bubble information
+                props_list = [["x ", "y ", "Orientation ", "Axis_major_length ", "Axis_minor_length ", "Area "]]
+                
+                for png_num in range(r['masks'].shape[2]):
+                    file_name = "mask_%03i.png"%(png_num+1)
+                    skimage.io.imsave(os.path.join(img_path_results, file_name), img_as_uint(r['masks'][:,:,png_num])) 
+        
+                    # Caculate bubble information & save as txt
+                    label_img = label(r['masks'][:,:,png_num])
+                    props = regionprops(label_img)
+                    props_list.append([round(props[0].centroid[1],2), round(props[0].centroid[0],2), round(props[0].orientation,2),
+                                                          round(props[0].major_axis_length,2), round(props[0].minor_axis_length,2), 
+                                                          round(props[0].area,2)])
+				# Save PNG mask for all bubbles
+                if args.all_bubble_mask:
+                    skimage.io.imsave(os.path.join(IMAGE_PATH_results, file.rsplit('.')[0] + ".png"), np.sum(r['masks'],axis=2))
+            
+                with open(os.path.join(img_path_results, file.rsplit('.')[0] + ".txt"), "w") as file2:
+                    for line in props_list:
+                        file2.write("%s\n" % str(line)[1 : -1])
+      
+                print("Saved to ", os.path.join(img_path_results, file.rsplit('.')[0], ".txt"))
+    
 
-def detect_and_color_splash(model, image_path=None, video_path=None):
+def splash(model, image_path=None, video_path=None, result_path=RESULTS_DIR):
     assert image_path or video_path
 
     # Create directory
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)
         
     # Custom color map
     colors1 = plt.cm.Blues(np.linspace(0.05, 0.05, 1))
     colors2 = plt.cm.Blues(np.linspace(0.25, 0.75, 128))
-    #colors2 = plt.cm.Blues_r(np.linspace(0.15, 0.75, 128))
     
     # combine them and build a new colormap
     colors = np.vstack((colors1, colors2))
@@ -399,6 +447,9 @@ def detect_and_color_splash(model, image_path=None, video_path=None):
         print("Running on {}".format(args.image))
         # Read image
         image = skimage.io.imread(args.image)
+        # 3 channel jpg?? 
+        if image.ndim == 2:
+            image = cv2.merge((image,image,image))
         # Detect objects
         a = datetime.datetime.now()
         r = model.detect([image], verbose=1)[0]
@@ -406,23 +457,20 @@ def detect_and_color_splash(model, image_path=None, video_path=None):
         c = b-a
         print('detection time = ', c.total_seconds())
         # Color splash
-        #splash = color_splash(image, r['masks'])
-        splash = color_mask(image, r['masks'], r['class_ids'], r['scores'], ['bubble']*len(r['scores']), mymap)
+        splash = color_splash(image, r['masks'])
         # Save output
-        file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-        #plt.imsave(os.path.join(RESULTS_DIR, file_name), splash, cmap=mymap)
-        skimage.io.imsave(os.path.join(RESULTS_DIR, file_name), splash)
+        file_name = "splash_"+os.path.basename(args.image).rsplit('.')[0]+".png"
+        skimage.io.imsave(os.path.join(result_path, file_name), splash)
     elif video_path:
         # Video capture
         vcapture = cv2.VideoCapture(video_path)
         width = int(vcapture.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(vcapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        #fps = vcapture.get(cv2.CAP_PROP_FPS)
         fps = 30
 
         # Define codec and create video writer
-        file_name = "splash_{:%Y%m%dT%H%M%S}.wmv".format(datetime.datetime.now())
-        vwriter = cv2.VideoWriter(os.path.join(RESULTS_DIR, file_name),
+        file_name = "splash_"+os.path.basename(video_path).rsplit('.')[0]+".wmv"
+        vwriter = cv2.VideoWriter(os.path.join(result_path, file_name),
                                   cv2.VideoWriter_fourcc(*'MJPG'),
                                   fps, (width, height))
 
@@ -435,6 +483,9 @@ def detect_and_color_splash(model, image_path=None, video_path=None):
             if success:
                 # OpenCV returns images as BGR, convert to RGB
                 image = image[..., ::-1]
+                # 3 channel jpg?? 
+                if image.ndim == 2:
+                    image = cv2.merge((image,image,image))
                 # Detect objects
                 a = datetime.datetime.now()
                 r = model.detect([image], verbose=0)[0]
@@ -442,15 +493,14 @@ def detect_and_color_splash(model, image_path=None, video_path=None):
                 c = b-a
                 print('detection time = ', c.total_seconds())
                 # Color splash
-                #splash = color_splash(image, r['masks'])
-                splash = color_mask(image, r['masks'], r['class_ids'], r['scores'], ['bubble']*len(r['scores']), mymap)
+                splash = color_splash(image, r['masks'])
                 # RGB -> BGR to save image to video
                 splash = splash[..., ::-1]
                 # Add image to video writer
                 vwriter.write(splash)
                 count += 1
         vwriter.release()
-    print("Saved to ", file_name)
+    print("Saved to ", os.path.join(result_path, file_name))
 
 
 ############################################################
@@ -465,7 +515,7 @@ if __name__ == '__main__':
         description='Train Mask R-CNN to detect bubbles.')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train' or 'splash'")
+                        help="'train' or 'splash' or 'detect'")
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/bubble/dataset/",
                         help='Directory of the Bubble dataset')
@@ -476,12 +526,32 @@ if __name__ == '__main__':
                         default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
                         help='Logs and checkpoints directory (default=logs/)')
+    parser.add_argument('--results', required=False,
+                        default=RESULTS_DIR,
+                        metavar="/path/to/results/",
+                        help='Save submission files here (default=resuls/bubble)')
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the color splash effect on')
     parser.add_argument('--video', required=False,
                         metavar="path or URL to video",
                         help='Video to apply the color splash effect on')
+    parser.add_argument('--folder_num', required=False,
+                        default=1,
+                        metavar="number of folders (default=1)",
+                        help='Number of total folders to detect')
+    parser.add_argument('--folder_num_start', required=False,
+                        default=0,
+                        metavar="starting folders",
+                        help='Where to start detecting (default=0)')
+    parser.add_argument('--all_bubble_mask', required=False,
+                        default=0,
+                        metavar="Entire bubble mask",
+                        help='If need entire bubble mask (default=0)')
+    parser.add_argument('--confidence', required=False,
+                        default=0.99,
+                        metavar="0.5~0.99",
+                        help='Skip detections with < confidence (default=0.99)')
     args = parser.parse_args()
 
     # Validate arguments
@@ -494,6 +564,7 @@ if __name__ == '__main__':
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
     print("Logs: ", args.logs)
+    print("Results: ", args.results)
 
     # Configurations
     if args.command == "train":
@@ -506,10 +577,13 @@ if __name__ == '__main__':
             IMAGES_PER_GPU = 1
             # Don't resize imager for inferencing
             IMAGE_RESIZE_MODE = "pad64"
-            IMAGE_MIN_DIM = 320
+            IMAGE_MIN_DIM = 320 #640 1024
             # Non-max suppression threshold to filter RPN proposals.
             # You can increase this during training to generate more propsals.
-            RPN_NMS_THRESHOLD = 0.98
+            RPN_NMS_THRESHOLD = 0.8 #0.8~0.98
+            
+            # Skip detections with < 60% confidence
+            DETECTION_MIN_CONFIDENCE = float(args.confidence) # 0.5~0.99
         config = InferenceConfig()
     config.display()
 
@@ -551,8 +625,11 @@ if __name__ == '__main__':
     if args.command == "train":
         train(model)
     elif args.command == "splash":
-        detect_and_color_splash(model, image_path=args.image,
-                                video_path=args.video)
+        splash(model, image_path=args.image,
+                                video_path=args.video, result_path=args.results)
+    elif args.command == "detect":
+        detect(model, image_path=args.image, result_path=args.results)
+    
     else:
         print("'{}' is not recognized. "
-              "Use 'train' or 'splash'".format(args.command))
+              "Use 'train' or 'splash' or 'detect'".format(args.command))
