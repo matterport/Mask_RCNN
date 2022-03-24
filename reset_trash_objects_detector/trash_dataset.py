@@ -79,7 +79,7 @@ class TrashDataset(utils.Dataset):
             # of class IDs that correspond to each channel of the mask.
             # for annotation in annotations:
             class_id = self.map_source_class_id(
-                "trash.{}".format(annotation["category_id"]))
+                "trash.{}".format(annotation["object_id"]))
             if class_id:
                 m = self.annToMask(annotation, image_info["height"],
                                    image_info["width"])
