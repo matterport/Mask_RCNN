@@ -40,7 +40,7 @@ setup(
     author_email='waleed.abdulla@gmail.com',
     license='MIT',
     description='Mask R-CNN for object detection and instance segmentation',
-    packages=["mrcnn", "materials_trash_detector", "annotations_utils", "reset_trash_detector", "reset_filling_detector"],
+    packages=["mrcnn", "materials_trash_detector", "annotations_utils", "reset_trash_objects_detector", "reset_filling_detector"],
     install_requires=install_reqs,
     include_package_data=True,
     python_requires='>=3.4',
