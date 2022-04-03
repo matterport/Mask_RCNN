@@ -26,9 +26,11 @@ anns = dataset['annotations']
 # scene_anns = dataset['scene_annotations']
 imgs = dataset['images']
 nr_images = len(imgs)
+print("Total Images: " + nr_images)
 
 nr_testing_images = int(nr_images * args.test_percentage * 0.01 + 0.5)
 nr_nontraining_images = int(nr_images * (args.test_percentage + args.val_percentage) * 0.01 + 0.5)
+print("Number of non training images: " + nr_nontraining_images)
 
 for i in range(args.nr_trials):
     random.shuffle(imgs)

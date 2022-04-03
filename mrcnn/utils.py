@@ -383,7 +383,7 @@ class Dataset(object):
         # Override this function to load a mask from your dataset.
         # Otherwise, it returns an empty mask.
         # logging.warning("You are using the default load_mask(), maybe you need to define your own one.\n")
-        #logging.warning("Empty Mask\n")
+        # logging.warning("Empty Mask\n")
         mask = np.empty([0, 0, 0])
         class_ids = np.empty([0], np.int32)
         return mask, class_ids
