@@ -41,7 +41,7 @@ class TrashDataset(utils.Dataset):
         # Add images
         image_ids = list(trash.imgs.keys())
 
-        for i in image_ids:
+        '''for i in image_ids:
             current_annotation = []
             for a in trash.loadAnns(trash.getAnnIds()):
                 if a["image_id"] == i:
@@ -52,7 +52,16 @@ class TrashDataset(utils.Dataset):
                 width=trash.imgs[i]["width"],
                 height=trash.imgs[i]["height"],
                 annotations=current_annotation)  # annotations=[a for a in trash.loadAnns(trash.getAnnIds()) if a['image_id'] == str(i)]
-
+        '''
+        # Add images
+        for i in image_ids:
+            self.add_image(
+                "trash", image_id=i,
+                path=os.path.join(data_dir, trash.imgs[i]['file_name']),
+                width=trash.imgs[i]["width"],
+                height=trash.imgs[i]["height"],
+                annotations=trash.loadAnns(trash.getAnnIds(
+                    imgIds=[i], catIds=class_ids, iscrowd=None)))
         return trash
 
     def load_mask(self, image_id):
