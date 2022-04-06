@@ -3,8 +3,6 @@
 
 Dataset for Mask R-CNN
 Configurations and data loading code for COCO format.
-
-@author: Mattia Brusamento
 """
 
 import os
@@ -73,8 +71,8 @@ class TrashDataset(utils.Dataset):
 
         instance_masks = []
         class_ids = []
-        annotation = image_info["annotations"]
-        if len(annotation) > 0:
+        annotations = image_info["annotations"]
+        for annotation in annotations:
             # Build mask of shape [height, width, instance_count] and list
             # of class IDs that correspond to each channel of the mask.
             # for annotation in annotations:
@@ -85,18 +83,18 @@ class TrashDataset(utils.Dataset):
                                    image_info["width"])
                 # Some objects are so small that they're less than 1 pixel area
                 # and end up rounded out. Skip those objects.
-                if m.max() > 0:
-                    # continue
-                    # Is it a crowd? If so, use a negative class ID.
-                    if annotation['iscrowd']:
-                        # Use negative class ID for crowds
-                        class_id *= -1
-                        # For crowd masks, annToMask() sometimes returns a mask
-                        # smaller than the given dimensions. If so, resize it.
-                        if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
-                            m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
-                    instance_masks.append(m)
-                    class_ids.append(class_id)
+                if m.max() < 1:
+                    continue
+                # Is it a crowd? If so, use a negative class ID.
+                if annotation['iscrowd']:
+                    # Use negative class ID for crowds
+                    class_id *= -1
+                    # For crowd masks, annToMask() sometimes returns a mask
+                    # smaller than the given dimensions. If so, resize it.
+                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
+                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                instance_masks.append(m)
+                class_ids.append(class_id)
 
         # Pack instance masks into an array
         if len(class_ids) > 0:
