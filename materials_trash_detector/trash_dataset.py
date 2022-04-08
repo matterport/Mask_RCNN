@@ -85,7 +85,7 @@ class TrashDataset(utils.Dataset):
             # Build mask of shape [height, width, instance_count] and list
             # of class IDs that correspond to each channel of the mask.
             # for annotation in annotations:
-            print(annotation)
+            # print(annotation)
             class_id = self.map_source_class_id(
                 "trash.{}".format(annotation["category_id"]))
             if class_id:
