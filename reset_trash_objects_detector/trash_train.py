@@ -3,7 +3,6 @@
 
 Train Mask R-CNN
 
-@author: Mattia Brusamento
 """
 
 from datetime import datetime

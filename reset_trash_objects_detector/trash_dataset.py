@@ -4,7 +4,6 @@
 Dataset for Mask R-CNN
 Configurations and data loading code for COCO format.
 
-@author: Mattia Brusamento
 """
 
 import os
@@ -43,7 +42,7 @@ class TrashDataset(utils.Dataset):
         # Add images
         image_ids = list(trash.imgs.keys())
 
-        for i in image_ids:
+        '''for i in image_ids:
             current_annotation = []
             for a in trash.loadAnns(trash.getAnnIds()):
                 if a["image_id"] == i:
@@ -54,7 +53,16 @@ class TrashDataset(utils.Dataset):
                 width=trash.imgs[i]["width"],
                 height=trash.imgs[i]["height"],
                 annotations=current_annotation)  # annotations=[a for a in trash.loadAnns(trash.getAnnIds()) if a['image_id'] == str(i)]
-
+        '''
+        # Add images
+        for i in image_ids:
+            self.add_image(
+                "trash", image_id=i,
+                path=os.path.join(data_dir, trash.imgs[i]['file_name']),
+                width=trash.imgs[i]["width"],
+                height=trash.imgs[i]["height"],
+                annotations=trash.loadAnns(trash.getAnnIds(
+                    imgIds=[i], catIds=class_ids, iscrowd=None)))
         return trash
 
     def load_mask(self, image_id):
@@ -73,30 +81,31 @@ class TrashDataset(utils.Dataset):
 
         instance_masks = []
         class_ids = []
-        annotation = image_info["annotations"]
-        if len(annotation) > 0:
+        annotations = image_info["annotations"]
+        for annotation in annotations:
             # Build mask of shape [height, width, instance_count] and list
             # of class IDs that correspond to each channel of the mask.
             # for annotation in annotations:
+            # print(annotation)
             class_id = self.map_source_class_id(
-                "trash.{}".format(annotation["object_id"]))
+                "trash.{}".format(annotation["category_id"]))
             if class_id:
                 m = self.annToMask(annotation, image_info["height"],
                                    image_info["width"])
                 # Some objects are so small that they're less than 1 pixel area
                 # and end up rounded out. Skip those objects.
-                if m.max() > 0:
-                    # continue
-                    # Is it a crowd? If so, use a negative class ID.
-                    if annotation['iscrowd']:
-                        # Use negative class ID for crowds
-                        class_id *= -1
-                        # For crowd masks, annToMask() sometimes returns a mask
-                        # smaller than the given dimensions. If so, resize it.
-                        if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
-                            m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
-                    instance_masks.append(m)
-                    class_ids.append(class_id)
+                if m.max() < 1:
+                    continue
+                # Is it a crowd? If so, use a negative class ID.
+                if annotation['iscrowd']:
+                    # Use negative class ID for crowds
+                    class_id *= -1
+                    # For crowd masks, annToMask() sometimes returns a mask
+                    # smaller than the given dimensions. If so, resize it.
+                    if m.shape[0] != image_info["height"] or m.shape[1] != image_info["width"]:
+                        m = np.ones([image_info["height"], image_info["width"]], dtype=bool)
+                instance_masks.append(m)
+                class_ids.append(class_id)
 
         # Pack instance masks into an array
         if len(class_ids) > 0:
