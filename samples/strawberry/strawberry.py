@@ -10,6 +10,7 @@ ROOT_DIR = os.path.abspath("../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
+sys.path.append('../../mrcnn')  # ...Actually use local version
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
 
@@ -40,7 +41,7 @@ class StrawberryConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + strawberry
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 10
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -64,13 +65,11 @@ class StrawberryDataset(utils.Dataset):
         assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
 
-        annotations = json.load(open(os.path.join(dataset_dir, "labels.json")))
+        annotations = json.load(open(os.path.join(dataset_dir, "my_labels.json")))
         annotations = list(annotations.values())  # don't need the dict keys
 
         # Add images
-        for a in annotations[:-1]:
-            annotation = a[0]
-            print('hi')
+        for annotation in annotations[0]:
             polygons = annotation['polygon']
             width, height = 4000, 3000
             image_name = annotation['file'].split("/")[-1]
@@ -101,6 +100,12 @@ class StrawberryDataset(utils.Dataset):
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
         for i, polygon in enumerate(info["polygons"]):
+            # Avoid single-dimension polygons 
+            # (i.e. [x, y] instead of [[x, y], [x, y], ...])
+            try:
+                len(polygon[0])
+            except:
+                continue
             # Get indexes of pixels inside the polygon and set them to 1
             x = [coord[0] for coord in polygon]
             y = [coord[1] for coord in polygon]
@@ -178,7 +183,7 @@ def detect_and_color_splash(model, image_path=None, video_path=None):
         splash = color_splash(image, r['masks'])
         # Save output
         file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-        skimage.io.imsave(file_name, splash)
+        skimage.io.imsave(os.path.join('output', file_name), splash)
     elif video_path:
         import cv2
         # Video capture
