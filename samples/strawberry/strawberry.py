@@ -148,8 +148,8 @@ def train(model):
                 layers='heads')
 
 
-def color_splash(image, mask):
-    """Apply color splash effect.
+def segment(image, mask):
+    """Segment the image.
     image: RGB image [height, width, 3]
     mask: instance segmentation mask [height, width, instance count]
 
@@ -157,33 +157,45 @@ def color_splash(image, mask):
     """
     # Make a grayscale copy of the image. The grayscale copy still
     # has 3 RGB channels, though.
-    gray = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
-    # Copy color pixels from the original color image where mask is set
-    if mask.shape[-1] > 0:
-        # We're treating all instances as one, so collapse the mask into one layer
-        mask = (np.sum(mask, -1, keepdims=True) >= 1)
-        splash = np.where(mask, image, gray).astype(np.uint8)
-    else:
-        splash = gray.astype(np.uint8)
-    return splash
+    black = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
+    # Make image completely black
+    # TODO: make them transparent instead
+    black[:, :] = 0
+    # Transpose to (nSegments, height, width)
+    mask_transpose = np.transpose(mask, [2, 0, 1])
+    segments = []
+    for mask_ in mask_transpose[0:1]:
+      # Convert (3000, 4000) to (3000, 4000, 3)
+      # TODO: find more efficient way
+      # TODO: when more efficient, remove the [0:1] above
+      mask_ = mask_ >= 1
+      arr_new = np.zeros((3000,4000,3))
+      for i, x in enumerate(mask_):
+          for j, y in enumerate(x):
+              arr_new[i][j] = [y, y, y]
+      mask_ = arr_new
+      # Use image values on mask, black otherwise
+      res = np.where(mask_, image, black).astype(np.uint8)
+      segments.append(res)
+    return segments
 
 
-def detect_and_color_splash(model, image_path=None):
+def detect_and_segment(model, image_path=None):
     assert image_path
 
-    # Run model detection and generate the color splash effect
+    # Run model detection and generate segment
     print("Running on {}".format(args.image))
     # Read image
     image = skimage.io.imread(args.image)
     # Detect objects
     r = model.detect([image], verbose=1)[0]
-    # Color splash
-    splash = color_splash(image, r['masks'])
+    # Segmentation
+    segments = segment(image, r['masks'])
     # Save output
-    file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-    skimage.io.imsave(os.path.join('output', file_name), splash)
-
-    print("Saved to", file_name)
+    for seg, roi in zip(segments, r['rois']):
+      file_name = "segment_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
+      skimage.io.imsave(os.path.join('output/aapje', file_name), seg[roi[0]:roi[2], roi[1]:roi[3]])
+      print("Saved to", file_name)
 
 
 ############################################################
@@ -198,7 +210,7 @@ if __name__ == '__main__':
         description='Train Mask R-CNN to detect strawberries.')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train' or 'splash'")
+                        help="'train' or 'segment'")
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/strawberry/dataset/",
                         help='Directory of the Strawberry dataset')
@@ -211,15 +223,15 @@ if __name__ == '__main__':
                         help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
-                        help='Image to apply the color splash effect on')
+                        help='Image to apply the segmentation on')
     args = parser.parse_args()
 
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
-    elif args.command == "splash":
+    elif args.command == "segment":
         assert args.image,\
-               "Provide --image to apply color splash"
+               "Provide --image to apply segmentation"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -274,8 +286,8 @@ if __name__ == '__main__':
     # Train or evaluate
     if args.command == "train":
         train(model)
-    elif args.command == "splash":
-        detect_and_color_splash(model, image_path=args.image)
+    elif args.command == "segment":
+        detect_and_segment(model, image_path=args.image)
     else:
         print("'{}' is not recognized. "
-              "Use 'train' or 'splash'".format(args.command))
+              "Use 'train' or 'segment'".format(args.command))
