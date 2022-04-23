@@ -168,56 +168,22 @@ def color_splash(image, mask):
     return splash
 
 
-def detect_and_color_splash(model, image_path=None, video_path=None):
-    assert image_path or video_path
+def detect_and_color_splash(model, image_path=None):
+    assert image_path
 
-    # Image or video?
-    if image_path:
-        # Run model detection and generate the color splash effect
-        print("Running on {}".format(args.image))
-        # Read image
-        image = skimage.io.imread(args.image)
-        # Detect objects
-        r = model.detect([image], verbose=1)[0]
-        # Color splash
-        splash = color_splash(image, r['masks'])
-        # Save output
-        file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-        skimage.io.imsave(os.path.join('output', file_name), splash)
-    elif video_path:
-        import cv2
-        # Video capture
-        vcapture = cv2.VideoCapture(video_path)
-        width = int(vcapture.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(vcapture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = vcapture.get(cv2.CAP_PROP_FPS)
+    # Run model detection and generate the color splash effect
+    print("Running on {}".format(args.image))
+    # Read image
+    image = skimage.io.imread(args.image)
+    # Detect objects
+    r = model.detect([image], verbose=1)[0]
+    # Color splash
+    splash = color_splash(image, r['masks'])
+    # Save output
+    file_name = "splash_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
+    skimage.io.imsave(os.path.join('output', file_name), splash)
 
-        # Define codec and create video writer
-        file_name = "splash_{:%Y%m%dT%H%M%S}.avi".format(datetime.datetime.now())
-        vwriter = cv2.VideoWriter(file_name,
-                                  cv2.VideoWriter_fourcc(*'MJPG'),
-                                  fps, (width, height))
-
-        count = 0
-        success = True
-        while success:
-            print("frame: ", count)
-            # Read next image
-            success, image = vcapture.read()
-            if success:
-                # OpenCV returns images as BGR, convert to RGB
-                image = image[..., ::-1]
-                # Detect objects
-                r = model.detect([image], verbose=0)[0]
-                # Color splash
-                splash = color_splash(image, r['masks'])
-                # RGB -> BGR to save image to video
-                splash = splash[..., ::-1]
-                # Add image to video writer
-                vwriter.write(splash)
-                count += 1
-        vwriter.release()
-    print("Saved to ", file_name)
+    print("Saved to", file_name)
 
 
 ############################################################
@@ -246,17 +212,14 @@ if __name__ == '__main__':
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the color splash effect on')
-    parser.add_argument('--video', required=False,
-                        metavar="path or URL to video",
-                        help='Video to apply the color splash effect on')
     args = parser.parse_args()
 
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
     elif args.command == "splash":
-        assert args.image or args.video,\
-               "Provide --image or --video to apply color splash"
+        assert args.image,\
+               "Provide --image to apply color splash"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -312,8 +275,7 @@ if __name__ == '__main__':
     if args.command == "train":
         train(model)
     elif args.command == "splash":
-        detect_and_color_splash(model, image_path=args.image,
-                                video_path=args.video)
+        detect_and_color_splash(model, image_path=args.image)
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'splash'".format(args.command))
