@@ -147,35 +147,47 @@ def train(model):
                 epochs=1,
                 layers='heads')
 
+def crop(image, roi):
+    """Crop an image to a region of interest."""
+    x1, y1, x2, y2 = roi
+    return image[x1:x2, y1:y2]
 
-def segment(image, mask):
+
+def segment(image, mask, roi):
     """Segment the image.
     image: RGB image [height, width, 3]
     mask: instance segmentation mask [height, width, instance count]
 
     Returns result image.
     """
-    # Make a grayscale copy of the image. The grayscale copy still
-    # has 3 RGB channels, though.
-    black = skimage.color.gray2rgb(skimage.color.rgb2gray(image)) * 255
-    # Make image completely black
-    # TODO: make them transparent instead
-    black[:, :] = 0
     # Transpose to (nSegments, height, width)
     mask_transpose = np.transpose(mask, [2, 0, 1])
+
     segments = []
-    for mask_ in mask_transpose[0:1]:
-      # Convert (3000, 4000) to (3000, 4000, 3)
+
+    for mask_, roi_ in zip(mask_transpose[0:2], roi[0:2]):
+      # Crop image and mask
+      image_ = crop(image, roi_)
+      mask_ = crop(mask_, roi_)
+
+      # Make a grayscale copy of the image. The grayscale copy still
+      # has 3 RGB channels, though.
+      black = skimage.color.gray2rgb(skimage.color.rgb2gray(image_)) * 255
+
+      # Make image completely black
+      # TODO: make them transparent instead
+      black[:, :] = 0
+
+      # Convert (width, height) to (width, height, 3)
       # TODO: find more efficient way
-      # TODO: when more efficient, remove the [0:1] above
-      mask_ = mask_ >= 1
-      arr_new = np.zeros((3000,4000,3))
+      arr_new = np.zeros((*mask_.shape, 3))
       for i, x in enumerate(mask_):
           for j, y in enumerate(x):
               arr_new[i][j] = [y, y, y]
       mask_ = arr_new
+
       # Use image values on mask, black otherwise
-      res = np.where(mask_, image, black).astype(np.uint8)
+      res = np.where(mask_, image_, black).astype(np.uint8)
       segments.append(res)
     return segments
 
@@ -190,11 +202,11 @@ def detect_and_segment(model, image_path=None):
     # Detect objects
     r = model.detect([image], verbose=1)[0]
     # Segmentation
-    segments = segment(image, r['masks'])
+    segments = segment(image, r['masks'], r['rois'])
     # Save output
-    for seg, roi in zip(segments, r['rois']):
+    for seg in segments:
       file_name = "segment_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-      skimage.io.imsave(os.path.join('output/aapje', file_name), seg[roi[0]:roi[2], roi[1]:roi[3]])
+      skimage.io.imsave(os.path.join('output/aapje', file_name), seg)
       print("Saved to", file_name)
 
 
