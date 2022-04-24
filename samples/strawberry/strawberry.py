@@ -41,7 +41,10 @@ class StrawberryConfig(Config):
     NUM_CLASSES = 1 + 1  # Background + strawberry
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 10
+    STEPS_PER_EPOCH = 100
+
+    # Validation steps per epoch
+    # VALIDATION_STEPS = 50
 
     # Skip detections with < 90% confidence
     DETECTION_MIN_CONFIDENCE = 0.9
@@ -165,7 +168,7 @@ def segment(image, mask, roi):
 
     segments = []
 
-    for mask_, roi_ in zip(mask_transpose[0:2], roi[0:2]):
+    for mask_, roi_ in zip(mask_transpose, roi):
       # Crop image and mask
       image_ = crop(image, roi_)
       mask_ = crop(mask_, roi_)
