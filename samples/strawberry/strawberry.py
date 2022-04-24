@@ -195,7 +195,7 @@ def segment(image, mask, roi):
 def detect_and_segment(model, image_path=None):
     assert image_path
 
-    # Run model detection and generate segment
+    # 1. Run model detection and generate segment
     print("Running on {}".format(args.image))
     # Read image
     image = skimage.io.imread(args.image)
@@ -203,10 +203,16 @@ def detect_and_segment(model, image_path=None):
     r = model.detect([image], verbose=1)[0]
     # Segmentation
     segments = segment(image, r['masks'], r['rois'])
-    # Save output
-    for seg in segments:
-      file_name = "segment_{:%Y%m%dT%H%M%S}.png".format(datetime.datetime.now())
-      skimage.io.imsave(os.path.join('output/aapje', file_name), seg)
+
+    # 2. Save output
+    # Create output directory
+    date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = os.path.join('output', date)
+    os.mkdir(path)
+    # Output each segment
+    for idx, seg in enumerate(segments):
+      file_name = args.image.split('/')[-1].split('.')[0] + '_seg' + str(idx) + '.png'
+      skimage.io.imsave(os.path.join('output', date, file_name), seg)
       print("Saved to", file_name)
 
 
