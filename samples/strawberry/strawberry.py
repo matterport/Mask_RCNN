@@ -174,20 +174,14 @@ def segment(image, mask, roi):
       mask_ = crop(mask_, roi_)
 
       # Make a grayscale copy of the image. The grayscale copy still
-      # has 3 RGB channels, though.
-      black = skimage.color.gray2rgb(skimage.color.rgb2gray(image_)) * 255
+      # has 4 RGBA channels, though.
+      black = skimage.color.gray2rgba(skimage.color.rgb2gray(image_), alpha=0) * 255
 
-      # Make image completely black
-      # TODO: make them transparent instead
-      black[:, :] = 0
+      # Add alpha dim to image
+      image_ = np.dstack((image_, np.full((image_.shape[0], image_.shape[1]), 255)))
 
-      # Convert (width, height) to (width, height, 3)
-      # TODO: find more efficient way
-      arr_new = np.zeros((*mask_.shape, 3))
-      for i, x in enumerate(mask_):
-          for j, y in enumerate(x):
-              arr_new[i][j] = [y, y, y]
-      mask_ = arr_new
+      # Convert (width, height) to (width, height, 4)
+      mask_ = np.dstack((mask_, np.full((image_.shape[0], image_.shape[1], 3), 255)))
 
       # Use image values on mask, black otherwise
       res = np.where(mask_, image_, black).astype(np.uint8)
