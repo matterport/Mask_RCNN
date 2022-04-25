@@ -181,7 +181,11 @@ def segment(image, mask, roi):
       image_ = np.dstack((image_, np.full((image_.shape[0], image_.shape[1]), 255)))
 
       # Convert (width, height) to (width, height, 4)
-      mask_ = np.dstack((mask_, np.full((image_.shape[0], image_.shape[1], 3), 255)))
+      arr_new = np.ones((*mask_.shape, 4))
+      for i, x in enumerate(mask_):
+          for j, y in enumerate(x):
+              arr_new[i][j] = [y for _ in range(4)]
+      mask_ = arr_new
 
       # Use image values on mask, black otherwise
       res = np.where(mask_, image_, black).astype(np.uint8)
