@@ -25,6 +25,8 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 #  Configurations
 ############################################################
 
+# Specify whether images are RGB or OCN.
+IMAGE_TYPE = "OCN"
 
 class StrawberryConfig(Config):
     """Configuration for training on the strawberry dataset.
@@ -38,7 +40,10 @@ class StrawberryConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # Background + strawberry
+    if IMAGE_TYPE == "RGB":
+      NUM_CLASSES = 1 + 1  # Background + strawberry
+    else:
+      NUM_CLASSES = 1 + 3 # Background + strawberry + flower + note
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -46,8 +51,8 @@ class StrawberryConfig(Config):
     # Validation steps per epoch
     # VALIDATION_STEPS = 50
 
-    # Skip detections with < 90% confidence
-    DETECTION_MIN_CONFIDENCE = 0.9
+    # Skip detections with < 80% confidence
+    DETECTION_MIN_CONFIDENCE = 0.8
 
 
 ############################################################
@@ -61,8 +66,12 @@ class StrawberryDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
-        # Add classes. We have only one class to add.
+        # Add classes. For RGB, we have only one class to add.
         self.add_class("strawberry", 1, "strawberry")
+        if IMAGE_TYPE == "OCN":
+          # For OCN, also add the flower and note classes.
+          self.add_class("flower", 2, "flower")
+          self.add_class("note", 3, "note")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -78,12 +87,22 @@ class StrawberryDataset(utils.Dataset):
             image_name = annotation['file'].split("/")[-1]
             image_path = os.path.join(dataset_dir, image_name)
 
-            self.add_image(
-                "strawberry",
-                image_id=image_name,  # use file name as a unique image id
-                path=image_path,
-                width=width, height=height,
-                polygons=polygons)
+            if IMAGE_TYPE == "RGB":
+              self.add_image(
+                  "strawberry",
+                  image_id=image_name,  # use file name as a unique image id
+                  path=image_path,
+                  width=width, height=height,
+                  polygons=polygons)
+            else:
+              labels = [label.lower() for label in annotation['label']]
+              self.add_image(
+                  "strawberry",
+                  image_id=image_name,  # use file name as a unique image id
+                  path=image_path,
+                  width=width, height=height,
+                  polygons=polygons,
+                  annotations=labels)
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -115,9 +134,14 @@ class StrawberryDataset(utils.Dataset):
             rr, cc = skimage.draw.polygon(y, x)
             mask[rr, cc, i] = 1
 
-        # Return mask, and array of class IDs of each instance. Since we have
-        # one class ID only, we return an array of 1s
-        return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
+        if IMAGE_TYPE == "RGB":
+          # Return mask, and array of class IDs of each instance. Since we have
+          # one class ID only, we return an array of 1s
+          return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
+        else:
+          # Return mask, and array of class IDs of each instance.
+          class_ids = np.array([1 if a == 'strawberry' else (2 if a == 'flower' else 3) for a in info['annotations']]).astype(np.int32)
+          return mask.astype(np.bool), class_ids
 
     def image_reference(self, image_id):
         """Return the path of the image."""
@@ -202,6 +226,7 @@ def detect_and_segment(model, image_path=None):
     image = skimage.io.imread(args.image)
     # Detect objects
     r = model.detect([image], verbose=1)[0]
+    print('r class ids', r['class_ids'])
     # Segmentation
     segments = segment(image, r['masks'], r['rois'])
 
