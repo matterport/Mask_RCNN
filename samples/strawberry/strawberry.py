@@ -218,60 +218,44 @@ def segment(image, mask, roi):
 
 
 def calculate_iou(seg, seg_bbox, mask, mask_bbox_array):
-  highest_iou = -99999999
+  highest_iou = 0
   for mask_bbox in mask_bbox_array:
-      # If bboxes dont overlap, return 0
+      # If bboxes dont overlap, continue
       if seg_bbox[2] < mask_bbox[0] or seg_bbox[0] > mask_bbox[2] or seg_bbox[3] < mask_bbox[1] or seg_bbox[1] > mask_bbox[3]:
         continue
-
-      print('seg_bbox', seg_bbox)
-      print('mask_bbox', mask_bbox)
 
       # Calculate intersection
       x_range = [max(seg_bbox[0], mask_bbox[0]), min(seg_bbox[2], mask_bbox[2])]
       y_range = [max(seg_bbox[1], mask_bbox[1]), min(seg_bbox[3], mask_bbox[3])]
-      intersect_size = (x_range[1] - x_range[0]) * (y_range[1] - y_range[0])
-      print('intersect_size', intersect_size)
       intersection = 0
       for x in range(x_range[0], x_range[1]):
         for y in range(y_range[0], y_range[1]):
           if mask[y, x] == seg[y, x]:
             intersection += 1
-      # intersection /= intersect_size
-      print('intersection', intersection)
 
       if intersection == 0:
         print('no intersection')
         continue
 
       # Calculate union
-      seg_bbox_size = abs(seg_bbox[2] - seg_bbox[0]) * abs(seg_bbox[3] - seg_bbox[1])
-      print('seg_bbox_size', seg_bbox_size)
-      mask_bbox_size = abs(mask_bbox[2] - mask_bbox[0]) * abs(mask_bbox[3] - mask_bbox[1])
-      print('mask_bbox_size', mask_bbox_size)
+      # Union = area of seg + area of mask - intersection
       seg_union = 0
       for x in range(seg_bbox[0], seg_bbox[2]):
         for y in range(seg_bbox[1], seg_bbox[3]):
           if mask[y, x] == seg[y, x]:
             seg_union += 1
-      # seg_union /= seg_bbox_size
-      print('seg_union', seg_union)
       mask_union = 0
       for x in range(mask_bbox[0], mask_bbox[2]):
         for y in range(mask_bbox[1], mask_bbox[3]):
           if mask[y, x] == seg[y, x]:
             mask_union += 1
-      # mask_union /= mask_bbox_size
-      print('mask_union', mask_union)
       union = seg_union + mask_union - intersection     
-      print('union', union)
 
       if union == 0:
         print('no union')
         continue
 
       cur = intersection / union
-      print('cur', cur)
       if cur > highest_iou:
         highest_iou = cur
     
@@ -284,6 +268,7 @@ def detect_and_segment(model, image_path=None):
     #
     # 1. Run model detection
     #
+    print('Running model on image...')
     print("Running on {}".format(args.image))
     # Read image
     image = skimage.io.imread(args.image)
@@ -294,15 +279,23 @@ def detect_and_segment(model, image_path=None):
     #
     # 2. Calculate accuracy
     #
+    print('Calculating accuracy...')
     if not len(r['masks']):
-      print('no masks')
+      print('No strawberries were detected, exiting')
       return
     transposed_masks = np.transpose(r['masks'], [2, 0, 1])
+    iou_sum = 0
     for seg, seg_bbox in zip(transposed_masks, r['rois']):
-    # seg = transposed_masks[-2]
-    # seg_bbox = r['rois'][-2]
         # flip x and y
         seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
+
+        # Crop predicted bbox
+        # Commented out since it doesn't seem to improve IoU
+        if False:
+          x, y = np.nonzero(seg)
+          x_min, x_max = x.min(), x.max()
+          y_min, y_max = y.min(), y.max()
+          seg_bbox = [y_min, x_min, y_max, x_max]
 
         # Get annotation
         # test_annotations = json.load(open(os.path.join(ROOT_DIR, "datasets/RGBCAM1_copy_manual_split/test/my_labels.json")))
@@ -310,9 +303,8 @@ def detect_and_segment(model, image_path=None):
         test_annotations = list(test_annotations.values())  # don't need the dict keys
         image_name = image_path.split("/")[-1]
         ann = [x for x in test_annotations[0] if image_name in x['file']]
-        if (len(ann) == 0):
-          print('No annotation found for image', image_name)
-          return
+        if len(ann) == 0:
+          raise Exception('No annotation found for image', image_name)
         ann = ann[0]
         # Convert polygons to a bitmap mask of shape
         # [height, width, instance_count]
@@ -334,17 +326,24 @@ def detect_and_segment(model, image_path=None):
         # Calculate IoU
         mask_bbox = ann['bbox']
         iou = calculate_iou(seg, seg_bbox, mask, mask_bbox)
-        print('iou', iou)
-        print('---------------------------')
+        iou_sum += iou
 
+    print('average IoU', iou_sum / len(transposed_masks))
     #
-    # 3. Generate segmentation images.
+    # 3. Generate segmentation images and crop them.
     #
+    print('Creating segmented images...')
     segments = segment(image, r['masks'], r['rois'])
+    for i, s in enumerate(segments):
+      x, y = np.nonzero(s[:,:,-1])
+      x_min, x_max = x.min(), x.max()
+      y_min, y_max = y.min(), y.max()
+      segments[i] = s[x_min:x_max + 1, y_min:y_max + 1, 0:4]
     
     #
     # 4. Save output.
     #
+    print('Saving images...')
     # Create output directory
     date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join('output', date)
@@ -353,7 +352,7 @@ def detect_and_segment(model, image_path=None):
     for idx, seg in enumerate(segments):
       file_name = args.image.split('/')[-1].split('.')[0] + '_seg' + str(idx) + '.png'
       skimage.io.imsave(os.path.join('output', date, file_name), seg)
-      print("Saved to", file_name)
+    print('Done')
 
 
 ############################################################
