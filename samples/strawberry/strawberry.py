@@ -4,9 +4,13 @@ import json
 import datetime
 import numpy as np
 import skimage.draw
+from os.path import exists
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
+
+# Main directory that contains project and data
+MAIN_DIR = os.path.abspath("../../../")
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -83,9 +87,16 @@ class StrawberryDataset(utils.Dataset):
         # Add images
         for annotation in annotations[0]:
             polygons = annotation['polygon']
+            # Skip empty labels or annotations with very little data
+            if len(polygons) < 20:
+                continue
             width, height = 4000, 3000
             image_name = annotation['file'].split("/")[-1]
             image_path = os.path.join(dataset_dir, image_name)
+            # Skip non-existing images
+            file_exists = exists(image_path)
+            if not file_exists:
+                continue
 
             if IMAGE_TYPE == "RGB":
               self.add_image(
@@ -285,6 +296,34 @@ def detect_and_segment(model, image_path=None):
       return
     transposed_masks = np.transpose(r['masks'], [2, 0, 1])
     iou_sum = 0
+
+    # Get image annotation
+    test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
+    test_annotations = list(test_annotations.values())  # don't need the dict keys
+    image_name = image_path.split("/")[-1]
+    ann = [x for x in test_annotations[0] if image_name in x['file']]
+    if len(ann) == 0:
+      raise Exception('No annotation found for image', image_name)
+    ann = ann[0]
+    
+    # Convert polygons to a bitmap mask of shape
+    # [height, width, instance_count]
+    polygons = ann['polygon']
+    mask = np.zeros([3000, 4000], dtype=np.int32)
+    for polygon in polygons:
+        # Avoid single-dimension polygons 
+        # (i.e. [x, y] instead of [[x, y], [x, y], ...])
+        try:
+            len(polygon[0])
+        except:
+            continue
+        # Get indexes of pixels inside the polygon and set them to 1
+        x = [coord[0] for coord in polygon]
+        y = [coord[1] for coord in polygon]
+        rr, cc = skimage.draw.polygon(y, x)
+        mask[rr, cc] = 1
+    mask_bbox = ann['bbox']
+
     for seg, seg_bbox in zip(transposed_masks, r['rois']):
         # flip x and y
         seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
@@ -297,34 +336,6 @@ def detect_and_segment(model, image_path=None):
           y_min, y_max = y.min(), y.max()
           seg_bbox = [y_min, x_min, y_max, x_max]
 
-        # Get annotation
-        # test_annotations = json.load(open(os.path.join(ROOT_DIR, "datasets/RGBCAM1_copy_manual_split/test/my_labels.json")))
-        test_annotations = json.load(open(os.path.join(ROOT_DIR, "datasets/RGBCAM1_copy_splitted/test/my_labels.json")))
-        test_annotations = list(test_annotations.values())  # don't need the dict keys
-        image_name = image_path.split("/")[-1]
-        ann = [x for x in test_annotations[0] if image_name in x['file']]
-        if len(ann) == 0:
-          raise Exception('No annotation found for image', image_name)
-        ann = ann[0]
-        # Convert polygons to a bitmap mask of shape
-        # [height, width, instance_count]
-        polygons = ann['polygon']
-        mask = np.zeros([3000, 4000], dtype=np.int32)
-        for polygon in polygons:
-            # Avoid single-dimension polygons 
-            # (i.e. [x, y] instead of [[x, y], [x, y], ...])
-            try:
-                len(polygon[0])
-            except:
-                continue
-            # Get indexes of pixels inside the polygon and set them to 1
-            x = [coord[0] for coord in polygon]
-            y = [coord[1] for coord in polygon]
-            rr, cc = skimage.draw.polygon(y, x)
-            mask[rr, cc] = 1
-
-        # Calculate IoU
-        mask_bbox = ann['bbox']
         iou = calculate_iou(seg, seg_bbox, mask, mask_bbox)
         iou_sum += iou
 
