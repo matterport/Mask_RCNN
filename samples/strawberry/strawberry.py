@@ -30,7 +30,7 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 ############################################################
 
 # Specify whether images are RGB or OCN.
-IMAGE_TYPE = "RGB"
+IMAGE_TYPE = "OCN"
 
 class StrawberryConfig(Config):
     """Configuration for training on the strawberry dataset.
@@ -228,9 +228,12 @@ def segment(image, mask, roi):
     return segments
 
 
-def calculate_iou(seg, seg_bbox, mask, mask_bbox_array):
+def calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array):
+  # Keep track of IoU and track id of best overlapping bbox
   highest_iou = 0
-  for mask_bbox in mask_bbox_array:
+  best_track_id = -1
+  
+  for mask_bbox, track_id in zip(mask_bbox_array, track_id_array):
       # If bboxes dont overlap, continue
       if seg_bbox[2] < mask_bbox[0] or seg_bbox[0] > mask_bbox[2] or seg_bbox[3] < mask_bbox[1] or seg_bbox[1] > mask_bbox[3]:
         continue
@@ -269,8 +272,9 @@ def calculate_iou(seg, seg_bbox, mask, mask_bbox_array):
       cur = intersection / union
       if cur > highest_iou:
         highest_iou = cur
+        best_track_id = track_id
     
-  return highest_iou
+  return highest_iou, best_track_id
 
 
 def detect_and_segment(model, image_path=None):
@@ -295,17 +299,19 @@ def detect_and_segment(model, image_path=None):
       print('No strawberries were detected, exiting')
       return
     transposed_masks = np.transpose(r['masks'], [2, 0, 1])
-    iou_sum = 0
 
     # Get image annotation
-    test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
+    if args.labels:
+      test_annotations = json.load(open(args.labels))
+    else:
+      test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
     test_annotations = list(test_annotations.values())  # don't need the dict keys
     image_name = image_path.split("/")[-1]
     ann = [x for x in test_annotations[0] if image_name in x['file']]
     if len(ann) == 0:
       raise Exception('No annotation found for image', image_name)
     ann = ann[0]
-    
+
     # Convert polygons to a bitmap mask of shape
     # [height, width, instance_count]
     polygons = ann['polygon']
@@ -322,8 +328,11 @@ def detect_and_segment(model, image_path=None):
         y = [coord[1] for coord in polygon]
         rr, cc = skimage.draw.polygon(y, x)
         mask[rr, cc] = 1
-    mask_bbox = ann['bbox']
+    mask_bbox_array = ann['bbox']
+    track_id_array = ann['track_id']
 
+    iou_sum = 0
+    track_id_estimations = []
     for seg, seg_bbox in zip(transposed_masks, r['rois']):
         # flip x and y
         seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
@@ -336,8 +345,9 @@ def detect_and_segment(model, image_path=None):
           y_min, y_max = y.min(), y.max()
           seg_bbox = [y_min, x_min, y_max, x_max]
 
-        iou = calculate_iou(seg, seg_bbox, mask, mask_bbox)
+        iou, track_id = calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array)
         iou_sum += iou
+        track_id_estimations.append(track_id)
 
     print('average IoU', iou_sum / len(transposed_masks))
     #
@@ -350,6 +360,9 @@ def detect_and_segment(model, image_path=None):
       x_min, x_max = x.min(), x.max()
       y_min, y_max = y.min(), y.max()
       segments[i] = s[x_min:x_max + 1, y_min:y_max + 1, 0:4]
+
+    print(track_id_array)
+    print(track_id_estimations)
     
     #
     # 4. Save output.
@@ -360,8 +373,9 @@ def detect_and_segment(model, image_path=None):
     path = os.path.join('output', date)
     os.mkdir(path)
     # Output each segment
-    for idx, seg in enumerate(segments):
-      file_name = args.image.split('/')[-1].split('.')[0] + '_seg' + str(idx) + '.png'
+    for idx, (seg, track_id) in enumerate(zip(segments, track_id_estimations)):
+      file_name = args.image.split('/')[-1].split('.')[0] + \
+                  '_seg' + str(idx) + '_' + str(track_id) + '.png'
       skimage.io.imsave(os.path.join('output', date, file_name), seg)
     print('Done')
 
@@ -392,6 +406,9 @@ if __name__ == '__main__':
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the segmentation on')
+    parser.add_argument('--labels', required=False,
+                        metavar="path or URL to labels JSON file",
+                        help='Labels')
     args = parser.parse_args()
 
     # Validate arguments
