@@ -5,6 +5,7 @@ import datetime
 import numpy as np
 import skimage.draw
 from os.path import exists
+import csv
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -277,106 +278,122 @@ def calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array):
   return highest_iou, best_track_id
 
 
-def detect_and_segment(model, image_path=None):
-    assert image_path
-
-    #
-    # 1. Run model detection
-    #
-    print('Running model on image...')
-    print("Running on {}".format(args.image))
-    # Read image
-    image = skimage.io.imread(args.image)
-    # Detect objects
-    r = model.detect([image], verbose=1)[0]
-    print('r class ids', r['class_ids'])
-
-    #
-    # 2. Calculate accuracy
-    #
-    print('Calculating accuracy...')
-    if not len(r['masks']):
-      print('No strawberries were detected, exiting')
-      return
-    transposed_masks = np.transpose(r['masks'], [2, 0, 1])
-
-    # Get image annotation
-    if args.labels:
-      test_annotations = json.load(open(args.labels))
-    else:
-      test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
-    test_annotations = list(test_annotations.values())  # don't need the dict keys
-    image_name = image_path.split("/")[-1]
-    ann = [x for x in test_annotations[0] if image_name in x['file']]
-    if len(ann) == 0:
-      raise Exception('No annotation found for image', image_name)
-    ann = ann[0]
-
-    # Convert polygons to a bitmap mask of shape
-    # [height, width, instance_count]
-    polygons = ann['polygon']
-    mask = np.zeros([3000, 4000], dtype=np.int32)
-    for polygon in polygons:
-        # Avoid single-dimension polygons 
-        # (i.e. [x, y] instead of [[x, y], [x, y], ...])
-        try:
-            len(polygon[0])
-        except:
-            continue
-        # Get indexes of pixels inside the polygon and set them to 1
-        x = [coord[0] for coord in polygon]
-        y = [coord[1] for coord in polygon]
-        rr, cc = skimage.draw.polygon(y, x)
-        mask[rr, cc] = 1
-    mask_bbox_array = ann['bbox']
-    track_id_array = ann['track_id']
-
-    iou_sum = 0
-    track_id_estimations = []
-    for seg, seg_bbox in zip(transposed_masks, r['rois']):
-        # flip x and y
-        seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
-
-        # Crop predicted bbox
-        # Commented out since it doesn't seem to improve IoU
-        if False:
-          x, y = np.nonzero(seg)
-          x_min, x_max = x.min(), x.max()
-          y_min, y_max = y.min(), y.max()
-          seg_bbox = [y_min, x_min, y_max, x_max]
-
-        iou, track_id = calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array)
-        iou_sum += iou
-        track_id_estimations.append(track_id)
-
-    print('average IoU', iou_sum / len(transposed_masks))
-    #
-    # 3. Generate segmentation images and crop them.
-    #
-    print('Creating segmented images...')
-    segments = segment(image, r['masks'], r['rois'])
-    for i, s in enumerate(segments):
-      x, y = np.nonzero(s[:,:,-1])
-      x_min, x_max = x.min(), x.max()
-      y_min, y_max = y.min(), y.max()
-      segments[i] = s[x_min:x_max + 1, y_min:y_max + 1, 0:4]
-
-    print(track_id_array)
-    print(track_id_estimations)
-    
-    #
-    # 4. Save output.
-    #
-    print('Saving images...')
+def detect_and_segment(model, image_paths, output_dir='output'):
     # Create output directory
     date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    path = os.path.join('output', date)
+    path = os.path.join(output_dir, date)
     os.mkdir(path)
-    # Output each segment
-    for idx, (seg, track_id) in enumerate(zip(segments, track_id_estimations)):
-      file_name = args.image.split('/')[-1].split('.')[0] + \
-                  '_seg' + str(idx) + '_' + str(track_id) + '.png'
-      skimage.io.imsave(os.path.join('output', date, file_name), seg)
+
+    # Create output csv
+    # f = open('/Users/ceesjol/Documents/csv_output/' + date + '.csv', 'w')
+    # f = open(os.path.join(output_dir, date, 'output.csv'), 'w')
+    # writer = csv.writer(f)
+    # writer.writerow(["Name", "Track ID", "Pixel width"])
+
+    for image_path in image_paths:
+      # Skip JSON, DS_Store, etc.
+      if not (image_path.lower().endswith("jpg") or \
+        image_path.lower().endswith("png")):
+        continue
+
+      #
+      # 1. Run model detection
+      #
+      print('1. Running model on image...')
+      print("Running on {}".format(image_path))
+      # Read image
+      image = skimage.io.imread(image_path)
+      # Detect objects
+      r = model.detect([image], verbose=1)[0]
+
+      #
+      # 2. Calculate accuracy
+      #
+      print('2. Calculating accuracy...')
+      if not len(r['masks']):
+        print('No strawberries were detected, exiting')
+        return
+      transposed_masks = np.transpose(r['masks'], [2, 0, 1])
+
+      # Get image annotation
+      if args.labels:
+        test_annotations = json.load(open(args.labels))
+      else:
+        test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
+      test_annotations = list(test_annotations.values())  # don't need the dict keys
+      image_name = image_path.split("/")[-1]
+      ann = [x for x in test_annotations[0] if image_name in x['file']]
+      if len(ann) == 0:
+        raise Exception('No annotation found for image', image_name)
+      ann = ann[0]
+
+      # Convert polygons to a bitmap mask of shape
+      # [height, width, instance_count]
+      polygons = ann['polygon']
+      mask = np.zeros([3000, 4000], dtype=np.int32)
+      for polygon in polygons:
+          # Avoid single-dimension polygons 
+          # (i.e. [x, y] instead of [[x, y], [x, y], ...])
+          try:
+              len(polygon[0])
+          except:
+              continue
+          # Get indexes of pixels inside the polygon and set them to 1
+          x = [coord[0] for coord in polygon]
+          y = [coord[1] for coord in polygon]
+          rr, cc = skimage.draw.polygon(y, x)
+          mask[rr, cc] = 1
+      mask_bbox_array = ann['bbox']
+      track_id_array = ann['track_id']
+
+      iou_sum = 0
+      track_id_estimations = []
+      for seg, seg_bbox in zip(transposed_masks, r['rois']):
+          # flip x and y
+          seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
+
+          # Crop predicted bbox
+          # Commented out since it doesn't seem to improve IoU
+          if False:
+            x, y = np.nonzero(seg)
+            x_min, x_max = x.min(), x.max()
+            y_min, y_max = y.min(), y.max()
+            seg_bbox = [y_min, x_min, y_max, x_max]
+
+          iou, track_id = calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array)
+          iou_sum += iou
+          track_id_estimations.append(track_id)
+
+      print('average IoU', iou_sum / len(transposed_masks))
+
+      #
+      # 3. Generate segmentation images and crop them.
+      #
+      print('3. Creating segmented images...')
+      segments = segment(image, r['masks'], r['rois'])
+      for i, s in enumerate(segments):
+        x, y = np.nonzero(s[:,:,-1])
+        x_min, x_max = x.min(), x.max()
+        y_min, y_max = y.min(), y.max()
+        segments[i] = s[x_min:x_max + 1, y_min:y_max + 1, 0:4]
+
+      #
+      # 4. Save output.
+      #
+      print('4. Outputting results...')
+
+      # Output each segment
+      for idx, (seg, track_id) in enumerate(zip(segments, track_id_estimations)):
+        # Image
+        image_name = image_path.split('/')[-1].split('.')[0]
+        seg_name = '_seg' + str(idx) + '_' + str(track_id)
+        file_name = image_name + seg_name + '.png'
+        skimage.io.imsave(os.path.join(output_dir, date, file_name), seg)
+
+        # csv
+        # writer.writerow([image_name, track_id, seg.shape[1]])
+
+      # f.close()
     print('Done')
 
 
@@ -406,17 +423,23 @@ if __name__ == '__main__':
     parser.add_argument('--image', required=False,
                         metavar="path or URL to image",
                         help='Image to apply the segmentation on')
+    parser.add_argument('--folder', required=False,
+                        metavar="path or URL to folder",
+                        help='Folder to apply the segmentation on')                    
     parser.add_argument('--labels', required=False,
                         metavar="path or URL to labels JSON file",
                         help='Labels')
+    parser.add_argument('--output', required=False,
+                        metavar="Segmentation images output folder",
+                        help='Output')
     args = parser.parse_args()
 
     # Validate arguments
     if args.command == "train":
         assert args.dataset, "Argument --dataset is required for training"
     elif args.command == "segment":
-        assert args.image,\
-               "Provide --image to apply segmentation"
+        assert args.image or args.folder,\
+               "Provide --image or --folder to apply segmentation"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -472,7 +495,13 @@ if __name__ == '__main__':
     if args.command == "train":
         train(model)
     elif args.command == "segment":
-        detect_and_segment(model, image_path=args.image)
+        if args.image:
+          image_paths = [args.image]
+        else:
+          image_paths = os.listdir(args.folder)
+          image_paths = [os.path.join(args.folder, image_path) for image_path in image_paths]
+        print('image_paths: ', image_paths)
+        detect_and_segment(model, image_paths, args.output)
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'segment'".format(args.command))
