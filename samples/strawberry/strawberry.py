@@ -285,10 +285,11 @@ def detect_and_segment(model, image_paths, output_dir='output'):
     os.mkdir(path)
 
     # Create output csv
-    # f = open('/Users/ceesjol/Documents/csv_output/' + date + '.csv', 'w')
-    # f = open(os.path.join(output_dir, date, 'output.csv'), 'w')
-    # writer = csv.writer(f)
-    # writer.writerow(["Name", "Track ID", "Pixel width"])
+    f = open(os.path.join(output_dir, date, 'output.csv'), 'w')
+    writer = csv.writer(f)
+    writer.writerow(["Track ID", "Name", "Pixel width"])
+
+    track_ids = {}
 
     for image_path in image_paths:
       # Skip JSON, DS_Store, etc.
@@ -384,16 +385,26 @@ def detect_and_segment(model, image_paths, output_dir='output'):
 
       # Output each segment
       for idx, (seg, track_id) in enumerate(zip(segments, track_id_estimations)):
-        # Image
         image_name = image_path.split('/')[-1].split('.')[0]
         seg_name = '_seg' + str(idx) + '_' + str(track_id)
         file_name = image_name + seg_name + '.png'
         skimage.io.imsave(os.path.join(output_dir, date, file_name), seg)
 
-        # csv
-        # writer.writerow([image_name, track_id, seg.shape[1]])
+        # Store track id if it's not in track_ids, or if it's a newer image
+        if not track_id in track_ids or track_ids[track_id]['name'] < image_name:
+          track_ids[track_id] = {
+            'name': image_name,
+            'width': seg.shape[1],
+          }    
 
-      # f.close()
+    for key in track_ids.keys():
+      arr  = [key]
+      for val in track_ids[key]:
+          arr.append(track_ids[key][val])
+      writer.writerow(arr)
+
+    f.close()
+
     print('Done')
 
 
