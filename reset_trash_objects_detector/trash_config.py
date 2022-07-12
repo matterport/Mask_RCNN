@@ -24,7 +24,7 @@ class TrashConfig(Config):
     # GPU_COUNT = 8
 
     # Number of classes (including background)
-    NUM_CLASSES = 56  # trash has 55 classes
+    NUM_CLASSES = 55  # trash has 54 classes
 
     # Loss weights for more precise optimization.
     # Can be used for R-CNN training setup.
