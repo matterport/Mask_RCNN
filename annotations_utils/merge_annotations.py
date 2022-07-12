@@ -47,7 +47,7 @@ def merge_annotation(merged_anno, merged_original_filenames, second_anno, second
     for img in second_anno['images']:
 
         # Change filename to include folder
-        img['file_name'] = '/'.join([second_folder, img['file_name']])
+        img['file_name'] = '/'.join([second_folder, "data", img['file_name']])
 
         old_img_id = int(img['id'])
         img['id'] = int(img['id']) + merged_anno_len_img
