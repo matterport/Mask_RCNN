@@ -23,7 +23,7 @@ def create_merge_annotation(first_anno, first_folder):
     first_anno_filenames = set(['/'.join([first_folder, i['file_name']]) for i in first_anno['images']])
 
     for img in merged_anno['images']:
-        img['file_name'] = '/'.join([first_folder, img['file_name']])
+        img['file_name'] = '/'.join([first_folder, "data", img['file_name']])
 
         if int(img['id']) not in first_anno_annotations:
             merged_anno['info']['missing_annotations'].append(img['file_name'])
