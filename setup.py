@@ -34,7 +34,7 @@ except Exception:
 
 setup(
     name='mask-rcnn',
-    version='2.1',
+    version='3.0',
     url='https://github.com/Waste-NANDO/Mask_RCNN',
     author='Matterport',
     author_email='waleed.abdulla@gmail.com',
