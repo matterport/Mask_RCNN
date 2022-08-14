@@ -34,7 +34,7 @@ except Exception:
 
 setup(
     name='mask-rcnn',
-    version='2.0',
+    version='3.0',
     url='https://github.com/Waste-NANDO/Mask_RCNN',
     author='Federico Fedi',
     author_email='federico.fedi@re-learn.eu',
@@ -45,7 +45,7 @@ setup(
     include_package_data=True,
     python_requires='>=3.4',
     long_description="""This is a modified version of this project (https://github.com/matterport/Mask_RCNN) so that 
-    the Mask R-CNN model works on Re Learn use cases """,
+    the Mask R-CNN model works on Re Learn use cases and Tensorflow 2 """,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
