@@ -6,6 +6,9 @@ import numpy as np
 import skimage.draw
 from os.path import exists
 import csv
+import glob
+
+DETECTIONS_PATH = '/Users/ceesjol/Documents/Thesis/data_original/Detections/'
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../../")
@@ -30,9 +33,6 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 #  Configurations
 ############################################################
 
-# Specify whether images are RGB or OCN.
-IMAGE_TYPE = "OCN"
-
 class StrawberryConfig(Config):
     """Configuration for training on the strawberry dataset.
     Derives from the base Config class and overrides some values.
@@ -45,19 +45,48 @@ class StrawberryConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    if IMAGE_TYPE == "RGB":
-      NUM_CLASSES = 1 + 1  # Background + strawberry
-    else:
-      NUM_CLASSES = 1 + 3 # Background + strawberry + flower + note
+    NUM_CLASSES = 1 + 3 # Background + strawberry + flower + note
 
     # Number of training steps per epoch
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1
 
     # Validation steps per epoch
-    # VALIDATION_STEPS = 50
+    VALIDATION_STEPS = 1
 
     # Skip detections with < 80% confidence
     DETECTION_MIN_CONFIDENCE = 0.8
+
+
+############################################################
+#  Util
+############################################################
+
+labels = []
+def get_labels():
+  global labels
+  if len(labels) == 0:
+    labels = []
+
+    for filepath in glob.iglob(DETECTIONS_PATH + 'v1/*.json', recursive=True):
+        print(filepath)
+        my_json = json.load(open(str(filepath)))
+        my_json = my_json["images"]
+        labels += my_json
+
+    len(labels)
+
+  return labels
+
+def get_polygon(label):
+  try:
+    polygon_array = None
+    if 'predicted_polygon' in label:
+        polygon_array = label['predicted_polygon']
+    if not polygon_array or not len(polygon_array) or not polygon_array[0]:
+        polygon_array = label['polygon']
+    return polygon_array
+  except:
+    return []
 
 
 ############################################################
@@ -71,25 +100,22 @@ class StrawberryDataset(utils.Dataset):
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
-        # Add classes. For RGB, we have only one class to add.
+        # Add classes. 
         self.add_class("strawberry", 1, "strawberry")
-        if IMAGE_TYPE == "OCN":
-          # For OCN, also add the flower and note classes.
-          self.add_class("flower", 2, "flower")
-          self.add_class("note", 3, "note")
+        self.add_class("flower", 2, "flower")
+        self.add_class("note", 3, "note")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
         dataset_dir = os.path.join(dataset_dir, subset)
 
-        annotations = json.load(open(os.path.join(dataset_dir, "my_labels.json")))
-        annotations = list(annotations.values())  # don't need the dict keys
+        annotations = get_labels()
 
         # Add images
-        for annotation in annotations[0]:
-            polygons = annotation['polygon']
+        for annotation in annotations:
+            polygons = get_polygon(annotation)
             # Skip empty labels or annotations with very little data
-            if len(polygons) < 20:
+            if len(polygons) <= 2:
                 continue
             width, height = 4000, 3000
             image_name = annotation['file'].split("/")[-1]
@@ -99,22 +125,14 @@ class StrawberryDataset(utils.Dataset):
             if not file_exists:
                 continue
 
-            if IMAGE_TYPE == "RGB":
-              self.add_image(
-                  "strawberry",
-                  image_id=image_name,  # use file name as a unique image id
-                  path=image_path,
-                  width=width, height=height,
-                  polygons=polygons)
-            else:
-              labels = [label.lower() for label in annotation['label']]
-              self.add_image(
-                  "strawberry",
-                  image_id=image_name,  # use file name as a unique image id
-                  path=image_path,
-                  width=width, height=height,
-                  polygons=polygons,
-                  annotations=labels)
+            labels = [label.lower() for label in annotation['label']]
+            self.add_image(
+                "strawberry",
+                image_id=image_name,  # use file name as a unique image id
+                path=image_path,
+                width=width, height=height,
+                polygons=polygons,
+                annotations=labels)
 
     def load_mask(self, image_id):
         """Generate instance masks for an image.
@@ -146,14 +164,9 @@ class StrawberryDataset(utils.Dataset):
             rr, cc = skimage.draw.polygon(y, x)
             mask[rr, cc, i] = 1
 
-        if IMAGE_TYPE == "RGB":
-          # Return mask, and array of class IDs of each instance. Since we have
-          # one class ID only, we return an array of 1s
-          return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
-        else:
-          # Return mask, and array of class IDs of each instance.
-          class_ids = np.array([1 if a == 'strawberry' else (2 if a == 'flower' else 3) for a in info['annotations']]).astype(np.int32)
-          return mask.astype(np.bool), class_ids
+        # Return mask, and array of class IDs of each instance.
+        class_ids = np.array([1 if a == 'strawberry' else (2 if a == 'flower' else 3) for a in info['annotations']]).astype(np.int32)
+        return mask.astype(np.bool), class_ids
 
     def image_reference(self, image_id):
         """Return the path of the image."""
@@ -180,6 +193,8 @@ def train(model):
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
+    # TODO: why train only the heads?
+    # TODO: why use pretraining (COCO)?
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
@@ -217,18 +232,14 @@ def segment(image, mask, roi):
       image_ = np.dstack((image_, np.full((image_.shape[0], image_.shape[1]), 255)))
 
       # Convert (width, height) to (width, height, 4)
-      arr_new = np.ones((*mask_.shape, 4))
-      for i, x in enumerate(mask_):
-          for j, y in enumerate(x):
-              arr_new[i][j] = [y for _ in range(4)]
-      mask_ = arr_new
+      mask_ = np.dstack([mask_ for _ in range(4)])
 
       # Use image values on mask, black otherwise
       res = np.where(mask_, image_, black).astype(np.uint8)
       segments.append(res)
     return segments
 
-
+# TODO: write simplified iou function
 def calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array):
   # Keep track of IoU and track id of best overlapping bbox
   highest_iou = 0
@@ -312,18 +323,17 @@ def detect_and_segment(model, image_paths, output_dir='output'):
       #
       print('2. Calculating accuracy...')
       if not len(r['masks']):
-        print('No strawberries were detected, exiting')
-        return
+        print('No strawberries were detected, continuing')
+        continue
       transposed_masks = np.transpose(r['masks'], [2, 0, 1])
 
       # Get image annotation
       if args.labels:
         test_annotations = json.load(open(args.labels))
       else:
-        test_annotations = json.load(open(os.path.join(MAIN_DIR, "data/Images/RGBCAM1_split/test/my_labels.json")))
-      test_annotations = list(test_annotations.values())  # don't need the dict keys
+        test_annotations = get_labels()
       image_name = image_path.split("/")[-1]
-      ann = [x for x in test_annotations[0] if image_name in x['file']]
+      ann = [x for x in test_annotations if image_name in x['file']]
       if len(ann) == 0:
         raise Exception('No annotation found for image', image_name)
       ann = ann[0]
@@ -354,12 +364,10 @@ def detect_and_segment(model, image_paths, output_dir='output'):
           seg_bbox = [seg_bbox[1], seg_bbox[0], seg_bbox[3], seg_bbox[2]]
 
           # Crop predicted bbox
-          # Commented out since it doesn't seem to improve IoU
-          if False:
-            x, y = np.nonzero(seg)
-            x_min, x_max = x.min(), x.max()
-            y_min, y_max = y.min(), y.max()
-            seg_bbox = [y_min, x_min, y_max, x_max]
+          x, y = np.nonzero(seg)
+          x_min, x_max = x.min(), x.max()
+          y_min, y_max = y.min(), y.max()
+          seg_bbox = [y_min, x_min, y_max, x_max]
 
           iou, track_id = calculate_iou(seg, seg_bbox, mask, mask_bbox_array, track_id_array)
           iou_sum += iou
@@ -393,7 +401,7 @@ def detect_and_segment(model, image_paths, output_dir='output'):
         # Store track id if it's not in track_ids, or if it's a newer image
         if not track_id in track_ids or track_ids[track_id]['name'] < image_name:
           track_ids[track_id] = {
-            'name': image_name,
+            'name': file_name,
             'width': seg.shape[1],
           }    
 
