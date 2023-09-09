@@ -4,7 +4,8 @@ Pillow
 cython
 matplotlib
 scikit-image
-tensorflow
+tensorflow-cpu == 2.10
+tensorflow-directml-plugin
 keras
 opencv-python
 h5py
