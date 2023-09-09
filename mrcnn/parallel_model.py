@@ -17,7 +17,8 @@ import tensorflow as tf
 import keras.backend as K
 import keras.layers as KL
 import keras.models as KM
-    
+
+
 class ParallelModel(KM.Model):
     """Subclasses the standard Keras Model and adds multi-GPU support.
     It works by creating a copy of the model on each GPU. Then it slices
@@ -96,7 +97,8 @@ class ParallelModel(KM.Model):
                 # Keras expects losses and metrics to be scalars.
                 if K.int_shape(outputs[0]) == ():
                     # Average
-                    m = KL.Lambda(lambda o: tf.add_n(o) / len(outputs), name=name)(outputs)
+                    m = KL.Lambda(lambda o: tf.add_n(
+                        o) / len(outputs), name=name)(outputs)
                 else:
                     # Concatenate
                     m = KL.Concatenate(axis=0, name=name)(outputs)
