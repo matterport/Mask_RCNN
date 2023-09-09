@@ -79,7 +79,7 @@ def compute_backbone_shapes(config, image_shape):
         return config.COMPUTE_BACKBONE_SHAPE(image_shape)
 
     # Currently supports ResNet only
-    assert config.BACKBONE in ["resnet50", "resnet101", "mobilenetv1", "mobilenetv2"]
+    assert config.BACKBONE in ["resnet50", "resnet101"]
     return np.array(
         [[int(math.ceil(image_shape[0] / stride)),
             int(math.ceil(image_shape[1] / stride))]
@@ -205,284 +205,6 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     else:
         C5 = None
     return [C1, C2, C3, C4, C5]
-
-############################################################
-#  Mobilenet V1 Graph
-############################################################
-
-# Code adopted from:
-# https://github.com/fchollet/deep-learning-models/blob/master/mobilenet.py
-
-def relu6(x):
-    return K.relu(x, max_value=6)
-
-
-def _conv_block(inputs, filters, alpha, kernel=(3, 3), strides=(1, 1),block_id=1, train_bn=False):
-    """Adds an initial convolution layer (with batch normalization and relu6).
-    # Arguments
-        inputs: Input tensor of shape `(rows, cols, 3)`
-            (with `channels_last` data format) or
-            (3, rows, cols) (with `channels_first` data format).
-            It should have exactly 3 inputs channels,
-            and width and height should be no smaller than 32.
-            E.g. `(224, 224, 3)` would be one valid value.
-        filters: Integer, the dimensionality of the output space
-            (i.e. the number output of filters in the convolution).
-        alpha: controls the width of the network.
-            - If `alpha` < 1.0, proportionally decreases the number
-                of filters in each layer.
-            - If `alpha` > 1.0, proportionally increases the number
-                of filters in each layer.
-            - If `alpha` = 1, default number of filters from the paper
-                 are used at each layer.
-        kernel: An integer or tuple/list of 2 integers, specifying the
-            width and height of the 2D convolution window.
-            Can be a single integer to specify the same value for
-            all spatial dimensions.
-        strides: An integer or tuple/list of 2 integers,
-            specifying the strides of the convolution along the width and height.
-            Can be a single integer to specify the same value for
-            all spatial dimensions.
-            Specifying any stride value != 1 is incompatible with specifying
-            any `dilation_rate` value != 1.
-    # Input shape
-        4D tensor with shape:
-        `(samples, channels, rows, cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(samples, rows, cols, channels)` if data_format='channels_last'.
-    # Output shape
-        4D tensor with shape:
-        `(samples, filters, new_rows, new_cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(samples, new_rows, new_cols, filters)` if data_format='channels_last'.
-        `rows` and `cols` values might have changed due to stride.
-    # Returns
-        Output tensor of block.
-    """
-    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    filters = int(filters * alpha)
-    x = KL.Conv2D(filters, kernel,
-               padding='same',
-               use_bias=False,
-               strides=strides,
-               name='conv{}'.format(block_id))(inputs)
-    x = BatchNorm(axis=channel_axis, name='conv{}_bn'.format(block_id))(x, training = train_bn)
-    return KL.Activation(relu6, name='conv{}_relu'.format(block_id))(x)
-
-
-def _depthwise_conv_block(inputs, pointwise_conv_filters, alpha,
-                          depth_multiplier=1, strides=(1, 1), block_id=1, train_bn=False):
-    """Adds a depthwise convolution block.
-    A depthwise convolution block consists of a depthwise conv,
-    batch normalization, relu6, pointwise convolution,
-    batch normalization and relu6 activation.
-    # Arguments
-        inputs: Input tensor of shape `(rows, cols, channels)`
-            (with `channels_last` data format) or
-            (channels, rows, cols) (with `channels_first` data format).
-        pointwise_conv_filters: Integer, the dimensionality of the output space
-            (i.e. the number output of filters in the pointwise convolution).
-        alpha: controls the width of the network.
-            - If `alpha` < 1.0, proportionally decreases the number
-                of filters in each layer.
-            - If `alpha` > 1.0, proportionally increases the number
-                of filters in each layer.
-            - If `alpha` = 1, default number of filters from the paper
-                 are used at each layer.
-        depth_multiplier: The number of depthwise convolution output channels
-            for each input channel.
-            The total number of depthwise convolution output
-            channels will be equal to `filters_in * depth_multiplier`.
-        strides: An integer or tuple/list of 2 integers,
-            specifying the strides of the convolution along the width and height.
-            Can be a single integer to specify the same value for
-            all spatial dimensions.
-            Specifying any stride value != 1 is incompatible with specifying
-            any `dilation_rate` value != 1.
-        block_id: Integer, a unique identification designating the block number.
-    # Input shape
-        4D tensor with shape:
-        `(batch, channels, rows, cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(batch, rows, cols, channels)` if data_format='channels_last'.
-    # Output shape
-        4D tensor with shape:
-        `(batch, filters, new_rows, new_cols)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(batch, new_rows, new_cols, filters)` if data_format='channels_last'.
-        `rows` and `cols` values might have changed due to stride.
-    # Returns
-        Output tensor of block.
-    """
-    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    pointwise_conv_filters = int(pointwise_conv_filters * alpha)
-    # Depthwise
-    x = KL.DepthwiseConv2D((3, 3),
-                    padding='same',
-                    depth_multiplier=depth_multiplier,
-                    strides=strides,
-                    use_bias=False,
-                    name='conv_dw_{}'.format(block_id))(inputs)
-    x = BatchNorm(axis=channel_axis, name='conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
-    x = KL.Activation(relu6, name='conv_dw_{}_relu'.format(block_id))(x)
-    # Pointwise
-    x = KL.Conv2D(pointwise_conv_filters, (1, 1),
-                    padding='same',
-                    use_bias=False,
-                    strides=(1, 1),
-                    name='conv_pw_{}'.format(block_id))(x)
-    x = BatchNorm(axis=channel_axis, name='conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
-    return KL.Activation(relu6, name='conv_pw_{}_relu'.format(block_id))(x)
-
-
-def mobilenetv1_graph(inputs, architecture, alpha=1.0, depth_multiplier=1, train_bn = False):
-    """MobileNetv1
-    This function defines a MobileNetv1 architectures.
-    # Arguments
-        inputs: Inuput Tensor, e.g. an image
-        architecture: to preserve consistency
-        alpha: Width Multiplier
-        depth_multiplier: Resolution Multiplier
-        train_bn: Boolean. Train or freeze Batch Norm layres
-    # Returns
-        five MobileNetv1 model stages.
-    """
-    assert architecture in ["mobilenetv1"]
-    # Stage 1
-    x      = _conv_block(inputs, 32, alpha, strides=(2, 2), block_id=0, train_bn=train_bn)              #Input Resolution: 224 x 224
-    C1 = x = _depthwise_conv_block(x, 64, alpha, depth_multiplier, block_id=1, train_bn=train_bn)       #Input Resolution: 112 x 112
-
-    # Stage 2
-    x      = _depthwise_conv_block(x, 128, alpha, depth_multiplier, strides=(2, 2), block_id=2, train_bn=train_bn)
-    C2 = x = _depthwise_conv_block(x, 128, alpha, depth_multiplier, block_id=3, train_bn=train_bn)      #Input Resolution: 56 x 56
-
-    # Stage 3
-    x      = _depthwise_conv_block(x, 256, alpha, depth_multiplier, strides=(2, 2), block_id=4, train_bn=train_bn)
-    C3 = x = _depthwise_conv_block(x, 256, alpha, depth_multiplier, block_id=5, train_bn=train_bn)      #Input Resolution: 28 x 28
-
-    # Stage 4
-    x      = _depthwise_conv_block(x, 512, alpha, depth_multiplier, strides=(2, 2), block_id=6, train_bn=train_bn)
-    x      = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=7, train_bn=train_bn)
-    x      = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=8, train_bn=train_bn)
-    x      = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=9, train_bn=train_bn)
-    x      = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=10, train_bn=train_bn)
-    C4 = x = _depthwise_conv_block(x, 512, alpha, depth_multiplier, block_id=11, train_bn=train_bn)     #Input Resolution: 14 x 14
-
-    # Stage 5
-    x      = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, strides=(2, 2), block_id=12, train_bn=train_bn)
-    C5 = x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13, train_bn=train_bn)    #Input Resolution: 7x7
-    return [C1, C2, C3, C4, C5]
-
-
-############################################################
-#  MobileNetV2 Graph
-############################################################
-
-# Code adpated from:
-# https://github.com/xiaochus/MobileNetV2/blob/master/mobilenet_v2.py
-
-"""MobileNet v2 models for Keras.
-# Reference
-- [Inverted Residuals and Linear Bottlenecks Mobile Networks for
-   Classification, Detection and Segmentation]
-   (https://arxiv.org/abs/1801.04381)
-"""
-
-def _bottleneck(inputs, filters, kernel, t, s, r=False, alpha=1.0, block_id=1, train_bn = False):
-    """Bottleneck
-    This function defines a basic bottleneck structure.
-    # Arguments
-        inputs: Tensor, input tensor of conv layer.
-        filters: Integer, the dimensionality of the output space.
-        kernel: An integer or tuple/list of 2 integers, specifying the
-            width and height of the 2D convolution window.
-        t: Integer, expansion factor.
-            t is always applied to the input size.
-        s: An integer or tuple/list of 2 integers,specifying the strides
-            of the convolution along the width and height.Can be a single
-            integer to specify the same value for all spatial dimensions.
-        r: Boolean, Whether to use the residuals.
-    # Returns
-        Output tensor.
-    """
-
-    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    tchannel = K.int_shape(inputs)[channel_axis] * t
-    filters = int(alpha * filters)
-
-    x = _conv_block(inputs, tchannel, alpha, (1, 1), (1, 1),block_id=block_id,train_bn=train_bn)
-
-    x = KL.DepthwiseConv2D(kernel,
-                    strides=(s, s),
-                    depth_multiplier=1,
-                    padding='same',
-                    name='conv_dw_{}'.format(block_id))(x)
-    x = BatchNorm(axis=channel_axis,name='conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
-    x = KL.Activation(relu6, name='conv_dw_{}_relu'.format(block_id))(x)
-
-    x = KL.Conv2D(filters,
-                    (1, 1),
-                    strides=(1, 1),
-                    padding='same',
-                    name='conv_pw_{}'.format(block_id))(x)
-    x = BatchNorm(axis=channel_axis, name='conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
-
-    if r:
-        x = KL.add([x, inputs], name='res{}'.format(block_id))
-    return x
-
-
-def _inverted_residual_block(inputs, filters, kernel, t, strides, n, alpha, block_id, train_bn):
-    """Inverted Residual Block
-    This function defines a sequence of 1 or more identical layers.
-    # Arguments
-        inputs: Tensor, input tensor of conv layer.
-        filters: Integer, the dimensionality of the output space.
-        kernel: An integer or tuple/list of 2 integers, specifying the
-            width and height of the 2D convolution window.
-        t: Integer, expansion factor.
-            t is always applied to the input size.
-        s: An integer or tuple/list of 2 integers,specifying the strides
-            of the convolution along the width and height.Can be a single
-            integer to specify the same value for all spatial dimensions.
-        n: Integer, layer repeat times.
-    # Returns
-        Output tensor.
-    """
-
-    x = _bottleneck(inputs, filters, kernel, t, strides, False, alpha, block_id, train_bn)
-
-    for i in range(1, n):
-        block_id += 1
-        x = _bottleneck(x, filters, kernel, t, 1, True, alpha, block_id, train_bn)
-
-    return x
-
-
-def mobilenetv2_graph(inputs, architecture, alpha = 1.0, train_bn = False):
-    """MobileNetv2
-    This function defines a MobileNetv2 architectures.
-    # Arguments
-        inputs: Inuput Tensor, e.g. an image
-        architecture: to preserve consistency
-        alpha: Width Multiplier
-        train_bn: Boolean. Train or freeze Batch Norm layres
-    # Returns
-        five MobileNetv2 model stages.
-    """
-    assert architecture in ["mobilenetv2"]
-
-    x      = _conv_block(inputs, 32, alpha, (3, 3), strides=(2, 2), block_id=0, train_bn=train_bn)                      # Input Res: 1
-    C1 = x = _inverted_residual_block(x, 16,  (3, 3), t=1, strides=1, n=1, alpha=1.0, block_id=1, train_bn=train_bn)	# Input Res: 1/2
-    C2 = x = _inverted_residual_block(x, 24,  (3, 3), t=6, strides=2, n=2, alpha=1.0, block_id=2, train_bn=train_bn)	# Input Res: 1/2
-    C3 = x = _inverted_residual_block(x, 32,  (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=4, train_bn=train_bn)	# Input Res: 1/4
-    x      = _inverted_residual_block(x, 64,  (3, 3), t=6, strides=2, n=4, alpha=1.0, block_id=7, train_bn=train_bn)	# Input Res: 1/8
-    C4 = x = _inverted_residual_block(x, 96,  (3, 3), t=6, strides=1, n=3, alpha=1.0, block_id=11, train_bn=train_bn)	# Input Res: 1/8
-    x      = _inverted_residual_block(x, 160, (3, 3), t=6, strides=2, n=3, alpha=1.0, block_id=14, train_bn=train_bn)	# Input Res: 1/16
-    C5 = x = _inverted_residual_block(x, 320, (3, 3), t=6, strides=1, n=1, alpha=1.0, block_id=17, train_bn=train_bn)	# Input Res: 1/32
-    #x = _conv_block(x, 1280, alpha, (1, 1), strides=(1, 1), block_id=18, train_bn=train_bn)                            # Input Res: 1/32
-
-    return [C1,C2,C3,C4,C5]
 
 
 ############################################################
@@ -1261,35 +983,6 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
 
-def _timedistributed_depthwise_conv_block(inputs, pointwise_conv_filters, strides=(1, 1), block_id=1, train_bn=False):
-    """Similiar to the _depthwise_conv_block used in the Backbone,
-    but with each layer wrapped in a TimeDistributed layer,
-    used to build the computation graph of the mask head of the FPN.
-    """
-    channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-
-    # Depthwise
-    x = KL.TimeDistributed(KL.DepthwiseConv2D(
-                    (3, 3),
-                    padding='same',
-                    depth_multiplier=1,
-                    strides=strides,
-                    use_bias=False),
-                    name='mrcnn_mask_conv_dw_{}'.format(block_id))(inputs)
-    x = KL.TimeDistributed(BatchNorm(axis=channel_axis),
-                    name='mrcnn_mask_conv_dw_{}_bn'.format(block_id))(x, training=train_bn)
-    x = KL.Activation(relu6, name='mrcnn_mask_conv_dw_{}_relu'.format(block_id))(x)
-    # Pointwise
-    x = KL.TimeDistributed(KL.Conv2D(pointwise_conv_filters,
-                    (1, 1),
-                    padding='same',
-                    use_bias=False,
-                    strides=(1, 1)),
-                    name='mrcnn_mask_conv_pw_{}'.format(block_id))(x)
-    x = KL.TimeDistributed(BatchNorm(
-                    axis=channel_axis),
-                    name='mrcnn_mask_conv_pw_{}_bn'.format(block_id))(x, training=train_bn)
-    return KL.Activation(relu6, name='mrcnn_mask_conv_pw_{}_relu'.format(block_id))(x)
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
                          pool_size, num_classes, train_bn=True):
@@ -1306,32 +999,35 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
 
     Returns: Masks [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, NUM_CLASSES]
     """
-    assert backbone in ['resnet50','resnet101','mobilenetv1','mobilenetv2']
     # ROI Pooling
     # Shape: [batch, num_rois, MASK_POOL_SIZE, MASK_POOL_SIZE, channels]
     x = PyramidROIAlign([pool_size, pool_size],
                         name="roi_align_mask")([rois, image_meta] + feature_maps)
 
     # Conv layers
-    if backbone in ['resnet50','resnet101']:
-        x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv1")(x)
-        x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn1')(x, training=train_bn)
-        x = KL.Activation('relu')(x)
-        x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv2")(x)
-        x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn2')(x, training=train_bn)
-        x = KL.Activation('relu')(x)
-        x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv3")(x)
-        x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn3')(x, training=train_bn)
-        x = KL.Activation('relu')(x)
-        x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),name="mrcnn_mask_conv4")(x)
-        x = KL.TimeDistributed(BatchNorm(),name='mrcnn_mask_bn4')(x, training=train_bn)
-        x = KL.Activation('relu')(x)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),
+                           name="mrcnn_mask_conv1")(x)
+    x = KL.TimeDistributed(BatchNorm(),
+                           name='mrcnn_mask_bn1')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
 
-    if backbone in ['mobilenetv1','mobilenetv2']:
-        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 1, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 2, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 3, train_bn = train_bn)
-        x = _timedistributed_depthwise_conv_block(x, 256, block_id = 4, train_bn = train_bn)
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),
+                           name="mrcnn_mask_conv2")(x)
+    x = KL.TimeDistributed(BatchNorm(),
+                           name='mrcnn_mask_bn2')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),
+                           name="mrcnn_mask_conv3")(x)
+    x = KL.TimeDistributed(BatchNorm(),
+                           name='mrcnn_mask_bn3')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
+
+    x = KL.TimeDistributed(KL.Conv2D(256, (3, 3), padding="same"),
+                           name="mrcnn_mask_conv4")(x)
+    x = KL.TimeDistributed(BatchNorm(),
+                           name='mrcnn_mask_bn4')(x, training=train_bn)
+    x = KL.Activation('relu')(x)
 
     x = KL.TimeDistributed(KL.Conv2DTranspose(256, (2, 2), strides=2, activation="relu"),
                            name="mrcnn_mask_deconv")(x)
@@ -2195,12 +1891,12 @@ class MaskRCNN(object):
         # Bottom-up Layers
         # Returns a list of the last layers of each stage, 5 in total.
         # Don't create the thead (stage 5), so we pick the 4th item in the list.
-        if config.BACKBONE in ["resnet50", "resnet101"]:
-            _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE, stage5=True, train_bn=config.TRAIN_BN)
-        elif config.BACKBONE in ["mobilenetv1"]:
-            _, C2, C3, C4, C5 = mobilenetv1_graph(input_image, config.BACKBONE, alpha=1.0, train_bn=config.TRAIN_BN)
-        elif config.BACKBONE in ["mobilenetv2"]:
-            _, C2, C3, C4, C5 = mobilenetv2_graph(input_image, config.BACKBONE, alpha=1.0, train_bn=config.TRAIN_BN)
+        if callable(config.BACKBONE):
+            _, C2, C3, C4, C5 = config.BACKBONE(input_image, stage5=True,
+                                                train_bn=config.TRAIN_BN)
+        else:
+            _, C2, C3, C4, C5 = resnet_graph(input_image, config.BACKBONE,
+                                             stage5=True, train_bn=config.TRAIN_BN)
         # Top-down Layers
         # TODO: add assert to varify feature map sizes match what's in config
         P5 = KL.Conv2D(config.TOP_DOWN_PYRAMID_SIZE, (1, 1), name='fpn_c5p5')(C5)
@@ -2235,6 +1931,10 @@ class MaskRCNN(object):
             # A hack to get around Keras's bad support for constants
             # 원본 tf1 버전 코드
             # anchors = tf.keras.layers.Lambda(lambda x: tf.Variable(anchors), name="anchors")(input_image)
+            """케라스에서 상수 레이어에 해당하는 레이어가 없어서 람다 레이어를 사용하는 편법이 있었는데
+            이제 통하지 않는다!
+            그건 그렇고 인풋 함수가 있는데 왜 저렇게 짠거지??? 아무튼 커스텀 레이어 작성해서 상수 텐서를 리턴해주기로 함.
+            """
 
             class ConstLayer(tf.keras.layers.Layer):
                 def __init__(self, x, name=None):
@@ -2616,27 +2316,13 @@ class MaskRCNN(object):
         layer_regex = {
             # all layers but the backbone
             "heads": r"(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            # From a specific Resnet stage and up
+            "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
+            "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
             # All layers
             "all": ".*",
         }
-        if self.config.BACKBONE in ["resnet50", "resnet101"]:
-            # From a specific Resnet stage and up
-            stage_regex = { "3+": r"(res3.*)|(bn3.*)|(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "4+": r"(res4.*)|(bn4.*)|(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "5+": r"(res5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
-        elif self.config.BACKBONE in ["mobilenetv1"]:
-            # From a specific Mobilenetv1 stage and up
-            stage_regex = { "3+": r"(conv.*5.*)|(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "4+": r"(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(bn4.*)|(mob5.*)|(bn5.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "5+": r"(conv.*13.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
-        elif self.config.BACKBONE in ["mobilenetv2"]:
-            # From a specific Mobilenetv2 stage and up
-            stage_regex = { "3+": r"(conv.*6.*)|(conv.*7.*)|(conv.*8.*)|(conv.*9.*)|(conv.*10.*)|(conv.*11.*)|(conv.*12.*)|(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "4+": r"(conv.*13.*)|(conv.*14.*)|(conv.*15.*)|(conv.*16.*)|(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)",
-                            "5+": r"(conv.*17.*)|(mrcnn\_.*)|(rpn\_.*)|(fpn\_.*)" }
-
-        layer_regex.update(stage_regex)
-        
         if layers in layer_regex.keys():
             layers = layer_regex[layers]
 
