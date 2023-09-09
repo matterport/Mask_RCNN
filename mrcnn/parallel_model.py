@@ -17,8 +17,7 @@ import tensorflow as tf
 import keras.backend as K
 import keras.layers as KL
 import keras.models as KM
-
-
+    
 class ParallelModel(KM.Model):
     """Subclasses the standard Keras Model and adds multi-GPU support.
     It works by creating a copy of the model on each GPU. Then it slices
@@ -32,6 +31,7 @@ class ParallelModel(KM.Model):
         keras_model: The Keras model to parallelize
         gpu_count: Number of GPUs. Must be > 1
         """
+        super(ParallelModel, self).__init__()
         self.inner_model = keras_model
         self.gpu_count = gpu_count
         merged_outputs = self.make_parallel()
