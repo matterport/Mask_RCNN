@@ -18,7 +18,7 @@ def _parse_requirements(file_path):
     pip_version = list(map(int, pip_ver.split('.')[:2]))
     if pip_version >= [6, 0]:
         raw = pip.req.parse_requirements(file_path,
-                                         session=pip.download.PipSession())
+                                            session=pip.download.PipSession())
     else:
         raw = pip.req.parse_requirements(file_path)
     return [str(i.req) for i in raw]
