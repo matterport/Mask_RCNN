@@ -7,6 +7,12 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
+"""
+This file is modified to run on updated versions of tensorflow, keras and python. Depracted functions and libraries are removed.
+Modified by Hadia Shafiq
+"""
+## UPDATED MASK R CNN
+
 import os
 import random
 import datetime
@@ -17,18 +23,18 @@ from collections import OrderedDict
 import multiprocessing
 import numpy as np
 import tensorflow as tf
+from packaging import version
 import keras
 import keras.backend as K
 import keras.layers as KL
-import keras.engine as KE
+#import keras.engine as KE
 import keras.models as KM
 
 from mrcnn import utils
 
-# Requires TensorFlow 1.3+ and Keras 2.0.8+.
-from distutils.version import LooseVersion
-assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
-assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+# Check TensorFlow and Keras versions
+assert version.parse(tf.__version__) >= version.parse("2.13.0")
+assert version.parse(keras.__version__) >= version.parse('2.13.1')
 
 
 ############################################################
@@ -49,7 +55,6 @@ def log(text, array=None):
         text += "  {}".format(array.dtype)
     print(text)
 
-
 class BatchNorm(KL.BatchNormalization):
     """Extends the Keras BatchNormalization class to allow a central place
     to make changes if needed.
@@ -66,7 +71,6 @@ class BatchNorm(KL.BatchNormalization):
             True: (don't use). Set layer in training mode even when making inferences
         """
         return super(self.__class__, self).call(inputs, training=training)
-
 
 def compute_backbone_shapes(config, image_shape):
     """Computes the width and height of each stage of the backbone network.
@@ -126,7 +130,6 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
     return x
 
-
 def conv_block(input_tensor, kernel_size, filters, stage, block,
                strides=(2, 2), use_bias=True, train_bn=True):
     """conv_block is the block that has a conv layer at shortcut
@@ -167,7 +170,6 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name='res' + str(stage) + block + '_out')(x)
     return x
 
-
 def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     """Build a ResNet graph.
         architecture: Can be resnet50 or resnet101
@@ -206,9 +208,11 @@ def resnet_graph(input_image, architecture, stage5=False, train_bn=True):
     return [C1, C2, C3, C4, C5]
 
 
+
 ############################################################
 #  Proposal Layer
 ############################################################
+
 
 def apply_box_deltas_graph(boxes, deltas):
     """Applies the given deltas to the given boxes.
@@ -251,8 +255,7 @@ def clip_boxes_graph(boxes, window):
     clipped.set_shape((clipped.shape[0], 4))
     return clipped
 
-
-class ProposalLayer(KE.Layer):
+class ProposalLayer(KL.Layer):
     """Receives anchor scores and selects a subset to pass as proposals
     to the second stage. Filtering is done based on anchor scores and
     non-max suppression to remove overlaps. It also applies bounding
@@ -331,17 +334,15 @@ class ProposalLayer(KE.Layer):
     def compute_output_shape(self, input_shape):
         return (None, self.proposal_count, 4)
 
-
 ############################################################
 #  ROIAlign Layer
 ############################################################
 
 def log2_graph(x):
     """Implementation of Log2. TF doesn't have a native implementation."""
-    return tf.log(x) / tf.log(2.0)
+    return tf.math.log(x) / tf.math.log(2.0)
 
-
-class PyramidROIAlign(KE.Layer):
+class PyramidROIAlign(KL.Layer):
     """Implements ROI Pooling on multiple levels of the feature pyramid.
 
     Params:
@@ -482,7 +483,6 @@ def overlaps_graph(boxes1, boxes2):
     overlaps = tf.reshape(iou, [tf.shape(boxes1)[0], tf.shape(boxes2)[0]])
     return overlaps
 
-
 def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config):
     """Generates detection targets for one image. Subsamples proposals and
     generates target class IDs, bounding box deltas, and masks for each.
@@ -618,8 +618,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
 
     return rois, roi_gt_class_ids, deltas, masks
 
-
-class DetectionTargetLayer(KE.Layer):
+class DetectionTargetLayer(KL.Layer):
     """Subsamples proposals and generates target box refinement, class_ids,
     and masks for each.
 
@@ -676,7 +675,6 @@ class DetectionTargetLayer(KE.Layer):
     def compute_mask(self, inputs, mask=None):
         return [None, None, None, None]
 
-
 ############################################################
 #  Detection Layer
 ############################################################
@@ -699,7 +697,8 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Class IDs per ROI
     class_ids = tf.argmax(probs, axis=1, output_type=tf.int32)
     # Class probability of the top class of each ROI
-    indices = tf.stack([tf.range(probs.shape[0]), class_ids], axis=1)
+    #indices = tf.stack([tf.range(probs.shape[0]), class_ids], axis=1)
+    indices = tf.stack([tf.range(tf.shape(probs)[0]), class_ids], axis = 1)
     class_scores = tf.gather_nd(probs, indices)
     # Class-specific bounding box deltas
     deltas_specific = tf.gather_nd(deltas, indices)
@@ -717,9 +716,12 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     # Filter out low confidence boxes
     if config.DETECTION_MIN_CONFIDENCE:
         conf_keep = tf.where(class_scores >= config.DETECTION_MIN_CONFIDENCE)[:, 0]
-        keep = tf.sets.set_intersection(tf.expand_dims(keep, 0),
-                                        tf.expand_dims(conf_keep, 0))
-        keep = tf.sparse_tensor_to_dense(keep)[0]
+        '''keep = tf.sets.set_intersection(tf.expand_dims(keep, 0),
+                                        tf.expand_dims(conf_keep, 0))'''
+        keep = tf.sets.intersection(tf.expand_dims(keep, 0),
+                                    tf.expand_dims(conf_keep, 0))
+        #keep = tf.sparse_tensor_to_dense(keep)[0]
+        keep = tf.sparse.to_dense(keep)[0]
 
     # Apply per-class NMS
     # 1. Prepare variables
@@ -755,9 +757,13 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     nms_keep = tf.reshape(nms_keep, [-1])
     nms_keep = tf.gather(nms_keep, tf.where(nms_keep > -1)[:, 0])
     # 4. Compute intersection between keep and nms_keep
-    keep = tf.sets.set_intersection(tf.expand_dims(keep, 0),
-                                    tf.expand_dims(nms_keep, 0))
-    keep = tf.sparse_tensor_to_dense(keep)[0]
+    '''keep = tf.sets.set_intersection(tf.expand_dims(keep, 0),
+                                    tf.expand_dims(nms_keep, 0))'''
+    keep = tf.sets.intersection(tf.expand_dims(keep, 0),
+                                tf.expand_dims(nms_keep, 0))
+
+    #keep = tf.sparse_tensor_to_dense(keep)[0]
+    keep = tf.sparse.to_dense(keep)[0]
     # Keep top detections
     roi_count = config.DETECTION_MAX_INSTANCES
     class_scores_keep = tf.gather(class_scores, keep)
@@ -767,11 +773,25 @@ def refine_detections_graph(rois, probs, deltas, window, config):
 
     # Arrange output as [N, (y1, x1, y2, x2, class_id, score)]
     # Coordinates are normalized.
-    detections = tf.concat([
+    '''detections = tf.concat([
         tf.gather(refined_rois, keep),
         tf.to_float(tf.gather(class_ids, keep))[..., tf.newaxis],
         tf.gather(class_scores, keep)[..., tf.newaxis]
+        ], axis=1)'''
+
+    # dtype is deprecated
+    detections = tf.concat([
+        tf.gather(refined_rois, keep),
+        tf.cast(tf.gather(class_ids, keep),dtype=tf.float32)[..., tf.newaxis],
+        tf.gather(class_scores, keep)[..., tf.newaxis]
         ], axis=1)
+
+    # have error related to rank
+    '''detections = tf.concat([
+        tf.gather(refined_rois, keep),
+        tf.map_fn(fn=lambda x: tf.gather(x[0], x[1]),elems=(class_ids, keep),fn_output_signature=tf.float32)[..., tf.newaxis],
+        tf.gather(class_scores, keep)[..., tf.newaxis]
+        ], axis=1)'''
 
     # Pad with zeros if detections < DETECTION_MAX_INSTANCES
     gap = config.DETECTION_MAX_INSTANCES - tf.shape(detections)[0]
@@ -779,7 +799,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     return detections
 
 
-class DetectionLayer(KE.Layer):
+class DetectionLayer(KL.Layer):
     """Takes classified proposal boxes and their bounding box deltas and
     returns the final detection boxes.
 
@@ -948,10 +968,13 @@ def fpn_classifier_graph(rois, feature_maps, image_meta,
                            name='mrcnn_bbox_fc')(shared)
     # Reshape to [batch, num_rois, NUM_CLASSES, (dy, dx, log(dh), log(dw))]
     s = K.int_shape(x)
-    mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
+    if s[1]==None:
+        mrcnn_bbox = KL.Reshape((-1, num_classes, 4), name="mrcnn_bbox")(x)
+    else:
+        mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
+    #mrcnn_bbox = KL.Reshape((s[1], num_classes, 4), name="mrcnn_bbox")(x)
 
     return mrcnn_class_logits, mrcnn_probs, mrcnn_bbox
-
 
 def build_fpn_mask_graph(rois, feature_maps, image_meta,
                          pool_size, num_classes, train_bn=True):
@@ -1003,6 +1026,7 @@ def build_fpn_mask_graph(rois, feature_maps, image_meta,
     x = KL.TimeDistributed(KL.Conv2D(num_classes, (1, 1), strides=1, activation="sigmoid"),
                            name="mrcnn_mask")(x)
     return x
+
 
 
 ############################################################
@@ -2099,13 +2123,15 @@ class MaskRCNN():
         exclude: list of layer names to exclude
         """
         import h5py
+        '''
         # Conditional import to support versions of Keras before 2.2
         # TODO: remove in about 6 months (end of 2018)
         try:
             from keras.engine import saving
         except ImportError:
             # Keras before 2.2 used the 'topology' namespace.
-            from keras.engine import topology as saving
+            from keras.engine import topology as saving'''
+        from tensorflow.python.keras import saving 
 
         if exclude:
             by_name = True
@@ -2127,9 +2153,11 @@ class MaskRCNN():
             layers = filter(lambda l: l.name not in exclude, layers)
 
         if by_name:
-            saving.load_weights_from_hdf5_group_by_name(f, layers)
+            #saving.load_weights_from_hdf5_group_by_name(f, layers)
+            saving.hdf5_format.load_weights_from_hdf5_group_by_name(f, layers)
         else:
-            saving.load_weights_from_hdf5_group(f, layers)
+            #saving.load_weights_from_hdf5_group(f, layers)
+            saving.hdf5_format.load_weights_from_hdf5_group(f, layers)
         if hasattr(f, 'close'):
             f.close()
 
@@ -2717,7 +2745,6 @@ class MaskRCNN():
             log(k, v)
         return outputs_np
 
-
 ############################################################
 #  Data Formatting
 ############################################################
@@ -2866,3 +2893,4 @@ def denorm_boxes_graph(boxes, shape):
     scale = tf.concat([h, w, h, w], axis=-1) - tf.constant(1.0)
     shift = tf.constant([0., 0., 1., 1.])
     return tf.cast(tf.round(tf.multiply(boxes, scale) + shift), tf.int32)
+
