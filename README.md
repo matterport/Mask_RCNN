@@ -1,6 +1,11 @@
 # Mask R-CNN for Object Detection and Segmentation
 
-This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
+This [Mask-RCNN](https://github.com/hadia-shafiq/Mask_RCNN)  project edits the original  [Mask_RCNN](https://github.com/matterport/Mask_RCNN)  project, which only supports TensorFlow 1.0. Based on this new project, the  [Mask R-CNN](https://arxiv.org/abs/1703.06870)  can be trained and tested (i.e make predictions) in TensorFlow 2.13. 
+The Mask R-CNN model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
+
+Compared to the source code of the old  [Mask_RCNN](https://github.com/matterport/Mask_RCNN)  project, the  [Mask-RCNN-TF2](https://github.com/hadia-shafiq/Mask_RCNN)  project edits the following modules:
+
+1.  `model.py`
 
 ![Instance Segmentation Sample](assets/street.png)
 
@@ -164,7 +169,7 @@ Contributions to this repository are welcome. Examples of things you can contrib
 You can also [join our team](https://matterport.com/careers/) and help us build even more projects like this one.
 
 ## Requirements
-Python 3.4, TensorFlow 1.3, Keras 2.0.8 and other common packages listed in `requirements.txt`.
+Python 3.8, TensorFlow 2.13.1, Keras 2.13.1 and other common packages listed in `requirements.txt`.
 
 ### MS COCO Requirements:
 To train or test on MS COCO, you'll also need:
