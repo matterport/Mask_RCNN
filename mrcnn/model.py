@@ -18,10 +18,10 @@ import multiprocessing
 import numpy as np
 import tensorflow as tf
 import keras
-import keras.backend as K
-import keras.layers as KL
-import keras.engine as KE
-import keras.models as KM
+from tensorflow.keras import backend as K
+from tensorflow.keras import layers as KL
+from tensorflow.keras import models as KM
+from tensorflow.keras import layers as KE
 
 from mrcnn import utils
 
