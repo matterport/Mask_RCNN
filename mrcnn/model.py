@@ -20,7 +20,8 @@ import tensorflow as tf
 import keras
 import keras.backend as K
 import keras.layers as KL
-import keras.engine as KE
+from tensorflow.keras.layers import Layer as _Layer
+KE = type('KE', (), {'Layer': _Layer})
 import keras.models as KM
 
 from mrcnn import utils
